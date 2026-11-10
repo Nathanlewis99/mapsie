@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-cream: #fbf6ee;
+  --color-sand: #f1e8da;
+  --color-ink: #1f2430;
+  --color-coral: #ff6b4a;
+  --color-coral-dark: #e9512f;
+  --color-sea: #2bb3a6;
+  --font-sans: var(--f-ui), system-ui, sans-serif;
+  --font-display: var(--f-playfair), serif;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* ---------- poster pieces (sized by --u = 1% of poster width) ---------- */
+.mapsie-stop {
+  width: calc(var(--u) * 3);
+  height: calc(var(--u) * 3);
+  cursor: grab;
+}
+.mapsie-stop-dot {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  border: calc(var(--u) * 0.35) solid;
+  display: grid;
+  place-items: center;
+  font: 700 calc(var(--u) * 1.5) / 1 var(--f-montserrat), sans-serif;
+  box-shadow: 0 calc(var(--u) * 0.2) calc(var(--u) * 0.6) rgb(0 0 0 / 0.25);
+}
+.mapsie-stop-label {
+  position: absolute;
+  left: calc(100% + var(--u) * 0.8);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: calc(var(--u) * 0.35) calc(var(--u) * 1);
+  border-radius: calc(var(--u) * 0.8);
+  font-size: calc(var(--u) * 2);
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 calc(var(--u) * 0.15) calc(var(--u) * 0.5) rgb(0 0 0 / 0.15);
+}
+
+.mapsie-sticker {
+  cursor: grab;
+  border-radius: 8px;
+}
+.mapsie-sticker img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.25));
+  pointer-events: none;
+}
+.mapsie-sticker.is-photo img {
+  object-fit: cover;
+  border-style: solid;
+  border-color: white;
+  border-radius: 4px;
+  background: white;
+}
+.mapsie-sticker.is-selected {
+  outline: 2px dashed var(--color-coral);
+  outline-offset: 4px;
+}
+
+/* paper grain for vintage looks */
+.mapsie-paper {
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.25  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    radial-gradient(ellipse at center, transparent 55%, rgb(120 90 50 / 0.35) 100%);
+  background-size: 300px 300px, 100% 100%;
+}
+
+.maplibregl-canvas { outline: none; }

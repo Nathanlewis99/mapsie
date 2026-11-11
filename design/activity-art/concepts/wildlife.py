@@ -588,7 +588,7 @@ def dolphin_leap(d: Drawing):
     d.shape("light", cloud(14, 60, 1.0), shadow=False)
     d.shape("light", cloud(150, 44, 0.8), shadow=False)
     d.band("mid", waves(130, 4, 30))
-    dolphin(d, ((50, 134), (52, 80), (112, 44), (164, 84)), 1.35, spot=True)
+    dolphin(d, ((50, 134), (52, 80), (112, 44), (164, 84)), 1.35)
     splash(d, 46, 132, 22)
     d.band("near", waves(148, 4, 34))
     d.stroke("light", "M120 146 q8 -6 16 0 M30 160 q6 -4 12 0 M150 160 q6 -4 12 0", 2.4)
@@ -602,7 +602,7 @@ def dolphin_pod(d: Drawing):
     d.band("far", waves(112, 2, 30))
     birds(d, [(40, 48, 1), (54, 40, 0.8), (150, 44, 0.9)])
     dolphin(d, ((24, 124), (24, 96), (56, 82), (78, 100)), 0.78)
-    dolphin(d, ((70, 122), (70, 84), (114, 62), (142, 92)), 1.0, spot=True)
+    dolphin(d, ((70, 122), (70, 84), (114, 62), (142, 92)), 1.0)
     dolphin(d, ((134, 128), (134, 102), (162, 90), (182, 106)), 0.7)
     d.band("mid", waves(124, 3, 30))
     d.band("near", waves(146, 4, 34))
@@ -758,7 +758,7 @@ def croc_jaws(d: Drawing):
 
 
 def croc_sign(d: Drawing):
-    d.disc("glow", 40, 56, 18)
+    birds(d, [(150, 30, 0.9), (166, 38, 0.7)])
     d.band("far", hills(118, 8))
     for x in (150, 162, 174, 22, 34):
         d.stroke("near", f"M{x} 150 Q{x + 2} 118 {x - 4} {92 + (x % 5) * 3}", 3, line=False)

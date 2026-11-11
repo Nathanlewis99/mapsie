@@ -11,6 +11,7 @@ public/stickers/originals/ and the catalogue to src/lib/originals.json.
 import importlib
 import json
 import shutil
+import xml.etree.ElementTree as ET
 import sys
 from pathlib import Path
 
@@ -50,6 +51,13 @@ def build_module(mod: str, seen: set[str]) -> list[dict]:
             (d / f"papercut-{p}.svg").write_text(render(c, "papercut", p))
         for p in LINE_PALETTES:
             (d / f"line-{p}.svg").write_text(render(c, "line", p))
+        # Every file must be valid SVG/XML, or browsers and the print renderer will drop it.
+        for f in d.glob("*.svg"):
+            try:
+                ET.parse(f)
+            except ET.ParseError as e:
+                problems.append(f"{f.name} is not valid SVG ({e})")
+                break
         why = {p: min((round(contrast(c.colours(p)[a], c.colours(p)[b]), 2), round(delta_e(c.colours(p)[a], c.colours(p)[b])))
                       for a, b in c.checks) for p in dropped}
         manifest.append({"id": c.id, "activity": c.activity, "title": c.title, "module": mod,

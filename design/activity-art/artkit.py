@@ -96,6 +96,10 @@ class Drawing:
     def paper(self) -> bool:
         return self.style == "papercut"
 
+    def _shl(self, shadow: bool) -> str:
+        """Shadow for strokes: a fixed-area filter, because a perfectly straight line has a zero-size box."""
+        return ' filter="url(#psl)"' if (self.paper and shadow) else ""
+
     def _sh(self, shadow: bool) -> str:
         return ' filter="url(#ps)"' if (self.paper and shadow) else ""
 
@@ -125,14 +129,14 @@ class Drawing:
 
     def stroke(self, role: str, d: str, w: float = 3, shadow: bool = False, line: bool = True):
         if self.paper:
-            self.parts.append(f'<path{self._sh(shadow)} d="{d}" fill="none" stroke="{self.c[role]}" stroke-width="{w}" stroke-linecap="round" stroke-linejoin="round"/>')
+            self.parts.append(f'<path{self._shl(shadow)} d="{d}" fill="none" stroke="{self.c[role]}" stroke-width="{w}" stroke-linecap="round" stroke-linejoin="round"/>')
         elif line:
             self.parts.append(f'<path d="{d}" fill="none" stroke="{self.c["ink"]}" stroke-width="{min(w, 3.2)}" stroke-linecap="round" stroke-linejoin="round"/>')
 
     # A thick rounded stroke (arms, legs, trunks). Line style draws it as an outlined tube.
     def limb(self, role: str, d: str, w: float, shadow: bool = True, spot: bool = False):
         if self.paper:
-            self.parts.append(f'<path{self._sh(shadow)} d="{d}" fill="none" stroke="{self.c[role]}" stroke-width="{w}" stroke-linecap="round" stroke-linejoin="round"/>')
+            self.parts.append(f'<path{self._shl(shadow)} d="{d}" fill="none" stroke="{self.c[role]}" stroke-width="{w}" stroke-linecap="round" stroke-linejoin="round"/>')
         else:
             inner = self.c["spot"] if spot else self.c["paper"]
             self.parts.append(f'<path d="{d}" fill="none" stroke="{self.c["ink"]}" stroke-width="{w + 3.4}" stroke-linecap="round" stroke-linejoin="round"/>'
@@ -190,7 +194,9 @@ def render(concept: Concept, style: str, palette: str) -> str:
         body = (f'<g clip-path="url(#clip)"><rect width="200" height="200" fill="{c["sky"]}"/>{"".join(d.parts)}</g>'
                 f'<circle cx="100" cy="100" r="92" fill="none" stroke="#fff" stroke-width="4" opacity=".9"/>')
         defs = ('<clipPath id="clip"><circle cx="100" cy="100" r="92"/></clipPath>'
-                '<filter id="ps" filterUnits="userSpaceOnUse" x="-40" y="-40" width="280" height="280">'
+                '<filter id="ps" x="-20%" y="-20%" width="140%" height="140%">'
+                '<feDropShadow dx="0" dy="2.2" stdDeviation="2" flood-color="#2a1f14" flood-opacity=".33"/></filter>'
+                '<filter id="psl" filterUnits="userSpaceOnUse" x="-400" y="-400" width="1000" height="1000">'
                 '<feDropShadow dx="0" dy="2.2" stdDeviation="2" flood-color="#2a1f14" flood-opacity=".33"/></filter>')
     else:
         c = LINE_PALETTES[palette]

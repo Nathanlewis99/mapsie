@@ -9,6 +9,7 @@ import { reverseGeocode } from "@/lib/geo";
 import { itemPrice, money, posterAspect } from "@/lib/products";
 import { FONTS } from "@/lib/fonts";
 import { ART_STYLES, stickerSrc, type ArtStyleId } from "@/lib/stickers";
+import { PALETTE_NAMES, getOriginal, type OriginalStyle } from "@/lib/originals";
 import { normalizeDesign, type Design } from "@/lib/types";
 import { TripPanel, StylePanel, StickersPanel, TextPanel, SizePanel } from "./Panels";
 
@@ -173,6 +174,11 @@ export default function Editor() {
                   onStickerChange: (id, patch) => store.updateSticker(id, patch),
                   onStickerSelect: (id) => store.select(id),
                   onDropSticker: (payload, lng, lat) => {
+                    if (payload.startsWith("orig:")) {
+                      const { style, palette } = design.originals;
+                      store.addSticker({ kind: "original", name: payload.slice(5), origStyle: style, palette, src: "", lng, lat, size: 15, rotation: 0 });
+                      return;
+                    }
                     const [name, art] = payload.split("|") as [string, ArtStyleId];
                     store.addSticker({ kind: "sticker", name, art, src: stickerSrc(name, art), lng, lat, size: 9, rotation: 0 });
                   },
@@ -205,6 +211,31 @@ export default function Editor() {
                     {FONTS.map((f) => <option key={f.id} value={f.id} className="text-ink">{f.name}</option>)}
                   </select>
                   <input type="color" value={sel.color ?? design.theme.colors.ink} onChange={(e) => store.updateSticker(sel.id, { color: e.target.value }, `color-${sel.id}`)} className="w-7 h-7 rounded-full bg-transparent border-0 p-0" />
+                  <span className="w-px h-5 bg-white/20 mx-1" />
+                </>
+              )}
+              {sel.kind === "original" && sel.name && (
+                <>
+                  <select
+                    title="Style"
+                    value={sel.origStyle ?? "papercut"}
+                    onChange={(e) => store.updateSticker(sel.id, { origStyle: e.target.value as OriginalStyle, palette: "auto" })}
+                    className="bg-white/10 rounded-full px-2 py-1 outline-none"
+                  >
+                    <option value="papercut" className="text-ink">Papercut</option>
+                    <option value="line" className="text-ink">Line</option>
+                  </select>
+                  <select
+                    title="Colours"
+                    value={sel.palette ?? "auto"}
+                    onChange={(e) => store.updateSticker(sel.id, { palette: e.target.value })}
+                    className="bg-white/10 rounded-full px-2 py-1 outline-none"
+                  >
+                    <option value="auto" className="text-ink">Match map</option>
+                    {(getOriginal(sel.name)?.[sel.origStyle ?? "papercut"] ?? []).map((p) => (
+                      <option key={p} value={p} className="text-ink">{PALETTE_NAMES[sel.origStyle ?? "papercut"][p] ?? p}</option>
+                    ))}
+                  </select>
                   <span className="w-px h-5 bg-white/20 mx-1" />
                 </>
               )}

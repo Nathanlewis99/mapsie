@@ -63,6 +63,8 @@ interface EditorState {
   setRegion: (r: RegionId) => void;
   /** Change the default sticker style; optionally restyle every sticker already placed. */
   setStickerStyle: (style: ArtStyleId, applyToAll: boolean) => void;
+  /** Change the default style/palette for Mapsie Originals and apply it to those already placed. */
+  setOriginals: (patch: Partial<Design["originals"]>) => void;
   ensureRoads: () => Promise<void>;
 }
 
@@ -186,6 +188,15 @@ export const useEditor = create<EditorState>()(
           afterStopsChange();
         },
         setRegion: (region) => set({ region }),
+        setOriginals: (patch) =>
+          commit((d) => {
+            const originals = { ...d.originals, ...patch };
+            return {
+              ...d,
+              originals,
+              stickers: d.stickers.map((x) => (x.kind === "original" ? { ...x, origStyle: originals.style, palette: originals.palette } : x)),
+            };
+          }),
         setStickerStyle: (style, applyToAll) =>
           commit((d) => ({
             ...d,

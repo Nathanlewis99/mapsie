@@ -5,6 +5,18 @@ import { searchPlaces, MODES, type PlaceResult } from "@/lib/geo";
 import { PRESETS, themeFromPreset } from "@/lib/themes";
 import { ART_STYLES, PACKS, STICKERS, getArtStyle, searchStickers, stickerSrc, suggestedStyleFor, type ArtStyleId } from "@/lib/stickers";
 import StickerFilters, { filterId } from "@/components/StickerFilters";
+import {
+  ORIGINALS,
+  ORIGINAL_CATEGORIES,
+  PALETTE_NAMES,
+  PALETTE_SWATCH,
+  matchedPalette,
+  originalSrc,
+  resolvePalette,
+  searchOriginals,
+  type OriginalDef,
+  type OriginalStyle,
+} from "@/lib/originals";
 import { FONTS } from "@/lib/fonts";
 import { PRODUCTS, FRAMES, money, getRegion, REGIONS } from "@/lib/products";
 import { TEMPLATES } from "@/lib/templates";
@@ -377,12 +389,11 @@ function SuggestionCard() {
   );
 }
 
-export function StickersPanel() {
+function EmojiStickers() {
   const { design, addSticker, setStickerStyle } = useEditor();
-  const fileRef = useRef<HTMLInputElement>(null);
+  const at = useDropPoint();
   const [q, setQ] = useState("");
   const [showAllStyles, setShowAllStyles] = useState(false);
-  const [cx, cy] = design.view.center;
   const style = design.stickerStyle;
   const suggested = suggestedStyleFor(design.theme.presetId);
   const results = searchStickers(q);
@@ -390,22 +401,8 @@ export function StickersPanel() {
   const placed = design.stickers.filter((s) => s.kind === "sticker");
   const mixed = placed.some((s) => s.art !== style);
 
-  // Scatter new stickers around the middle of the map so they don't stack up.
-  const degPerPx = 360 / (512 * 2 ** design.view.zoom);
-  const jitter = () => (Math.random() - 0.5) * 220 * degPerPx;
-  const at = () => ({ lng: cx + jitter(), lat: cy + jitter() * 0.7 });
   const place = (name: string, art: ArtStyleId = style) =>
     addSticker({ kind: "sticker", name, art, src: stickerSrc(name, art), ...at(), size: 9, rotation: 0 });
-
-  const onFile = async (f: File) => {
-    const img = await createImageBitmap(f);
-    const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
-    const c = document.createElement("canvas");
-    c.width = Math.round(img.width * scale);
-    c.height = Math.round(img.height * scale);
-    c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
-    addSticker({ kind: "photo", src: c.toDataURL("image/jpeg", 0.88), ...at(), size: 16, rotation: -4 });
-  };
 
   const tile = (name: string, art: ArtStyleId, title?: string) => (
     <button
@@ -459,19 +456,6 @@ export function StickersPanel() {
 
       <SuggestionCard />
 
-      <div className="grid grid-cols-2 gap-2">
-        <button onClick={() => fileRef.current?.click()} className="rounded-2xl border-2 border-dashed border-ink/15 px-3 py-3 font-bold text-ink/70 hover:border-coral hover:text-coral">
-          📸 Your photo
-        </button>
-        <button
-          onClick={() => addSticker({ kind: "text", src: "", text: "Best day ever!", font: "caveat", ...at(), size: 4, rotation: -6 })}
-          className="rounded-2xl border-2 border-dashed border-ink/15 px-3 py-3 font-bold text-ink/70 hover:border-coral hover:text-coral"
-        >
-          ✍️ Text note
-        </button>
-      </div>
-      <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
-
       <div className="relative">
         <input
           value={q}
@@ -503,6 +487,181 @@ export function StickersPanel() {
         ))
       )}
       <p className="text-[11px] text-ink/40">Artwork: Microsoft Fluent Emoji (MIT) and Twemoji (CC-BY 4.0).</p>
+    </div>
+  );
+}
+
+/** Where to drop a new sticker: scattered around the middle of the current view so they don't stack up. */
+function useDropPoint() {
+  const { design } = useEditor();
+  const [cx, cy] = design.view.center;
+  const degPerPx = 360 / (512 * 2 ** design.view.zoom);
+  const jitter = () => (Math.random() - 0.5) * 220 * degPerPx;
+  return () => ({ lng: cx + jitter(), lat: cy + jitter() * 0.7 });
+}
+
+function ExtrasRow() {
+  const { addSticker } = useEditor();
+  const at = useDropPoint();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const onFile = async (f: File) => {
+    const img = await createImageBitmap(f);
+    const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.width * scale);
+    c.height = Math.round(img.height * scale);
+    c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
+    addSticker({ kind: "photo", src: c.toDataURL("image/jpeg", 0.88), ...at(), size: 16, rotation: -4 });
+  };
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      <button onClick={() => fileRef.current?.click()} className="rounded-2xl border-2 border-dashed border-ink/15 px-3 py-3 font-bold text-ink/70 hover:border-coral hover:text-coral">
+        📸 Your photo
+      </button>
+      <button
+        onClick={() => addSticker({ kind: "text", src: "", text: "Best day ever!", font: "caveat", ...at(), size: 4, rotation: -6 })}
+        className="rounded-2xl border-2 border-dashed border-ink/15 px-3 py-3 font-bold text-ink/70 hover:border-coral hover:text-coral"
+      >
+        ✍️ Text note
+      </button>
+      <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
+    </div>
+  );
+}
+
+function Swatch({ name }: { name: string }) {
+  const [a, b, c] = PALETTE_SWATCH[name] ?? ["#eee", "#ccc", "#999"];
+  return (
+    <span className="inline-flex w-6 h-6 rounded-full overflow-hidden border border-ink/10 shrink-0" aria-hidden>
+      <span className="flex-1" style={{ background: a }} />
+      <span className="flex-1" style={{ background: b }} />
+      <span className="flex-1" style={{ background: c }} />
+    </span>
+  );
+}
+
+function OriginalsPanel() {
+  const { design, addSticker, setOriginals } = useEditor();
+  const at = useDropPoint();
+  const [q, setQ] = useState("");
+  const { style, palette } = design.originals;
+  const preset = design.theme.presetId;
+  const matched = matchedPalette(preset, style);
+  const resolved = resolvePalette(palette, preset, style);
+  const results = searchOriginals(q);
+  const byActivity = new Map<string, OriginalDef[]>();
+  for (const o of results) byActivity.set(o.activity, [...(byActivity.get(o.activity) ?? []), o]);
+  const categories = ORIGINAL_CATEGORIES.filter((c) => results.some((o) => o.category === c));
+  const presetName = PRESETS.find((p) => p.id === preset)?.name ?? "your";
+  const placed = design.stickers.filter((s) => s.kind === "original").length;
+
+  const place = (id: string) => addSticker({ kind: "original", name: id, origStyle: style, palette, src: "", ...at(), size: 15, rotation: 0 });
+
+  return (
+    <div className="space-y-5">
+      <div className="rounded-2xl bg-sand/60 p-3 text-sm text-ink/70">
+        Our own artwork, drawn for Mapsie. {ORIGINALS.length} designs across {new Set(ORIGINALS.map((o) => o.activity)).size} activities. Tap to add, or drag onto the map.
+      </div>
+
+      <div>
+        <Label>Style</Label>
+        <div className="grid grid-cols-2 gap-2">
+          {(["papercut", "line"] as OriginalStyle[]).map((st) => (
+            <button
+              key={st}
+              onClick={() => setOriginals({ style: st, palette: "auto" })}
+              className={`rounded-2xl border-2 p-2 flex items-center gap-2 transition ${style === st ? "border-coral bg-white" : "border-transparent bg-white/60 hover:border-ink/15"}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={originalSrc("safari-giraffe", st, matchedPalette(preset, st))} alt="" className="w-12 h-12" />
+              <span className="font-extrabold text-sm">{st === "papercut" ? "Papercut" : "Line"}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <Label>Colours</Label>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setOriginals({ palette: "auto" })}
+            className={`flex items-center gap-1.5 rounded-full border-2 pl-1 pr-3 py-1 text-sm font-bold ${palette === "auto" ? "border-coral bg-white" : "border-ink/10 bg-white"}`}
+          >
+            <Swatch name={matched} /> ✨ Match {presetName} map
+          </button>
+          {Object.entries(PALETTE_NAMES[style]).map(([id, name]) => (
+            <button
+              key={id}
+              onClick={() => setOriginals({ palette: id })}
+              className={`flex items-center gap-1.5 rounded-full border-2 pl-1 pr-3 py-1 text-sm font-bold ${palette === id ? "border-coral bg-white" : "border-ink/10 bg-white"}`}
+            >
+              <Swatch name={id} /> {name}
+            </button>
+          ))}
+        </div>
+        {placed > 0 && <p className="text-xs text-ink/50 mt-2">Applies to the {placed} Mapsie Original{placed > 1 ? "s" : ""} on your map too.</p>}
+      </div>
+
+      <ExtrasRow />
+
+      <div className="relative">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="🔍 Search: safari, diving, ramen, skiing…"
+          className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral"
+        />
+        {q && <button onClick={() => setQ("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/40 font-bold px-2">✕</button>}
+      </div>
+
+      {results.length === 0 && <div className="text-sm text-ink/50">Nothing matches “{q}” yet. Try the activity, like “boat” or “mountain”.</div>}
+      {categories.map((cat) => (
+        <div key={cat}>
+          <Label>{cat}</Label>
+          <div className="space-y-3">
+            {[...byActivity.entries()]
+              .filter(([, list]) => list[0].category === cat)
+              .map(([activity, list]) => (
+                <div key={activity}>
+                  <div className="text-sm font-extrabold mb-1">{list[0].label}</div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {list.map((o) => (
+                      <button
+                        key={o.id}
+                        title={o.title}
+                        draggable
+                        onDragStart={(e) => e.dataTransfer.setData(stickerDragType, `orig:${o.id}`)}
+                        onClick={() => place(o.id)}
+                        className="rounded-2xl p-1.5 hover:scale-105 hover:-rotate-3 transition"
+                        style={{ background: style === "line" && resolved === "night" ? "#1F2A44" : "transparent" }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={originalSrc(o.id, style, resolved)} alt={o.title} loading="lazy" className="w-full aspect-square pointer-events-none" />
+                        <div className="text-[11px] font-bold text-ink/60 leading-tight mt-0.5 truncate">{o.title}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function StickersPanel() {
+  const [collection, setCollection] = useState<"originals" | "emoji">("originals");
+  return (
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-1 rounded-full bg-sand/70 p-1">
+        {([["originals", "✨ Mapsie Originals"], ["emoji", "😀 Emoji stickers"]] as const).map(([id, label]) => (
+          <button key={id} onClick={() => setCollection(id)} className={`rounded-full py-2 text-sm font-extrabold transition ${collection === id ? "bg-white shadow-sm" : "text-ink/50"}`}>
+            {label}
+          </button>
+        ))}
+      </div>
+      {collection === "originals" ? <OriginalsPanel /> : (<><ExtrasRow /><EmojiStickers /></>)}
     </div>
   );
 }

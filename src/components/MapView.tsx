@@ -8,6 +8,7 @@ import { buildLegs, routeGeoJSON, stopsBounds, MODES } from "@/lib/geo";
 import { loadCountries, visitedCountries } from "@/lib/countries";
 import { fontCss } from "@/lib/fonts";
 import { getArtStyle, stickerSrc } from "@/lib/stickers";
+import { originalSrc, resolvePalette } from "@/lib/originals";
 import { filterId } from "./StickerFilters";
 
 export interface MapHandlers {
@@ -310,7 +311,7 @@ export default function MapView(props: Props) {
   );
 
   // --- stickers, photos and text notes, pinned to a place on the map
-  const stickersKey = JSON.stringify([design.stickers, selectedSticker, width, editable, design.theme.colors.land]);
+  const stickersKey = JSON.stringify([design.stickers, selectedSticker, width, editable, design.theme.colors.land, design.theme.presetId]);
   useEffect(
     () =>
       whenMap((mm) => {
@@ -331,7 +332,12 @@ export default function MapView(props: Props) {
             node.style.width = `${px}px`;
             node.style.height = `${px}px`;
             const img = document.createElement("img");
-            img.src = st.kind === "sticker" && st.name ? stickerSrc(st.name, st.art) : st.src;
+            img.src =
+              st.kind === "original" && st.name
+                ? originalSrc(st.name, st.origStyle ?? "papercut", resolvePalette(st.palette ?? "auto", design.theme.presetId, st.origStyle ?? "papercut"))
+                : st.kind === "sticker" && st.name
+                  ? stickerSrc(st.name, st.art)
+                  : st.src;
             if (art && art.finish !== "none") img.style.filter = `url(#${filterId(filterPrefix, art.finish)})`;
             img.draggable = false;
             img.alt = "";

@@ -849,7 +849,8 @@ def cobra_hood(d: Drawing, spot=True):
     d.shape("hero", "M100 28 C112 28 119 36 119 46 C119 56 110 62 100 62 C90 62 81 56 81 46 C81 36 88 28 100 28Z")
     d.stroke("mark", "M92 34 L100 38 L108 34 M100 38 V48 M92 48 Q100 52 108 48", 1.2, line=False)
     for x in (88, 112):
-        d.shape("hero2", circle(x, 44, 3.4), shadow=False)
+        if d.paper:
+            d.shape("hero2", circle(x, 44, 3.4), shadow=False)
         d.marks("mark", circle(x, 44, 2))
     d.stroke("pop", "M100 62 L100 72 M100 72 L96 78 M100 72 L104 78", 1.8)
 
@@ -1060,11 +1061,11 @@ RP_EAR = "M50 74 C44 54 52 38 66 34 C74 44 78 58 76 68Z"
 def redpanda_head(d: Drawing):
     for side in (False, True):
         def ear():
-            d.shape("hero", RP_EAR)
+            d.shape("hero", RP_EAR, spot=True)
             d.shape("hero2", "M56 66 C52 54 56 44 64 41 C69 48 71 58 70 64Z", shadow=False, line=False)
             d.stroke("light", "M50 72 C44 54 52 38 66 34", 3)
         flip(d, ear) if side else ear()
-    d.shape("hero", "M100 50 C130 50 152 66 154 92 C156 116 136 136 100 136 C64 136 44 116 46 92 C48 66 70 50 100 50Z")
+    d.shape("hero", "M100 50 C130 50 152 66 154 92 C156 116 136 136 100 136 C64 136 44 116 46 92 C48 66 70 50 100 50Z", spot=True)
     d.shape("light", ellipse(64, 106, 13, 10), shadow=False)
     d.shape("light", ellipse(136, 106, 13, 10), shadow=False)
     d.shape("light", ellipse(80, 74, 7, 5), shadow=False)
@@ -1250,7 +1251,7 @@ def snowleopard_face(d: Drawing):
 
 
 def snowleopard_ledge(d: Drawing):
-    d.disc("glow", 160, 46, 14)
+    d.disc("glow", 148, 48, 13)
     d.band("near", "M-30 124 L20 92 L44 108 L84 50 L118 90 L152 58 L190 84 L230 70")
     for s in ["M84 50 L96 66 L89 64 L84 70 L78 64 L72 68Z", "M152 58 L162 72 L156 70 L151 76 L146 70 L142 73Z", "M20 92 L28 102 L22 100 L18 104 L13 99Z"]:
         d.shape("light", s, shadow=False)
@@ -1258,7 +1259,7 @@ def snowleopard_ledge(d: Drawing):
     d.band("deep", "M-30 150 L40 136 L80 146 L130 130 L230 144")
     d.shape("rock", "M230 200 L230 134 L150 128 L72 130 C62 132 58 138 62 146 L70 152 L110 156 L118 200Z")
     d.shape("rock2", "M62 146 L70 152 L110 156 L118 200 L230 200 L230 168 L120 162Z", shadow=False)
-    flip(d, lambda: group(d, "translate(-30 2)", lambda: cat_lying(
+    flip(d, lambda: group(d, "translate(-16 2)", lambda: cat_lying(
         d, "M150 116 C168 120 174 140 168 162 C164 174 170 182 178 180", tail_w=10, spots="snow", ear_r=4.6)))
     d.band("deep", hills(192, 3, 30), line=False)
 

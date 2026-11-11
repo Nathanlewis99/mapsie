@@ -395,7 +395,7 @@ def highlandcow_glen(d: Drawing):
     mist(d, 112, 3, 40, ".5")
     d.band("mid", hills(140, 6, 30))
     d.band("near", hills(160, 4, -20))
-    group(d, "translate(100 156) scale(1.04) translate(-96 -164)", lambda: coo_side(d))
+    group(d, "translate(104 156) scale(1.0) translate(-96 -164)", lambda: coo_side(d))
     d.band("ground", hills(178, 3, 10))
     for x in range(-6, 210, 13):
         d.shape("heather", scallop(x, 178 + (x * 7 % 6), 5.5, 7, 0.2), shadow=False, line=False)
@@ -580,7 +580,7 @@ def brownbear_forest(d: Drawing):
         pine(d, x, 146, h, "near", line=x < 140)
     d.band("far", hills(140, 4), line=False)
     d.band("mid", hills(150, 3, 30))
-    group(d, "translate(104 164) scale(1.0) translate(-90 -164)", lambda: bear_side(d))
+    group(d, "translate(100 164) scale(.92) translate(-90 -164)", lambda: bear_side(d))
     d.band("ground", hills(170, 3, 20))
     for x, y, r in [(24, 176, 8), (150, 182, 10), (172, 176, 6)]:
         d.shape("far", ellipse(x, y, r * 1.4, r * 0.8))
@@ -795,7 +795,7 @@ def redsquirrel_pine(d: Drawing):
         needles(d, x, y)
     cone(d, 40, 130, 1.0)
     cone(d, 120, 132, 0.9)
-    group(d, "translate(94 127) scale(.78) translate(-100 -172)", lambda: squirrel(d))
+    group(d, "translate(92 128) scale(.72) translate(-100 -172)", lambda: squirrel(d))
     for x, y in [(150, 128), (186, 80)]:
         needles(d, x, y, 1.1)
     d.band("near", hills(190, 3), line=False)
@@ -1089,9 +1089,9 @@ def swan_cygnets(d: Drawing):
     d.raw('<g opacity=".5">', "")
     d.stroke("light", "M30 132 H70 M120 128 H170 M40 170 H90 M130 176 H180", 2, line=False)
     d.raw("</g>", "")
-    group(d, "translate(102 118) scale(1.08) translate(-110 -120)", lambda: swan_glide(d))
-    cygnet(d, 152, 146, 1.0)
-    cygnet(d, 178, 150, 0.85)
+    group(d, "translate(108 118) scale(1.04) translate(-110 -120)", lambda: swan_glide(d))
+    cygnet(d, 154, 148, 1.0)
+    cygnet(d, 176, 154, 0.85)
     d.stroke("lake2", "M50 150 q12 -4 24 0 M88 154 q12 -4 24 0 M138 152 q6 -2 12 0", 2)
     for x, h in [(12, 74), (20, 92), (28, 66), (180, 70), (190, 88)]:
         d.stroke("near", f"M{x} 200 Q{x + 2} {200 - h / 2} {x - 2} {200 - h}", 2.4, line=False)
@@ -1181,8 +1181,9 @@ def falcon_stoop(d: Drawing):
     wing = taper([(84, 114), (110, 90), (136, 64), (164, 36)], 1, 1, wf=lambda t: 9 * (1 - t) ** 0.7 + 1)
     group(d, "translate(-4 -3)", lambda: d.shape("hero2", wing, spot=True))
     d.stroke("hero", "M118 82 L150 50 M126 78 L158 46", 1.2, line=False)
-    d.shape("hero", circle(64, 134, 11))
-    d.shape("light", P([(64, 138), (72, 134), (76, 142), (68, 146)]), shadow=False)
+    d.shape("hero", circle(64, 134, 12.5))
+    d.shape("light", P([(62, 140), (72, 134), (78, 140), (72, 148), (64, 147)]), shadow=False)
+    d.marks("hero", P([(66, 136), (70, 136), (68, 147), (64, 146)]))
     d.shape("beak", P([(56, 140, 1), (52, 146), (50, 152, 1), (56, 148), (60, 144)]))
     d.shape("pop", circle(60, 132, 3.6), shadow=False)
     d.marks("mark", circle(60, 132, 2.4))
@@ -1336,8 +1337,8 @@ def parrot_portrait(d: Drawing):
 
 def macaw_flying(d: Drawing):
     d.shape("pop2", taper([(112, 102), (124, 120), (136, 136)], 7, 2))
-    d.shape("hero", taper([(126, 96), (150, 112), (172, 130), (192, 150)], 6, 1.5), spot=True)
-    d.shape("pop2", taper([(132, 98), (156, 116), (178, 136), (196, 156)], 2.5, 1.2), shadow=False, line=False)
+    d.shape("hero", taper([(126, 96), (148, 112), (166, 128), (182, 144)], 6, 1.5), spot=True)
+    d.shape("pop2", taper([(132, 98), (152, 114), (170, 132), (186, 148)], 2.5, 1.2), shadow=False, line=False)
     d.shape("hero", P([(58, 88), (70, 78), (96, 78), (120, 86), (134, 96), (120, 102), (92, 102), (70, 98)]), spot=True)
     wing = [(86, 82), (94, 58), (110, 38)] + fingers(128, 34, 8, 24, 210, 330, 5)[1:-1] + [(140, 46), (122, 66), (110, 86)]
     d.shape("pop2", P(wing))
@@ -1359,7 +1360,7 @@ def parrot_flight(d: Drawing):
     for x in range(-6, 220, 30):
         d.shape("near", scallop(x, 192 - (x * 3 % 8), 16, 8, 0.16), shadow=False, line=False)
     d.band("near", hills(190, 3), line=False)
-    group(d, "translate(100 108) scale(1.12) translate(-110 -90)", lambda: macaw_flying(d))
+    group(d, "translate(98 108) scale(1.12) translate(-110 -90)", lambda: macaw_flying(d))
 
 
 # ================================================================ colours
@@ -1402,7 +1403,7 @@ CONCEPTS = [
             checks=[("hero", "sky"), ("mane", "sky"), ("horn", "sky"), ("hero", "near"), ("hero", "mid"), ("horn", "far")],
             fixes={"near": ["deep", "far", "ground"], "mid": ["far", "near"], "horn": ["#9C7E56", "#EFE3C8"], "sky": ["sky2"]}),
     Concept("highlandcow-portrait", "animal-highland-cow", "Highland coo", highlandcow_portrait, overrides=COO,
-            checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("horn2", "sky"), ("hero", "glow")],
+            checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("horn2", "sky"), ("hero", "glow"), ("hero2", "glow")],
             fixes={"far": ["mid", "near", "deep"], "mid": ["near", "deep"], "glow": ["glow2", "light"], "horn": ["#D2BC8E", "#BFA273"]}),
     Concept("highlandcow-glen", "animal-highland-cow", "Coo in the glen", highlandcow_glen, overrides=COO,
             checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("horn2", "sky"), ("heather", "ground")],

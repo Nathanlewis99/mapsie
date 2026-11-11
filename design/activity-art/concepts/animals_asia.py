@@ -264,15 +264,15 @@ def slothbear_yala(d: Drawing):
     def bear():
         d.limb("mark", "M108 132 L104 166", 13)
         d.limb("mark", "M152 132 L156 166", 13)
-        d.shape("hero", tufty(126, 120, 42, 27, 30, 0.09))
-        d.shape("hero", tufty(98, 112, 27, 27, 18, 0.12))
+        d.shape("hero", tufty(126, 120, 42, 27, 30, 0.09), spot=True)
+        d.shape("hero", tufty(98, 112, 27, 27, 18, 0.12), spot=True)
         d.limb("hero", "M92 130 L88 166", 14)
         d.limb("hero", "M142 132 C146 146 144 156 142 166", 14)
         d.stroke("light", "M84 170 q-6 -1 -9 3 M88 171 q-6 0 -8 5 M92 171 q-5 1 -6 6 M138 170 q-6 -1 -9 3 M142 171 q-6 0 -8 5", 1.8)
         for ex, ey in [(64, 100), (80, 96)]:
             d.shape("hero", tufty(ex, ey, 7.5, 7.5, 8, 0.3))
         d.shape("hero", tufty(72, 114, 18, 17, 14, 0.13))
-        d.shape("hero2", "M66 108 C56 110 46 118 42 128 C40 133 44 137 49 136 C58 134 68 130 80 124Z", spot=True)
+        d.shape("hero2", "M66 108 C56 110 46 118 42 128 C40 133 44 137 49 136 C58 134 68 130 80 124Z")
         d.marks("mark", ellipse(43, 131, 4.2, 3.3))
         d.marks("light", circle(70, 108, 1.8))
         d.shape("light", "M86 122 L94 140 L102 122 L97 121 L94 130 L91 121Z", shadow=False)
@@ -395,7 +395,7 @@ def cat_lying(d: Drawing, tail, tail_w=6, spots="rosette", ear_r=5.5):
         d.marks("mark", circle(52, 84, 1.2) + circle(60, 82, 1.3) + circle(68, 84, 1.2) + circle(56, 80, 1) + circle(64, 79, 1))
         d.shape("light", ellipse(59, 102, 8.5, 6), shadow=False)
         d.marks("mark", circle(53, 92, 1.9) + circle(66, 92, 1.9) + "M56 98 L62 98 L59 102Z")
-    group(d, "translate(60 104) scale(1.3) translate(-60 -104)", head)
+    group(d, "translate(60 104) scale(1.15) translate(-60 -104)", head)
 
 
 def srileopard_rock(d: Drawing):
@@ -820,8 +820,8 @@ def bluewhale_mirissa(d: Drawing):
     ))
     d.band("mid", waves(108, 3, 30))
     # the tall, straight blow of a blue whale
-    d.shape("light", "M58 134 C57 110 55 86 51 64 C44 58 42 46 49 40 C51 30 62 28 66 35 C73 32 80 42 75 50 "
-                     "C70 56 66 60 66 68 C66 92 67 114 68 134Z", spot=True)
+    d.shape("light", "M60 134 C58 112 53 90 45 70 C39 58 41 46 49 44 C51 36 58 34 62 40 C66 34 74 36 76 44 "
+                     "C84 46 86 58 80 70 C72 90 68 112 68 134Z", spot=True)
     for x, y, r in [(42, 54, 2.2), (82, 52, 2.4), (46, 70, 1.8), (78, 68, 1.8), (60, 22, 1.8)]:
         d.shape("light", drop(x, y, r), shadow=False)
     d.shape("hero", "M30 148 C40 136 70 126 112 125 C150 124 190 130 230 142 L230 170 L30 170Z")
@@ -1262,7 +1262,7 @@ def snowleopard_ledge(d: Drawing):
 
 # ================================================================ MACAQUE
 MACAQUE = {"hero": "#B9AA94", "hero2": "#8F8170", "face": "#E0705E", "face2": "#C9524A", "mark": "#2A1E1A", "light": "#FFFFFF",
-           "water": "#4E9AAE", "water2": "#A9DCE4", "rock": "#7D7A76"}
+           "water": "#3E8BA0", "water2": "#A9DCE4", "rock": "#7D7A76"}
 
 
 def macaque_head(d: Drawing, sleepy=False, snow=True):

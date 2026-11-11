@@ -422,7 +422,7 @@ def _jelly(d: Drawing, x, y, s, spot=False):
     def draw():
         d.stroke("hero2", "M-10 0 q-4 10 0 20 t0 20 M-3 0 q4 12 0 24 t0 22 M4 0 q-4 11 0 22 t0 18 M11 0 q4 9 0 18 t0 16", 2.4)
         d.shape("hero", JELLY_BELL, spot=spot)
-        d.shape("light", "M-9 -12 C-7 -16 -3 -18 1 -18", shadow=False, line=False, extra='fill="none" stroke="#fff" stroke-width="2" opacity=".7"')
+        d.stroke("light", "M-9 -12 C-7 -16 -3 -18 1 -18", 2, line=False)
     group(d, f"translate({x} {y}) scale({s})", draw)
 
 
@@ -613,7 +613,7 @@ def yoga_lotus(d: Drawing):
             d.shape("hero", PETAL, extra=f'transform="rotate({a})"', spot=True)
         d.shape("hero2", PETAL, extra='transform="scale(1.05)"')
         d.shape("hero", "M-26 -10 C-20 -2 -10 2 0 2 C10 2 20 -2 26 -10 C20 4 10 8 0 8 C-10 8 -20 4 -26 -10Z", spot=True)
-    _tg(d, "translate(100 124)", flower)
+    group(d, "translate(100 124)", flower)
 
 
 # ================================================================ SPA DAY
@@ -745,7 +745,7 @@ def _hut(d: Drawing, x, y, s=1.0):
         d.shape("light", rrect(-18, -26, 36, 24, 2))
         d.shape("dark", rrect(-5, -18, 10, 16, 1.5), shadow=False)
         d.shape("hero2", "M-30 -22 L0 -46 L30 -22 Q15 -18 0 -22 Q-15 -18 -30 -22Z", spot=True)
-    _tg(d, f"translate({x} {y}) scale({s})", draw)
+    group(d, f"translate({x} {y}) scale({s})", draw)
 
 
 def honeymoon_bungalow(d: Drawing):
@@ -772,8 +772,8 @@ def honeymoon_champagne(d: Drawing):
         d.limb("light", "M0 -4 L0.4 34", 3.5)
         d.shape("light", ellipse(0, 36, 15, 4.5))
         d.marks("light", circle(-4, -24, 1.6) + circle(3, -34, 1.3) + circle(-2, -40, 1.1) + circle(4, -18, 1.4))
-    _tg(d, "translate(72 152) rotate(17)", lambda: flute(True))
-    _tg(d, "translate(128 152) rotate(-17)", lambda: flute(False))
+    group(d, "translate(72 152) rotate(17)", lambda: flute(True))
+    group(d, "translate(128 152) rotate(-17)", lambda: flute(False))
     d.stroke("hero2", "M100 78 L100 64 M90 80 L82 68 M110 80 L118 68", 2.6)
     d.shape("pop", _heart(100, 50, 0.9), spot=True)
 
@@ -858,10 +858,10 @@ def wedding_bells(d: Drawing):
         d.limb("hero2", "M0 -38 L0.3 -48", 3)
         d.shape("mark", circle(0, 22, 6))
         d.shape("hero2", bell, spot=spot)
-        d.shape("light", "M-9 -24 C-12 -16 -12 -6 -12 2", line=False, shadow=False, extra='fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"')
+        d.stroke("light", "M-9 -24 C-12 -16 -12 -6 -12 2", 3, line=False)
         d.shape("mark", rrect(-28, 14, 56, 5, 2.5), shadow=False, line=False)
-    _tg(d, "translate(78 106) rotate(14)", lambda: b(True))
-    _tg(d, "translate(122 106) rotate(-14)", lambda: b(False))
+    group(d, "translate(78 106) rotate(14)", lambda: b(True))
+    group(d, "translate(122 106) rotate(-14)", lambda: b(False))
     d.limb("pop", "M100 62 C86 46 70 50 74 62 C78 72 92 66 100 62 C108 66 122 72 126 62 C130 50 114 46 100 62Z", 4, shadow=False)
     d.shape("pop", "M100 62 C90 46 72 48 74 60 C76 72 92 68 100 62Z M100 62 C110 46 128 48 126 60 C124 72 108 68 100 62Z", spot=True)
     d.shape("pop", "M97 62 L88 84 L94 82 L96 88 L100 66 L104 88 L106 82 L112 84 L103 62Z", shadow=False)
@@ -1002,7 +1002,7 @@ def solo_backpack(d: Drawing):
         d.stroke("mark", "M-6 -14 V-8 M6 -14 V-8", 1.6, line=False)
         d.shape("pop", rrect(-20, -54, 40, 11, 5.5))
         d.stroke("dark", "M-10 -54 V-43 M10 -54 V-43", 1.4)
-    _tg(d, "translate(124 136) rotate(-4)", pack)
+    group(d, "translate(124 136) rotate(-4)", pack)
     for x, y in [(150, 50), (164, 58)]:
         d.stroke("dark", f"M{x - 5} {y} q2.5 -3 5 0 q2.5 -3 5 0", 1.6)
 

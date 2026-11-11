@@ -618,7 +618,7 @@
   "tier": 2
  },
  {
-  "id": "apr-s-ski",
+  "id": "apres-ski",
   "label": "Apr\u00e8s-ski",
   "category": "Snow & ice",
   "tier": 1
@@ -1194,7 +1194,7 @@
   "tier": 1
  },
  {
-  "id": "caf-and-croissant",
+  "id": "cafe-and-croissant",
   "label": "Caf\u00e9 & croissant",
   "category": "Food & drink",
   "tier": 1

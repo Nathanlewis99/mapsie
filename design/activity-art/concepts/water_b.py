@@ -1,6 +1,5 @@
 """Water B: kitesurfing, dolphins, turtles, shark cage, cliff jumping, hot springs,
 waterfall swim, fishing, beach day and beach hammock. Three concepts each."""
-import os
 from math import hypot
 
 from _common import Concept, Drawing, cloud, fish, circle, ellipse, waves, hills, rrect, group, bubbles, water
@@ -723,9 +722,10 @@ def hammock_palms(d: Drawing):
 
 
 def hammock_feet(d: Drawing):
-    d.disc("glow", 100, 60, 14)
-    d.band("far", "M-30 112 H230")
-    d.band("mid", waves(126, 3, 26))
+    d.disc("glow", 100, 44, 12)
+    d.band("far", "M-30 70 H230")
+    d.band("mid", waves(96, 3, 26))
+    d.band("near", waves(124, 3, 30), line=False)
     d.band("ground", "M-30 156 Q60 148 120 154 T230 150")
     palm(d, 8, 200, 150, 14, trunk_w=7)
     palm(d, 192, 200, 150, -14, trunk_w=7)
@@ -824,12 +824,9 @@ CONCEPTS = [
     Concept("hammock-palms", "beach-hammock", "Between two palms", hammock_palms,
             checks=[("hero", "glow"), ("hero", "sky"), ("hero", "far"), ("hero2", "hero")], fixes={"hero": ["pop", "deep"]}),
     Concept("hammock-feet", "beach-hammock", "Feet up", clipline(hammock_feet), overrides=SKIN,
-            checks=[("hero", "mid"), ("hero", "ground"), ("hero2", "far"), ("hero2", "sky"), ("glow2", "hero")], fixes={"hero": ["pop", "deep"], "glow2": ["hero2", "light"]}),
+            checks=[("hero", "near"), ("hero", "ground"), ("hero2", "far"), ("hero2", "mid"), ("glow2", "hero")],
+            fixes={"hero": ["pop", "deep"], "glow2": ["hero2", "light"], "far": ["near", "mid"], "mid": ["near", "deep"]}),
     Concept("hammock-hut", "beach-hammock", "Beach hut", hammock_hut,
             checks=[("hero2", "sky"), ("hero2", "far"), ("glow2", "sky"), ("glow2", "hero2"), ("hero", "far")],
             fixes={"glow2": ["mid", "near", "far"], "hero2": ["near", "pop", "hero"], "hero": ["pop", "deep"]}),
 ]
-
-_only = os.environ.get("WB_ONLY")  # dev filter while drawing: comma-separated activity ids
-if _only:
-    CONCEPTS = [c for c in CONCEPTS if c.activity in _only.split(",")]

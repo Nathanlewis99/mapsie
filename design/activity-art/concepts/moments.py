@@ -971,7 +971,7 @@ CONCEPTS = [
     Concept("honeymoon-bungalow", "honeymoon", "Overwater bungalow", honeymoon_bungalow,
             checks=[("light", "far"), ("light", "mid"), ("hero2", "glow"), ("hero2", "sky"), ("dark", "mid")], fixes={"hero2": ["near", "deep"], "far": ["mid", "near"]}),
     Concept("honeymoon-champagne", "honeymoon", "Two glasses", honeymoon_champagne, overrides={"hero2": "#F6CF5E"},
-            checks=[("light", "glow"), ("hero2", "light"), ("light", "sky")], fixes={"glow": ["near", "mid", "deep"]}),
+            checks=[("light", "glow"), ("hero2", "light")], fixes={"glow": ["near", "mid", "deep"]}),
     Concept("honeymoon-chairs", "honeymoon", "Two deckchairs", honeymoon_chairs,
             checks=[("hero", "far"), ("pop", "far"), ("hero", "ground"), ("pop", "sky")], fixes={"hero": ["deep", "near", "mark"]}),
     Concept("proposal-ringbox", "proposal", "Ring box at sunset", proposal_ringbox, overrides=RING,

@@ -640,8 +640,9 @@ def glacier_valley(d: Drawing):
     for snow in ["M76 44 L88 58 L82 56 L76 62 L70 56 L65 58Z", "M136 58 L146 70 L140 68 L135 73 L130 68 L126 70Z",
                  "M10 66 L18 75 L12 74 L8 78 L3 73Z"]:
         d.shape("light", snow, shadow=False)
-    d.shape("light", "M92 70 Q100 66 110 70 C112 92 124 116 158 146 Q100 160 40 146 C78 116 90 92 92 70Z")
-    d.stroke("sky2", "M90 88 Q100 92 110 88 M84 106 Q100 112 118 106 M70 124 Q100 132 132 124 M96 116 L94 126 M110 96 L108 102", 2.2)
+    d.shape("light", "M94 70 Q102 66 110 70 C114 94 98 104 108 124 C116 138 138 144 162 150 Q100 162 38 150 C60 140 74 128 72 112 C70 94 90 88 94 70Z")
+    d.stroke("mid", "M102 70 C100 90 86 100 92 120 C96 134 100 144 100 156", 2.6)
+    d.stroke("sky2", "M86 92 l6 3 M106 86 l-5 3 M80 112 l7 2 M108 108 l-6 3 M70 136 l8 2 M120 134 l-7 3 M84 144 l6 2 M134 146 l-6 2", 2.2)
     d.shape("mid", "M-30 92 C30 90 70 96 90 76 C92 110 74 140 40 160 H-30Z", line=False)
     d.shape("mid", "M230 92 C170 90 130 96 112 76 C114 110 128 140 160 160 H230Z", line=False)
     d.band("near", waves(152, 3, 30))
@@ -659,7 +660,6 @@ def glacier_axe(d: Drawing):
     d.stroke("sky2", "M30 140 L44 152 M70 134 L66 146 M150 138 L160 150 M176 134 L170 142", 2.4)
     d.stroke("hero2", "M126 150 C150 150 170 140 166 128 C162 118 140 122 140 132 C140 146 166 150 176 140", 4)
     d.limb("hero", "M78 158 L118 64", 7, spot=True)
-    d.limb("hero2", "M100 112 Q92 124 102 128", 2.4, shadow=False)
     d.shape("dark", "M114 60 C130 60 146 70 158 82 C164 88 168 96 168 102 C156 90 140 80 120 74 Z")
     d.marks("light", "M150 84 l3 4 l2 -5Z M140 77 l3 4 l2 -5Z")
     d.shape("dark", "M120 62 L92 52 Q86 52 84 58 L84 62 L116 72Z")
@@ -677,7 +677,7 @@ def glacier_cave(d: Drawing):
     d.band("far", "M-30 120 L30 90 L60 110 L100 70 L140 108 L170 92 L230 120", line=False)
     d.shape("light", "M88 82 L100 70 L112 82 L106 80 L100 86 L94 80Z", shadow=False, line=False)
     d.band("ground", hills(140, 5), line=False)
-    for role, hole in CAVE:
+    for role, hole in reversed(CAVE):
         d.shape(role, "M-30 -30 H230 V230 H-30Z " + hole, extra='fill-rule="evenodd"', line=False)
     d.stroke("light", "M40 70 L52 92 M150 54 L142 74 M164 120 L174 138 M30 130 L24 150", 2.2, line=False)
     ink = d.c.get("ink", "")
@@ -716,7 +716,7 @@ def rf_toucan(d: Drawing):
     leaves(d, [("far", -10, 60, 70, -20, 18), ("far", 210, 70, 70, 200, 18), ("mid", -10, 120, 70, -40, 18),
                ("mid", 210, 120, 80, 210, 20), ("far", 160, 196, 60, 250, 14)], line=False)
     leaves(d, [("mid", 150, 120, 34, -40, 9), ("mid", 46, 112, 30, 220, 8)])
-    d.band("deep", "M-30 150 Q80 138 230 146", line=False)
+    d.band("near", "M-30 182 Q40 168 100 178 T230 172", line=False)
     d.limb("deep", "M14 150 Q80 140 188 147", 10)
     d.shape("dark", TOUCAN_BODY)
     d.shape("dark", circle(92, 78, 19))
@@ -735,7 +735,7 @@ def rf_bridge(d: Drawing):
     d.disc("glow", 100, 52, 16)
     for x, y, r in [(10, 100, 26), (42, 86, 22), (160, 82, 24), (192, 98, 24), (100, 104, 26), (70, 100, 20), (132, 98, 22)]:
         d.shape("far", circle(x, y, r), line=False)
-    d.band("far", "M-30 110 L230 110", shadow=False)
+    d.band("far", "M-30 110 L230 110", shadow=False, line=False)
     d.band("mid", "M-30 144 Q0 128 30 140 Q60 126 90 142 Q120 126 150 140 Q180 128 230 142")
     sag = lambda x, y0, depth: y0 + depth * (1 - ((x - 100) / 66) ** 2)
     d.limb("deep", "M34 52 V184 M166 52 V184", 9)

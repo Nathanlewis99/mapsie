@@ -500,11 +500,8 @@ def ferry_lifering(d: Drawing):
     d.band("near", waves(128, 3, 30), line=False)
     d.stroke("dark", "M30 56 q4 -4 8 0 q4 -4 8 0", 1.8)
     # railing
-    for x in (22, 178):
-        post(d, "dark", x, 64, 200, 5)
     d.shape("dark", rrect(-30, 61, 260, 6, 3))
-    d.shape("dark", rrect(-30, 150, 260, 4, 2))
-    d.shape("dark", rrect(-30, 176, 260, 4, 2))
+    d.shape("dark", rrect(-30, 158, 260, 5, 2.5))
     d.stroke("hero2", "M88 66 Q86 54 100 56 Q114 54 112 66", 3)
     # ring
     ring = f"{circle(100, 112, 48)} {circle(100, 112, 22)}"
@@ -604,7 +601,7 @@ def cablecar_tram(d: Drawing):
         d.marks("dark", rrect(x + 6, top + 8, 8, 12, 2) + rrect(x + 20, top + 8, 8, 12, 2) + rrect(x + 13, top - 6, 8, 6, 2))
     d.band("ground", f"M-30 {slope(-30) + 2:.1f} L230 {slope(230) + 2:.1f}")
     d.stroke("dark", f"M-30 {slope(-30) + 8:.1f} L230 {slope(230) + 8:.1f}", 1.6)
-    group(d, f"translate(100 {slope(100) + 2:.1f}) rotate(-19.9) scale(1.3)", lambda: tram(d))
+    group(d, f"translate(100 {slope(100) + 2:.1f}) rotate(-19.9) scale(1.12)", lambda: tram(d))
     d.band("deep", f"M-30 {slope(-30) + 26:.1f} L230 {slope(230) + 26:.1f}", line=False)
 
 # ================================================================ GONDOLA
@@ -638,8 +635,8 @@ def gondolier(d: Drawing, x: float = 44, y: float = 141):
 
 
 def venice_houses(d: Drawing):
-    d.shape("mid", "M-30 160 V36 H22 V160Z")
-    d.shape("far", "M178 160 V48 H230 V160Z")
+    d.shape("far", "M-30 160 V36 H22 V160Z")
+    d.shape("near", "M178 160 V48 H230 V160Z")
     for y in (52, 84, 116):
         d.marks("dark", f"M2 {y + 16} V{y + 6} Q7 {y} 12 {y + 6} V{y + 16}Z")
     for y in (64, 96, 128):
@@ -648,14 +645,14 @@ def venice_houses(d: Drawing):
 
 @framed
 def gondola_bridge(d: Drawing):
-    d.band("far", "M-30 112 H40 V96 L50 90 L60 96 V104 H92 V84 H104 V104 H140 V94 H170 V112 H230")
-    d.shape("ground", "M-30 30 H230 V140 H196 Q100 48 4 140 H-30Z")
-    d.shape("hero2", "M-30 24 H230 V32 H-30Z", shadow=False)
+    d.band("mid", "M-30 112 H40 V96 L50 90 L60 96 V104 H92 V84 H104 V104 H140 V94 H170 V112 H230")
+    d.shape("ground", "M-30 48 H230 V140 H194 Q100 22 6 140 H-30Z")
+    d.stroke("hero2", "M6 140 Q100 22 194 140", 4, line=False)
+    d.stroke("dark", "M18 140 Q100 38 182 140", 1.4, line=False)
+    d.shape("hero2", "M-30 40 H230 V48 H-30Z", spot=True)
     for x in range(-24, 230, 12):
-        d.shape("ground", f"M{x} 32 V22 Q{x + 4} 16 {x + 8} 22 V32Z", shadow=False, line=False)
-    d.shape("ground", "M-30 14 H230 V18 H-30Z", shadow=False, line=False)
-    d.stroke("light", "M14 140 Q100 64 186 140", 3, line=False)
-    d.stroke("hero2", "M4 140 Q100 48 196 140", 4)
+        d.shape("ground", f"M{x} 40 V30 Q{x + 4} 24 {x + 8} 30 V40Z", shadow=False, line=False)
+    d.shape("ground", "M-30 22 H230 V27 H-30Z", line=False)
     venice_houses(d)
     d.band("mid", waves(140, 3, 22))
     d.band("near", waves(160, 3, 28), line=False)
@@ -780,11 +777,12 @@ def camper_camp(d: Drawing):
         d.shape("near", pine(x, y, s), shadow=False)
     d.band("ground", "M-30 150 Q100 140 230 150")
     group(d, "translate(14 40) scale(.62)", lambda: camper(d))
-    d.shape("hero2", "M110 78 L146 96 L144 100 L110 86Z", spot=False)
-    post(d, "dark", 144, 98, 134, 2.4, shadow=False)
-    d.stroke("dark", "M112 86 Q130 98 146 98", 1, line=False)
-    for i, x in enumerate(range(116, 146, 7)):
-        d.marks(["glow2", "pop"][i % 2], circle(x, 90 + (x - 112) * 0.3 + 3, 1.6))
+    post(d, "dark", 146, 92, 148, 2.6, shadow=False)
+    d.stroke("dark", "M108 80 Q128 98 146 92", 1)
+    for i, t in enumerate([0.15, 0.35, 0.55, 0.75, 0.92]):
+        x = (1 - t) ** 2 * 108 + 2 * (1 - t) * t * 128 + t * t * 146
+        y = (1 - t) ** 2 * 80 + 2 * (1 - t) * t * 98 + t * t * 92
+        d.marks(["glow2", "pop"][i % 2], circle(round(x, 1), round(y + 2.5, 1), 2))
     campfire(d, 162, 156)
     d.band("deep", hills(182, 4, 20), line=False)
 
@@ -792,22 +790,26 @@ def camper_camp(d: Drawing):
 # ================================================================ MOTORBIKE
 def motorbike(d: Drawing, body="hero", bags="hero2"):
     """Touring motorbike facing right, wheels on y=150."""
-    d.shape(bags, rrect(22, 92, 32, 30, 6))
-    d.shape(bags, rrect(26, 76, 26, 18, 5))
-    d.stroke("dark", "M38 92 V122", 1.4)
-    d.limb("dark", "M146 134 L128 74", 6)
-    d.shape("light", "M126 70 L138 46 L146 50 L136 76Z", shadow=False)
-    d.stroke("dark", "M128 74 L116 70", 3)
-    d.shape("dark", "M84 112 Q84 104 92 104 H118 Q124 104 124 112 V128 Q124 134 118 134 H90 Q84 134 84 128Z")
-    d.stroke("light", "M88 138 Q70 140 40 132", 4)
-    d.stroke("dark", "M88 138 Q70 140 40 132", 1, line=False)
-    d.shape(body, "M48 100 Q50 92 60 92 H80 L96 98 L82 108 H52 Q46 108 48 100Z")
-    d.shape("dark", "M54 92 Q64 84 84 88 L92 96 L56 96Z")
-    d.shape(body, "M86 92 Q92 78 112 80 Q126 82 130 92 Q128 104 112 106 H92 Q84 102 86 92Z", spot=True)
-    d.shape("light", "M96 86 Q106 82 118 85", shadow=False, line=False)
-    d.shape(body, "M124 76 Q138 74 142 86 Q138 96 128 94Z")
-    d.shape("glow2", ellipse(140, 85, 3.5, 5), shadow=False)
-    d.stroke(body, "M136 128 A16 16 0 0 1 160 126", 3.4)
+    d.limb("dark", "M92 128 L52 132", 5)
+    d.limb("dark", "M146 132 L128 76", 6)
+    d.shape("light", "M124 72 L134 48 L143 51 L134 76Z", shadow=False)
+    d.stroke("dark", "M128 76 L114 70", 3)
+    d.marks("dark", circle(114, 70, 2.4))
+    d.shape(bags, rrect(22, 96, 34, 28, 6))
+    d.shape(bags, rrect(28, 78, 24, 18, 5))
+    d.stroke("dark", "M39 96 V124", 1.4)
+    d.shape("dark", "M88 104 H120 L124 132 H92Z")
+    d.stroke("light", "M93 112 H120 M94 118 H121 M95 124 H122", 1.4, line=False)
+    d.stroke("light", "M96 134 Q76 140 44 136", 4.4)
+    d.stroke("dark", "M96 134 Q76 140 44 136", 1, line=False)
+    d.shape(body, "M44 96 H90 L86 108 H52Z")
+    d.shape("dark", "M50 96 Q56 86 86 90 L90 98 H52Z")
+    d.shape(body, "M84 94 Q88 80 108 80 Q124 80 130 90 L124 104 H90Z", spot=True)
+    d.shape("light", "M94 88 Q104 83 116 85", shadow=False, line=False)
+    d.shape(body, circle(135, 88, 8))
+    d.shape("glow2", circle(137, 88, 5), shadow=False)
+    d.stroke(body, "M132 126 A17 17 0 0 1 162 124", 3.4)
+    d.stroke(body, "M34 116 A20 20 0 0 1 70 116", 3.4, line=False)
     for x in (52, 146):
         wheel(d, x, 132, 18)
 
@@ -828,20 +830,18 @@ def moto_road(d: Drawing):
 @framed
 def moto_helmet(d: Drawing):
     d.disc("glow", 100, 96, 70)
-    d.band("far", hills(156, 6, 10))
-    d.shape("hero", "M40 126 Q36 50 100 44 Q164 50 160 126 Q160 156 138 158 H62 Q40 156 40 126Z")
-    d.shape("hero2", "M90 45 Q100 44 110 45 L112 78 H88Z", shadow=False, spot=True)
-    d.shape("dark", "M62 112 Q62 92 100 92 Q138 92 138 112 V160 H62Z", shadow=False)
-    d.stroke("hero2", "M62 158 V112 Q62 92 100 92 Q138 92 138 112 V158", 4)
-    d.shape("dark", "M38 78 Q100 64 162 78 V92 Q100 78 38 92Z", shadow=False)
-    for x in (74, 126):
-        d.shape("dark", circle(x, 80, 18))
-        d.shape("light", circle(x, 80, 13), shadow=False)
-        d.shape("sky2", "M" + f"{x - 7} 74 Q{x} 68 {x + 6} 72", shadow=False, line=False)
-    d.stroke("light", "M66 76 Q70 72 76 72 M118 76 Q122 72 128 72", 2.4, line=False)
-    d.shape("dark", rrect(90, 76, 20, 6, 3), shadow=False)
-    d.stroke("dark", "M66 150 Q100 176 134 150", 2.4)
-    d.shape("light", rrect(94, 166, 12, 6, 2))
+    d.band("far", hills(162, 6, 10))
+    d.shape("hero", "M34 120 Q28 50 98 44 Q152 42 164 94 L166 110 H130 Q116 110 114 124 L112 152 H58 Q36 150 34 120Z")
+    d.stroke("hero2", "M48 112 Q46 60 98 54 Q132 52 146 72", 9)
+    d.stroke("hero2", "M166 110 H130 Q116 110 114 124 L112 152", 4)
+    d.shape("dark", "M150 92 L184 98 Q186 104 180 106 L156 106Z")
+    d.shape("dark", "M33 92 Q90 70 152 72 V86 Q90 86 35 108Z", shadow=False)
+    d.shape("dark", ellipse(134, 72, 20, 15))
+    d.shape("light", ellipse(134, 72, 14, 10), shadow=False, spot=True)
+    d.stroke("sky2", "M126 68 Q130 64 136 64", 2.4, line=False)
+    d.shape("hero2", ellipse(58, 128, 10, 13), shadow=False)
+    d.stroke("dark", "M112 140 Q118 156 132 156", 2.6)
+    d.shape("light", rrect(128, 152, 10, 8, 2))
 
 
 @framed
@@ -851,9 +851,7 @@ def moto_pass(d: Drawing):
     d.shape("light", "M100 40 L112 52 L106 51 L100 56 L94 50 L88 52Z", shadow=False)
     d.band("mid", "M-30 112 L40 80 L110 96 L230 72")
     road = "M200 82 L50 98 Q34 102 50 108 L170 118 Q190 122 170 128 L20 146 Q4 150 20 156 L230 172"
-    d.stroke("ground", road, 9, shadow=True, line=False)
-    d.stroke("dark", road, 2, line=True) if False else None
-    d.raw("", f'<path d="{road}" fill="none" stroke="{d.c.get("ink", "#000") if not d.paper else ""}" stroke-width="2.4" stroke-dasharray="5 6" stroke-linecap="round"/>' if not d.paper else "")
+    d.limb("ground", road, 9)
     d.raw(f'<path d="{road}" fill="none" stroke="{d.c.get("light")}" stroke-width="1.2" stroke-dasharray="3 5"/>', "")
     group(d, "translate(70 82) scale(.22)", lambda: motorbike(d))
     # warning sign
@@ -904,7 +902,7 @@ CONCEPTS = [
     Concept("cablecar-tram", "cable-car", "Hill cable car", cablecar_tram,
             checks=[("hero", "ground"), ("hero", "sky"), ("light", "hero"), ("hero", "mid"), ("hero", "near"), ("hero", "hero2")], fixes={"hero": ["deep", "pop", "dark"]}),
     Concept("gondola-bridge", "gondola-ride", "Under the bridge", gondola_bridge,
-            checks=[("ground", "mid"), ("ground", "far"), ("dark", "mid"), ("light", "dark")], fixes={"ground": ["light", "glow2", "sky2"], "mid": ["near", "far"]}),
+            checks=[("ground", "mid"), ("ground", "far"), ("ground", "near"), ("ground", "sky"), ("dark", "mid")], fixes={"ground": ["glow", "hero2", "glow2", "light"]}),
     Concept("gondola-gondolier", "gondola-ride", "Gondolier", gondola_gondolier,
             checks=[("dark", "glow"), ("dark", "mid"), ("dark", "sky"), ("far", "glow")], fixes={"glow": ["glow2", "far", "light"], "far": ["mid", "near"]}),
     Concept("gondola-prow", "gondola-ride", "Gondola prow", gondola_prow,

@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["playwright"],
-  experimental: { serverActions: { bodySizeLimit: "15mb" } },
+  serverExternalPackages: ["playwright", "sharp"],
+  devIndicators: false,
 };
 
 export default nextConfig;

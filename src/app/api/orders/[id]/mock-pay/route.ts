@@ -9,6 +9,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const order = await getOrder(id);
   if (!order || order.status !== "pending_payment") return NextResponse.json({ error: "Order not payable" }, { status: 400 });
   const address = (await req.json()) as Address;
-  after(() => fulfilOrder(id, { ...address, country: "GB" }));
+  after(() => fulfilOrder(id, { ...address, country: order.region ?? "GB" }));
   return NextResponse.json({ ok: true });
 }

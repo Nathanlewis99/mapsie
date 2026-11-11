@@ -11,6 +11,15 @@
   --font-display: var(--f-playfair), serif;
 }
 
+:root {
+  --f-ui: "Nunito Variable";
+  --f-playfair: "Playfair Display Variable";
+  --f-caveat: "Caveat Variable";
+  --f-montserrat: "Montserrat Variable";
+  --f-pacifico: "Pacifico";
+  --f-bebas: "Bebas Neue";
+}
+
 body {
   background: var(--color-cream);
   color: var(--color-ink);
@@ -41,9 +50,67 @@ body {
   padding: calc(var(--u) * 0.35) calc(var(--u) * 1);
   border-radius: calc(var(--u) * 0.8);
   font-size: calc(var(--u) * 2);
+  line-height: 1.2;
   font-weight: 700;
   white-space: nowrap;
   box-shadow: 0 calc(var(--u) * 0.15) calc(var(--u) * 0.5) rgb(0 0 0 / 0.15);
+}
+
+.mapsie-stop.is-dot { width: calc(var(--u) * 1.8); height: calc(var(--u) * 1.8); }
+.mapsie-stop.is-pin { width: calc(var(--u) * 3); height: calc(var(--u) * 4); }
+.mapsie-stop.is-heart { width: calc(var(--u) * 3.4); height: calc(var(--u) * 3.1); }
+.mapsie-stop-icon { width: 100%; height: 100%; filter: drop-shadow(0 calc(var(--u) * 0.2) calc(var(--u) * 0.4) rgb(0 0 0 / 0.3)); }
+.mapsie-stop.is-pin .mapsie-stop-label { top: 35%; }
+.mapsie-stop-label small {
+  display: block;
+  font: 600 calc(var(--u) * 1.3) / 1.2 var(--f-montserrat), sans-serif;
+  opacity: 0.65;
+  margin-top: calc(var(--u) * 0.15);
+}
+
+.mapsie-stop, .mapsie-mode, .mapsie-sticker { -webkit-text-size-adjust: none; text-size-adjust: none; }
+.mapsie-mode {
+  width: calc(var(--u) * 3.6);
+  height: calc(var(--u) * 3.6);
+  border-radius: 999px;
+  border: calc(var(--u) * 0.3) solid;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 calc(var(--u) * 0.15) calc(var(--u) * 0.5) rgb(0 0 0 / 0.2);
+  pointer-events: none;
+}
+.mapsie-mode img { width: 64%; height: 64%; }
+
+.mapsie-note {
+  white-space: pre;
+  line-height: 1.05;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 0 3px rgb(255 255 255 / 0.85), 0 0 8px rgb(255 255 255 / 0.6);
+}
+
+.mapsie-handle {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: white;
+  border: 3px solid var(--color-coral);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
+  touch-action: none;
+  z-index: 2;
+}
+.mapsie-handle.is-resize { right: -14px; bottom: -14px; cursor: nwse-resize; }
+.mapsie-handle.is-rotate { left: 50%; top: -30px; margin-left: -9px; cursor: grab; }
+.mapsie-handle.is-rotate::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 12px;
+  margin-left: -1px;
+  background: var(--color-coral);
 }
 
 .mapsie-sticker {
@@ -57,6 +124,7 @@ body {
   filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.25));
   pointer-events: none;
 }
+.mapsie-sticker.is-text { width: auto; height: auto; }
 .mapsie-sticker.is-photo img {
   object-fit: cover;
   border-style: solid;

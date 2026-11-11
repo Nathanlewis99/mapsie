@@ -1,9 +1,20 @@
 "use client";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import { SAMPLE } from "@/lib/sample";
+import { guessRegion, money, PRODUCTS, REGIONS, type RegionId } from "@/lib/products";
 
 const Poster = dynamic(() => import("@/components/Poster"), { ssr: false });
+
+const FEATURES = [
+  { icon: "✈️", title: "Every way you travelled", text: "Flights arc across oceans, road trips follow the real roads, trains, boats and hikes each get their own line." },
+  { icon: "🌍", title: "Countries you've been", text: "Light up every country on your route with one tap." },
+  { icon: "✍️", title: "Notes & photos", text: "Write “swam with turtles!” right on the map, or pin your own photos where they were taken." },
+  { icon: "🎨", title: "Endless styles", text: "Vintage, topographic, midnight… then change any colour to make it yours." },
+  { icon: "🖼️", title: "Framed & ready to hang", text: "A4 up to A1, with black, white or oak frames. Preview it on a wall before you buy." },
+  { icon: "🚚", title: "Printed near you", text: `Made to order and delivered across ${REGIONS.map((r) => r.label).join(", ").replace(/, ([^,]*)$/, " and $1")}.` },
+];
 
 const STEPS = [
   { icon: "📍", title: "Add your stops", text: "Search the places you went. We draw the route between them." },
@@ -13,6 +24,9 @@ const STEPS = [
 ];
 
 export default function Home() {
+  const [region, setRegion] = useState<RegionId>("GB");
+  useEffect(() => setRegion(guessRegion()), []);
+  const from = Math.min(...PRODUCTS.map((p) => p.price[region]));
   return (
     <div className="min-h-dvh overflow-x-hidden">
       <header className="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
@@ -35,7 +49,7 @@ export default function Home() {
               <Link href="/create" className="rounded-full bg-coral px-7 py-4 text-lg font-extrabold text-white shadow-xl shadow-coral/30 hover:bg-coral-dark hover:-translate-y-0.5 transition">
                 Create my map →
               </Link>
-              <span className="text-sm text-ink/50 font-semibold">From £34 · Free UK delivery</span>
+              <span className="text-sm text-ink/50 font-semibold">From {money(region, from)} · Free delivery · Ships to 🇬🇧 🇺🇸 🇦🇺</span>
             </div>
           </div>
           <div className="relative grid place-items-center">
@@ -56,6 +70,24 @@ export default function Home() {
                 <p className="text-ink/60 mt-1 text-sm">{s.text}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="max-w-6xl mx-auto px-6 py-20">
+          <h2 className="font-display text-4xl font-extrabold text-center">Made for the trip <span className="text-coral">you</span> took</h2>
+          <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {FEATURES.map((f) => (
+              <div key={f.title} className="rounded-3xl bg-white p-6 shadow-sm">
+                <div className="text-3xl">{f.icon}</div>
+                <div className="font-extrabold text-lg mt-3">{f.title}</div>
+                <p className="text-ink/60 mt-1 text-sm">{f.text}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-12 text-center">
+            <Link href="/create" className="inline-block rounded-full bg-coral px-8 py-4 text-lg font-extrabold text-white shadow-xl shadow-coral/30 hover:bg-coral-dark hover:-translate-y-0.5 transition">
+              Start my map, it&apos;s free to design →
+            </Link>
           </div>
         </section>
       </main>

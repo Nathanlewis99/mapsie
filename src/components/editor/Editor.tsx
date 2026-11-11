@@ -1,11 +1,14 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import Poster from "@/components/Poster";
+import { useRouter, useSearchParams } from "next/navigation";
+import FramedPoster, { frameWidth } from "@/components/FramedPoster";
+import WallPreview from "@/components/WallPreview";
 import { useEditor } from "@/lib/store";
 import { reverseGeocode } from "@/lib/geo";
-import { getProduct, posterAspect } from "@/lib/products";
+import { itemPrice, money, posterAspect } from "@/lib/products";
+import { FONTS } from "@/lib/fonts";
+import { normalizeDesign, type Design } from "@/lib/types";
 import { TripPanel, StylePanel, StickersPanel, TextPanel, SizePanel } from "./Panels";
 
 const TABS = [
@@ -13,17 +16,26 @@ const TABS = [
   { id: "style", label: "Style", icon: "🎨" },
   { id: "stickers", label: "Stickers", icon: "🐊" },
   { id: "text", label: "Text", icon: "✍️" },
-  { id: "size", label: "Size", icon: "📐" },
+  { id: "size", label: "Size", icon: "🖼️" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
+async function saveSnapshot(design: Design): Promise<string> {
+  const r = await fetch("/api/designs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(design) });
+  if (!r.ok) throw new Error("save failed");
+  return (await r.json()).id;
+}
+
 export default function Editor() {
   const store = useEditor();
-  const { design, selectedSticker, fitRequest } = store;
+  const { design, selectedSticker, fitRequest, region, past, future } = store;
   const [tab, setTab] = useState<Tab>("trip");
   const [pickMode, setPickMode] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [busy, setBusy] = useState<"" | "order" | "share">("");
+  const [toast, setToast] = useState("");
+  const [wall, setWall] = useState(false);
   const router = useRouter();
+  const params = useSearchParams();
   const stage = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
 
@@ -35,61 +47,129 @@ export default function Editor() {
     return () => ro.disconnect();
   }, []);
 
-  // Delete / Backspace removes the selected sticker
+  // Open a shared design: /create?d=<id>
+  useEffect(() => {
+    const id = params.get("d");
+    if (!id) return;
+    fetch(`/api/designs/${id}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d: Design) => {
+        useEditor.getState().load(normalizeDesign(d));
+        setToast("Design loaded. Make it your own!");
+        router.replace("/create");
+      })
+      .catch(() => setToast("Sorry, we couldn't find that design."));
+  }, [params, router]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(""), 3500);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  // Keyboard: undo/redo, delete sticker, escape
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (!selectedSticker || (e.target as HTMLElement).tagName === "INPUT") return;
-      if (e.key === "Delete" || e.key === "Backspace") store.removeSticker(selectedSticker);
-      if (e.key === "Escape") store.select(null);
+      const typing = ["INPUT", "TEXTAREA"].includes((e.target as HTMLElement).tagName);
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.key.toLowerCase() === "z" && !typing) {
+        e.preventDefault();
+        if (e.shiftKey) store.redo();
+        else store.undo();
+        return;
+      }
+      if (mod && e.key.toLowerCase() === "y" && !typing) return e.preventDefault(), store.redo();
+      if (typing) return;
+      if (selectedSticker && (e.key === "Delete" || e.key === "Backspace")) store.removeSticker(selectedSticker);
+      if (e.key === "Escape") {
+        store.select(null);
+        setPickMode(false);
+        setWall(false);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [selectedSticker, store]);
 
   const aspect = posterAspect(design.productId, design.orientation);
-  const posterW = Math.floor(Math.max(200, Math.min(box.w - 48, (box.h - 48) / aspect)));
+  const pad = box.w < 640 ? 24 : 56;
+  const fitW = Math.min(box.w - pad, (box.h - pad) / aspect);
+  const posterW = Math.floor(Math.max(180, fitW - frameWidth(design, fitW) * 2));
   const sel = design.stickers.find((s) => s.id === selectedSticker);
-  const product = getProduct(design.productId);
+  const price = itemPrice(design.productId, design.frame, region);
 
   const order = async () => {
-    setSaving(true);
-    const r = await fetch("/api/designs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(design) });
-    const { id } = await r.json();
-    router.push(`/checkout/${id}`);
+    setBusy("order");
+    try {
+      const id = await saveSnapshot(design);
+      router.push(`/checkout/${id}`);
+    } catch {
+      setToast("Couldn't save your design, please try again.");
+      setBusy("");
+    }
   };
+
+  const share = async () => {
+    setBusy("share");
+    try {
+      const id = await saveSnapshot(design);
+      const url = `${location.origin}/d/${id}`;
+      if (navigator.share && matchMedia("(pointer: coarse)").matches) await navigator.share({ title: design.title, url }).catch(() => {});
+      else await navigator.clipboard.writeText(url).catch(() => {});
+      setToast("Link copied! Anyone with it can see your map.");
+    } catch {
+      setToast("Couldn't create a link, please try again.");
+    }
+    setBusy("");
+  };
+
+  const iconBtn = "w-8 h-8 sm:w-10 sm:h-10 grid place-items-center rounded-full hover:bg-ink/5 disabled:opacity-25 text-base sm:text-lg";
 
   return (
     <div className="h-dvh flex flex-col">
-      <header className="flex items-center justify-between px-5 py-3 border-b border-ink/5 bg-cream">
-        <Link href="/" className="font-display text-2xl font-extrabold tracking-tight">
+      <header className="flex items-center justify-between gap-2 px-3 sm:px-5 py-2.5 border-b border-ink/5 bg-cream">
+        <Link href="/" className="font-display text-xl sm:text-2xl font-extrabold tracking-tight shrink-0">
           Mapsie<span className="text-coral">.</span>
         </Link>
-        <div className="flex items-center gap-3">
-          <button onClick={() => confirm("Start a fresh map? This clears your current design.") && store.reset()} className="hidden sm:block text-sm font-bold text-ink/50 hover:text-ink">
-            Start over
+        <div className="flex items-center gap-0.5 sm:gap-1">
+          <button title="Undo (Ctrl+Z)" className={iconBtn} disabled={!past.length} onClick={store.undo}>↶</button>
+          <button title="Redo (Ctrl+Shift+Z)" className={iconBtn} disabled={!future.length} onClick={store.redo}>↷</button>
+          <span className="w-px h-6 bg-ink/10 mx-1 hidden sm:block" />
+          <button title="See it on a wall" className={`${iconBtn} sm:w-auto sm:px-3 sm:text-sm sm:font-bold`} onClick={() => setWall(true)} disabled={!design.stops.length}>
+            🛋️<span className="hidden sm:inline ml-1">On the wall</span>
           </button>
-          <button onClick={order} disabled={saving || design.stops.length === 0} className="rounded-full bg-coral px-5 py-2.5 font-extrabold text-white shadow-lg shadow-coral/30 hover:bg-coral-dark disabled:opacity-40 transition">
-            {saving ? "Saving…" : `Order print · £${product.priceGbp}`}
+          <button title="Share a link" className={`${iconBtn} sm:w-auto sm:px-3 sm:text-sm sm:font-bold`} onClick={share} disabled={!!busy || !design.stops.length}>
+            🔗<span className="hidden sm:inline ml-1">{busy === "share" ? "…" : "Share"}</span>
+          </button>
+          <button
+            onClick={() => confirm("Start a fresh map? (You can undo this.)") && store.reset()}
+            className="hidden md:block text-sm font-bold text-ink/50 hover:text-ink px-2"
+          >
+            New
+          </button>
+          <button onClick={order} disabled={!!busy || design.stops.length === 0} className="ml-1 rounded-full bg-coral px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-extrabold text-white shadow-lg shadow-coral/30 hover:bg-coral-dark disabled:opacity-40 transition whitespace-nowrap">
+            {busy === "order" ? "Saving…" : <>Order<span className="hidden sm:inline"> print</span> · {money(region, price)}</>}
           </button>
         </div>
       </header>
 
       <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
         {/* poster stage */}
-        <div ref={stage} className="relative flex-1 min-h-[60vh] lg:min-h-0 grid place-items-center bg-[radial-gradient(circle_at_30%_20%,#fff_0%,#f1e8da_70%)]">
+        <div ref={stage} className="relative h-[54dvh] lg:h-auto lg:flex-1 shrink-0 grid place-items-center bg-[radial-gradient(circle_at_30%_20%,#fff_0%,#f1e8da_70%)] overflow-hidden">
           {box.w > 0 && (
-            <div className={`shadow-[0_30px_60px_-15px_rgba(31,36,48,0.35)] ${pickMode ? "cursor-crosshair [&_canvas]:cursor-crosshair" : ""}`}>
-              <Poster
-                key={`${design.productId}-${design.orientation}-${design.layout}`}
+            <div className={pickMode ? "[&_canvas]:!cursor-crosshair" : ""}>
+              <FramedPoster
+                key={`${design.productId}-${design.orientation}-${design.layout}-${design.frame}`}
                 design={design}
                 width={posterW}
                 editable
                 selectedSticker={selectedSticker}
                 fitRequest={fitRequest}
                 handlers={{
-                  onView: (view) => store.set({ view }),
+                  onView: (view) => store.setView(view),
                   onStopMove: (id, lng, lat) => store.updateStop(id, { lng, lat }),
                   onStickerMove: (id, lng, lat) => store.updateSticker(id, { lng, lat }),
+                  onStickerChange: (id, patch) => store.updateSticker(id, patch),
                   onStickerSelect: (id) => store.select(id),
                   onDropSticker: (src, lng, lat) => store.addSticker({ src, kind: "sticker", lng, lat, size: 9, rotation: 0 }),
                   onMapClick: async (lng, lat) => {
@@ -103,42 +183,59 @@ export default function Editor() {
           )}
 
           {sel && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-full bg-ink text-white px-2 py-1.5 shadow-xl text-sm font-bold">
-              <button className="px-3 py-1 rounded-full hover:bg-white/15" onClick={() => store.updateSticker(sel.id, { size: Math.max(3, sel.size / 1.15) })}>➖</button>
-              <span className="px-1 opacity-60">size</span>
-              <button className="px-3 py-1 rounded-full hover:bg-white/15" onClick={() => store.updateSticker(sel.id, { size: Math.min(45, sel.size * 1.15) })}>➕</button>
-              <span className="w-px h-5 bg-white/20 mx-1" />
-              <button className="px-3 py-1 rounded-full hover:bg-white/15" onClick={() => store.updateSticker(sel.id, { rotation: sel.rotation - 15 })}>⟲</button>
-              <button className="px-3 py-1 rounded-full hover:bg-white/15" onClick={() => store.updateSticker(sel.id, { rotation: sel.rotation + 15 })}>⟳</button>
-              <span className="w-px h-5 bg-white/20 mx-1" />
-              <button className="px-3 py-1 rounded-full hover:bg-white/15" onClick={() => store.addSticker({ ...sel, lng: sel.lng + 0.5 * 2 ** -(design.view.zoom - 2), lat: sel.lat })}>⧉</button>
-              <button className="px-3 py-1 rounded-full hover:bg-coral" onClick={() => store.removeSticker(sel.id)}>🗑</button>
-              <button className="px-3 py-1 rounded-full hover:bg-white/15 opacity-60" onClick={() => store.select(null)}>Done</button>
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-full bg-ink text-white px-2 py-1.5 shadow-xl text-sm font-bold max-w-[96%] overflow-x-auto">
+              {sel.kind === "text" && (
+                <>
+                  <input
+                    autoFocus
+                    value={sel.text ?? ""}
+                    onChange={(e) => store.updateSticker(sel.id, { text: e.target.value }, `text-${sel.id}`)}
+                    className="bg-white/10 rounded-full px-3 py-1 outline-none w-40 placeholder:text-white/40"
+                    placeholder="Type your note"
+                  />
+                  <select
+                    value={sel.font ?? "caveat"}
+                    onChange={(e) => store.updateSticker(sel.id, { font: e.target.value as Design["font"] })}
+                    className="bg-white/10 rounded-full px-2 py-1 outline-none"
+                  >
+                    {FONTS.map((f) => <option key={f.id} value={f.id} className="text-ink">{f.name}</option>)}
+                  </select>
+                  <input type="color" value={sel.color ?? design.theme.colors.ink} onChange={(e) => store.updateSticker(sel.id, { color: e.target.value }, `color-${sel.id}`)} className="w-7 h-7 rounded-full bg-transparent border-0 p-0" />
+                  <span className="w-px h-5 bg-white/20 mx-1" />
+                </>
+              )}
+              <button title="Duplicate" className="px-3 py-1 rounded-full hover:bg-white/15" onClick={() => store.addSticker({ ...sel, lng: sel.lng + 40 * (360 / (512 * 2 ** design.view.zoom)) })}>⧉</button>
+              <button title="Bring to front" className="px-3 py-1 rounded-full hover:bg-white/15" onClick={() => { store.removeSticker(sel.id); store.addSticker({ ...sel }); }}>⬆</button>
+              <button title="Delete" className="px-3 py-1 rounded-full hover:bg-coral" onClick={() => store.removeSticker(sel.id)}>🗑</button>
+              <button className="px-3 py-1 rounded-full hover:bg-white/15 opacity-70" onClick={() => store.select(null)}>Done</button>
             </div>
           )}
 
           {design.stops.length === 0 && tab === "trip" && (
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-white/95 px-5 py-2.5 shadow-lg text-sm font-bold animate-bounce">
-              👉 Start by adding your first stop
+            <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/95 px-4 sm:px-5 py-2 sm:py-2.5 shadow-lg text-xs sm:text-sm font-bold animate-bounce whitespace-nowrap">
+              👉 Pick a trip or add your first stop
             </div>
+          )}
+          {toast && (
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-ink text-white px-5 py-2.5 shadow-lg text-sm font-bold whitespace-nowrap">{toast}</div>
           )}
         </div>
 
         {/* sidebar */}
-        <aside className="lg:w-[400px] shrink-0 border-t lg:border-t-0 lg:border-l border-ink/5 bg-cream flex flex-col min-h-0">
-          <nav className="flex gap-1 p-2 border-b border-ink/5 sticky top-0 bg-cream z-10">
+        <aside className="flex-1 lg:flex-none lg:w-[400px] min-h-0 border-t lg:border-t-0 lg:border-l border-ink/5 bg-cream flex flex-col">
+          <nav className="flex gap-1 p-2 border-b border-ink/5 bg-cream">
             {TABS.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`flex-1 rounded-2xl py-2 text-xs font-extrabold transition ${tab === t.id ? "bg-white shadow-sm text-ink" : "text-ink/50 hover:text-ink"}`}
+                className={`flex-1 rounded-2xl py-1.5 sm:py-2 text-xs font-extrabold transition ${tab === t.id ? "bg-white shadow-sm text-ink" : "text-ink/50 hover:text-ink"}`}
               >
                 <div className="text-lg leading-none mb-0.5">{t.icon}</div>
                 {t.label}
               </button>
             ))}
           </nav>
-          <div className="flex-1 overflow-y-auto p-5">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-5">
             {tab === "trip" && <TripPanel pickMode={pickMode} setPickMode={setPickMode} />}
             {tab === "style" && <StylePanel />}
             {tab === "stickers" && <StickersPanel />}
@@ -147,6 +244,22 @@ export default function Editor() {
           </div>
         </aside>
       </div>
+
+      {wall && (
+        <div className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm grid place-items-center p-4" onClick={() => setWall(false)}>
+          <div className="w-full max-w-4xl rounded-3xl bg-cream p-4 sm:p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display text-2xl font-extrabold">How it&apos;ll look at home</h2>
+              <button onClick={() => setWall(false)} className="w-9 h-9 rounded-full hover:bg-ink/5 font-bold">✕</button>
+            </div>
+            <WallPreview design={design} />
+            <div className="mt-4 flex justify-end gap-2">
+              <button onClick={() => { setWall(false); setTab("size"); }} className="rounded-full border-2 border-ink/15 px-5 py-2.5 font-bold">Change size or frame</button>
+              <button onClick={order} className="rounded-full bg-coral px-5 py-2.5 font-extrabold text-white">Order · {money(region, price)}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

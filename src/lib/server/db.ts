@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import type { Design } from "../types";
-import type { ShippingId } from "../products";
+import type { ShippingId, RegionId } from "../products";
 
 // MVP storage: JSON files on disk. Swap for Supabase/Postgres + object storage
 // before deploying (Vercel's disk is not persistent).
@@ -29,11 +29,13 @@ export interface Order {
   designId: string;
   email: string;
   shipping: ShippingId;
-  totalGbp: number;
+  region: RegionId;
+  currency: string;
+  total: number;
   status: OrderStatus;
   address?: Address;
   renderFile?: string;
-  renderInfo?: { width: number; height: number; dpi: number };
+  renderInfo?: { width: number; height: number; dpi: number; mapDpi?: number };
   printProviderOrderId?: string;
   error?: string;
   createdAt: string;
@@ -62,3 +64,10 @@ export async function updateOrder(id: string, patch: Partial<Order>) {
   return n;
 }
 export const rendersDir = () => dir("renders");
+
+export async function listOrders(): Promise<Order[]> {
+  const d = await dir("orders");
+  const files = (await fs.readdir(d)).filter((f) => f.endsWith(".json"));
+  const all = await Promise.all(files.map((f) => fs.readFile(path.join(d, f), "utf8").then((t) => JSON.parse(t) as Order)));
+  return all.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}

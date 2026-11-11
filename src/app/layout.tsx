@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
-import { fontVariables } from "@/lib/fonts";
+import "@fontsource-variable/nunito";
+import "@fontsource-variable/playfair-display";
+import "@fontsource-variable/caveat";
+import "@fontsource-variable/montserrat";
+import "@fontsource/pacifico";
+import "@fontsource/bebas-neue";
 import "./globals.css";
-
-const ui = Nunito({ subsets: ["latin"], weight: ["400", "600", "700", "800"], variable: "--f-ui" });
 
 export const metadata: Metadata = {
   title: "Mapsie — turn your trip into a print",
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${ui.variable} ${fontVariables} antialiased`}>{children}</body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

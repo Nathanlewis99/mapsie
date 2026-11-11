@@ -5,9 +5,9 @@ import Link from "next/link";
 interface Status {
   status: string;
   renderFile?: string;
-  renderInfo?: { width: number; height: number; dpi: number };
+  renderInfo?: { width: number; height: number; dpi: number; mapDpi?: number };
   printProviderOrderId?: string;
-  totalGbp: number;
+  total: number;
 }
 
 const STEPS = [

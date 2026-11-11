@@ -2,10 +2,6 @@
 import Poster from "@/components/Poster";
 import type { Design } from "@/lib/types";
 
-declare global {
-  interface Window { __MAPSIE_READY?: boolean }
-}
-
 export default function PrintView({ design }: { design: Design }) {
   return (
     <div style={{ margin: 0, padding: 0, width: design.view.refWidth }}>

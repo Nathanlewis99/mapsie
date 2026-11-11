@@ -2,15 +2,17 @@
 import { useEffect, useRef } from "react";
 import maplibregl, { Map as MLMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import type { Design, Sticker } from "@/lib/types";
+import type { Design, Sticker, Stop } from "@/lib/types";
 import { buildStyle, loadBaseStyle } from "@/lib/themes";
-import { routeGeoJSON, stopsBounds } from "@/lib/geo";
+import { buildLegs, routeGeoJSON, stopsBounds, MODES } from "@/lib/geo";
+import { loadCountries, visitedCountries } from "@/lib/countries";
 import { fontCss } from "@/lib/fonts";
 
 export interface MapHandlers {
   onView?: (v: Design["view"]) => void;
   onStopMove?: (id: string, lng: number, lat: number) => void;
   onStickerMove?: (id: string, lng: number, lat: number) => void;
+  onStickerChange?: (id: string, patch: Partial<Sticker>) => void;
   onStickerSelect?: (id: string | null) => void;
   onMapClick?: (lng: number, lat: number) => void;
   onDropSticker?: (src: string, lng: number, lat: number) => void;
@@ -30,10 +32,37 @@ interface Props {
 }
 
 const ROUTE_SRC = "mapsie-route";
-const ROUTE_LAYER = "mapsie-route-line";
+const VISITED_SRC = "mapsie-visited";
+const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
 
-const dash = (style: Design["route"]["style"]) =>
-  style === "dashed" ? [2.2, 1.6] : style === "dotted" ? [0.01, 2] : [1, 0];
+// One line layer per look, because dash patterns can't vary per feature.
+const ROUTE_LAYERS: { id: string; dash: string; pattern?: number[]; overlay?: boolean }[] = [
+  { id: "mapsie-route-solid", dash: "solid" },
+  { id: "mapsie-route-dashed", dash: "dashed", pattern: [2.2, 1.6] },
+  { id: "mapsie-route-dotted", dash: "dotted", pattern: [0.01, 2] },
+  { id: "mapsie-route-rail", dash: "rail" },
+  { id: "mapsie-route-rail-ties", dash: "rail", pattern: [1.2, 1.2], overlay: true },
+];
+
+declare global {
+  interface Window {
+    __MAPSIE_READY?: boolean;
+    __MAPSIE_ERROR?: string;
+    __MAPSIE_GLMAX?: number;
+  }
+}
+/** Largest map canvas for print renders; the renderer can override it. */
+const glMax = () => (typeof window !== "undefined" && window.__MAPSIE_GLMAX) || 7680;
+
+const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+function markerSvg(style: Design["markers"]["style"], fill: string, stroke: string) {
+  if (style === "pin")
+    return `<svg viewBox="0 0 24 32" width="100%" height="100%"><path d="M12 31C12 31 2 19.5 2 12a10 10 0 0 1 20 0c0 7.5-10 19-10 19z" fill="${fill}" stroke="${stroke}" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="${stroke}"/></svg>`;
+  if (style === "heart")
+    return `<svg viewBox="0 0 24 22" width="100%" height="100%"><path d="M12 21s-9-5.6-9-12a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.4-9 12-9 12z" fill="${fill}" stroke="${stroke}" stroke-width="2"/></svg>`;
+  return "";
+}
 
 export default function MapView(props: Props) {
   const { design, width, height, mapWidth, editable, print, selectedSticker, fitRequest, handlers, onReady } = props;
@@ -41,6 +70,7 @@ export default function MapView(props: Props) {
   const map = useRef<MLMap | null>(null);
   const stopMarkers = useRef<Marker[]>([]);
   const stickerMarkers = useRef<Marker[]>([]);
+  const modeMarkers = useRef<Marker[]>([]);
   const h = useRef(handlers);
   h.current = handlers;
   const latest = useRef(design);
@@ -49,6 +79,16 @@ export default function MapView(props: Props) {
   const widthRef = useRef(width);
   widthRef.current = width;
   const u = width / 100;
+
+  /** Run once the map exists (markers can be added before the style is loaded). */
+  const whenMap = (run: (m: MLMap) => void) => {
+    if (map.current) {
+      run(map.current);
+      return;
+    }
+    const t = setInterval(() => map.current && (clearInterval(t), run(map.current)), 50);
+    return () => clearInterval(t);
+  };
 
   // --- create the map once
   useEffect(() => {
@@ -71,14 +111,25 @@ export default function MapView(props: Props) {
         renderWorldCopies: true,
         fadeDuration: print ? 0 : 300,
         canvasContextAttributes: { preserveDrawingBuffer: !!print, antialias: true },
-        ...(print ? { maxCanvasSize: [16384, 16384] as [number, number] } : {}),
+        // In print mode the page runs at a very high pixel density. WebGL tops out
+        // around 8192px, so the map is drawn at most that size and gently upscaled,
+        // while text, stickers and markers (HTML) stay at full resolution.
+        ...(print ? { maxCanvasSize: [glMax(), glMax()] as [number, number] } : {}),
       });
+      if (print) {
+        // Tell the renderer straight away if WebGL can't start, rather than hanging.
+        m.on("error", (e) => {
+          const msg = String((e as { error?: Error }).error?.message ?? e);
+          if (/webgl/i.test(msg)) window.__MAPSIE_ERROR = msg;
+        });
+      }
       if (editable) m.touchZoomRotate.disableRotation();
       map.current = m;
 
       m.on("style.load", () => {
         styleReady.current = true;
         syncRoute();
+        syncVisited();
       });
       m.on("moveend", () => {
         const c = m.getCenter();
@@ -90,6 +141,12 @@ export default function MapView(props: Props) {
       });
       if (onReady) {
         m.once("idle", async () => {
+          // the visited-countries layer loads asynchronously
+          if (latest.current.visited.show) await loadCountries();
+          await new Promise((r) => {
+            m.once("idle", r);
+            m.triggerRepaint();
+          });
           await document.fonts.ready;
           onReady();
         });
@@ -115,103 +172,228 @@ export default function MapView(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeKey]);
 
-  // --- route line
+  // --- route lines
   function syncRoute() {
     const m = map.current;
     if (!m || !styleReady.current) return;
     const d = latest.current;
-    const data = routeGeoJSON(d.route.show ? d.stops : [], d.route.curved);
+    const data = d.route.show ? routeGeoJSON(buildLegs(d.stops, d.route.curved), d.route.style) : EMPTY;
     const src = m.getSource(ROUTE_SRC) as maplibregl.GeoJSONSource | undefined;
     if (src) src.setData(data);
     else m.addSource(ROUTE_SRC, { type: "geojson", data });
-    const lw = Math.max(1, d.route.width * widthRef.current / 100);
-    if (!m.getLayer(ROUTE_LAYER)) {
-      m.addLayer({ id: ROUTE_LAYER, type: "line", source: ROUTE_SRC, layout: { "line-cap": "round", "line-join": "round" }, paint: {} });
+    const lw = Math.max(1, (d.route.width * widthRef.current) / 100);
+    for (const l of ROUTE_LAYERS) {
+      if (!m.getLayer(l.id)) {
+        m.addLayer({
+          id: l.id,
+          type: "line",
+          source: ROUTE_SRC,
+          filter: ["==", ["get", "dash"], l.dash],
+          layout: { "line-cap": l.dash === "dotted" ? "round" : "butt", "line-join": "round" },
+          paint: {},
+        });
+      }
+      m.setPaintProperty(l.id, "line-color", l.overlay ? d.theme.colors.paper : d.theme.colors.accent);
+      m.setPaintProperty(l.id, "line-width", l.dash === "rail" ? (l.overlay ? lw * 0.6 : lw * 1.6) : lw);
+      if (l.pattern) m.setPaintProperty(l.id, "line-dasharray", l.pattern);
     }
-    m.setPaintProperty(ROUTE_LAYER, "line-color", d.theme.colors.accent);
-    m.setPaintProperty(ROUTE_LAYER, "line-width", lw);
-    m.setPaintProperty(ROUTE_LAYER, "line-dasharray", dash(d.route.style));
   }
-  const routeKey = JSON.stringify([design.stops.map((s) => [s.lng, s.lat]), design.route, design.theme.colors.accent, width]);
+  const routeKey = JSON.stringify([design.stops.map((s) => [s.lng, s.lat, s.arriveBy, s.pathFor, s.path?.length]), design.route, design.theme.colors, width]);
   useEffect(() => {
     syncRoute();
      
   }, [routeKey]);
 
-  // --- stop markers (DOM, so they can use any font and stay crisp in print)
-  const stopsKey = JSON.stringify([design.stops, design.theme.colors, design.font, width, editable]);
-  useEffect(() => {
-    const m = map.current;
-    const run = () => {
-      const mm = map.current;
-      if (!mm) return;
-      stopMarkers.current.forEach((mk) => mk.remove());
-      const c = design.theme.colors;
-      stopMarkers.current = design.stops.map((s, i) => {
-        const node = document.createElement("div");
-        node.className = "mapsie-stop";
-        node.style.setProperty("--u", `${u}px`);
-        node.innerHTML = `
-          <div class="mapsie-stop-dot" style="background:${c.accent};color:${c.paper};border-color:${c.paper}">${i + 1}</div>
-          ${s.showLabel ? `<div class="mapsie-stop-label" style="color:${c.ink};background:${c.paper};font-family:${fontCss(design.font)}"></div>` : ""}`;
-        const label = node.querySelector(".mapsie-stop-label");
-        if (label) label.textContent = s.name;
-        const mk = new maplibregl.Marker({ element: node, draggable: editable, anchor: "center" }).setLngLat([s.lng, s.lat]).addTo(mm);
-        mk.on("dragend", () => {
-          const p = mk.getLngLat();
-          h.current?.onStopMove?.(s.id, p.lng, p.lat);
+  // --- travel-mode icons halfway along each leg
+  useEffect(
+    () =>
+      whenMap((mm) => {
+        modeMarkers.current.forEach((mk) => mk.remove());
+        modeMarkers.current = [];
+        if (!design.route.show || !design.route.modeIcons) return;
+        const c = design.theme.colors;
+        modeMarkers.current = buildLegs(design.stops, design.route.curved).map((leg) => {
+          const node = document.createElement("div");
+          node.className = "mapsie-mode";
+          node.style.cssText = `--u:${u}px;background:${c.paper};border-color:${c.accent}`;
+          node.innerHTML = `<img src="${MODES.find((x) => x.id === leg.mode)?.icon}" alt="" />`;
+          const a = leg.line[0];
+          const b = leg.line[leg.line.length - 1];
+          // Only show the icon when the leg is long enough on screen not to crowd the stops.
+          const fit = () => {
+            const pa = mm.project(a);
+            const pb = mm.project(b);
+            node.style.visibility = Math.hypot(pa.x - pb.x, pa.y - pb.y) > u * 13 ? "visible" : "hidden";
+          };
+          fit();
+          mm.on("zoom", fit);
+          const mk = new maplibregl.Marker({ element: node, anchor: "center" }).setLngLat(leg.mid).addTo(mm);
+          const remove = mk.remove.bind(mk);
+          mk.remove = () => (mm.off("zoom", fit), remove());
+          return mk;
         });
-        return mk;
-      });
-    };
-    if (m) run();
-    else {
-      const t = setInterval(() => map.current && (clearInterval(t), run()), 50);
-      return () => clearInterval(t);
-    }
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stopsKey]);
+    [routeKey],
+  );
 
-  // --- stickers & photos, pinned to a place on the map
-  const stickersKey = JSON.stringify([design.stickers, selectedSticker, width, editable]);
-  useEffect(() => {
-    const run = () => {
-      const mm = map.current;
-      if (!mm) return;
-      stickerMarkers.current.forEach((mk) => mk.remove());
-      stickerMarkers.current = design.stickers.map((st: Sticker) => {
-        const node = document.createElement("div");
-        node.className = "mapsie-sticker" + (st.id === selectedSticker && editable ? " is-selected" : "") + (st.kind === "photo" ? " is-photo" : "");
-        const px = st.size * u;
-        node.style.width = `${px}px`;
-        node.style.height = `${px}px`;
-        const img = document.createElement("img");
-        img.src = st.src;
-        img.draggable = false;
-        img.alt = "";
-        img.style.transform = `rotate(${st.rotation}deg)`;
-        if (st.kind === "photo") img.style.borderWidth = `${Math.max(2, px * 0.05)}px`;
-        node.appendChild(img);
-        node.addEventListener("click", (e) => {
-          e.stopPropagation();
-          h.current?.onStickerSelect?.(st.id);
-        });
-        const mk = new maplibregl.Marker({ element: node, draggable: editable, anchor: "center" }).setLngLat([st.lng, st.lat]).addTo(mm);
-        mk.on("dragstart", () => h.current?.onStickerSelect?.(st.id));
-        mk.on("dragend", () => {
-          const p = mk.getLngLat();
-          h.current?.onStickerMove?.(st.id, p.lng, p.lat);
-        });
-        return mk;
-      });
+  // --- visited countries
+  function syncVisited() {
+    const m = map.current;
+    if (!m || !styleReady.current) return;
+    const d = latest.current;
+    const apply = (data: GeoJSON.FeatureCollection) => {
+      if (!map.current || !styleReady.current) return;
+      const src = m.getSource(VISITED_SRC) as maplibregl.GeoJSONSource | undefined;
+      if (src) src.setData(data);
+      else m.addSource(VISITED_SRC, { type: "geojson", data });
+      if (!m.getLayer(VISITED_SRC)) {
+        // Below the water layer, so the sea crisply trims the country shapes.
+        m.addLayer({ id: VISITED_SRC, type: "fill", source: VISITED_SRC, paint: {} }, m.getLayer("water") ? "water" : undefined);
+      }
+      m.setPaintProperty(VISITED_SRC, "fill-color", d.theme.colors.accent);
+      m.setPaintProperty(VISITED_SRC, "fill-opacity", d.visited.opacity);
     };
-    if (map.current) run();
-    else {
-      const t = setInterval(() => map.current && (clearInterval(t), run()), 50);
-      return () => clearInterval(t);
-    }
+    if (!d.visited.show) return apply(EMPTY);
+    loadCountries().then((all) => apply(visitedCountries(all, latest.current.stops)));
+  }
+  const visitedKey = JSON.stringify([design.visited, design.stops.map((s) => [s.lng, s.lat]), design.theme.colors.accent]);
+  useEffect(() => {
+    syncVisited();
+     
+  }, [visitedKey]);
+
+  // --- stop markers (HTML, so they can use any font and stay crisp in print)
+  const stopsKey = JSON.stringify([design.stops.map(({ path: _p, ...s }) => s), design.markers, design.theme.colors, design.font, width, editable]); // eslint-disable-line @typescript-eslint/no-unused-vars
+  useEffect(
+    () =>
+      whenMap((mm) => {
+        stopMarkers.current.forEach((mk) => mk.remove());
+        const c = design.theme.colors;
+        const style = design.markers.style;
+        stopMarkers.current = design.stops.map((s: Stop, i) => {
+          const node = document.createElement("div");
+          node.className = `mapsie-stop is-${style}`;
+          node.style.setProperty("--u", `${u}px`);
+          const icon =
+            style === "number"
+              ? `<div class="mapsie-stop-dot" style="background:${c.accent};color:${c.paper};border-color:${c.paper}">${i + 1}</div>`
+              : style === "dot"
+                ? `<div class="mapsie-stop-dot" style="background:${c.accent};border-color:${c.paper}"></div>`
+                : `<div class="mapsie-stop-icon">${markerSvg(style, c.accent, c.paper)}</div>`;
+          const date = design.markers.showDates && s.date ? `<small>${esc(s.date)}</small>` : "";
+          const label = s.showLabel
+            ? `<div class="mapsie-stop-label" style="color:${c.ink};background:${c.paper};font-family:${fontCss(design.font)}">${esc(s.name)}${date}</div>`
+            : "";
+          node.innerHTML = icon + label;
+          const mk = new maplibregl.Marker({ element: node, draggable: editable, anchor: style === "pin" ? "bottom" : "center" })
+            .setLngLat([s.lng, s.lat])
+            .addTo(mm);
+          mk.on("dragend", () => {
+            const p = mk.getLngLat();
+            h.current?.onStopMove?.(s.id, p.lng, p.lat);
+          });
+          return mk;
+        });
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stickersKey]);
+    [stopsKey],
+  );
+
+  // --- stickers, photos and text notes, pinned to a place on the map
+  const stickersKey = JSON.stringify([design.stickers, selectedSticker, width, editable]);
+  useEffect(
+    () =>
+      whenMap((mm) => {
+        stickerMarkers.current.forEach((mk) => mk.remove());
+        stickerMarkers.current = design.stickers.map((st: Sticker) => {
+          const selected = st.id === selectedSticker && editable;
+          const node = document.createElement("div");
+          node.className = `mapsie-sticker is-${st.kind}` + (selected ? " is-selected" : "");
+          const px = st.size * u;
+          let inner: HTMLElement;
+          if (st.kind === "text") {
+            inner = document.createElement("div");
+            inner.className = "mapsie-note";
+            inner.textContent = st.text || "Your note";
+            inner.style.cssText = `font-family:${fontCss(st.font ?? "caveat")};color:${st.color ?? design.theme.colors.ink};font-size:${px}px`;
+          } else {
+            node.style.width = `${px}px`;
+            node.style.height = `${px}px`;
+            const img = document.createElement("img");
+            img.src = st.src;
+            img.draggable = false;
+            img.alt = "";
+            if (st.kind === "photo") img.style.borderWidth = `${Math.max(2, px * 0.05)}px`;
+            inner = img;
+          }
+          inner.style.transform = `rotate(${st.rotation}deg)`;
+          node.appendChild(inner);
+          node.addEventListener("click", (e) => {
+            e.stopPropagation();
+            h.current?.onStickerSelect?.(st.id);
+          });
+          if (selected) addHandles(node, inner, st);
+          const mk = new maplibregl.Marker({ element: node, draggable: editable, anchor: "center" }).setLngLat([st.lng, st.lat]).addTo(mm);
+          mk.on("dragstart", () => h.current?.onStickerSelect?.(st.id));
+          mk.on("dragend", () => {
+            const p = mk.getLngLat();
+            h.current?.onStickerMove?.(st.id, p.lng, p.lat);
+          });
+          return mk;
+        });
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [stickersKey],
+  );
+
+  /** Corner handle to resize, top handle to rotate. Updates live, saves on release. */
+  function addHandles(node: HTMLElement, inner: HTMLElement, st: Sticker) {
+    const make = (cls: string, mode: "size" | "rotate") => {
+      const hd = document.createElement("div");
+      hd.className = `mapsie-handle ${cls}`;
+      const start = (e: PointerEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const r = node.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const d0 = Math.hypot(e.clientX - cx, e.clientY - cy) || 1;
+        const a0 = Math.atan2(e.clientY - cy, e.clientX - cx);
+        let size = st.size;
+        let rotation = st.rotation;
+        const move = (ev: PointerEvent) => {
+          if (mode === "size") {
+            size = Math.max(2, Math.min(60, (st.size * Math.hypot(ev.clientX - cx, ev.clientY - cy)) / d0));
+            const px = size * (widthRef.current / 100);
+            if (st.kind === "text") inner.style.fontSize = `${px}px`;
+            else {
+              node.style.width = `${px}px`;
+              node.style.height = `${px}px`;
+            }
+          } else {
+            rotation = Math.round(st.rotation + ((Math.atan2(ev.clientY - cy, ev.clientX - cx) - a0) * 180) / Math.PI);
+            if (!ev.shiftKey) rotation = Math.round(rotation / 5) * 5;
+            inner.style.transform = `rotate(${rotation}deg)`;
+          }
+        };
+        const up = () => {
+          window.removeEventListener("pointermove", move);
+          window.removeEventListener("pointerup", up);
+          h.current?.onStickerChange?.(st.id, mode === "size" ? { size } : { rotation });
+        };
+        window.addEventListener("pointermove", move);
+        window.addEventListener("pointerup", up);
+      };
+      hd.addEventListener("pointerdown", start);
+      // keep the marker's own drag from starting
+      hd.addEventListener("mousedown", (e) => e.stopPropagation());
+      hd.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
+      node.appendChild(hd);
+    };
+    make("is-resize", "size");
+    make("is-rotate", "rotate");
+  }
 
   // --- keep the canvas sized to its box
   useEffect(() => {

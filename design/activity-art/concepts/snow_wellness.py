@@ -41,6 +41,12 @@ def _line_only(d: Drawing, path: str, w: float = 2.4):
         d.bands.append(f'<path d="{path}" fill="none" stroke="{d.c["ink"]}" stroke-width="{w}" stroke-linecap="round" stroke-linejoin="round"/>')
 
 
+def _ink(d: Drawing, path: str, w: float = 1.6):
+    """Detail drawn only in line style, on top of the shapes drawn so far."""
+    if not d.paper:
+        d.parts.append(f'<path d="{path}" fill="none" stroke="{d.c["ink"]}" stroke-width="{w}" stroke-linecap="round" stroke-linejoin="round"/>')
+
+
 def _pine(x, y, h, w=None):
     """A three-tier pine standing on (x, y)."""
     w = w or h * 0.55
@@ -166,7 +172,7 @@ def iceclimb_icefall(d: Drawing):
     ice = "M56 44 Q100 34 146 40 L140 110 Q150 140 144 176 L56 176 Q50 140 62 110Z"
     d.shape("glow2", ice)
     d.stroke("light", "M74 50 Q68 90 76 126 Q80 150 72 172 M100 44 Q106 80 98 112 Q94 140 102 172 M126 46 Q132 86 124 120 Q120 150 128 172", 2.6, line=False)
-    _line_only(d, "M74 50 Q68 90 76 126 Q80 150 72 172 M126 46 Q132 86 124 120 Q120 150 128 172", 1.6)
+    _ink(d, "M74 50 Q68 90 76 126 Q80 150 72 172 M126 46 Q132 86 124 120 Q120 150 128 172", 1.6)
     d.shape("deep", "M-30 34 L36 40 L58 60 L66 104 L56 140 L60 200 L-30 200Z")
     d.shape("deep", "M230 26 L170 34 L146 60 L138 104 L148 140 L142 200 L230 200Z")
     d.shape("light", "M-30 30 L36 36 L58 56 L60 62 L40 48 L20 50 L-30 42Z", shadow=False)
@@ -187,11 +193,11 @@ def _axe(d: Drawing):
 def iceclimb_axes(d: Drawing):
     d.band("glow2", "M-30 -30 H230", shadow=False, line=False)
     d.stroke("light", "M30 10 Q20 60 34 110 Q44 140 30 180 M166 10 Q178 70 164 120 Q156 150 170 190 M64 20 Q58 50 66 70", 3, line=False)
-    _line_only(d, "M30 10 Q20 60 34 110 Q44 140 30 180 M166 10 Q178 70 164 120 Q156 150 170 190", 1.6)
+    _ink(d, "M30 10 Q20 60 34 110 Q44 140 30 180 M166 10 Q178 70 164 120 Q156 150 170 190", 1.6)
     d.disc("glow", 100, 104, 50)
     d.band("light", "M-30 164 Q100 150 230 164")
-    group(d, "translate(100 112) rotate(30)", lambda: _axe(d))
-    group(d, "translate(100 112) scale(-1 1) rotate(30)", lambda: _axe(d))
+    group(d, "translate(100 108) rotate(-32)", lambda: _axe(d))
+    group(d, "translate(100 108) scale(-1 1) rotate(-32)", lambda: _axe(d))
     _flakes(d, [(40, 76, 4), (164, 78, 4.5), (150, 160, 3)])
 
 
@@ -202,7 +208,7 @@ def iceclimb_crampon(d: Drawing):
     wall = "M150 -30 L230 -30 L230 230 L146 230 L150 170 L140 110 L152 50Z"
     d.shape("glow2", wall)
     d.stroke("light", "M172 -10 Q166 40 176 90 Q184 140 174 200 M200 -10 Q206 60 196 120 Q190 160 200 200", 3, line=False)
-    _line_only(d, "M180 20 Q174 70 184 120 Q190 160 182 200", 1.6)
+    _ink(d, "M180 20 Q174 70 184 120 Q190 160 182 200", 1.6)
 
     def leg():
         d.shape("dark", "M56 -30 L104 -30 L100 74 L58 78Z")
@@ -229,11 +235,12 @@ def icefish_hole(d: Drawing):
     d.band("mid", "M-30 114 H230")
     _cover(d, "mid", "M90 91 H110 V115 H90Z")
     d.stroke("glow2", "M90 99 V114 M110 99 V114", 1.4, line=False)
-    _line_only(d, "M90 92 V114 M110 92 V114", 3)
+    _ink(d, "M90 92 V114 M110 92 V114", 3)
     d.band("near", waves(162, 4, 40), line=False)
-    d.shape("pop", _bar(46, 58, 64, 66, 7), spot=True)
-    d.shape("dark", _bar(62, 65, 100, 78, 3.4))
-    d.stroke("dark", "M100 78 L100 146", 1.2)
+    d.limb("dark", "M66 92 L70 78 L74 92", 2.6, shadow=False)
+    d.shape("pop", _bar(40, 84, 58, 80, 7), spot=True)
+    d.shape("dark", _bar(56, 80, 100, 72, 3.4))
+    d.stroke("dark", "M100 72 L100 146", 1.2)
     d.shape("pop", "M96 146 L104 146 L102 156 L100 160 L98 156Z")
     d.shape("hero", fish(132, 150, 2.4))
     d.marks("mark", circle(118, 148, 1.8))
@@ -241,8 +248,8 @@ def icefish_hole(d: Drawing):
     d.shape("hero2", fish(52, 176, 1.3, right=True))
     for x, y, r in [(112, 136, 2), (118, 126, 1.6), (70, 160, 1.6)]:
         d.stroke("light", circle(x, y, r), 1.4)
-    d.shape("hero", "M140 80 L148 92 H164 L170 80Z")
-    d.shape("dark", ellipse(155, 80, 15, 3), shadow=False)
+    d.shape("hero2", "M146 78 H166 L163 92 H149Z")
+    d.shape("dark", ellipse(156, 78, 10, 2.5), shadow=False)
 
 
 def _shack(d: Drawing, x, y, s, body, door="dark"):
@@ -277,8 +284,8 @@ def icefish_bucket(d: Drawing):
     d.band("light", "M-30 124 Q100 116 230 124")
     d.shape("near", ellipse(140, 152, 16, 5))
     d.shape("glow2", "M124 152 Q140 145 156 152 Q140 148 124 152Z", shadow=False, line=False)
-    d.shape("mark", fish(146, 172, 1.6))
-    d.marks("light", circle(136, 171, 1.2))
+    d.shape("mark", fish(158, 160, 1.9), spot=True)
+    d.marks("light", circle(147, 159, 1.4))
     d.shape("hero2", "M60 124 H86 L90 162 H56Z")
     d.stroke("dark", "M58 136 H88 M57 150 H89", 1.4, line=False)
     d.limb("dark", "M80 120 L102 122 L104 150", 9)
@@ -303,7 +310,7 @@ def icehotel_facade(d: Drawing):
     d.shape("glow2", rrect(26, 96, 148, 58, 3))
     d.stroke("light", "M26 110 H174 M26 124 H174 M26 138 H174 M44 96 V110 M80 96 V110 M140 96 V110 M160 110 V124 M60 110 V124 "
                       "M40 124 V138 M154 124 V138 M52 138 V154 M150 138 V154", 1.6, line=False)
-    _line_only(d, "M26 110 H66 M134 110 H174 M26 132 H66 M134 132 H174", 1.4)
+    _ink(d, "M26 110 H66 M134 110 H174 M26 132 H66 M134 132 H174", 1.4)
     d.shape("light", "M72 156 V114 Q72 84 100 84 Q128 84 128 114 V156 H120 V116 Q120 94 100 94 Q80 94 80 116 V156Z")
     d.shape("glow", "M80 156 V116 Q80 94 100 94 Q120 94 120 116 V156Z", shadow=False, spot=True)
     d.stroke("glow2", "M100 96 V156", 1.6, line=False)
@@ -318,8 +325,8 @@ def icehotel_bed(d: Drawing):
     niche = "M22 166 V86 Q22 34 100 34 Q178 34 178 86 V166Z"
     d.shape("glow2", niche)
     d.stroke("light", "M22 86 H178 M22 112 H178 M32 60 H168 M60 40 H140 M100 34 V60 M60 60 V86 M140 60 V86 M100 86 V112", 1.8, line=False)
-    _flakes(d, [(100, 74, 0)])
-    d.stroke("light", "M100 62 V86 M90 68 L110 80 M90 80 L110 68", 2.4, line=False)
+    _ink(d, "M22 86 H178 M32 60 H168 M60 60 V86 M140 60 V86 M22 112 H50 M150 112 H178", 1.4)
+    d.stroke("light", "M100 62 V86 M90 68 L110 80 M90 80 L110 68", 2.4)
     d.shape("glow2", rrect(26, 128, 148, 34, 4))
     d.stroke("light", "M26 140 H174 M74 128 V140 M126 128 V140 M50 140 V162 M100 140 V162 M150 140 V162", 1.6, line=False)
     d.shape("ground", "M24 132 C30 120 40 126 50 118 C60 124 70 116 80 120 L150 116 C160 122 170 118 178 128 L176 136 C170 140 160 136 150 140 L40 142 C32 140 26 138 24 132Z")
@@ -327,8 +334,9 @@ def icehotel_bed(d: Drawing):
     d.stroke("hero2", "M92 98 V120 M124 98 V120", 1.6, line=False)
     d.shape("light", "M34 104 Q30 94 42 92 L62 94 Q68 104 62 114 L42 116 Q32 114 34 104Z")
     d.band("far", "M-30 166 H230")
-    d.shape("glow2", rrect(176, 140, 14, 18, 2))
-    d.shape("pop", "M183 140 C179 134 182 130 183 126 C185 130 188 134 183 140Z", shadow=False, spot=True)
+    for x in (56, 144):
+        d.shape("glow2", rrect(x - 7, 168, 14, 16, 2))
+        d.shape("pop", f"M{x} 168 C{x - 4} 162 {x - 1} 158 {x} 154 C{x + 2} 158 {x + 5} 162 {x} 168Z", shadow=False, spot=True)
 
 
 def icehotel_glass(d: Drawing):
@@ -357,7 +365,7 @@ def igloo_day(d: Drawing):
     dome = "M34 144 A66 80 0 0 1 166 144Z"
     d.shape("light", dome)
     d.stroke("glow2", _dome_blocks(100, 144, 66, 80, 4), 2, line=False)
-    _line_only(d, _dome_blocks(100, 144, 66, 80, 4), 1.4)
+    _ink(d, _dome_blocks(100, 144, 66, 80, 4), 1.4)
     d.shape("light", "M76 150 V124 Q76 102 100 102 Q124 102 124 124 V150Z")
     d.stroke("glow2", "M76 130 H124 M88 130 V150 M112 130 V150 M100 102 V114 M82 112 L90 118 M118 112 L110 118", 2, line=False)
     d.shape("dark", "M88 150 V130 Q88 116 100 116 Q112 116 112 130 V150Z", shadow=False)
@@ -367,7 +375,7 @@ def igloo_day(d: Drawing):
 
 def igloo_glass(d: Drawing):
     _stars(d, [(40, 30, 1.4), (150, 26, 1.6), (172, 60, 1.2), (24, 64, 1.2), (110, 18, 1.2)])
-    _aurora(d, -6)
+    _aurora(d, -16)
     d.band("far", "M-30 124 L20 106 L60 118 L110 98 L150 114 L190 102 L230 112")
     _pines(d, "dark", [(14, 138, 34), (30, 140, 24), (178, 136, 36), (194, 140, 26)])
     d.band("light", "M-30 136 Q100 128 230 136")
@@ -385,8 +393,8 @@ def igloo_glass(d: Drawing):
             d.shape("pop", rrect(cx - r * .38, base - r * .2, r * .76, r * .2, 2), shadow=False)
     dome(44, 140, 20, False)
     dome(162, 142, 22, False)
-    dome(100, 160, 46)
-    d.band("light", "M-30 158 Q100 152 230 158")
+    dome(100, 168, 54)
+    d.band("light", "M-30 166 Q100 160 230 166")
 
 
 def igloo_entrance(d: Drawing):
@@ -395,16 +403,13 @@ def igloo_entrance(d: Drawing):
     dome = "M-6 206 A106 150 0 0 1 206 206Z"
     d.shape("light", dome)
     d.stroke("sky2", _dome_blocks(100, 206, 106, 150, 6), 2, line=False)
-    _line_only(d, "M18 120 Q100 90 182 120 M8 160 Q100 132 192 160", 1.6)
+    _ink(d, "M18 120 Q100 90 182 120 M8 160 Q100 132 192 160", 1.6)
     d.shape("light", "M50 190 V140 Q50 92 100 92 Q150 92 150 140 V190Z")
     d.stroke("sky2", "M50 140 H150 M50 166 H150 M76 140 V166 M124 140 V166 M100 166 V190 M62 166 V190 M138 166 V190 M100 92 V112 M64 108 L76 118 M136 108 L124 118", 2, line=False)
     d.shape("dark", "M68 190 V146 Q68 112 100 112 Q132 112 132 146 V190Z", shadow=False)
     d.shape("glow", "M74 190 V148 Q74 120 100 120 Q126 120 126 148 V190Z", shadow=False, spot=True)
     d.shape("ground", "M80 190 L84 168 H116 L120 190Z", shadow=False)
     d.band("light", "M-30 184 Q100 178 230 184")
-    for x in (36, 52):
-        d.shape("hero", f"M{x} 160 H{x + 10} V178 Q{x + 18} 178 {x + 20} 184 V188 H{x} Z")
-        d.shape("hero2", rrect(x - 1, 156, 12, 6, 2), shadow=False)
     d.shape("dark", rrect(152, 166, 22, 6, 2))
     d.shape("pop", rrect(154, 146, 18, 20, 3))
     d.shape("glow", rrect(158, 150, 10, 12, 2), shadow=False)
@@ -427,11 +432,9 @@ def sledging_wooden(d: Drawing):
     d.band("mid", "M-30 112 Q40 92 100 106 T230 98")
     _pines(d, "deep", [(140, 120, 40), (158, 122, 30), (176, 120, 44), (194, 124, 28), (20, 124, 26)])
     d.band("light", "M-30 124 Q100 114 230 126")
-    group(d, "translate(96 152) rotate(-5) scale(1.25)", lambda: (
+    group(d, "translate(98 150) rotate(-4) scale(1.15)", lambda: (
         _sledge(d),
-        d.limb("pop", "M58 -34 Q62 -12 40 -2 Q24 4 18 -8", 2.4, shadow=False)))
-    d.limb("pop", "M60 128 Q74 122 88 130", 7, spot=True)
-    d.stroke("light", "M66 126 V132 M74 124 V130 M82 126 V132", 2, line=False)
+        d.limb("pop", "M58 -34 Q66 -10 46 4 Q34 12 22 8", 2.4, shadow=False)))
     d.band("light", "M-30 168 Q100 158 230 170", line=False)
     _flakes(d, [(150, 52, 4.5), (110, 36, 3.5), (178, 78, 3.5)])
 
@@ -442,7 +445,7 @@ def sledging_hill(d: Drawing):
     _pines(d, "deep", [(150, 104, 34), (166, 106, 26), (184, 102, 40), (200, 106, 28)])
     d.band("light", "M-30 70 Q50 74 110 104 T230 150")
     d.stroke("glow2", "M-20 82 Q30 86 76 108 M-20 90 Q30 94 72 114", 1.8, line=False)
-    _line_only(d, "M-20 86 Q30 90 74 110", 1.4)
+    _ink(d, "M-20 86 Q30 90 74 110", 1.4)
 
     def kid():
         d.limb("light", "M-60 -4 Q-48 -16 -40 -6 M-66 4 Q-56 -6 -46 2", 3, shadow=False)
@@ -590,7 +593,7 @@ def thermal_roman(d: Drawing):
     d.shape("ground", rrect(-30, 46, 260, 8, 1))
     for x in range(-14, 220, 12):
         d.shape("ground", rrect(x, 52, 4, 9, 1), shadow=False)
-    for x in (40, 100, 160):
+    for x in (64, 100, 136):
         d.shape("dark", _statue(x, 46, 1.4))
     d.shape("far", rrect(-30, 70, 260, 52, 0), shadow=False, line=False)
     for x in (12, 44, 76, 108, 140, 172):
@@ -600,8 +603,8 @@ def thermal_roman(d: Drawing):
     d.shape("ground", rrect(-30, 120, 260, 8, 1))
     d.band("mid", "M-30 130 H230")
     for x in (18, 50, 82, 114, 146, 178):
-        d.stroke("near", f"M{x} 136 V150 M{x - 2} 156 V164", 3, line=False)
-    _line_only(d, "M10 150 Q30 146 50 150 M120 160 Q140 156 160 160", 1.6)
+        d.stroke("near", f"M{x - 6} 140 H{x + 6} M{x - 4} 150 H{x + 4} M{x - 2} 160 H{x + 2}", 3, line=False)
+    _ink(d, "M10 150 Q30 146 50 150 M120 160 Q140 156 160 160", 1.6)
     steam(d, [(30, 128), (90, 126), (150, 128)], 30)
     d.band("ground", "M-30 176 H230")
 
@@ -637,7 +640,7 @@ def thermal_chess(d: Drawing):
         d.shape("dark", sq, shadow=False)
     group(d, "translate(100 138) scale(1 .5) rotate(45)", board)
     d.stroke("light", "M30 150 Q44 146 58 150 M142 154 Q154 150 168 154 M60 176 Q100 184 140 176", 2.2, line=False)
-    _line_only(d, "M30 150 Q44 146 58 150 M142 154 Q154 150 168 154", 1.6)
+    _ink(d, "M30 150 Q44 146 58 150 M142 154 Q154 150 168 154", 1.6)
     _king(d, 82, 140, 1.15, "dark")
     _knight(d, 124, 144, 1.0, "light")
     d.stroke("dark", "M114 120 Q117 118 120 120", 1.2, line=False)
@@ -647,14 +650,15 @@ def thermal_chess(d: Drawing):
 # ================================================================ ONSEN
 def onsen_rotenburo(d: Drawing):
     d.disc("glow", 150, 40, 12)
-    d.band("far", "M-30 104 Q40 86 100 98 T230 92")
+    d.band("near", "M-30 104 Q40 86 100 98 T230 92")
     _pines(d, "deep", [(120, 110, 30), (140, 112, 24), (102, 112, 20)])
     d.band("light", "M-30 110 Q100 102 230 112")
-    d.limb("dark", "M50 40 V118", 6)
-    d.shape("dark", "M-30 24 L92 40 L98 50 L-30 38Z")
-    d.shape("light", "M-30 18 L90 34 L94 40 L-30 26Z", shadow=False)
-    d.stroke("ground", "M-20 34 L80 46", 1.2, line=False)
-    d.shape("hero", ellipse(100, 150, 80, 24), spot=True)
+    d.shape("ground", "M-30 66 L70 74 L70 126 L-30 126Z")
+    d.stroke("near", " ".join(f"M{x} {66 + (x + 30) * .08:.1f} V126" for x in range(-22, 70, 8)), 1.4, line=False)
+    _ink(d, " ".join(f"M{x} {66 + (x + 30) * .08:.1f} V126" for x in range(-14, 70, 16)), 1.4)
+    d.limb("dark", "M-30 84 L70 90 M-30 108 L70 112", 3, shadow=False)
+    d.shape("light", "M-30 62 L72 70 L72 75 L-30 68Z", shadow=False)
+    d.shape("hero", ellipse(100, 150, 80, 24))
     d.stroke("light", "M60 148 Q70 144 80 148 M120 156 Q132 152 144 156", 2, line=False)
     for x, y, rx, ry in [(26, 136, 16, 9), (50, 128, 14, 7), (152, 128, 14, 7), (176, 140, 16, 9), (34, 170, 18, 9), (166, 172, 18, 8), (100, 180, 22, 7)]:
         d.shape("mid", ellipse(x, y, rx, ry))
@@ -700,11 +704,11 @@ def onsen_noren(d: Drawing):
 
 
 def onsen_soaker(d: Drawing):
-    d.band("far", "M-30 96 Q40 82 100 92 T230 88")
+    d.band("mid", "M-30 96 Q40 82 100 92 T230 88")
     _pines(d, "deep", [(20, 104, 34), (38, 106, 24), (164, 102, 36), (182, 106, 26)])
     d.band("light", "M-30 104 Q100 96 230 106")
     for x, y, rx, ry in [(20, 120, 22, 10), (180, 118, 24, 10)]:
-        d.shape("mid", ellipse(x, y, rx, ry))
+        d.shape("dark", ellipse(x, y, rx, ry))
         d.shape("light", f"M{x - rx * .7:.1f} {y - ry * .5:.1f} Q{x} {y - ry * 1.3:.1f} {x + rx * .7:.1f} {y - ry * .5:.1f} Q{x} {y - ry * .9:.1f} {x - rx * .7:.1f} {y - ry * .5:.1f}Z", shadow=False)
     d.band("near", "M-30 122 Q100 118 230 122")
     d.shape("hero2", "M68 108 C68 84 82 72 100 72 C118 72 132 84 132 108 C132 126 118 138 100 138 C82 138 68 126 68 108Z")
@@ -714,7 +718,7 @@ def onsen_soaker(d: Drawing):
     d.stroke("mark", "M84 106 Q89 110 94 106 M106 106 Q111 110 116 106 M95 120 Q100 123 105 120", 2)
     d.marks("pop", ellipse(82, 116, 4, 2.4) + " " + ellipse(118, 116, 4, 2.4))
     d.band("near", "M-30 128 Q100 124 230 128", line=False)
-    _line_only(d, "M-30 128 Q100 124 230 128", 2.4)
+    _ink(d, "M-30 128 Q100 124 230 128", 2.4)
     d.stroke("light", "M68 130 Q100 140 132 130 M30 150 Q40 146 50 150 M150 156 Q160 152 170 156", 2, line=False)
     for x, y in [(46, 138), (152, 140), (164, 166)]:
         d.shape("glow2", circle(x, y, 6), spot=True)
@@ -813,7 +817,7 @@ def sauna_lake(d: Drawing):
     _pines(d, "deep", [(x, 108, 12 + (x * 7) % 9) for x in range(90, 220, 11)], shadow=False)
     d.band("mid", "M-30 108 H230")
     d.stroke("glow", "M126 118 H174 M136 126 H164 M144 134 H156", 2.4, line=False)
-    _line_only(d, "M126 120 H174 M138 130 H162", 1.6)
+    _ink(d, "M126 120 H174 M138 130 H162", 1.6)
     d.shape("near", "M-30 120 Q30 110 74 126 Q96 136 104 160 L-30 180Z")
     _pines(d, "deep", [(8, 124, 40), (24, 120, 30)])
     d.stroke("light", "M82 70 q-5 -6 0 -12 q5 -6 0 -12 q-5 -6 0 -12", 3)
@@ -901,21 +905,19 @@ def soundbath_gong(d: Drawing):
 
 
 def soundbath_lying(d: Drawing):
-    d.disc("glow", 100, 84, 50)
-    d.band("far", "M-30 128 H230")
-    d.stroke("pop", "M70 66 Q80 58 90 66 T110 66 T130 66 M78 50 Q88 42 98 50 T118 50", 2.6)
-    d.shape("hero2", rrect(14, 120, 172, 8, 3), spot=True)
-    d.shape("ground", circle(36, 110, 10))
-    d.shape("dark", "M26 112 C24 98 36 94 44 100 C40 102 34 104 30 114Z", shadow=False)
-    d.shape("pop", rrect(32, 104, 10, 4, 2), shadow=False)
-    d.shape("light", rrect(22, 114, 22, 8, 4))
-    d.shape("hero", "M46 108 Q46 98 58 98 L150 100 Q160 100 162 92 Q170 92 170 104 L170 120 H46Z")
-    d.stroke("hero2", "M80 100 V120 M118 100 V120", 1.6, line=False)
+    d.disc("glow", 100, 80, 46)
+    d.band("far", "M-30 140 H230")
+    d.stroke("pop", "M66 62 Q76 54 86 62 T106 62 T126 62 M74 46 Q84 38 94 46 T114 46", 2.6)
+    d.shape("hero2", rrect(14, 132, 172, 8, 3), spot=True)
+    d.shape("light", rrect(18, 122, 30, 10, 5))
+    d.shape("ground", "M24 120 C22 106 30 98 40 98 C46 98 50 102 50 108 L56 110 L50 114 C48 122 40 126 32 126 C28 126 25 124 24 120Z")
+    d.shape("dark", "M24 120 C20 106 30 96 42 98 C36 102 32 110 32 124Z", shadow=False)
+    d.shape("hero", "M50 132 V122 Q50 112 62 112 L132 114 Q140 114 144 104 Q150 96 156 104 Q160 110 160 120 L160 132Z")
+    d.stroke("hero2", "M86 114 V132 M120 115 V132", 1.6, line=False)
     for x, w, h in [(50, 34, 20), (98, 42, 24), (148, 30, 18)]:
-        d.shape("light", f"M{x - w / 2} {164 - h} H{x + w / 2} C{x + w / 2} {164 - h * .2} {x + w * .3} 166 {x} 166 C{x - w * .3} 166 {x - w / 2} {164 - h * .2} {x - w / 2} {164 - h}Z")
-        d.shape("glow2", ellipse(x, 164 - h, w / 2, 3), shadow=False)
-    d.shape("dark", _bar(112, 150, 132, 136, 4))
-    d.stroke("light", "M30 146 Q24 136 30 128 M168 142 Q176 132 170 124", 2, line=False)
+        d.shape("light", f"M{x - w / 2} {176 - h} H{x + w / 2} C{x + w / 2} {176 - h * .2} {x + w * .3} 178 {x} 178 C{x - w * .3} 178 {x - w / 2} {176 - h * .2} {x - w / 2} {176 - h}Z")
+        d.shape("glow2", ellipse(x, 176 - h, w / 2, 3), shadow=False)
+    d.shape("dark", _bar(112, 162, 132, 148, 4))
 
 
 # ================================================================ SURF & YOGA CAMP
@@ -965,8 +967,8 @@ def surfyoga_camp(d: Drawing):
     tent(150, 128, 0.7, "hero2")
     tent(84, 148, 1.15)
     _board(d, 152, 150, 16, "hero", "light", spot=True, s=0.68)
-    d.shape("hero2", "M30 176 L70 166 L90 182 L46 194Z")
-    d.stroke("pop", "M20 100 Q50 108 74 102", 1.2, line=False)
+    d.shape("pop", "M24 168 L66 158 L84 176 L38 188Z", spot=True)
+    _mat(d, 34, 146, -12, "pop", 0.7)
 
 
 def surfyoga_pose(d: Drawing):
@@ -991,6 +993,7 @@ def _phone(d: Drawing, x, y, rot, s=1.0):
         d.shape("dark", rrect(-14, -26, 28, 52, 6))
         d.shape("mark", rrect(-11, -21, 22, 42, 3), shadow=False, line=False)
         d.shape("light", rrect(-11, -21, 22, 42, 3), shadow=False, extra='opacity=".12"', line=False)
+        _ink(d, rrect(-10, -20, 20, 40, 3), 1.4)
         d.marks("light", rrect(-4, -24, 8, 1.6, .8))
         d.stroke("light", "M-6 -14 L2 -18", 1.2, line=False)
     group(d, f"translate({x} {y}) rotate({rot}) scale({s})", g)
@@ -1003,10 +1006,10 @@ def detox_basket(d: Drawing):
     _pines(d, "deep", [(x, 108, 12 + (x * 7) % 9) for x in range(-14, 220, 11)], shadow=False)
     d.band("mid", "M-30 106 H230")
     d.stroke("light", "M20 122 H50 M150 118 H180 M160 134 H186", 2, line=False)
-    _line_only(d, "M20 124 H50 M150 120 H180", 1.4)
+    _ink(d, "M20 124 H50 M150 120 H180", 1.4)
     d.shape("ground", "M64 130 H136 L176 230 H24Z")
     d.stroke("near", "M62 140 H138 M56 156 H144 M48 176 H152 M38 200 H162", 1.4, line=False)
-    _phone(d, 106, 128, 12, 1.05)
+    _phone(d, 104, 112, 10, 1.15)
     d.limb("hero2", "M74 136 Q100 96 126 136", 3.2, shadow=False)
     d.shape("hero2", "M64 134 H136 L128 176 H72Z", spot=True)
     d.stroke("near", "M66 144 H134 M68 154 H132 M70 164 H130 M84 136 L86 176 M100 136 V176 M116 136 L114 176", 1.2, line=False)
@@ -1070,11 +1073,11 @@ CONCEPTS = [
       fixes={"far": ["mid", "near"]}),
     C("iceclimb-axes", "ice-climbing", "Crossed ice axes", iceclimb_axes, overrides={"glow2": ICE},
       checks=[("hero", "glow"), ("dark", "glow"), ("glow", "glow2"), ("hero", "glow2"), ("dark", "glow2"), ("light", "glow2")],
-      fixes={"glow": ["glow2", "far", "mid"], "hero": ["pop", "deep"]}),
+      fixes={"glow2": ["#86BEDD"], "glow": ["far", "mid"], "hero": ["pop", "deep"]}),
     C("iceclimb-crampon", "ice-climbing", "Crampon kick", iceclimb_crampon, overrides={"glow2": ICE, "mark": "#8D99AE"},
       checks=[("hero", "sky"), ("hero", "glow2"), ("mark", "glow2"), ("light", "far"), ("far", "sky"), ("pop", "dark")],
       fixes={"hero": ["pop", "deep"], "far": ["mid", "near"]}),
-    C("icefish-hole", "ice-fishing", "Under the ice", icefish_hole, UNDERWATER, {"glow2": ICE},
+    C("icefish-hole", "ice-fishing", "Under the ice", icefish_hole, ALL, {"glow2": ICE, **POOL},
       checks=[("light", "far"), ("hero", "mid"), ("pop", "mid"), ("glow2", "mid"), ("far", "sky"), ("hero2", "mid")],
       fixes={"far": ["near", "deep"], "mid": ["near"], "hero": ["pop", "light"], "hero2": ["light", "glow"], "pop": ["hero2", "light"]}),
     C("icefish-shacks", "ice-fishing", "Shacks on the lake", icefish_shacks, overrides={"glow2": ICE},
@@ -1096,10 +1099,10 @@ CONCEPTS = [
       checks=[("light", "sky"), ("mid", "light"), ("glow2", "light"), ("mid", "sky")], fixes={**SNOW_FIX, "glow2": ["#86BEDD"]}),
     C("igloo-glass", "igloo-stay", "Glass igloos", igloo_glass, NIGHT_PALETTES, NIGHT,
       checks=[("sky", "light"), ("mark", "light"), ("mark", "sky"), ("far", "sky"), ("dark", "light")],
-      fixes={**NIGHT_FIX, "mark": ["deep", "dark", "near"]}),
+      fixes={**NIGHT_FIX, "mark": ["deep", "mid", "near"]}),
     C("igloo-entrance", "igloo-stay", "Glowing igloo door", igloo_entrance, NIGHT_PALETTES,
       overrides={"glow2": "#F7E7A6", "sky2": "#C9DCEA"},
-      checks=[("sky", "light"), ("hero", "light"), ("glow", "dark"), ("pop", "light")], fixes=NIGHT_FIX),
+      checks=[("sky", "light"), ("glow", "dark"), ("glow", "light"), ("pop", "light")], fixes={**NIGHT_FIX, "glow": ["#F2C14E"]}),
     C("sledging-wooden", "sledging", "Wooden sledge", sledging_wooden, overrides={"ground": WOOD},
       checks=[("light", "sky"), ("hero", "light"), ("ground", "light"), ("light", "mid"), ("pop", "light"), ("mid", "sky")],
       fixes={**SNOW_FIX, "hero": ["pop", "deep"]}),
@@ -1117,7 +1120,7 @@ CONCEPTS = [
       fixes={"glow": ["far", "mid"], "hero2": ["pop", "light"]}),
     C("meditate-buddha", "meditation", "Buddha & bodhi leaves", meditate_buddha, overrides={"hero": "#D4A94F", "hero2": "#F2D58C"},
       checks=[("hero", "glow"), ("hero", "sky"), ("hero", "far"), ("pop", "far"), ("near", "sky")],
-      fixes={"glow": ["far", "light", "mid"], "far": ["mid", "near"]}),
+      fixes={"glow": ["far", "light", "mid"], "far": ["mid", "near", "deep"], "near": ["mid", "far"]}),
     C("thermal-palace", "thermal-baths", "Bath palace", thermal_palace, NO_GOLD, {"hero2": "#F3C350", "mark": "#4F9A86", **POOL},
       checks=[("hero2", "sky"), ("mark", "sky"), ("light", "mid"), ("dark", "hero2"), ("light", "hero2")], fixes={"sky": [SNOW_SKY]}),
     C("thermal-roman", "thermal-baths", "Roman bath", thermal_roman, overrides={"mid": "#6FAE8F", "near": "#4C8A72", "ground": "#E7D3A8", "far": "#9C8466"},
@@ -1125,13 +1128,13 @@ CONCEPTS = [
     C("thermal-chess", "thermal-baths", "Chess in the pool", thermal_chess, NO_GOLD, {**POOL, "ground": "#C9955A", "hero2": "#F3C350"},
       checks=[("dark", "mid"), ("light", "mid"), ("ground", "mid"), ("hero2", "far")], fixes={"far": ["sky", "light"]}),
     C("onsen-rotenburo", "onsen", "Rock pool & lantern", onsen_rotenburo, overrides={"hero": "#86CFD3", "mid": "#9AA3AE"},
-      checks=[("light", "sky"), ("hero", "mid"), ("dark", "light"), ("mid", "light"), ("far", "sky"), ("light", "far")],
-      fixes={**SNOW_FIX, "far": ["near", "deep"]}),
+      checks=[("light", "sky"), ("hero", "mid"), ("dark", "light"), ("mid", "light"), ("near", "sky"), ("light", "near"), ("ground", "light")],
+      fixes=SNOW_FIX),
     C("onsen-noren", "onsen", "Noren curtain", onsen_noren, overrides={"ground": "#C8955F"},
-      checks=[("hero", "dark"), ("light", "hero"), ("pop", "ground"), ("dark", "ground")], fixes={"hero": ["pop", "mid", "near"]}),
+      checks=[("hero", "dark"), ("light", "hero"), ("pop", "ground"), ("dark", "ground")], fixes={"hero": ["pop", "mid", "near"], "pop": ["#D7263D"]}),
     C("onsen-soaker", "onsen", "Towel on the head", onsen_soaker, overrides={"hero2": "#F1C9A0", "glow2": "#F4C430", "near": "#5FB3BE"},
-      checks=[("light", "sky"), ("hero2", "near"), ("light", "dark"), ("glow2", "near"), ("far", "sky"), ("mid", "light")],
-      fixes={**SNOW_FIX, "far": ["mid", "deep"]}),
+      checks=[("light", "sky"), ("hero2", "near"), ("light", "dark"), ("glow2", "near"), ("mid", "sky"), ("mid", "light"), ("deep", "mid")],
+      fixes=SNOW_FIX),
     C("hammam-dome", "hammam", "Star-lit dome", hammam_dome,
       checks=[("glow", "mid"), ("mid", "far"), ("light", "far"), ("deep", "far")], fixes={"glow": ["glow2", "light"], "mid": ["near", "deep"]}),
     C("hammam-tas", "hammam", "Copper bowl & towel", hammam_tas, overrides={"hero": "#C97B3F", "hero2": "#EDB06C", "glow2": "#BFE6EE"},
@@ -1144,7 +1147,7 @@ CONCEPTS = [
       fixes={"sky": [SNOW_SKY, "sky2"], "near": ["deep", "ground"]}),
     C("sauna-stove", "sauna", "Löyly on the stones", sauna_stove, overrides={"hero": "#C98B55", "hero2": "#A86E3E", "mark": "#7D8794", "ground": "#7A4B2A"},
       checks=[("mark", "hero"), ("light", "hero"), ("dark", "hero"), ("ground", "hero")]),
-    C("sauna-icehole", "sauna", "Ice hole plunge", sauna_icehole, overrides={"hero": WOOD, "hero2": "#8A4E2A", "glow2": ICE},
+    C("sauna-icehole", "sauna", "Ice hole plunge", sauna_icehole, overrides={"hero": WOOD, "hero2": "#8A4E2A", "glow2": ICE, "near": "#2F6F8F"},
       checks=[("light", "sky"), ("light", "deep"), ("hero", "light"), ("near", "light"), ("mid", "sky")],
       fixes=SNOW_FIX),
     C("soundbath-bowl", "sound-bath", "Singing bowl", soundbath_bowl, overrides={"hero": "#D9A441", "hero2": "#F2CF7A"},
@@ -1162,7 +1165,7 @@ CONCEPTS = [
       checks=[("light", "far"), ("light", "ground"), ("hero", "ground"), ("hero2", "ground"), ("light", "sky")],
       fixes={"ground": ["#E3C08A"], "hero2": ["pop", "deep"], "hero": ["pop", "light"], "sky": [SNOW_SKY]}),
     C("surfyoga-pose", "surf-and-yoga-camp", "Tree pose on the board", surfyoga_pose, NO_GOLD,
-      checks=[("dark", "glow"), ("hero", "ground"), ("glow", "far")], fixes={"hero": ["pop", "deep"]}),
+      checks=[("dark", "glow"), ("hero", "ground"), ("glow", "far")], fixes={"hero": ["pop", "deep"], "glow": ["glow2", "light"]}),
     C("detox-basket", "digital-detox", "Phone in the basket", detox_basket, NO_GOLD, {"hero2": "#D9A866", "ground": "#8C6A4A", "near": "#5E4128"},
       checks=[("dark", "mid"), ("hero2", "ground"), ("ground", "mid"), ("far", "sky")], fixes={"far": ["mid"]}),
     C("detox-hammock", "digital-detox", "Hammock & book", detox_hammock, NO_GOLD,

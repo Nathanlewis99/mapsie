@@ -357,7 +357,7 @@ def devil_side(d: Drawing):
 
 
 def devil_cradle(d: Drawing):
-    d.disc("glow", 160, 48, 18)
+    d.disc("glow", 146, 50, 16)
     d.band("far", CRADLE.replace("L230 108", "L230 104"))
     d.shape("light", "M68 50 L74 56 L78 46 L84 56 L88 52 L92 62 L84 60 L78 54 L72 60Z", shadow=False, line=False)
     d.band("mid", hills(120, 6))
@@ -415,7 +415,7 @@ def platypus_creek(d: Drawing):
             d.shape("near", leaf(x + 2, 112 - h, 26, 4.5, a), shadow=False)
     d.band("mid", "M-30 112 Q60 104 120 110 T230 108")
     d.band("sky2", "M-30 122 L230 122", line=False)
-    place(d, lambda: platypus(d), 100, 104, 104, 122, 0.9)
+    place(d, lambda: platypus(d), 100, 104, 104, 118, 0.9)
     d.band("near", "M-30 128 L230 128", line=False)
     d.stroke("near", "M-30 128 H230", 2.4, line=False)
     d.stroke("light", "M30 140 L60 136 M150 136 L190 142 M40 150 L76 144 M140 146 L180 154 M62 160 L90 154", 2.2)
@@ -668,7 +668,7 @@ def emu_outback(d: Drawing):
     d.band("mid", hills(144, 4))
     tufts(d, [(150, 146, 0.9), (180, 148, 0.7), (24, 150, 0.8)], "near")
     d.band("ground", hills(160, 3))
-    place(d, lambda: emu(d, run=True), 108, 172, 162, 154, 0.46)
+    birds(d, [(150, 50, 1), (166, 42, 0.8)])
     place(d, lambda: emu(d, run=True), 108, 172, 92, 172, 0.84)
     d.stroke("light", "M172 166 q4 -4 8 0 M178 172 q3 -3 6 0", 1.8, line=False)
     d.band("deep", hills(188, 3, 20), line=False)
@@ -728,6 +728,434 @@ def kookaburra_fence(d: Drawing):
     place(d, lambda: kookaburra(d, False), 112, 162, 94, 132, 0.72)
 
 
+
+# ================================================================ WALLABY
+# Sitting, facing right, feet on y=171.
+WALLABY = ("M14 170 C30 168 46 162 54 152 C46 136 48 116 60 104 C70 92 82 84 92 78 C94 70 100 64 108 64 "
+           "C116 64 122 68 126 72 L134 78 C137 80 136 85 132 85 L120 86 C114 92 110 96 108 100 "
+           "C112 112 112 126 106 138 C112 146 114 156 110 164 L128 166 C132 167 132 171 128 171 L66 171 "
+           "C60 171 58 166 60 162 C48 168 30 172 14 172Z")
+
+
+def wallaby(d: Drawing, rock=False):
+    ears = "M98 70 C91 58 93 47 99 47 C104 51 104 62 104 68Z M106 66 C106 54 110 46 115 48 C117 54 115 62 112 68Z"
+    d.shape("hero", ears)
+    d.shape("hero2" if rock else "mark2", "M99 52 C98 58 100 64 102 66 L103 60Z M111 52 L111 64 L113 60Z", shadow=False, line=False)
+    d.shape("hero", WALLABY)
+    if rock:
+        rings = "".join(f"M{x} {176 - (x - 14) * 0.47:.1f} l6 -12 " for x in (18, 28, 38, 48))
+        clipped(d, WALLABY, lambda: d.stroke("hero2", rings, 4.5))
+        d.shape("hero2", "M112 160 L128 166 C132 167 132 171 128 171 L106 171Z", shadow=False, spot=True)
+    else:
+        d.shape("hero2", "M80 86 C90 76 104 70 114 74 C112 86 106 96 100 100 C94 94 86 90 80 86Z", shadow=False, spot=True)
+        d.shape("mark", "M118 166 L128 166 C132 167 132 171 128 171 L116 171Z", shadow=False)
+    d.shape("mark", "M126 72 L134 78 C137 80 136 85 132 85 L124 85 C123 80 124 75 126 72Z", shadow=False, line=False)
+    d.marks("mark", circle(114, 74, 2.2) + "M131 78 L135 80 L132 82Z")
+    d.marks("light", circle(114.7, 73.3, 0.7))
+    d.limb("hero2" if rock else "hero", "M104 102 L112 116 L118 118", 5)
+    d.marks("mark", circle(119, 118, 2.4))
+
+
+def wallaby_portrait(d: Drawing):
+    d.disc("glow", 76, 92, 46)
+    d.band("far", hills(150, 6))
+    tufts(d, [(28, 152, 1), (178, 150, 0.9), (150, 154, 0.7)], "near")
+    d.band("ground", hills(168, 3))
+    place(d, lambda: wallaby(d), 76, 171, 96, 172, 0.96, flipx=True)
+    d.band("deep", hills(186, 3, 20), line=False)
+
+
+def wallaby_gorge(d: Drawing):
+    d.disc("glow", 52, 54, 18)
+    d.band("far", "M-30 96 L10 90 L30 74 L60 70 L80 82 L120 80 L150 64 L176 66 L196 80 L230 82")
+    d.band("mid", "M-30 116 L20 108 L60 112 L110 100 L160 110 L230 104")
+    d.limb("dark", "M168 140 C166 120 172 104 168 80 M168 104 L186 86", 5)
+    d.shape("near", scallop(176, 74, 16, 9, 0.16), shadow=False)
+    # stacked boulders
+    d.shape("near", "M-20 200 L-14 150 C-6 132 20 128 40 132 C60 128 80 134 96 144 C112 140 130 146 138 162 L144 200Z")
+    d.stroke("deep", "M30 150 Q44 146 56 152 M88 160 Q100 156 112 164", 1.8, line=False)
+    d.band("ground", "M-30 172 Q100 162 230 172")
+    place(d, lambda: wallaby(d, rock=True), 76, 171, 72, 142, 0.92)
+    d.band("deep", hills(188, 3, 20), line=False)
+
+
+# ================================================================ DINGO
+DINGO_HEAD = ("M30 84 C32 79 40 77 48 75 L54 70 L56 50 L65 61 L69 59 L75 50 L77 68 C82 72 88 80 90 88 "
+              "C88 98 80 102 72 102 L62 98 L44 94 C36 92 30 89 30 84Z")
+
+
+def dingo_face(d: Drawing):
+    d.disc("glow", 64, 70, 40)
+    d.band("far", "M-30 172 L30 166 L40 152 L70 150 L78 164 L230 170")
+    place(d, lambda: dingo_bust(d), 80, 110, 112, 128, 1.45)
+    for x, y, k in [(30, 78, 1), (24, 92, 0.8), (36, 98, 0.7)]:
+        d.stroke("mark", f"M{x} {y} q-6 -3 -8 -9", 2 * k + 0.4)
+    d.band("ground", hills(190, 3), line=False)
+
+
+def dingo_bust(d: Drawing):
+    d.shape("hero", "M66 98 C62 124 56 160 54 210 L150 210 C140 160 118 118 90 84Z")
+    d.shape("light", "M66 98 C62 124 56 160 54 210 L74 210 C74 160 76 124 80 104Z", shadow=False, spot=True)
+    def head():
+        d.shape("hero", DINGO_HEAD)
+        d.shape("hero2", "M58 56 L59 66 L64 61Z", shadow=False, line=False)
+        d.shape("pop", "M40 92 L62 96 L44 98Z", shadow=False, line=False)
+        d.shape("light", "M36 92 C44 96 54 98 62 98 L72 102 C62 104 48 102 38 98Z", shadow=False, line=False)
+        d.stroke("mark", "M38 91 L60 96", 1.4)
+        d.marks("mark", circle(31, 83, 2.8))
+        d.shape("eye", ellipse(58, 76, 3.4, 2.2), shadow=False, line=False)
+        d.marks("mark", circle(58, 76, 1.3))
+    group(d, "rotate(-28 80 96)", head)
+
+
+DINGO = ("M30 84 C32 80 40 78 48 76 L54 70 L56 52 L64 62 L68 60 L74 52 L76 68 C80 72 84 78 88 86 "
+         "C98 90 118 90 140 92 C150 94 156 102 154 112 L158 148 L149 148 L145 124 C138 126 128 126 118 124 "
+         "L120 148 L111 148 L108 122 L96 120 L92 148 L83 148 L82 116 C76 108 72 100 70 96 C60 96 50 92 42 90 "
+         "C35 89 30 88 30 84Z")
+
+
+def dingo_side(d: Drawing):
+    d.shape("hero", "M148 96 C164 92 176 80 176 64 C186 76 184 98 168 108 C162 110 156 110 152 108Z")
+    d.shape("light", "M176 64 C186 76 184 90 178 98 C178 86 176 76 172 70Z", shadow=False, line=False)
+    d.shape("hero", DINGO)
+    d.shape("hero2", "M58 60 L60 70 L66 64Z", shadow=False, line=False)
+    d.shape("light", "M36 88 C46 90 58 94 70 96 C74 102 78 108 82 116 L80 104 C72 96 62 90 50 88Z", shadow=False, line=False)
+    d.stroke("light", "M83 145 H92 M111 145 H120 M149 145 H158", 3.4, line=False)
+    d.marks("mark", circle(31, 83, 2.6) + circle(56, 76, 1.8))
+
+
+def dingo_kgari(d: Drawing):
+    d.disc("glow", 150, 54, 20)
+    d.band("far", "M-30 104 L230 104", line=False)
+    # SS Maheno wreck
+    d.shape("rust", "M126 108 L132 86 L176 86 L184 108Z")
+    d.shape("rust", "M142 86 L144 74 L156 74 L158 86Z", shadow=False)
+    d.marks("dark", circle(140, 95, 1.8) + circle(150, 95, 1.8) + circle(160, 95, 1.8) + circle(170, 95, 1.8))
+    d.band("mid", waves(106, 2, 30))
+    d.band("light", waves(118, 3, 24), line=False)
+    d.band("near", "M-30 120 Q60 116 120 120 T230 118", line=False)
+    d.band("ground", "M-30 128 Q60 122 120 128 T230 124")
+    d.shape("far", "M-20 132 C10 110 40 108 60 130Z", line=False)
+    place(d, lambda: dingo_side(d), 100, 148, 96, 166, 0.88)
+    d.stroke("deep", "M150 176 l5 -2 M164 180 l5 -2 M40 180 l5 -2", 1.6, line=False)
+    d.band("deep", hills(188, 2, 20), line=False)
+
+
+# ================================================================ SALTWATER CROCODILE
+SALTIE_HEAD = ("M14 116 C14 106 24 100 34 102 C56 104 82 100 104 94 C114 80 130 72 146 74 C156 76 162 84 162 92 "
+               "C176 92 190 94 210 100 L210 150 L14 150 C10 136 10 124 14 116Z")
+
+
+def saltie_head(d: Drawing):
+    d.shape("hero", SALTIE_HEAD)
+    d.shape("hero", ellipse(28, 104, 9, 6), shadow=False)
+    d.marks("mark", ellipse(26, 101, 2.2, 1.3) + ellipse(33, 101, 2.2, 1.3))
+    teeth_up = "".join(f"M{x} 120 l3 9 l3 -9Z " for x in range(24, 140, 12))
+    teeth_dn = "".join(f"M{x} 123 l3 -8 l3 8Z " for x in range(30, 130, 12))
+    d.shape("light", teeth_up + teeth_dn, shadow=False)
+    d.stroke("mark", "M16 122 C40 121 70 121 100 117 C118 114 136 116 152 122 C162 126 172 126 182 124", 2.4)
+    d.shape("hero", "M126 80 C130 70 146 68 152 76 C150 80 140 82 126 80Z", shadow=False)
+    d.shape("eye", ellipse(141, 82, 8, 5.5), shadow=False, spot=True)
+    d.marks("mark", ellipse(141, 82, 1.5, 4.6))
+    d.marks("hero2", circle(60, 108, 2) + circle(74, 106, 2) + circle(88, 104, 2) + circle(66, 113, 1.6) + circle(82, 112, 1.6)
+            + circle(100, 108, 2) + circle(116, 98, 1.8) + circle(124, 108, 2))
+    d.shape("hero", "M166 92 l5 -9 l5 9Z M180 95 l5 -10 l5 10Z M194 98 l5 -10 l5 10Z M172 104 l4 -7 l4 7Z M188 106 l4 -8 l4 8Z", shadow=False)
+
+
+def saltie_portrait(d: Drawing):
+    d.disc("glow", 60, 54, 22)
+    d.band("far", hills(84, 6))
+    for x, h in [(150, 40), (176, 50), (24, 30)]:
+        d.limb("light", f"M{x} 90 L{x + 2} {90 - h}", 4, shadow=False)
+        d.shape("near", scallop(x + 2, 86 - h, 12, 8, 0.2), shadow=False, line=False)
+    d.band("mid", "M-30 92 L230 92", line=False)
+    place(d, lambda: saltie_head(d), 100, 120, 100, 112, 1.0)
+    d.band("near", waves(136, 3, 34))
+    d.stroke("light", "M30 146 q10 -5 20 0 M120 150 q10 -5 20 0", 2, line=False)
+    for x, y in [(40, 166), (150, 170)]:
+        d.shape("hero2", f"M{x - 13} {y} a13 6 0 1 0 1 -6 L{x} {y - 3}Z", line=False)
+    d.shape("pop", "M96 168 l-6 -8 l6 3 l0 -8 l4 8 l4 -8 l0 8 l6 -3 l-6 8Z", shadow=False, spot=True)
+    d.band("deep", waves(182, 3, 38), line=False)
+
+
+def saltie_croc(d: Drawing):
+    """Horizontal croc, jaws wide open, facing right (rotated upright for the jump)."""
+    d.shape("pop2", "M148 92 L198 72 L198 108Z", shadow=False)
+    d.limb("hero", "M118 110 L126 126 L132 128", 7)
+    d.shape("hero", "M-40 104 C0 92 60 86 110 88 L130 84 C140 76 152 76 158 82 L196 66 C201 64 204 70 199 73 "
+                    "L150 94 L198 110 C203 112 201 118 196 116 L146 108 C130 112 110 114 90 114 C40 116 0 112 -40 104Z")
+    d.shape("light", "M160 90 l4 -6 l3 5 l4 -7 l3 5 l4 -7 l3 5 l4 -6 l2 4Z M160 104 l3 6 l4 -5 l3 7 l4 -6 l3 7 l4 -6 l3 6 l2 -3Z", shadow=False)
+    d.shape("hero2", "M-40 104 C0 108 50 112 100 111 L146 108 C130 112 110 114 90 114 C40 116 0 112 -40 104Z", shadow=False, line=False)
+    d.marks("mark", "M20 96 l4 -6 l4 6Z M36 93 l4 -7 l4 7Z M52 91 l4 -7 l4 7Z M68 89 l4 -7 l4 7Z M84 88 l4 -7 l4 7Z M100 88 l4 -6 l4 6Z")
+    d.shape("eye", ellipse(146, 82, 5, 3.5), shadow=False, spot=True)
+    d.marks("mark", ellipse(146, 82, 1, 3))
+    d.limb("hero", "M60 110 L54 126 L46 128", 7)
+
+
+def saltie_jump(d: Drawing):
+    d.disc("glow", 50, 60, 20)
+    d.band("far", hills(130, 4))
+    for x in (8, 24, 172, 186):
+        d.shape("near", scallop(x, 126, 12, 8, 0.2), shadow=False, line=False)
+    d.band("mid", "M-30 136 L230 136")
+    # the bait on a pole held out from the boat
+    d.stroke("dark", "M214 14 L132 34", 3)
+    d.stroke("dark", "M140 32 L140 44", 1.4)
+    d.shape("pop", "M134 44 C134 40 146 40 146 44 L144 56 C142 60 138 60 136 56Z", spot=True)
+    place(d, lambda: saltie_croc(d), 60, 100, 102, 150, 0.82, rot=-66)
+    d.shape("light", "M50 152 C60 138 70 146 76 136 C80 146 92 140 96 150 C104 140 112 146 118 136 C124 146 136 140 146 152Z", line=False)
+    d.band("near", waves(152, 3, 30))
+    d.stroke("light", "M30 164 q10 -5 20 0 M140 168 q10 -5 20 0 M80 176 q10 -5 20 0", 2, line=False)
+    d.band("deep", waves(184, 3, 36), line=False)
+
+
+# ================================================================ FRILLED LIZARD
+def frill_disc(d: Drawing, cx, cy, rx, ry, rot=0):
+    def draw():
+        n = 18
+        d.shape("rim", scallop(cx, cy, rx, n, 0.05), extra=f'transform="translate({cx} {cy}) scale(1 {ry / rx}) translate({-cx} {-cy})"')
+        d.shape("frill", circle(cx, cy, rx * 0.84), shadow=False, spot=True, extra=f'transform="translate({cx} {cy}) scale(1 {ry / rx}) translate({-cx} {-cy})"')
+        d.shape("frill2", circle(cx, cy, rx * 0.5), shadow=False, line=False, extra=f'transform="translate({cx} {cy}) scale(1 {ry / rx}) translate({-cx} {-cy})"')
+        ribs = ""
+        for i in range(n):
+            a = 2 * math.pi * (i + 0.5) / n
+            ribs += f"M{cx + rx * 0.3 * math.cos(a):.1f} {cy + ry * 0.3 * math.sin(a):.1f} L{cx + rx * 0.95 * math.cos(a):.1f} {cy + ry * 0.95 * math.sin(a):.1f} "
+        d.stroke("rim", ribs, 1.6)
+    group(d, f"rotate({rot} {cx} {cy})", draw)
+
+
+def frilled_portrait(d: Drawing):
+    d.band("far", hills(170, 4), line=False)
+    frill_disc(d, 100, 90, 72, 66)
+    d.shape("hero", "M66 210 C68 166 82 132 100 128 C118 132 132 166 134 210Z")
+    d.limb("hero", "M78 158 L62 180 L54 182", 8)
+    d.limb("hero", "M122 158 L138 180 L146 182", 8)
+    d.stroke("mark", "M54 182 l-6 -2 M54 182 l-6 3 M146 182 l6 -2 M146 182 l6 3", 1.6)
+    d.shape("hero", "M100 52 C118 52 128 66 128 86 C128 108 118 124 100 128 C82 124 72 108 72 86 C72 66 82 52 100 52Z")
+    d.shape("mouth", "M80 92 C86 88 114 88 120 92 C120 112 112 124 100 126 C88 124 80 112 80 92Z")
+    d.shape("pop", "M90 112 C94 108 106 108 110 112 C108 120 104 122 100 122 C96 122 92 120 90 112Z", shadow=False, line=False)
+    for ex in (78, 122):
+        d.marks("eye", circle(ex, 72, 5))
+        d.marks("mark", circle(ex, 72, 2.4))
+    d.marks("mark", circle(94, 62, 1.4) + circle(106, 62, 1.4))
+    d.marks("hero2", circle(90, 140, 2) + circle(110, 146, 2) + circle(100, 160, 2) + circle(88, 172, 2) + circle(112, 180, 2))
+
+
+def frilled_run(d: Drawing):
+    d.disc("glow", 150, 60, 22)
+    d.band("far", hills(118, 4))
+    # cathedral termite mounds
+    for x, h in [(30, 46), (58, 30), (176, 36)]:
+        d.shape("mid", f"M{x - 12} 124 C{x - 10} {124 - h * 0.6} {x - 6} {124 - h} {x} {124 - h} C{x + 4} {124 - h * 0.8} {x + 4} {124 - h * 0.5} {x + 8} {124 - h * 0.4} "
+                       f"C{x + 10} {124 - h * 0.2} {x + 12} 120 {x + 14} 124Z")
+    d.band("ground", hills(138, 3))
+    def lizard():
+        d.shape("hero", "M114 134 C140 140 170 146 204 150 C170 154 140 152 112 146Z")
+        d.limb("hero", "M120 140 L136 152 L150 166", 6)
+        d.stroke("mark", "M150 166 l8 0 M150 166 l6 4", 1.6)
+        d.shape("hero", "M86 96 C96 90 108 96 114 108 C120 120 124 132 122 142 C116 148 108 146 102 138 C94 126 86 112 86 96Z")
+        d.marks("hero2", circle(98, 108, 1.6) + circle(106, 122, 1.6) + circle(112, 112, 1.6) + circle(112, 134, 1.6))
+        d.limb("hero", "M114 136 L98 150 L106 168", 6.5)
+        d.stroke("mark", "M106 168 l9 0 M106 168 l2 6", 1.6)
+        frill_disc(d, 82, 88, 25, 29, -20)
+        d.shape("hero", "M88 84 C80 76 66 70 52 72 C46 74 46 80 52 82 C62 84 74 88 86 92Z")
+        d.shape("mouth", "M86 92 C76 90 62 90 52 94 C58 98 72 98 88 98Z")
+        d.marks("eye", circle(70, 76, 2.6))
+        d.marks("mark", circle(70, 76, 1.3))
+        d.limb("hero", "M96 104 L90 116 L84 120", 4.5)
+    place(d, lizard, 110, 168, 104, 170, 1.12)
+    d.stroke("light", "M168 150 q4 -4 8 0 M178 156 q3 -3 6 0", 1.8, line=False)
+    d.band("deep", hills(182, 3, 20), line=False)
+
+
+# ================================================================ COCKATOO
+def cockatoo(d: Drawing):
+    for a, ln in [(-130, 44), (-110, 52), (-92, 54), (-74, 50), (-56, 42)]:
+        d.shape("crest", leaf(112, 66, ln, 6, a + 25), spot=True)
+    d.shape("white", "M96 96 C84 110 84 140 96 164 C108 182 134 186 146 170 C158 152 152 116 136 98Z")
+    d.shape("shade", "M126 104 C144 116 150 140 144 162 C140 172 132 178 124 178 C134 160 136 130 122 110Z", shadow=False)
+    d.stroke("shade2", "M130 128 Q136 140 134 156 M138 122 Q146 138 142 160", 1.4, line=False)
+    d.shape("white", "M132 170 L150 196 L136 200 L120 176Z")
+    d.shape("white", circle(104, 82, 27))
+    d.shape("crestsoft", ellipse(114, 92, 9, 6), shadow=False, line=False)
+    d.shape("beak", "M82 74 C70 72 62 82 62 96 C62 102 66 106 70 104 C70 96 74 88 84 88Z")
+    d.shape("beak", "M70 104 C76 106 82 102 86 94 L84 88 C78 90 72 96 70 104Z", shadow=False)
+    d.marks("ring", ellipse(97, 76, 6.5, 6))
+    d.marks("mark", circle(97, 76, 3.2))
+    d.marks("light", circle(98, 75, 1))
+    d.stroke("beak", "M106 178 L102 188 M116 180 L116 190", 3)
+
+
+def cockatoo_portrait(d: Drawing):
+    d.disc("mid", 104, 100, 66, line=False)
+    d.limb("dark", "M-10 192 C40 184 140 184 210 176", 10)
+    place(d, lambda: cockatoo(d), 110, 188, 104, 190, 0.98)
+
+
+SISTERS = ("M-30 112 L30 110 L38 104 L44 76 C46 70 52 70 54 76 L56 96 L62 96 L64 70 C66 62 74 62 76 70 L78 96 "
+           "L84 96 L86 62 C88 52 98 52 100 62 L104 98 L130 100 L230 106")
+
+
+def cockatoo_sisters(d: Drawing):
+    d.disc("glow", 160, 46, 16)
+    birds(d, [(130, 40, 1), (146, 32, 0.8)], "light")
+    d.band("far", SISTERS)
+    d.shape("deep", "M54 76 L56 96 M76 70 L78 96 M100 62 L104 98", line=False)
+    d.band("mid", "M-30 122 Q40 116 100 122 T230 118")
+    d.band("near", "M-30 140 Q40 132 100 138 T230 132")
+    d.limb("dark", "M210 150 C170 152 140 158 110 172 C90 180 60 182 30 200", 8)
+    for x, y, a in [(186, 146, 110), (196, 146, 70), (176, 150, 95)]:
+        d.shape("deep", gum(x, y, a, 26), shadow=False)
+    place(d, lambda: cockatoo(d), 110, 188, 132, 166, 0.6)
+
+
+# ================================================================ RAINBOW LORIKEET
+def lorikeet(d: Drawing):
+    d.shape("green", "M132 160 L156 196 L142 198 L124 166Z")
+    d.shape("green", "M92 100 C82 118 84 146 98 164 C110 176 132 174 140 156 C148 134 142 108 128 96Z")
+    d.shape("belly", "M90 142 C94 158 106 168 118 170 C126 160 126 146 122 138 C112 146 100 148 90 142Z", shadow=False, line=False)
+    d.shape("chest", "M90 108 C84 120 84 134 90 144 C102 150 116 146 122 134 C122 120 114 106 100 102Z", shadow=False, spot=True)
+    d.stroke("chest2", "M90 118 Q102 122 116 116 M88 128 Q102 132 120 126 M92 138 Q104 142 118 136", 2.2, line=False)
+    d.shape("green", "M118 98 C142 104 152 128 148 152 C146 164 138 172 128 172 C136 150 134 120 118 106Z")
+    d.stroke("green2", "M132 120 Q140 136 138 156 M124 112 Q134 128 132 150", 1.4, line=False)
+    d.shape("collar", "M86 100 C98 96 118 98 128 106 L126 113 C114 106 100 104 90 108Z", shadow=False)
+    d.shape("blue", circle(102, 80, 24))
+    d.shape("beak", "M82 74 C72 74 64 82 66 94 C68 98 72 98 74 94 C74 88 78 84 86 86Z")
+    d.shape("beak", "M74 96 C78 98 84 96 86 90 L84 86 C78 88 76 92 74 96Z", shadow=False)
+    d.marks("eye", circle(96, 76, 4.6))
+    d.marks("mark", circle(96, 76, 2.4))
+    d.marks("light", circle(97, 75, 0.8))
+    d.stroke("mark", "M104 168 L100 178 M114 170 L114 180", 2.6)
+
+
+def lorikeet_portrait(d: Drawing):
+    for x, y, a in [(-6, 40, 30), (0, 86, 10), (206, 44, 150), (204, 96, 170)]:
+        d.shape("near", gum(x, y, a, 54), line=False)
+    d.limb("dark", "M-10 180 C40 172 140 172 210 166", 10)
+    place(d, lambda: lorikeet(d), 110, 176, 104, 176, 1.02)
+
+
+def bottlebrush(d: Drawing, x, y, ang, s=1.0):
+    a = math.radians(ang)
+    ux, uy = math.cos(a), math.sin(a)
+    px, py = -uy, ux
+    p = ""
+    for i in range(14):
+        t = 4 + i * 2.3
+        bx, by = x + ux * t * s, y + uy * t * s
+        for k in (-1, 1):
+            p += f"M{bx:.1f} {by:.1f} L{bx + px * k * 11 * s + ux * 2 * s:.1f} {by + py * k * 11 * s + uy * 2 * s:.1f} "
+    d.stroke("dark", f"M{x - ux * 6} {y - uy * 6} L{x + ux * 38 * s:.1f} {y + uy * 38 * s:.1f}", 2.2)
+    d.stroke("brush", p, 1.8, shadow=True)
+    d.marks("brush2", "".join(circle(x + ux * (4 + i * 3.6) * s + px * k * 11 * s + ux * 2 * s, y + uy * (4 + i * 3.6) * s + py * k * 11 * s + uy * 2 * s, 1.4 * s)
+                              for i in range(0, 9, 2) for k in (-1, 1)))
+
+
+def lorikeet_bottlebrush(d: Drawing):
+    d.disc("glow", 150, 48, 18)
+    d.band("far", hills(170, 4), line=False)
+    d.limb("dark", "M-10 150 C40 140 120 138 210 120", 7)
+    for x, y, a in [(160, 128, 80), (176, 124, 120), (20, 146, 70), (100, 136, 100)]:
+        d.shape("near", gum(x, y, a, 30), shadow=False, line=False)
+    for x, y, a in [(150, 126, -80), (40, 144, -100), (186, 120, -60)]:
+        bottlebrush(d, x, y, a, 0.9)
+    place(d, lambda: lorikeet(d), 110, 176, 78, 148, 0.56)
+    place(d, lambda: lorikeet(d), 110, 176, 128, 136, 0.48, flipx=True)
+
+
+# ================================================================ LITTLE PENGUIN
+def little_penguin(d: Drawing):
+    d.shape("feet", "M84 172 C80 176 76 180 82 182 L98 182 L96 172Z M104 172 L104 182 L120 182 C124 180 120 176 116 172Z")
+    d.shape("hero", "M96 38 C110 36 120 46 122 60 C130 78 138 104 138 128 C138 156 126 174 104 176 C82 176 66 160 66 132 "
+                    "C66 108 72 88 76 72 C76 52 84 40 96 38Z")
+    d.shape("white", "M80 66 C88 72 92 82 90 96 C86 120 88 150 104 172 C82 174 70 158 70 134 C70 110 74 88 80 66Z", shadow=False)
+    d.shape("hero", "M118 92 C130 104 136 128 132 150 C128 154 124 152 122 148 C124 128 120 110 112 98Z", shadow=False)
+    d.stroke("white", "M122 148 C126 130 124 112 116 100", 1.4, line=False)
+    d.shape("dark", "M80 58 C70 58 60 60 54 64 C60 68 70 70 82 68Z")
+    d.marks("eye", circle(92, 56, 3.6))
+    d.marks("mark", circle(92, 56, 1.8))
+
+
+def penguin_rock(d: Drawing):
+    d.disc("glow", 150, 66, 24)
+    d.band("far", "M-30 120 L230 120")
+    d.stroke("light", "M20 128 H50 M140 130 H176 M70 136 H100", 2, line=False)
+    d.band("mid", waves(142, 2, 30), line=False)
+    d.shape("near", "M10 210 L18 176 C26 160 52 156 80 160 C110 156 150 158 168 172 L180 210Z")
+    d.stroke("deep", "M40 176 Q60 172 74 178 M118 174 Q136 172 150 178", 1.8, line=False)
+    place(d, lambda: little_penguin(d), 100, 182, 100, 170, 0.98)
+
+
+def penguin_parade(d: Drawing):
+    d.disc("glow", 136, 92, 28)
+    d.band("far", "M-30 104 L230 104")
+    d.band("mid", waves(114, 2, 30), line=False)
+    d.band("light", waves(124, 3, 22), line=False)
+    d.band("ground", "M-30 128 Q60 122 120 128 T230 124")
+    d.shape("near", "M-20 200 C0 160 30 150 60 152 C40 162 30 180 30 200Z", line=False)
+    for x, y, s in [(150, 140, 0.34), (124, 146, 0.4), (94, 154, 0.48), (58, 166, 0.58)]:
+        place(d, lambda: little_penguin(d), 100, 182, x, y + 20 * s, s, rot=-6)
+    d.stroke("deep", "M110 184 l4 -2 M150 176 l4 -2 M170 186 l4 -2", 1.6, line=False)
+
+
+# ================================================================ SUGAR GLIDER
+def glider_face(d: Drawing, s_eyes=11):
+    for ex, r in ((62, -32), (138, 32)):
+        d.shape("hero", ellipse(ex, 66, 15, 22), extra=f'transform="rotate({r} {ex} 66)"')
+        d.shape("ear", ellipse(ex, 68, 9, 15), extra=f'transform="rotate({r} {ex} 68)"', shadow=False, spot=True)
+    d.shape("hero", "M100 60 C126 60 144 78 144 100 C144 124 124 138 100 138 C76 138 56 124 56 100 C56 78 74 60 100 60Z")
+    d.shape("hero2", "M64 112 C72 128 86 136 100 136 C114 136 128 128 136 112 C124 120 112 122 100 122 C88 122 76 120 64 112Z", shadow=False, line=False)
+    d.marks("mark", "M96 60 L104 60 L104 98 L100 110 L96 98Z")
+    d.marks("mark", "M66 78 C74 82 84 88 88 96 L84 102 C76 96 70 88 66 78Z M134 78 C126 82 116 88 112 96 L116 102 C124 96 130 88 134 78Z")
+    for ex in (78, 122):
+        d.marks("mark", circle(ex, 98, s_eyes))
+        d.marks("light", circle(ex + 3, 94, s_eyes * 0.3) + circle(ex - 3, 102, s_eyes * 0.12))
+    d.marks("ear", ellipse(100, 114, 4, 3))
+    d.stroke("mark", "M96 122 Q100 125 104 122", 1.4)
+
+
+def glider_portrait(d: Drawing):
+    d.shape("dark", "M36 -10 C46 60 40 140 26 210 L174 210 C162 140 156 60 164 -10Z")
+    d.stroke("bark", "M48 10 C52 40 50 60 46 80 M154 20 C150 50 152 70 156 96 M44 150 C46 170 42 186 40 200 M158 150 C156 170 160 186 162 200", 2, line=False)
+    d.shape("deep", ellipse(100, 150, 46, 32))
+    glider_face(d)
+    d.shape("hero", "M60 150 C64 132 80 126 100 126 C120 126 136 132 140 150 Z", shadow=False)
+    d.limb("hero", "M72 150 L70 158", 9)
+    d.limb("hero", "M128 150 L130 158", 9)
+    d.marks("ear", circle(66, 160, 2) + circle(71, 161, 2) + circle(76, 160, 2) + circle(124, 160, 2) + circle(129, 161, 2) + circle(134, 160, 2))
+    d.shape("dark", "M50 156 C70 148 130 148 150 156 L160 200 L40 200Z", line=False)
+
+
+def glider_fly(d: Drawing):
+    d.limb("hero", "M100 128 C102 150 96 170 100 196", 11)
+    d.limb("mark", "M100 184 L100 198", 11, shadow=False)
+    d.shape("hero", "M58 70 C80 78 120 78 142 70 L152 74 C146 96 146 116 152 132 L142 136 C120 128 80 128 58 136 "
+                    "L48 132 C54 116 54 96 48 74Z")
+    d.shape("hero2", "M62 128 C80 122 120 122 138 128 L142 136 C120 128 80 128 58 136Z", shadow=False, line=False)
+    d.marks("mark", "M97 72 L103 72 L103 130 L97 130Z")
+    for x, y in [(50, 72), (150, 72), (48, 134), (152, 134)]:
+        d.marks("ear", circle(x, y, 3.2))
+    for ex, r in ((88, -30), (112, 30)):
+        d.shape("hero", ellipse(ex, 52, 6, 9), extra=f'transform="rotate({r} {ex} 52)"', shadow=False)
+    d.shape("hero", circle(100, 62, 14))
+    d.marks("mark", "M98 48 L102 48 L102 62 L100 66 L98 62Z")
+    d.marks("mark", circle(93, 62, 3.6) + circle(107, 62, 3.6))
+    d.marks("light", circle(94, 61, 1) + circle(108, 61, 1))
+
+
+def glider_night(d: Drawing):
+    d.disc("glow", 140, 52, 26)
+    d.marks("light", circle(40, 40, 1.4) + circle(70, 24, 1.2) + circle(170, 100, 1.4) + circle(30, 84, 1.2))
+    d.limb("dark", "M24 210 C20 150 28 100 20 -10", 18)
+    d.limb("dark", "M176 210 C180 160 172 120 180 -10", 18)
+    d.limb("dark", "M178 140 L204 120", 5)
+    d.limb("dark", "M24 70 L-4 52", 5)
+    for x, y, a in [(-2, 54, 80), (6, 60, 110), (196, 122, 70), (186, 128, 110)]:
+        d.shape("near", gum(x, y, a, 26), shadow=False, line=False)
+    place(d, lambda: glider_fly(d), 100, 110, 98, 110, 0.82, rot=-56)
+    d.band("far", hills(186, 3), line=False)
+
+
 # ================================================================ colours
 ROO_RED = {"hero": "#B65A30", "hero2": "#E6C29A", "mark": "#2E1C10"}
 KOALA_C = {"hero": "#98A1AB", "hero2": "#C7CDD4", "light": "#F1F2F4", "mark": "#2B2D35"}
@@ -744,6 +1172,21 @@ EMU_C = {"hero": "#6E5D4C", "hero2": "#4A3D31", "neck": "#8FAAC8", "dark": "#2A2
          "leg": "#4F4A45"}
 KOOKA_C = {"hero": "#6B4A2E", "hero2": "#F2E8D4", "mark": "#2A2018", "pop": "#5DA9D6", "beak2": "#D9C8A2", "pop2": "#B85A5A",
            "light": "#FFFFFF"}
+WALLABY_C = {"hero": "#8E8780", "hero2": "#B0653E", "mark": "#2A2420", "mark2": "#6A625C", "light": "#FFFFFF"}
+ROCKWALLABY_C = {"hero": "#9A958F", "hero2": "#E2A23B", "mark": "#2A2420", "mark2": "#6A625C", "light": "#FFFFFF"}
+DINGO_C = {"hero": "#D38B47", "hero2": "#E9B98A", "light": "#FBF1E2", "mark": "#231A14", "eye": "#E2A63B", "pop": "#E88A8A"}
+DINGO_BEACH = {**DINGO_C, "rust": "#8E4A30", "dark": "#2E2420"}
+SALTIE = {"hero": "#5E6B43", "hero2": "#8E9660", "mark": "#20241A", "light": "#FFFDF2", "eye": "#E3C547", "pop": "#F2A7C0"}
+SALTIE_JUMP = {**SALTIE, "hero2": "#D7CF94", "pop2": "#E8838F", "pop": "#B23A3A"}
+FRILL_C = {"hero": "#8C7A60", "hero2": "#5E503E", "mark": "#231C14", "frill": "#E8873A", "frill2": "#F6C445",
+           "rim": "#9E3B22", "mouth": "#F6DD7C", "eye": "#E3B23C", "pop": "#E88A8A"}
+COCKY_C = {"white": "#FCFCF8", "shade": "#E3E4DE", "shade2": "#C9CBC2", "crest": "#F5CF2E", "crestsoft": "#F8E7A0",
+           "beak": "#34343A", "ring": "#DCE9F4", "mark": "#1A1A1E", "light": "#FFFFFF"}
+LORI_C = {"blue": "#3D4FC6", "green": "#2E9E4A", "green2": "#1E7A38", "chest": "#F2862E", "chest2": "#F7D13A",
+          "belly": "#2B3F9E", "collar": "#A9D63B", "beak": "#E3402C", "eye": "#E3402C", "mark": "#1A1A1E",
+          "light": "#FFFFFF", "brush": "#D7263D", "brush2": "#F6D13A"}
+LPENG_C = {"hero": "#5A86B0", "white": "#FFFFFF", "dark": "#2A2E36", "eye": "#C9D6E2", "mark": "#1A1E26", "feet": "#F2B9B0"}
+GLIDER_C = {"bark": "#3A2A1E", "hero": "#9AA0A8", "hero2": "#E6E7EA", "mark": "#1F1E22", "ear": "#E9A9B4", "light": "#FFFFFF"}
 
 UNDERWATER = ["coastal", "dusk", "meadow"]
 
@@ -808,4 +1251,52 @@ CONCEPTS = [
     Concept("kookaburra-fence", "animal-kookaburra", "Kookaburra on the fence", kookaburra_fence, overrides=KOOKA_C,
             checks=[("hero2", "glow"), ("hero", "glow"), ("glow", "sky"), ("dark", "ground"), ("dark", "mid")],
             fixes={"glow": ["near", "mid", "deep"], "mid": ["near", "far"]}),
+    Concept("wallaby-portrait", "animal-wallaby", "Red-necked wallaby", wallaby_portrait, overrides=WALLABY_C,
+            checks=[("hero", "glow"), ("hero", "sky"), ("hero", "ground"), ("hero", "far")],
+            fixes={"glow": ["glow2", "light", "near"], "ground": ["light", "far"], "far": ["mid", "sky2"]}),
+    Concept("wallaby-gorge", "animal-wallaby", "Rock-wallaby in the gorge", wallaby_gorge, overrides=ROCKWALLABY_C,
+            checks=[("hero", "near"), ("hero", "far"), ("hero", "mid"), ("hero2", "near")],
+            fixes={"near": ["deep", "ground"], "mid": ["far", "sky2"], "far": ["sky2", "mid"]}),
+    Concept("dingo-portrait", "animal-dingo", "Dingo", dingo_face, overrides=DINGO_C,
+            checks=[("hero", "glow"), ("hero", "sky"), ("hero", "far")],
+            fixes={"glow": ["light", "glow2", "far"], "far": ["near", "deep", "sky2"]}),
+    Concept("dingo-kgari", "animal-dingo", "Dingo on K'gari", dingo_kgari, ["coastal", "meadow", "blush", "dusk"], DINGO_BEACH,
+            checks=[("hero", "ground"), ("hero", "near"), ("hero", "mid"), ("rust", "mid"), ("rust", "sky")],
+            fixes={"ground": ["light", "#F3E3C0"], "mid": ["far", "near"]}),
+    Concept("saltie-head", "animal-saltwater-crocodile", "Saltie at the billabong", saltie_portrait, ["coastal", "meadow", "blush", "dusk"], SALTIE,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("hero", "sky")],
+            fixes={"mid": ["sky2", "far", "glow2"], "near": ["deep", "far"], "far": ["sky2", "mid"]}),
+    Concept("saltie-jump", "animal-saltwater-crocodile", "Jumping croc", saltie_jump, ["golden", "coastal", "meadow", "blush", "dusk"], SALTIE_JUMP,
+            checks=[("hero", "sky"), ("hero", "far"), ("hero", "near"), ("hero", "mid")],
+            fixes={"far": ["sky2", "mid"], "near": ["deep", "mid"], "mid": ["far", "deep"]}),
+    Concept("frilled-portrait", "animal-frilled-lizard", "Frilled lizard", frilled_portrait, overrides=FRILL_C,
+            checks=[("rim", "sky"), ("frill", "sky"), ("hero", "frill2"), ("hero", "far")],
+            fixes={"sky": ["sky2", "far", "light"], "far": ["near", "deep"]}),
+    Concept("frilled-run", "animal-frilled-lizard", "Frilled lizard on the run", frilled_run, overrides=FRILL_C,
+            checks=[("hero", "ground"), ("hero", "sky"), ("hero", "far"), ("frill", "far"), ("frill", "sky"), ("hero", "glow")],
+            fixes={"ground": ["light", "far"], "far": ["sky2", "mid"], "glow": ["glow2", "light"]}),
+    Concept("cockatoo-portrait", "animal-cockatoo", "Sulphur-crested cockatoo", cockatoo_portrait, overrides=COCKY_C,
+            checks=[("white", "mid"), ("crest", "mid"), ("crest", "sky"), ("white", "dark")],
+            fixes={"mid": ["near", "deep", "far"]}),
+    Concept("cockatoo-sisters", "animal-cockatoo", "Cockatoo & the Three Sisters", cockatoo_sisters, overrides=COCKY_C,
+            checks=[("white", "near"), ("white", "mid"), ("crest", "mid"), ("crest", "near"), ("far", "sky")],
+            fixes={"near": ["deep", "mid"], "mid": ["near", "deep"], "far": ["mid", "near"]}),
+    Concept("lorikeet-portrait", "animal-rainbow-lorikeet", "Rainbow lorikeet", lorikeet_portrait, overrides=LORI_C,
+            checks=[("blue", "sky"), ("green", "sky"), ("green", "near"), ("chest", "sky")],
+            fixes={"near": ["deep", "far", "mid"], "sky": ["sky2"]}),
+    Concept("lorikeet-bottlebrush", "animal-rainbow-lorikeet", "Lorikeets in the bottlebrush", lorikeet_bottlebrush, overrides=LORI_C,
+            checks=[("blue", "sky"), ("green", "sky"), ("brush", "sky"), ("green", "near")],
+            fixes={"near": ["far", "deep"], "sky": ["sky2"]}),
+    Concept("littlepenguin-portrait", "animal-little-penguin", "Little penguin", penguin_rock, ["coastal", "meadow", "blush", "dusk"], LPENG_C,
+            checks=[("hero", "far"), ("hero", "near"), ("white", "far"), ("hero", "sky"), ("hero", "glow")],
+            fixes={"far": ["mid", "deep"], "near": ["deep", "ground", "far"], "glow": ["glow2", "light"]}),
+    Concept("littlepenguin-parade", "animal-little-penguin", "Penguin parade", penguin_parade, ["coastal", "meadow", "blush", "dusk"], LPENG_C,
+            checks=[("hero", "ground"), ("white", "ground"), ("hero", "near"), ("hero", "light")],
+            fixes={"ground": ["#E8D3A8", "far", "mid"], "near": ["deep", "mid"]}),
+    Concept("glider-portrait", "animal-sugar-glider", "Sugar glider", glider_portrait, overrides=GLIDER_C,
+            checks=[("hero", "dark"), ("hero", "deep"), ("ear", "dark"), ("dark", "sky")],
+            fixes={"dark": ["#6B4A32", "near", "mid"], "deep": ["#2A1D14", "dark"]}),
+    Concept("glider-night", "animal-sugar-glider", "Gliding by moonlight", glider_night, ["dusk", "coastal", "meadow", "blush", "golden"], GLIDER_C,
+            checks=[("hero", "sky"), ("hero", "dark"), ("hero", "glow")],
+            fixes={"sky": ["sky2", "deep", "near"], "glow": ["glow2", "light", "far"]}),
 ]

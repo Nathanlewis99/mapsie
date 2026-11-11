@@ -116,7 +116,6 @@ def hang_ramp(d: Drawing):
     d.stroke("dark", "M48 113 L54 126 M62 117 L56 132 M70 120 L57 134", 2.4)
     d.shape("hero2", "M20 104 L82 118 L81 123 L20 110Z", spot=True)
     d.stroke("dark", "M28 106 V112 M44 109.5 V115.5 M60 113 V119 M76 116.5 V122", 1, line=False)
-    _windsock(d, 24, 106, 32, flip=True)
     group(d, "translate(128 62) rotate(-12) scale(.62)", lambda: _delta(d))
     d.shape("light", cloud(54, 46, 0.8))
 
@@ -193,7 +192,7 @@ def scenic_nazca(d: Drawing):
             "M107 92 L150 74 L152 81 L143 84 L154 88 L143 91 L152 96 L106 99 "
             "M96 76 L88 58 L93 56 L98 70 L100 54 L104 54 L102 70 L107 56 L112 58 L104 76")
     group(d, "translate(96 116) scale(1.18 .92) translate(-100 -110)", lambda: d.stroke("light", bird, 2.6))
-    group(d, "translate(158 72) rotate(-60) scale(.56)", lambda: _plane_top(d))
+    group(d, "translate(142 148) rotate(-50) scale(.56)", lambda: _plane_top(d))
 
 
 def scenic_heart(d: Drawing):
@@ -232,16 +231,16 @@ def glide_airfield(d: Drawing):
 
     def glider():
         # far wing rising up and away, near wing sweeping down towards us
-        d.shape("hero", "M116 95 L130 95 L170 26 L165 25Z")
-        d.shape("hero2", "M170 26 L165 25 L159 36 L165 37Z", shadow=False, spot=True)
+        d.shape("hero", "M116 95 L130 95 L164 36 L159 35Z")
+        d.shape("hero2", "M164 36 L159 35 L154 44 L160 45Z", shadow=False, spot=True)
         d.shape("hero", "M34 101 L38 62 L48 62 L54 99Z")
         d.shape("hero", "M26 62 L60 60 L60 65 L26 66Z")
         d.shape("hero2", "M40 63 L48 63 L46 72 L39 72Z", shadow=False, spot=True)
         d.shape("hero", "M162 102 Q160 91 142 89 L122 91 Q96 95 50 97 L34 99 L34 104 L50 104 Q96 106 122 110 Q152 112 162 102Z")
         d.shape("dark", "M124 91 Q132 82 146 86 Q154 89 156 95 Q140 92 124 91Z")
         d.shape("light", "M134 86 Q142 85 148 89 L136 89Z", shadow=False, line=False)
-        d.shape("hero", "M112 104 L132 104 L82 182 L70 182Z")
-        d.shape("hero2", "M82 182 L70 182 L76 172 L88 172Z", shadow=False, spot=True)
+        d.shape("hero", "M112 104 L132 104 L90 168 L80 168Z")
+        d.shape("hero2", "M90 168 L80 168 L85 160 L95 160Z", shadow=False, spot=True)
     group(d, "translate(100 100) rotate(-8) scale(.98) translate(-100 -104)", glider)
 
 
@@ -255,7 +254,6 @@ def glide_tow(d: Drawing):
                 k += 1
             k += 2
     group(d, "rotate(-14 100 100)", fields)
-    _line_only(d, "M-30 70 L230 20 M-30 160 L230 110 M60 -30 L90 230", 1.6)
     d.stroke("light", "M-10 150 C40 140 70 170 110 150 S170 120 210 130", 4, line=False)
     d.shape("light", cloud(10, 60, 1.1))
     d.shape("light", cloud(138, 170, 1.0))
@@ -321,18 +319,17 @@ def micro_falls(d: Drawing):
     d.band("deep", "M-30 110 Q100 106 230 110", line=False)
     for x0, x1 in [(-30, 30), (40, 112), (124, 230)]:
         d.shape("light", f"M{x0} 110 L{x1} 109 L{x1} 160 L{x0} 160Z", shadow=False, line=False)
-    d.shape("near", "M30 109 L40 109 L42 160 L28 160Z M112 109 L124 109 L126 160 L110 160Z", shadow=False, line=False)
+    d.shape("near", "M29 109 L39 109 L36 126 L41 144 L36 160 L30 160 L33 140 L28 124Z M112 109 L123 109 L119 124 L125 140 L121 160 L114 160 L116 140 L111 126Z", shadow=False, line=False)
     _line_only(d, "M-30 110 Q100 106 230 110", 3)
-    _line_only(d, "M30 110 L28 150 M40 110 L42 150 M112 110 L110 150 M124 110 L126 150", 2)
+    _line_only(d, "M10 116 V128 M24 120 V140 M56 116 V132 M76 120 V142 M96 116 V130 M140 116 V134 M160 120 V144 M180 116 V130", 1.6)
     d.stroke("sky2", "M6 114 V150 M20 112 V152 M52 112 V150 M66 112 V152 M82 111 V150 M98 111 V152 "
                      "M136 112 V152 M152 112 V150 M168 112 V152 M184 113 V150", 2.4, line=False)
     d.band("deep", "M-30 150 Q100 146 230 150", line=False)
     for x, y, s in [(-10, 150, 1.5), (40, 142, 1.3), (96, 150, 1.6), (150, 144, 1.3)]:
-        d.shape("light", cloud(x, y, s), shadow=False, line=False)
+        d.shape("light", cloud(x, y, s), shadow=False)
     d.stroke("pop", "M52 150 A54 46 0 0 1 160 150", 3, line=False)
     d.stroke("hero2", "M57 150 A49 41 0 0 1 155 150", 3, line=False)
     d.stroke("far", "M62 150 A44 36 0 0 1 150 150", 3, line=False)
-    _line_only(d, "M56 150 A50 42 0 0 1 156 150", 2)
     d.band("near", "M-30 172 Q40 160 100 168 T230 162")
     for x, y, h in [(26, 172, 18), (40, 170, 14), (166, 166, 18), (180, 168, 14)]:
         d.shape("deep", _pine(x, y, h), line=False)
@@ -355,8 +352,8 @@ def micro_sunset(d: Drawing):
 # ================================================================ SKYWALK
 def skywalk_horseshoe(d: Drawing):
     d.disc("glow", 160, 46, 14)
-    d.band("far", "M-30 80 H60 L66 88 H120 L126 78 H230")
-    d.band("mid", "M-30 110 H70 L78 120 H130 L138 108 H230")
+    d.band("far", "M-30 80 H60 L66 88 H120 L126 78 H230", line=False)
+    d.band("mid", "M-30 110 H70 L78 120 H130 L138 108 H230", line=False)
     d.band("near", "M-30 142 H80 L88 152 H140 L150 138 H230")
     d.band("deep", "M-30 174 Q60 168 100 172 T230 170")
     d.stroke("sky2", "M80 230 Q90 196 120 186 T150 172", 4, line=False)
@@ -462,7 +459,7 @@ def swing_bali(d: Drawing):
     palm(168, 150, 0.9, -1)
     palm(20, 186, 1.0, 1)
     # swing ropes from a branch out of view, rider in a flowing dress
-    d.stroke("dark", "M54 -10 L116 112 M70 -10 L128 108", 1.6)
+    d.stroke("dark", "M46 -10 L106 114 M62 -10 L128 106", 1.6)
 
     def rider():
         d.shape("pop", "M2 -18 C-14 -10 -36 4 -64 0 C-48 10 -28 14 -6 8 C4 4 8 -4 6 -12Z", spot=True)
@@ -473,7 +470,7 @@ def swing_bali(d: Drawing):
         d.shape("hero2", circle(-1, -35, 6))
         d.shape("dark", "M-7 -36 a6 6 0 0 1 12 -2 Q0 -38 -7 -36Z", shadow=False)
         d.shape("dark", rrect(-6, -2, 20, 3.4, 1.5), shadow=False)
-    group(d, "translate(116 112) rotate(-20)", rider)
+    group(d, "translate(112 112) rotate(-20) scale(1.3)", rider)
 
 
 def swing_treehouse(d: Drawing):
@@ -589,7 +586,6 @@ def drone_controller(d: Drawing):
     d.raw("</g>", "")
     d.marks("pop", circle(62, 44, 2.6))
     d.stroke("light", "M136 44 h6 M136 48 h4", 1.4, line=False)
-    _line_only(d, "M60 74 L76 56 L92 68 L108 54 L140 78", 2)
     # the controller
     d.limb("dark", "M50 116 L34 88 M150 116 L166 88", 4)
     d.shape("hero", "M48 108 Q50 100 62 100 H138 Q150 100 152 108 L162 150 Q164 164 150 164 Q140 164 134 152 "
@@ -599,6 +595,7 @@ def drone_controller(d: Drawing):
         d.shape("dark", circle(x, 124, 9), shadow=False)
         d.shape("light", circle(x, 124, 3.6), shadow=False)
     d.marks("dark", circle(92, 128, 2.4) + circle(108, 128, 2.4))
+    d.raw("", f'<path d="M58 80 L76 58 L92 70 L108 54 L142 78" fill="none" stroke="{_ink(d, "dark")}" stroke-width="2" stroke-linejoin="round"/>')
 
 
 # ================================================================ MULTI-DAY TREK
@@ -839,8 +836,8 @@ def abseil_cliff(d: Drawing):
     face = "M150 -30 L156 40 L148 90 L158 140 L150 230 L230 230 L230 -30Z"
     _land(d, "near", face, "M150 -30 L156 40 L148 90 L158 140 L150 230")
     d.stroke("deep", "M170 30 L180 70 L172 110 M196 80 L190 140 L200 180", 2, line=False)
-    d.stroke("dark", "M154 -10 Q150 40 118 114", 1.8)
-    d.stroke("dark", "M112 120 Q110 170 124 230", 1.8)
+    d.stroke("dark", "M152 -10 L141 82 L114 124", 1.8)
+    d.stroke("dark", "M110 128 Q108 170 122 230", 1.8)
 
     def person():
         d.limb("hero", "M112 118 L148 112", 7)
@@ -924,7 +921,7 @@ def dirt_jump(d: Drawing):
     d.disc("glow", 60, 56, 20)
     d.band("far", hills(140, 10, 20))
     _land(d, "ground", "M-30 230 L-30 150 Q10 146 40 128 Q56 120 64 124 L76 230Z", "M-30 150 Q10 146 40 128 Q56 120 64 124 L76 230")
-    _land(d, "ground", "M120 230 Q150 160 180 158 Q210 158 230 162 L230 230Z", "M120 230 Q150 160 180 158 Q210 158 230 162")
+    _land(d, "ground", "M96 230 Q114 168 146 162 Q190 156 230 166 L230 230Z", "M96 230 Q114 168 146 162 Q190 156 230 166")
     d.band("near", "M-30 186 Q100 178 230 186", line=False)
     d.marks("mid", "".join(circle(x, y, r) for x, y, r in [(54, 118, 5), (42, 110, 4), (60, 104, 3), (34, 120, 3)]))
     d.stroke("dark", "M30 72 q4 -4 8 0 M160 60 q4 -4 8 0", 1.6)
@@ -1016,11 +1013,11 @@ def ebike_charge(d: Drawing):
     d.shape("dark", rrect(156, 96, 14, 24, 2), shadow=False)
     d.band("mid", "M-30 150 Q100 144 230 150")
     # charging post with its cable to the battery
-    d.shape("dark", rrect(124, 62, 24, 92, 6))
-    d.shape("light", rrect(128, 70, 16, 20, 3), shadow=False)
-    d.marks("pop", "M138 72 L131 81 L136 81 L133 88 L142 78 L137 78Z")
-    d.stroke("dark", "M136 106 Q136 136 112 134 Q92 132 80 124", 2.4)
-    group(d, "translate(64 130) scale(.86) translate(-100 -118)", lambda: _ebike(d))
+    d.shape("dark", rrect(131, 62, 24, 92, 6))
+    d.shape("light", rrect(135, 70, 16, 20, 3), shadow=False)
+    d.marks("pop", "M145 72 L138 81 L143 81 L140 88 L149 78 L144 78Z")
+    d.stroke("dark", "M143 106 Q143 140 118 138 Q96 136 88 126", 2.4)
+    group(d, "translate(76 130) scale(.86) translate(-100 -118)", lambda: _ebike(d))
     d.band("near", "M-30 176 Q100 168 230 176", line=False)
 
 
@@ -1039,7 +1036,7 @@ CONCEPTS = [
     Concept("scenic-nazca-lines", "scenic-flight", "Nazca lines", scenic_nazca, overrides={"ground": "#C98B5B", "mid": "#B97A4E", "light": "#FBEBD0"},
             checks=[("hero", "ground"), ("far", "sky")], fixes={"hero": ["hero2", "pop"]}),
     Concept("scenic-heart-reef", "scenic-flight", "Heart Reef", scenic_heart, SEA,
-            checks=[("pop", "light"), ("pop", "mid"), ("light", "mid")], fixes={"pop": ["hero", "deep"]}),
+            checks=[("pop", "light"), ("pop", "mid"), ("light", "mid")], fixes={"pop": ["#C8414B", "deep"]}),
     Concept("glide-sailplane", "gliding", "Sailplane over the hills", glide_airfield,
             checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid")], fixes={"hero": ["pop", "deep"]}),
     Concept("glide-aerotow", "gliding", "Aerotow", glide_tow,
@@ -1074,8 +1071,8 @@ CONCEPTS = [
             checks=[("light", "mid"), ("pop", "mid"), ("far", "sky")], fixes={"pop": ["hero", "deep"]}),
     Concept("trek-cairn", "multi-day-trek", "Cairn on the trail", trek_cairn,
             checks=[("dark", "mid"), ("dark", "near"), ("far", "sky")], fixes={"far": ["mid"]}),
-    Concept("trek-torres", "multi-day-trek", "Granite towers", trek_torres, SEA,
-            checks=[("near", "sky"), ("near", "mid"), ("hero", "ground")], fixes={"hero": ["pop", "deep"]}),
+    Concept("trek-torres", "multi-day-trek", "Granite towers", trek_torres, SEA, overrides={"near": "#8C93A0", "deep": "#5B6272"},
+            checks=[("near", "sky"), ("near", "mid"), ("hero", "ground")], fixes={"hero": ["pop", "dark"], "mid": ["far", "ground", "#C9C3B8"]}),
     Concept("boulder-crash-pad", "bouldering", "Boulder & crash pad", boulder_pad,
             checks=[("far", "sky"), ("far", "deep"), ("hero", "ground"), ("hero", "far")], fixes={"hero": ["pop", "deep"]}),
     Concept("boulder-chalk-bag", "bouldering", "Chalk bag", boulder_chalk,

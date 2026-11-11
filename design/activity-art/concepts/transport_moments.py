@@ -884,6 +884,506 @@ def bus_stop(d: Drawing):
     d.shape("dark", circle(78, 146, 2.2) + " " + circle(94, 146, 2.2), shadow=False)
 
 
+# ================================================================ BIRTHDAY TRIP
+def _drip_top(d: Drawing, x, y, w, role="hero2", spot=True):
+    n = max(3, int(w // 14))
+    p = f"M{x} {y} H{x + w}"
+    for i in range(n):
+        x0 = x + w - i * w / n
+        p += f" V{y + 6} Q{x0 - w / n / 2:.1f} {y + 14} {x0 - w / n:.1f} {y + 6}"
+    d.shape(role, p + f" V{y}Z", shadow=False, spot=spot)
+
+
+def bd_cake(d: Drawing):
+    d.disc("glow", 152, 54, 16)
+    d.band("far", waves(104, 3, 30))
+    d.band("mid", waves(118, 3, 34), line=False)
+    d.band("ground", "M-30 134 Q100 126 230 134")
+    _palm(d, 28, 150, 0.95, "dark", 8)
+    d.shape("dark", ellipse(104, 168, 52, 7))
+    d.shape("light", rrect(62, 116, 84, 50, 7))
+    _drip_top(d, 62, 118, 84)
+    d.shape("hero2", rrect(62, 116, 84, 8, 4), shadow=False, line=False)
+    d.stroke("pop", "M66 150 H142", 3)
+    for x in (72, 88, 104, 120, 136):
+        d.marks("pop", circle(x, 140, 2.6))
+    for i, x in enumerate((80, 96, 112, 128)):
+        top = 88 + (i % 2) * 6
+        d.shape("hero", rrect(x - 3.5, top, 7, 118 - top, 2))
+        d.stroke("light", f"M{x - 3.5} {top + 8} L{x + 3.5} {top + 4} M{x - 3.5} {top + 18} L{x + 3.5} {top + 14}", 1.4, line=False)
+        d.shape("pop", f"M{x} {top - 16} C{x + 6} {top - 9} {x + 6} {top - 3} {x} {top - 2} C{x - 6} {top - 3} {x - 6} {top - 9} {x} {top - 16}Z",
+                spot=True)
+        d.shape("glow2", ellipse(x, top - 6, 2, 3.2), shadow=False)
+    d.band("deep", hills(188, 4, 30), line=False)
+
+
+def bd_balloons(d: Drawing):
+    d.disc("glow", 100, 100, 60)
+    d.band("ground", "M-30 160 Q100 152 230 160")
+    knots = [(64, 82, "pop", True), (100, 62, "hero2", False), (138, 80, "hero", False)]
+    for x, y, _, _ in knots:
+        d.stroke("dark", f"M100 112 Q{(x + 100) / 2 + 4} {(y + 112) / 2 + 8} {x} {y + 4}", 1.3)
+    for x, y, role, spot in knots:
+        d.shape(role, f"M{x} {y} C{x - 18} {y - 6} {x - 22} {y - 26} {x - 18} {y - 36} C{x - 12} {y - 52} {x + 12} {y - 52} {x + 18} {y - 36} "
+                      f"C{x + 22} {y - 26} {x + 18} {y - 6} {x} {y}Z", spot=spot)
+        d.shape(role, f"M{x} {y - 1} L{x + 4} {y + 5} H{x - 4}Z", shadow=False)
+        d.stroke("light", f"M{x - 11} {y - 34} Q{x - 10} {y - 42} {x - 4} {y - 45}", 2.4, line=False)
+    # suitcase
+    d.stroke("dark", "M90 114 V104 H110 V114", 3)
+    d.shape("hero", rrect(64, 112, 72, 48, 7))
+    d.stroke("mark", "M64 124 H136", 1.4, line=False)
+    d.shape("light", circle(84, 140, 9), shadow=False)
+    d.shape("pop", "M75 140 A9 9 0 0 1 93 140Z", shadow=False)
+    d.shape("hero2", rrect(104, 132, 22, 15, 3), shadow=False, spot=True)
+    d.shape("dark", circle(74, 163, 3.5) + " " + circle(126, 163, 3.5), shadow=False)
+    _stars(d, [(36, 130, 4), (168, 128, 4.5), (160, 40, 3.5)])
+
+
+def bd_gift(d: Drawing):
+    d.disc("glow", 100, 104, 58)
+    d.band("ground", "M-30 166 Q100 158 230 166")
+    for x, y, r, role in [(44, 60, 3, "pop"), (152, 52, 2.6, "hero"), (164, 96, 3, "hero2"), (36, 108, 2.6, "hero"), (60, 34, 2.4, "hero2")]:
+        d.shape(role, rrect(x - r, y - r / 2, 2 * r, r, r / 2), shadow=False, extra=f'transform="rotate({x % 60 - 30} {x} {y})"')
+    _dash(d, "M96 110 C76 96 66 70 86 60 C98 54 106 62 102 70", "dark", 2, "4 5")
+
+    def plane():
+        d.shape("light", "M-30 -2 L30 -16 L-8 6Z")
+        d.shape("far", "M-8 6 L30 -16 L-4 16Z")
+        d.stroke("mark", "M-8 6 L30 -16", 1.2, line=False)
+    group(d, "translate(130 64) rotate(-18)", plane)
+    # lid leaning on the box
+    def lid():
+        d.shape("hero", rrect(0, 0, 18, 70, 4))
+        d.shape("pop", rrect(5, 0, 8, 70, 2), shadow=False, spot=True)
+    group(d, "translate(140 98) rotate(12)", lid)
+    d.shape("hero", rrect(56, 112, 84, 54, 5))
+    d.shape("pop", rrect(92, 112, 12, 54, 2), shadow=False, spot=True)
+    d.shape("dark", "M56 112 H140 V118 H56Z", shadow=False, line=False)
+    d.shape("pop", "M98 112 C88 96 70 100 74 110 C76 114 88 114 98 112Z M98 112 C108 96 126 100 122 110 C120 114 108 114 98 112Z")
+
+
+# ================================================================ ANNIVERSARY
+def _padlock(d: Drawing, x, y, s, role, spot=False):
+    d.stroke("mark", f"M{x - 5 * s} {y} V{y - 5 * s} A{5 * s} {5 * s} 0 0 1 {x + 5 * s} {y - 5 * s} V{y}", 2.2 * s)
+    d.shape(role, rrect(x - 8 * s, y - 1, 16 * s, 13 * s, 2.5 * s), spot=spot)
+    d.marks("dark", circle(x, y + 5 * s, 1.4 * s))
+
+
+def an_locks(d: Drawing):
+    d.disc("glow", 100, 96, 58)
+    d.band("far", waves(150, 3, 30))
+    d.band("mid", waves(164, 3, 34), line=False)
+    d.limb("dark", "M-30 52 H230", 5)
+    d.limb("dark", "M-30 152 H230", 5)
+    for x in range(10, 200, 20):
+        d.stroke("dark", f"M{x} 52 V152", 2.6)
+    for x, y, s, role in [(30, 70, 1.1, "hero"), (50, 112, 1.0, "hero2"), (150, 72, 1.0, "hero2"), (170, 120, 1.1, "near"),
+                          (130, 130, 0.9, "hero"), (70, 136, 0.9, "near"), (30, 116, 0.8, "light")]:
+        _padlock(d, x, y, s, role)
+    d.stroke("mark", "M86 92 V76 A14 14 0 0 1 114 76 V92", 5.5)
+    d.shape("pop", _heart(100, 108, 2.6), spot=True)
+    d.stroke("light", "M82 98 C80 92 84 86 90 86", 2.4, line=False)
+    d.marks("dark", circle(100, 106, 3.4) + " M98 106 L96 116 H104 L102 106Z")
+
+
+def _wine(d: Drawing, x, base, s=1.0, spot=False):
+    X = lambda dx: round(x + dx * s, 1)
+    Y = lambda dy: round(base + dy * s, 1)
+    d.shape("light", f"M{X(-12)} {Y(-62)} C{X(-15)} {Y(-44)} {X(-10)} {Y(-34)} {X(0)} {Y(-33)} C{X(10)} {Y(-34)} {X(15)} {Y(-44)} {X(12)} {Y(-62)}Z")
+    d.shape("pop", f"M{X(-13.4)} {Y(-48)} H{X(13.4)} C{X(12)} {Y(-38)} {X(7)} {Y(-35)} {X(0)} {Y(-35)} C{X(-7)} {Y(-35)} {X(-12)} {Y(-38)} {X(-13.4)} {Y(-48)}Z",
+            shadow=False, spot=spot)
+    d.limb("light", f"M{X(0)} {Y(-33)} L{X(0.2)} {Y(-3)}", 2.6 * s, shadow=False)
+    d.shape("light", ellipse(X(0), Y(-2), 10 * s, 2.6 * s))
+
+
+def an_dinner(d: Drawing):
+    _night(d)
+    d.disc("glow", 152, 50, 14)
+    for x, y, r in [(40, 46, 2.6), (74, 30, 2), (118, 40, 2.2), (182, 92, 2)]:
+        d.marks("light", _sparkle(x, y, r))
+    d.band("mid", "M-30 112 H8 V90 H24 V100 H40 V84 H54 V112 H140 V96 H156 V80 H172 V112 H230")
+    for x, y in [(12, 96), (44, 92), (160, 88), (160, 100)]:
+        d.marks("glow2", rrect(x, y, 4, 5, 1))
+    d.band("light", "M-30 136 H230")
+    d.shape("light", "M-30 136 H230 V150 Q200 160 170 150 Q140 160 110 150 Q80 160 50 150 Q20 160 -30 150Z", line=False)
+    d.stroke("far", "M-30 150 Q20 160 50 150 Q80 160 110 150 Q140 160 170 150 Q200 160 230 150", 1.4, line=False)
+    # candle
+    d.shape("hero2", ellipse(100, 136, 14, 4))
+    d.limb("hero2", "M100 134 L100.2 124", 4, shadow=False)
+    d.shape("light", rrect(94, 84, 12, 42, 3))
+    d.shape("pop", "M100 62 C108 72 108 80 100 82 C92 80 92 72 100 62Z", spot=True)
+    d.shape("glow2", ellipse(100, 76, 2.6, 4), shadow=False)
+    _wine(d, 64, 138, 1.0, spot=True)
+    _wine(d, 136, 138, 1.0)
+    d.limb("near", "M156 136 Q158 124 154 112", 2, shadow=False)
+    d.shape("pop", "M148 110 C146 102 150 98 154 98 C158 98 162 102 160 110 C158 114 150 114 148 110Z")
+
+
+def an_bench(d: Drawing):
+    d.disc("glow", 100, 116, 46)
+    d.band("far", waves(126, 3, 30))
+    d.band("mid", waves(138, 3, 34), line=False)
+    d.band("ground", "M-30 156 Q100 148 230 156")
+    # two people seen from behind, heads together
+    d.shape("dark", "M58 140 V118 C58 106 66 100 78 100 C90 100 98 106 98 118 V140Z")
+    d.shape("dark", "M102 140 V118 C102 106 110 100 122 100 C134 100 142 106 142 118 V140Z")
+    d.shape("dark", circle(84, 88, 10))
+    d.shape("dark", circle(116, 88, 10))
+    d.limb("dark", "M96 116 Q104 110 112 112", 5, shadow=False)
+    # bench
+    d.shape("hero", rrect(40, 120, 120, 7, 3), spot=True)
+    d.shape("hero", rrect(40, 132, 120, 7, 3), spot=True)
+    d.limb("hero", "M50 120 V160 M150 120 V160", 5)
+    d.shape("hero", rrect(36, 144, 128, 6, 3))
+    d.shape("pop", _heart(100, 52, 1.0), spot=True)
+    d.shape("pop", _heart(124, 38, 0.55), shadow=False)
+    d.band("deep", hills(186, 4, 20), line=False)
+
+
+# ================================================================ GIRLS' TRIP
+def gt_cocktails(d: Drawing):
+    d.disc("glow", 100, 96, 34)
+    d.band("far", waves(106, 3, 30))
+    d.band("mid", waves(120, 3, 34), line=False)
+    d.band("near", "M-30 146 H230")
+    d.shape("dark", "M-30 146 H230 V152 H-30Z", shadow=False, line=False)
+    # coupe
+    d.shape("light", "M34 92 C34 108 44 116 56 116 C68 116 78 108 78 92Z")
+    d.shape("pop", "M36 98 C38 108 46 113 56 113 C66 113 74 108 76 98Z", shadow=False, spot=True)
+    d.limb("light", "M56 116 L56.2 142", 2.6, shadow=False)
+    d.shape("light", ellipse(56, 144, 11, 3))
+    d.shape("hero2", circle(76, 92, 6))
+    # martini
+    d.shape("light", "M78 62 L100 96 L122 62Z")
+    d.shape("hero", "M84 70 L100 94 L116 70Z", shadow=False)
+    d.stroke("dark", "M108 52 L96 80", 1.4)
+    d.marks("near", circle(98, 76, 4))
+    d.limb("light", "M100 96 L100.2 142", 2.6, shadow=False)
+    d.shape("light", ellipse(100, 144, 11, 3))
+    # highball with umbrella
+    d.stroke("pop", "M150 84 L162 56", 2.4)
+    d.shape("light", rrect(128, 82, 28, 62, 3))
+    d.shape("hero2", rrect(130, 94, 24, 48, 2), shadow=False)
+    d.shape("light", rrect(134, 98, 8, 8, 1.5) + " " + rrect(144, 110, 8, 8, 1.5), shadow=False, line=False)
+    d.shape("near", "M130 82 A11 11 0 0 1 152 82Z", shadow=False)
+    d.limb("dark", "M136 84 L128 56", 1.4, shadow=False)
+    d.shape("pop", "M114 58 Q128 40 144 54 Q129 52 114 58Z", spot=True)
+
+
+def gt_convertible(d: Drawing):
+    d.disc("glow", 150, 58, 20)
+    d.band("far", waves(104, 3, 30))
+    d.band("near", "M-30 120 Q60 110 230 118")
+    d.band("dark", "M-30 150 H230")
+    d.stroke("light", "M-30 160 H10 M30 160 H70 M90 160 H130 M150 160 H190", 2.4, line=False)
+    # three heads with scarves and sunglasses
+    for x, role in [(58, "pop"), (84, "hero2"), (114, "light")]:
+        d.shape(role, f"M{x - 6} 84 C{x - 16} 80 {x - 22} 88 {x - 32} 82 C{x - 26} 94 {x - 14} 94 {x - 6} 92Z", shadow=False,
+                spot=role == "pop")
+        d.shape("dark", f"M{x - 12} 120 V106 C{x - 12} 100 {x - 6} 98 {x} 98 C{x + 6} 98 {x + 12} 100 {x + 12} 106 V120Z")
+        d.shape("dark", circle(x, 88, 8.5))
+        d.shape(role, f"M{x - 9} 88 C{x - 9} 76 {x + 9} 76 {x + 9} 88 C{x + 4} 84 {x - 4} 84 {x - 9} 88Z", shadow=False)
+    d.limb("dark", "M120 104 L132 88", 4.5)
+    # car, facing right
+    d.shape("light", "M136 112 L142 92 L146 93 L142 112Z")
+    d.shape("hero", "M22 132 C22 120 30 114 44 114 H160 C174 114 182 120 182 132 V142 C182 146 180 148 176 148 H26 C24 148 22 146 22 142Z")
+    d.shape("hero2", "M22 126 H182 V131 H22Z", shadow=False, spot=True)
+    d.stroke("mark", "M100 116 V146 M108 122 H114", 1.4, line=False)
+    d.shape("glow2", rrect(176, 120, 6, 6, 2), shadow=False)
+    for x in (52, 152):
+        d.marks("dark", f"M{x - 16} 148 A16 16 0 0 1 {x + 16} 148Z")
+        _wheel(d, x, 149, 12)
+
+
+POOLFLOAT = {"pop": "#F47FA8", "mid": "#5FBCC6", "near": "#2F8FA3", "hero": "#8A5536", "glow2": "#F2C88A"}
+
+
+def gt_floats(d: Drawing):
+    d.band("mid", "M-30 -30 H230", shadow=False, line=False)
+    d.shape("light", "M-30 -30 H230 V36 H-30Z")
+    d.stroke("far", "M10 -30 V32 M40 -30 V32 M70 -30 V32 M100 -30 V32 M130 -30 V32 M160 -30 V32 M190 -30 V32 M-30 12 H230", 1.2, line=False)
+    for y, x0 in [(60, 20), (150, 110), (176, 30), (90, 150)]:
+        d.stroke("light", f"M{x0} {y} q8 -5 16 0 q8 5 16 0", 2.2, line=False)
+    # flamingo ring
+    d.shape("pop", circle(88, 108, 40) + " " + circle(88, 108, 17), spot=True, extra=EVENODD)
+    d.stroke("light", "M58 96 A32 32 0 0 1 80 77", 3, line=False)
+    d.limb("pop", "M124 100 C140 86 138 62 124 54 C114 48 106 54 112 62", 9, spot=True)
+    d.shape("pop", circle(112, 60, 8))
+    d.shape("light", "M104 58 L94 62 L104 66Z")
+    d.shape("dark", "M94 62 L99 60 L99 64Z", shadow=False)
+    d.marks("dark", circle(114, 58, 1.8))
+    # doughnut ring
+    group(d, "translate(-8 -6)", lambda: _donut(d))
+
+
+def _donut(d: Drawing):
+    d.shape("glow2", circle(150, 150, 28) + " " + circle(150, 150, 12), extra=EVENODD)
+    d.shape("hero", f"M123 148 C126 132 138 122 150 122 C164 122 176 132 177 148 C170 140 166 152 158 146 C152 140 146 152 140 146 C134 140 128 152 123 148Z "
+                    f"M162 150 A12 12 0 1 0 138 150 A12 12 0 1 0 162 150Z", shadow=False, extra=EVENODD)
+    for x, y, a in [(134, 132, 30), (150, 128, -20), (166, 136, 60), (142, 140, 80)]:
+        d.shape("light", rrect(x - 3, y - 1, 6, 2.2, 1), shadow=False, extra=f'transform="rotate({a} {x} {y})"')
+
+
+# ================================================================ LADS' TRIP
+BEER = {"hero2": "#E9A23B"}
+
+
+def lt_pints(d: Drawing):
+    d.disc("glow", 100, 104, 60)
+
+    def pint(spot):
+        d.shape("light", "M-17 -64 H17 L14 0 H-14Z")
+        d.shape("hero2", "M-15.5 -50 H15.5 L13 -3 H-13Z", shadow=False, spot=spot)
+        d.shape("light", "M-18 -50 C-22 -58 -16 -70 -8 -66 C-6 -74 6 -74 8 -66 C16 -70 22 -58 18 -50Z")
+        d.stroke("light", "M-8 -40 L-7 -12", 2.2, line=False)
+    group(d, "translate(62 152) rotate(-16)", lambda: pint(True))
+    group(d, "translate(138 152) rotate(16)", lambda: pint(False))
+    group(d, "translate(100 160) scale(1.04)", lambda: pint(False))
+    for x, y, r in [(92, 72, 3.4), (110, 66, 2.6), (100, 58, 2.2), (84, 62, 2), (118, 76, 2.2)]:
+        d.shape("light", circle(x, y, r), shadow=False)
+    d.stroke("hero2", "M100 46 V36 M86 50 L80 42 M114 50 L120 42", 2.6)
+
+
+def _buckethat(d: Drawing, x, y, role, spot=False):
+    d.shape(role, f"M{x - 12} {y} C{x - 12} {y - 16} {x + 12} {y - 16} {x + 12} {y}Z", spot=spot)
+    d.shape(role, f"M{x - 12} {y - 2} H{x + 12} L{x + 20} {y + 7} C{x + 8} {y + 10} {x - 8} {y + 10} {x - 20} {y + 7}Z", spot=spot)
+    d.shape("mark", f"M{x - 12} {y - 4} H{x + 12} V{y} H{x - 12}Z", shadow=False)
+
+
+def lt_hats(d: Drawing):
+    d.disc("glow", 100, 96, 52)
+    d.band("far", waves(116, 3, 30))
+    d.band("ground", "M-30 136 Q100 130 230 136")
+    _flags(d, -10, 40, 210, 40, 22, 9, ["pop", "hero2", "light"])
+    for x, base, s in [(52, 230, 1.15), (100, 222, 1.25), (148, 230, 1.15)]:
+        _person(d, x, base, s, legs=False)
+    for x, base, s in [(52, 230, 1.15), (100, 222, 1.25), (148, 230, 1.15)]:
+        _buckethat(d, x, round(base - 72 * s - 3, 1), "hero", spot=x == 100)
+
+
+def lt_football(d: Drawing):
+    d.disc("glow", 150, 58, 18)
+    d.band("far", waves(110, 3, 30))
+    d.band("mid", waves(124, 3, 34), line=False)
+    d.band("ground", "M-30 138 Q100 130 230 138")
+    # goal
+    d.stroke("light", "M30 108 L36 106 M30 108 V154 M150 108 V154 M30 108 H150", 1, line=False)
+    d.stroke("dark", "M36 112 L44 146 M64 112 V146 M92 112 V146 M120 112 V146 M144 112 L136 146 M36 124 H144 M38 136 H142", 0.9, line=False)
+    d.limb("light", "M30 156 V106 H150 V156", 5)
+    d.shape("pop", rrect(24, 150, 12, 10, 3) + " " + rrect(144, 150, 12, 10, 3), spot=True)
+    # ball
+    d.stroke("dark", "M150 136 Q128 104 110 82", 1.6, line=False)
+    d.shape("light", circle(104, 74, 18))
+    d.marks("dark", "M104 68 L110 72 L108 79 L100 79 L98 72Z M86 68 L92 62 L94 66 L90 72Z M118 62 L122 70 L116 72 L114 66Z "
+                    "M96 90 L104 86 L112 90 L108 92 H100Z")
+    d.stroke("dark", "M104 68 V58 M110 72 L118 68 M108 79 L114 86 M100 79 L94 86 M98 72 L90 68", 1.2)
+    d.stroke("dark", "M122 80 L134 86 M120 90 L132 98", 1.8, line=False)
+    d.shape("dark", ellipse(104, 158, 12, 3), shadow=False, line=False)
+
+
+# ================================================================ GRADUATION TRIP
+def _mortar(d: Drawing, x, y, rot, s=1.0, tassel="hero2", spot=False):
+    def draw():
+        d.shape("dark", "M-13 2 V12 C-6 17 6 17 13 12 V2 L0 8Z")
+        d.shape("dark", "M-26 0 L0 -11 L26 0 L0 11Z", spot=spot)
+        d.stroke("mark", "M-26 0 L0 11 L26 0", 1, line=False)
+        d.stroke(tassel, "M0 0 L16 5 V18", 1.8)
+        d.shape(tassel, "M13.5 16 H18.5 L19.5 24 H12.5Z", shadow=False)
+        d.marks(tassel, circle(0, 0, 2))
+    group(d, f"translate({x} {y}) rotate({rot}) scale({s})", draw)
+
+
+def gr_caps(d: Drawing):
+    d.disc("glow", 100, 112, 52)
+    for x, y, r, role in [(40, 70, 2.6, "pop"), (160, 60, 3, "hero"), (130, 114, 2.4, "pop"), (66, 118, 2.6, "hero2"), (100, 30, 2.4, "hero")]:
+        d.shape(role, rrect(x - r, y - r / 2, 2 * r, r, r / 2), shadow=False, extra=f'transform="rotate({y % 50 - 25} {x} {y})"')
+    _mortar(d, 64, 82, -18, 1.0)
+    _mortar(d, 104, 50, 10, 1.2, spot=True)
+    _mortar(d, 146, 88, 24, 0.9, "pop")
+    heads = [(30, 168), (66, 160), (100, 166), (136, 158), (172, 168)]
+    p = f"M-30 230 V{heads[0][1] + 22}"
+    for x, y in heads:
+        p += f" L{x - 14} {y + 22} Q{x - 14} {y + 11} {x - 6} {y + 9} A8 8 0 1 1 {x + 6} {y + 9} Q{x + 14} {y + 11} {x + 14} {y + 22}"
+    p += f" L230 {heads[-1][1] + 22} V230Z"
+    d.limb("dark", "M74 172 L80 134 M128 172 L120 132", 5)
+    d.shape("dark", circle(80, 130, 4.5) + " " + circle(120, 128, 4.5), shadow=False)
+    d.shape("dark", p)
+
+
+def gr_suitcase(d: Drawing):
+    d.disc("glow", 100, 100, 58)
+    d.band("ground", "M-30 164 Q100 156 230 164")
+    d.stroke("dark", "M88 70 V58 H112 V70", 3.4)
+    d.shape("hero", rrect(60, 68, 80, 94, 9))
+    d.stroke("mark", "M76 72 V158 M124 72 V158", 2, line=False)
+    d.shape("light", circle(84, 96, 10), shadow=False)
+    d.shape("pop", "M74 96 A10 10 0 0 1 94 96Z", shadow=False)
+    d.shape("hero2", rrect(98, 108, 30, 18, 3), shadow=False, spot=True)
+    d.shape("light", rrect(70, 130, 28, 16, 3), shadow=False)
+    d.stroke("pop", "M74 138 H94", 2, line=False)
+    d.shape("dark", circle(72, 165, 4) + " " + circle(128, 165, 4), shadow=False)
+    # scroll leaning on the case
+    def scroll():
+        d.shape("light", rrect(-6, -44, 12, 88, 6))
+        d.stroke("far", "M-6 -40 H6", 1.2, line=False)
+        d.shape("pop", rrect(-7, -4, 14, 8, 2), shadow=False, spot=True)
+        d.shape("pop", "M-2 4 L-8 18 L-3 16 L0 21 L2 4Z", shadow=False)
+    group(d, "translate(152 124) rotate(-14)", scroll)
+    _mortar(d, 100, 52, -8, 1.5, spot=True)
+
+
+def gr_summit(d: Drawing):
+    d.disc("glow", 100, 92, 46)
+    d.band("far", "M-30 136 L20 112 L52 124 L76 108 L120 116 L160 100 L230 120")
+    d.shape("near", "M-30 230 V176 L40 150 L76 112 Q100 100 124 112 L170 150 L230 170 V230Z")
+    d.shape("light", "M76 112 Q100 100 124 112 L132 120 L118 118 L108 126 L96 118 L84 124 L70 118Z", shadow=False)
+    # graduate, arms up
+    d.limb("dark", "M90 66 L80 40 M110 66 L120 38", 5)
+    d.shape("light", rrect(116, 26, 8, 16, 3), extra='transform="rotate(20 120 34)"')
+    d.shape("dark", "M88 108 L92 70 C92 64 96 62 100 62 C104 62 108 64 108 70 L112 108Z")
+    d.shape("dark", circle(100, 52, 8))
+    _mortar(d, 100, 44, 0, 0.7, spot=True)
+    d.shape("hero2", "M95 64 L100 74 L105 64Z", shadow=False)
+
+
+# ================================================================ DIGITAL NOMAD
+def _laptop(d: Drawing, screen="glow2", spot=True):
+    """An open laptop, base centred on the origin, screen tilted back."""
+    d.shape("dark", "M-20 -2 L-16 -30 H16 L20 -2Z")
+    d.shape(screen, "M-16 -5 L-13 -27 H13 L16 -5Z", shadow=False, spot=spot)
+    d.stroke("mark", "M-10 -21 H6 M-10 -15 H10 M-10 -9 H2", 1.4, line=False)
+    d.shape("dark", "M-26 -2 H26 L22 3 H-22Z")
+
+
+def dn_hammock(d: Drawing):
+    d.disc("glow", 100, 100, 30)
+    d.band("far", waves(108, 3, 30))
+    d.band("mid", waves(122, 3, 34), line=False)
+    d.band("ground", "M-30 146 Q100 138 230 146")
+    _palm(d, 32, 166, 1.05, "dark", -8)
+    _palm(d, 168, 166, 1.05, "dark", 8)
+    d.stroke("dark", "M28 108 L46 114 M172 108 L154 114", 1.6)
+    d.shape("hero", "M44 112 Q100 168 156 112 Q100 146 44 112Z", spot=True)
+    d.stroke("light", "M60 126 Q100 156 140 126", 2, line=False)
+    group(d, "translate(100 138) rotate(-4)", lambda: _laptop(d))
+    d.shape("hero2", "M140 170 C140 160 160 160 160 170Z")
+    d.stroke("pop", "M152 162 L158 150", 1.8)
+
+
+def dn_cafe(d: Drawing):
+    d.band("sky2", "M-30 -30 H230", shadow=False, line=False)
+    d.shape("light", rrect(34, 24, 132, 84, 8))
+    def view():
+        d.shape("sky", "M30 20 H170 V110 H30Z", shadow=False, line=False)
+        d.disc("glow", 138, 52, 12)
+        d.shape("far", waves(84, 2, 24) + " L230 230 L-30 230Z", shadow=False)
+        d.shape("mid", waves(96, 2, 28) + " L230 230 L-30 230Z", shadow=False, line=False)
+    _clip(d, "dncafe", rrect(40, 30, 120, 72, 5), view)
+    d.stroke("light", "M100 30 V102", 4)
+    d.band("near", "M-30 140 H230")
+    d.shape("deep", "M-30 140 H230 V146 H-30Z", shadow=False, line=False)
+    group(d, "translate(88 140) scale(1.7)", lambda: _laptop(d))
+    # coffee
+    d.shape("light", ellipse(150, 140, 18, 4))
+    d.shape("light", "M136 116 H164 L160 138 H140Z")
+    d.limb("light", "M162 120 C172 120 172 132 160 132", 3.2, shadow=False)
+    d.shape("hero2", ellipse(150, 116, 14, 3.4), shadow=False)
+    d.stroke("light", "M144 104 Q140 96 144 88 M154 102 Q150 94 154 86", 2.2, line=False)
+    # plant
+    d.shape("pop", "M30 120 H54 L50 140 H34Z")
+    for a, l in [(-120, 24), (-90, 28), (-60, 22), (-150, 18), (-30, 18)]:
+        group(d, f"translate(42 120) rotate({a})", lambda l=l: d.shape("dark", f"M0 0 C{l * .3:.1f} -5 {l * .7:.1f} -5 {l} 0 C{l * .7:.1f} 5 {l * .3:.1f} 5 0 0Z", shadow=False))
+
+
+def dn_wifi(d: Drawing):
+    d.disc("glow", 52, 64, 16)
+    d.band("far", waves(132, 3, 30))
+    d.band("mid", waves(146, 3, 34), line=False)
+    d.shape("ground", "M40 150 C60 128 140 128 160 150Z")
+    _palm(d, 116, 146, 1.05, "dark", 10)
+    d.shape("hero", "M60 146 V130 H84 V146Z")
+    d.shape("pop", "M54 132 L72 118 L90 132Z")
+    d.band("near", waves(158, 4, 30))
+    for r, w in [(14, 6), (28, 6), (42, 6)]:
+        d.limb("hero2", f"M{100 - r * 0.8:.1f} {64 - r * 0.6:.1f} A{r} {r} 0 0 1 {100 + r * 0.8:.1f} {64 - r * 0.6:.1f}", w, spot=True)
+    d.shape("hero2", circle(100, 60, 5), spot=True)
+
+
+# ================================================================ REUNION
+def ru_hug(d: Drawing):
+    d.disc("glow", 100, 108, 50)
+    d.band("far", waves(132, 3, 30))
+    d.band("ground", "M-30 152 Q100 144 230 152")
+    people = [(40, 172, 0.9), (78, 172, 1.05), (122, 172, 1.0), (160, 172, 0.88)]
+    for x, base, s in people:
+        _person(d, x, base, s)
+    for (x0, b0, s0), (x1, b1, s1) in zip(people, people[1:]):
+        y0, y1 = b0 - 56 * s0, b1 - 56 * s1
+        d.limb("dark", f"M{x0} {y0 + 4:.1f} Q{(x0 + x1) / 2} {min(y0, y1) - 6:.1f} {x1 + 4} {y1 + 6:.1f}", 4.6, shadow=False)
+    for x, y, s in [(100, 46, 0.9), (126, 32, 0.55), (74, 34, 0.5)]:
+        d.shape("pop", _heart(x, y, s), shadow=False, spot=True)
+    d.band("deep", hills(186, 4, 20), line=False)
+
+
+def ru_photos(d: Drawing):
+    d.disc("glow", 100, 104, 60)
+    d.stroke("dark", "M-10 50 Q100 82 210 50", 1.6)
+    def photo(x, y, rot, pic, spot):
+        def draw():
+            d.shape("light", rrect(-20, 0, 40, 48, 2))
+            def inner():
+                d.shape("sky2", "M-16 4 H16 V36 H-16Z", shadow=False, line=False)
+                pic()
+            _clip(d, f"ph{int(x)}", "M-16 4 H16 V36 H-16Z", inner)
+            d.stroke("dark", "M-16 4 H16 V36 H-16Z", 1, line=False)
+            d.shape("hero2", rrect(-3, -6, 6, 12, 1.5), spot=spot)
+        group(d, f"translate({x} {y}) rotate({rot})", draw)
+
+    def sunset():
+        d.shape("glow", circle(0, 24, 9), shadow=False)
+        d.shape("mid", "M-16 26 Q0 22 16 26 V36 H-16Z", shadow=False)
+
+    def friends():
+        d.shape("hero", circle(0, 24, 10), shadow=False, line=False)
+        for px, c in [(-8, "dark"), (0, "dark"), (8, "dark")]:
+            d.shape(c, f"M{px - 5} 36 V31 C{px - 5} 28 {px + 5} 28 {px + 5} 31 V36Z " + circle(px, 23, 3.4), shadow=False)
+
+    def peak():
+        d.shape("near", "M-16 36 L-4 14 L4 24 L10 18 L16 28 V36Z", shadow=False)
+        d.shape("light", "M-4 14 L0 21 L-3 20 L-6 22 L-7 19Z", shadow=False)
+        d.shape("pop", circle(8, 10, 3), shadow=False)
+    photo(46, 66, -10, sunset, False)
+    photo(100, 72, 4, friends, True)
+    photo(154, 64, 10, peak, False)
+    for x, y, s in [(70, 152, 0.7), (130, 158, 0.5)]:
+        d.shape("pop", _heart(x, y, s), shadow=False, spot=True)
+    _stars(d, [(40, 140, 4), (166, 136, 4.5), (100, 160, 3)])
+
+
+def ru_table(d: Drawing):
+    d.disc("glow", 100, 96, 44)
+    d.band("far", hills(118, 8, 20))
+    _bulbs(d, -10, 26, 210, 26, 26, 9, ["pop", "glow2", "light"])
+    heads = [(24, 104), (60, 98), (100, 102), (140, 96), (176, 104)]
+    p = f"M-30 230 V{heads[0][1] + 22}"
+    for x, y in heads:
+        p += f" L{x - 15} {y + 24} Q{x - 15} {y + 12} {x - 6} {y + 10} A8.5 8.5 0 1 1 {x + 6} {y + 10} Q{x + 15} {y + 12} {x + 15} {y + 24}"
+    p += f" L230 {heads[-1][1] + 22} V230Z"
+    d.shape("dark", p)
+    d.band("light", "M-30 134 H230")
+    d.shape("hero", "M60 134 H140 V230 H60Z", shadow=False, spot=True)
+    d.stroke("far", "M-30 140 H230", 1.2, line=False)
+    for x in (40, 160):
+        d.shape("near", rrect(x - 5, 102, 10, 32, 4))
+        d.shape("near", rrect(x - 2, 94, 4, 10, 1.5), shadow=False)
+    for x in (100,):
+        d.shape("light", rrect(x - 3, 112, 6, 20, 1.5))
+        d.shape("pop", "M100 98 C105 104 105 108 100 110 C95 108 95 104 100 98Z", shadow=False)
+    for x in (20, 66, 134, 182):
+        d.shape("light", f"M{x - 4} 116 H{x + 4} L{x + 3} 127 H{x - 3}Z")
+        d.limb("light", f"M{x} 127 L{x + 0.1} 133", 1.6, shadow=False)
+
+
 # ================================================================ CONCEPTS
 SILVER = {"hero": "#C9CED6", "mark": "#8D96A6"}
 TEA = {"hero": "#C9CED6", "hero2": "#C8702A", "mark": "#7D8696"}
@@ -946,4 +1446,48 @@ CONCEPTS = [
             checks=[("hero", "glow"), ("hero", "sky"), ("pop", "hero"), ("hero2", "hero")], fixes={"glow": ["far", "glow2"], "hero2": ["light", "glow2"]}),
     Concept("bus-stop", "bus-journey", "Bus stop", bus_stop,
             checks=[("hero", "sky"), ("hero", "glow"), ("pop", "ground"), ("hero2", "sky")], fixes={"glow": ["far", "glow2"], "hero2": ["near", "pop"]}),
+    Concept("birthday-beach-cake", "birthday-trip", "Cake on the beach", bd_cake, overrides={"pop": "#FF7B3A", "glow2": "#FFD25E"},
+            checks=[("light", "ground"), ("light", "far"), ("hero", "light"), ("pop", "sky")], fixes={"ground": ["mid", "near"], "far": ["mid", "near"]}),
+    Concept("birthday-balloons", "birthday-trip", "Balloons & suitcase", bd_balloons,
+            checks=[("pop", "glow"), ("hero2", "glow"), ("hero", "glow"), ("hero", "ground")], fixes={"glow": ["far", "mid", "near"], "hero2": ["near", "deep"]}),
+    Concept("birthday-gift", "birthday-trip", "A trip for a present", bd_gift,
+            checks=[("hero", "glow"), ("pop", "hero"), ("light", "glow")], fixes={"glow": ["far", "mid"], "pop": ["light", "hero2"]}),
+    Concept("anniversary-love-locks", "anniversary", "Love locks", an_locks, overrides={"mark": "#8D96A6"},
+            checks=[("pop", "glow"), ("dark", "glow"), ("mark", "glow")], fixes={"glow": ["far", "light", "sky2"]}),
+    Concept("anniversary-candlelit", "anniversary", "Candlelit dinner", an_dinner, overrides={"pop": "#B3243B"},
+            checks=[("light", "deep"), ("mid", "deep"), ("pop", "light"), ("hero2", "light")], fixes={"mid": ["near", "far"], "hero2": ["near", "mark"]}),
+    Concept("anniversary-bench", "anniversary", "Sunset bench", an_bench,
+            checks=[("dark", "glow"), ("dark", "far"), ("dark", "sky"), ("hero", "glow"), ("hero", "ground"), ("pop", "sky")],
+            fixes={"hero": ["near", "deep", "pop"], "sky": ["sky2", "far"]}),
+    Concept("girlstrip-cocktails", "girls-trip", "Sundowner cocktails", gt_cocktails,
+            checks=[("light", "glow"), ("light", "far"), ("light", "sky"), ("hero2", "light"), ("pop", "light")],
+            fixes={"sky": ["sky2", "far"], "far": ["mid", "near"], "hero2": ["glow2", "pop"], "glow": ["mid", "near", "pop"]}),
+    Concept("girlstrip-convertible", "girls-trip", "Convertible road trip", gt_convertible,
+            checks=[("hero", "near"), ("hero", "dark"), ("dark", "far"), ("dark", "sky"), ("pop", "sky")], fixes={"hero": ["pop", "light", "hero2"]}),
+    Concept("girlstrip-pool-floats", "girls-trip", "Pool floats", gt_floats, SEA, POOLFLOAT,
+            checks=[("pop", "mid"), ("glow2", "mid"), ("hero", "glow2"), ("light", "mid")], fixes={"hero": ["pop", "deep"], "glow2": ["ground", "light"]}),
+    Concept("ladstrip-pints", "lads-trip", "Pints up", lt_pints, overrides=BEER,
+            checks=[("light", "glow"), ("hero2", "glow"), ("hero2", "light")], fixes={"glow": ["near", "mid", "deep"]}),
+    Concept("ladstrip-bucket-hats", "lads-trip", "Matching bucket hats", lt_hats,
+            checks=[("hero", "dark"), ("hero", "glow"), ("dark", "glow"), ("dark", "ground"), ("hero", "sky")], fixes={"hero": ["pop", "hero2", "light"]}),
+    Concept("ladstrip-beach-football", "lads-trip", "Beach football", lt_football,
+            checks=[("light", "far"), ("light", "sky"), ("light", "ground"), ("pop", "ground")], fixes={"sky": ["sky2", "far"], "far": ["mid", "near"]}),
+    Concept("grad-caps-in-the-air", "graduation-trip", "Caps in the air", gr_caps,
+            checks=[("dark", "glow"), ("dark", "sky"), ("hero2", "dark")], fixes={"sky": ["sky2", "far"]}),
+    Concept("grad-cap-suitcase", "graduation-trip", "Cap on a suitcase", gr_suitcase,
+            checks=[("hero", "glow"), ("dark", "glow"), ("light", "glow"), ("hero", "ground")], fixes={"glow": ["far", "mid"], "hero": ["pop", "near"]}),
+    Concept("grad-summit", "graduation-trip", "Graduate on the summit", gr_summit,
+            checks=[("dark", "glow"), ("dark", "sky"), ("light", "glow"), ("near", "far")], fixes={"glow": ["glow2", "far"], "near": ["mid", "deep"]}),
+    Concept("nomad-hammock", "digital-nomad", "Laptop in a hammock", dn_hammock,
+            checks=[("hero", "mid"), ("hero", "ground"), ("hero", "far"), ("dark", "sky"), ("dark", "hero")], fixes={"hero": ["pop", "hero2", "light"]}),
+    Concept("nomad-cafe", "digital-nomad", "Café desk with a view", dn_cafe,
+            checks=[("dark", "near"), ("light", "near"), ("light", "sky2"), ("dark", "sky2")], fixes={"sky2": ["far", "mid"], "near": ["mid", "far"]}),
+    Concept("nomad-island-wifi", "digital-nomad", "Island wi-fi", dn_wifi,
+            checks=[("hero2", "sky"), ("dark", "sky"), ("ground", "far")], fixes={"hero2": ["pop", "hero", "deep"], "ground": ["light", "glow2"]}),
+    Concept("reunion-group-hug", "reunion", "Group hug", ru_hug,
+            checks=[("dark", "glow"), ("dark", "far"), ("dark", "sky"), ("dark", "ground"), ("pop", "sky")], fixes={"sky": ["sky2", "far"], "ground": ["far", "light"]}),
+    Concept("reunion-photo-string", "reunion", "Photos on a string", ru_photos,
+            checks=[("light", "glow"), ("light", "sky"), ("hero2", "light")], fixes={"glow": ["far", "mid"], "sky": ["sky2", "far"], "hero2": ["pop", "hero"]}),
+    Concept("reunion-long-table", "reunion", "Long table", ru_table,
+            checks=[("dark", "glow"), ("dark", "far"), ("dark", "sky"), ("hero", "light"), ("light", "dark")], fixes={"hero": ["pop", "near", "deep"]}),
 ]

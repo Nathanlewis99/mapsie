@@ -592,6 +592,701 @@ def cheese_cellar(d: Drawing):
     d.band("near", "M-30 172 L230 172", line=False)
 
 
+# ================================================================ PICNIC
+def gingham(d: Drawing, x, y, w, h, n, role="pop"):
+    """Red-and-white check: overlapping translucent stripes (papercut), a sparse grid (line)."""
+    step = w / n
+    for i in range(0, n, 2):
+        d.shape(role, f"M{x + i*step:.1f} {y} h{step:.1f} v{h} h{-step:.1f}Z", shadow=False, line=False, extra='opacity=".55"')
+    step_h = h / n
+    for j in range(0, n, 2):
+        d.shape(role, f"M{x} {y + j*step_h:.1f} h{w} v{step_h:.1f} h{-w}Z", shadow=False, line=False, extra='opacity=".55"')
+    grid = " ".join(f"M{x + i*step:.1f} {y} v{h}" for i in range(2, n, 2)) + " " + " ".join(f"M{x} {y + j*step_h:.1f} h{w}" for j in range(2, n, 2))
+    line_only(d, grid, 1.4)
+
+
+def picnic_blanket(d: Drawing):
+    d.band("mid", "M-30 -30 L230 -30", line=False)
+    for x, y in [(24, 60), (170, 150), (40, 160), (160, 40), (100, 178)]:
+        d.stroke("near", f"M{x} {y} l-3 -7 M{x} {y} l0 -8 M{x} {y} l3 -7", 1.6, line=False)
+    def blanket():
+        d.shape("light", rrect(44, 44, 112, 112, 2))
+        gingham(d, 44, 44, 112, 112, 8)
+    group(d, "rotate(-12 100 100)", blanket)
+    # plate of sandwiches
+    d.shape("light", circle(78, 82, 22))
+    d.stroke("sky2", circle(78, 82, 16), 1.4, line=False)
+    d.shape("hero2", "M64 74 L90 70 L76 94Z")
+    d.stroke("near", "M67 76 L88 72.5", 2.4, line=False)
+    d.shape("hero2", "M80 92 L94 74 L96 96Z", shadow=False)
+    # watermelon slice
+    d.shape("near", "M104 132 A30 30 0 0 0 158 116Z", spot=False)
+    d.shape("light", "M108 129 A25 25 0 0 0 153 116Z", shadow=False, line=False)
+    d.shape("hero", "M111 127 A22 22 0 0 0 150 116Z", shadow=False, spot=True)
+    d.marks("dark", ellipse(126, 126, 1.4, 2.2) + ellipse(136, 123, 1.4, 2.2) + ellipse(142, 118, 1.4, 2.2))
+    # cups and an apple
+    for x, y in [(134, 70), (150, 84)]:
+        d.shape("ground", circle(x, y, 10))
+        d.shape("glow2", circle(x, y, 7), shadow=False)
+    d.shape("near", circle(66, 134, 11))
+    d.shape("light", circle(62, 130, 2.4), shadow=False, line=False)
+    d.stroke("dark", "M66 124 l1 -5", 2)
+    d.shape("mid", leaf(67, 120, 10, 6, -30), shadow=False)
+
+
+def hamper(d: Drawing):
+    d.limb("dark", "M66 100 C66 66 134 66 134 100", 6)
+    # baguette and bottle poking out of the open side
+    d.shape("deep", "M120 104 V64 C120 58 124 56 124 50 V40 H132 V50 C132 56 136 58 136 64 V104Z")
+    d.shape("light", rrect(123.5, 38, 9, 5, 1.5), shadow=False)
+    d.shape("hero2", "M74 102 L150 52 C156 48 162 54 158 60 L92 110Z", spot=True)
+    d.stroke("mark", "M118 74 l6 6 M130 66 l6 6 M142 58 l5 5", 2)
+    d.shape("hero", rrect(42, 100, 116, 56, 6))
+    for y in [112, 124, 136, 148]:
+        d.stroke("mark", f"M46 {y} H154", 1.4, line=False)
+    for x in range(52, 152, 10):
+        d.stroke("mark", f"M{x} 102 V154", 1, line=False)
+    d.shape("hero", rrect(38, 94, 62, 12, 4))
+    d.stroke("dark", "M62 100 V128 M138 104 V128", 4)
+    d.shape("ground", rrect(56, 124, 12, 8, 2), shadow=False)
+    d.shape("ground", rrect(132, 124, 12, 8, 2), shadow=False)
+    # napkin hanging over the front
+    def nap():
+        d.shape("light", rrect(-14, -14, 28, 28, 1))
+        gingham(d, -14, -14, 28, 28, 4)
+    group(d, "translate(118 108) rotate(45)", nap)
+
+
+def picnic_basket(d: Drawing):
+    d.disc("glow", 100, 84, 58)
+    d.band("mid", hills(146, 6))
+    d.band("near", "M-30 172 Q100 164 230 172", line=False)
+    hamper(d)
+
+
+def picnic_tree(d: Drawing):
+    d.disc("glow", 64, 58, 18)
+    d.shape("light", cloud(18, 94, 0.9), shadow=False)
+    # kite
+    d.stroke("dark", "M70 52 Q80 90 104 118", 1.2)
+    d.shape("hero2", "M62 30 L78 42 L70 62 L54 46Z", spot=True)
+    d.stroke("pop", "M70 62 q-4 6 0 10 q4 4 0 10", 2)
+    d.band("far", hills(118, 10))
+    d.band("mid", "M-30 150 Q60 124 230 140")
+    # big shady tree
+    d.limb("dark", "M150 150 V96 M150 116 L132 98 M150 108 L166 92", 8)
+    d.shape("near", "M104 96 C96 70 120 46 146 52 C164 34 196 52 190 76 C204 92 186 114 166 108 C154 120 130 116 124 106 C108 112 98 104 104 96Z")
+    d.shape("deep", "M118 92 C126 82 140 86 144 94 C134 100 124 98 118 92Z", shadow=False, line=False)
+    # blanket and basket under it
+    d.shape("light", "M86 152 L150 140 L172 160 L102 174Z")
+    def blk():
+        for i in range(4):
+            t = i / 4
+            d.shape("pop", f"M{86 + 64*t:.1f} {152 - 12*t:.1f} L{86 + 64*(t+.125):.1f} {152 - 12*(t+.125):.1f} L{102 + 70*(t+.125):.1f} {174 - 14*(t+.125):.1f} L{102 + 70*t:.1f} {174 - 14*t:.1f}Z", shadow=False, line=False, extra='opacity=".6"')
+        for j in range(4):
+            u = j / 4
+            a0 = (86 + 16*u, 152 + 22*u); a1 = (86 + 16*(u+.125), 152 + 22*(u+.125))
+            b0 = (150 + 22*u, 140 + 20*u); b1 = (150 + 22*(u+.125), 140 + 20*(u+.125))
+            d.shape("pop", f"M{a0[0]:.1f} {a0[1]:.1f} L{b0[0]:.1f} {b0[1]:.1f} L{b1[0]:.1f} {b1[1]:.1f} L{a1[0]:.1f} {a1[1]:.1f}Z", shadow=False, line=False, extra='opacity=".6"')
+    blk()
+    d.shape("hero", rrect(112, 140, 26, 16, 3))
+    d.stroke("dark", "M114 142 C114 128 136 128 136 142", 2.4)
+    d.stroke("mark", "M114 148 H136", 1.2, line=False)
+
+
+# ================================================================ FRUIT MARKET
+def fruit_heap(d: Drawing, pts, role, r, spot=False, dot="mark"):
+    for x, y in pts:
+        d.shape(role, circle(x, y, r), spot=spot)
+        d.shape("light", circle(x - r * 0.35, y - r * 0.35, r * 0.2), shadow=False, line=False)
+
+
+def fruit_stall(d: Drawing):
+    d.disc("glow", 150, 46, 16)
+    d.band("far", "M-30 150 V96 H18 V80 H40 V104 H160 V86 H184 V100 H230")
+    d.band("ground", "M-30 160 L230 160")
+    d.stroke("dark", "M36 72 V160 M164 72 V160", 3.2)
+    # peaked striped awning
+    for i in range(8):
+        x0 = 28 + i * 18
+        role = "mid" if i % 2 == 0 else "light"
+        d.shape(role, f"M{x0} 76 L{x0+18} 76 L{100 + (x0 + 18 - 100) * 0.5:.1f} 46 L{100 + (x0 - 100) * 0.5:.1f} 46Z", shadow=i == 0, spot=i % 2 == 0)
+    d.shape("mid", rrect(26, 74, 148, 8, 2))
+    # crates heaped with fruit
+    fruit_heap(d, [(48, 112), (60, 110), (54, 102), (72, 112)], "hero", 8.5)
+    fruit_heap(d, [(92, 110), (104, 112), (116, 110), (98, 100), (110, 101)], "pop", 8.5, spot=True)
+    d.shape("hero2", "M126 112 C128 96 142 88 158 94 C146 96 136 104 134 114Z")
+    d.shape("hero2", "M134 114 C138 98 152 92 166 100 C154 100 146 106 142 116Z")
+    d.shape("hero2", "M142 116 C148 104 160 100 170 108 C160 108 154 112 150 118Z")
+    for x in [40, 84, 128]:
+        d.shape("ground", rrect(x, 114, 44, 30, 2))
+        d.stroke("mark", f"M{x+2} 124 H{x+42} M{x+2} 134 H{x+42}", 1.4, line=False)
+    d.shape("near", rrect(30, 144, 140, 6, 2))
+    for x in [58, 102, 146]:
+        d.shape("light", f"M{x-6} 122 H{x+6} V130 L{x} 134 L{x-6} 130Z", shadow=False)
+
+
+def pineapple(d: Drawing, x, y, role="ground"):
+    for ang, L in [(-90, 30), (-115, 26), (-65, 26), (-135, 20), (-45, 20)]:
+        d.shape("near", leaf(x, y - 26, L, 9, ang))
+    d.shape(role, ellipse(x, y, 21, 30), spot=True)
+    d.stroke("mark", f"M{x-18} {y-12} L{x+6} {y+26} M{x-12} {y-24} L{x+18} {y+16} M{x+2} {y-29} L{x+20} {y-2} "
+                     f"M{x+18} {y-12} L{x-6} {y+26} M{x+12} {y-24} L{x-18} {y+16} M{x-2} {y-29} L{x-20} {y-2}", 1.6, line=False)
+
+
+def fruit_tropical(d: Drawing):
+    d.disc("glow", 100, 84, 60, line=False)
+    table(d, 150, "far", "mid")
+    pineapple(d, 92, 92)
+    # bananas
+    for k, dy in enumerate([0, 9, 18]):
+        d.shape("hero2", f"M118 {84+dy} C134 {108+dy} 160 {110+dy} 176 {94+dy} C178 {100+dy} 170 {116+dy} 150 {120+dy} C132 {122+dy} 120 {104+dy} 118 {84+dy}Z", spot=k == 2)
+    d.shape("dark", rrect(113, 80, 8, 6, 2), shadow=False)
+    # mango
+    d.shape("pop", "M124 150 C112 150 106 130 124 122 C140 116 160 124 160 138 C160 150 140 152 124 150Z")
+    # watermelon wedge in front
+    d.shape("near", "M22 132 A44 44 0 0 0 104 132Z")
+    d.shape("light", "M28 132 A38 38 0 0 0 98 132Z", shadow=False, line=False)
+    d.shape("hero", "M32 132 A33 33 0 0 0 94 132Z", shadow=False, spot=True)
+    for x, y in [(50, 140), (62, 148), (76, 146), (84, 138), (64, 138)]:
+        d.marks("dark", ellipse(x, y, 1.6, 2.6))
+
+
+def fruit_boat(d: Drawing):
+    d.disc("glow", 150, 50, 17)
+    d.band("far", bumpy(-30, 104, 100, 92, 230, 102, n=12))
+    # stilt houses on the bank
+    for x, w in [(26, 30), (128, 34)]:
+        d.shape("ground", rrect(x, 84, w, 20, 1))
+        d.shape("dark", f"M{x-4} 86 L{x + w/2} 70 L{x + w + 4} 86Z")
+        d.marks("dark", rrect(x + w/2 - 4, 90, 8, 10, 1))
+    d.band("mid", waves(112, 3, 30))
+    d.band("near", waves(150, 3, 34), line=False)
+    # rower with conical hat and paddle
+    d.limb("dark", "M36 92 L22 152", 3.4)
+    d.shape("mark", rrect(34, 104, 18, 30, 7))
+    d.shape("light", "M26 106 L43 90 L60 106Z", spot=True)
+    # piles of fruit
+    fruit_heap(d, [(70, 124), (80, 122), (75, 114)], "pop", 6.5)
+    fruit_heap(d, [(94, 124), (104, 124), (99, 115)], "hero", 6.5)
+    d.shape("hero2", "M114 128 C116 112 132 108 140 116 C132 116 124 122 122 130Z")
+    d.shape("hero2", "M118 130 C122 116 138 112 146 120 C138 120 130 124 126 132Z")
+    fruit_heap(d, [(152, 126), (162, 124), (157, 117)], "glow2", 6)
+    # long boat
+    d.shape("ground", "M14 120 Q20 130 30 134 H170 Q184 128 190 112 Q190 136 168 146 H36 Q16 140 14 120Z")
+    d.stroke("dark", "M30 136 H170", 2, line=False)
+    d.stroke("light", "M40 158 q8 -4 16 0 M120 162 q8 -4 16 0 M160 154 q6 -3 12 0", 2)
+
+
+# ================================================================ TAPAS CRAWL
+def cazuela(d: Drawing, x, y, r):
+    d.shape("hero", circle(x, y, r))
+    d.shape("mark", circle(x, y, r - 5), shadow=False)
+
+
+def tapas_plates(d: Drawing):
+    d.band("ground", "M-30 -30 L230 -30", line=False)
+    d.stroke("deep", "M-30 40 Q100 34 230 44 M-30 100 Q100 96 230 104 M-30 160 Q100 154 230 164", 1.6, line=False)
+    # patatas bravas
+    cazuela(d, 68, 78, 32)
+    for x, y in [(56, 70), (70, 66), (82, 74), (60, 84), (74, 82), (66, 94), (82, 90)]:
+        d.shape("hero2", rrect(x - 6, y - 6, 12, 12, 2.5), shadow=False)
+    d.stroke("pop", "M54 74 Q62 70 68 78 T84 80", 3.4)
+    d.marks("light", circle(64, 88, 2) + circle(76, 72, 2) + circle(58, 78, 1.6))
+    # olives
+    cazuela(d, 140, 82, 28)
+    for x, y in [(130, 74), (144, 70), (152, 82), (138, 86), (128, 90), (148, 94)]:
+        d.shape("near", ellipse(x, y, 6.5, 5), shadow=False, spot=True)
+        d.marks("pop", circle(x + 2, y - 1, 1.8))
+    # gambas al ajillo
+    cazuela(d, 100, 138, 34)
+    d.shape("glow2", circle(100, 138, 25), shadow=False, line=False)
+    for x, y, r in [(86, 130, 0), (108, 126, 60), (112, 148, 160), (88, 150, 230)]:
+        def pr(x=x, y=y, r=r):
+            d.limb("sky2", "M-8 -4 C-8 -12 6 -12 8 -2 C9 6 2 10 -4 8", 6, shadow=False)
+            d.marks("dark", circle(-6, -6, 1.4))
+        group(d, f"translate({x} {y}) rotate({r})", pr)
+    d.marks("near", circle(100, 138, 1.6) + circle(96, 142, 1.4) + circle(104, 134, 1.4))
+    # bread and toothpick
+    d.shape("hero2", rrect(32, 128, 30, 20, 8), extra='transform="rotate(-20 47 138)"')
+    d.shape("light", rrect(37, 132, 20, 12, 5), shadow=False, line=False, extra='transform="rotate(-20 47 138)"')
+
+
+def pintxo(d: Drawing, x, top):
+    d.shape("hero2", f"M{x-22} 132 C{x-24} 120 {x-20} 114 {x-14} 113 H{x+14} C{x+20} 114 {x+24} 120 {x+22} 132Z")
+    d.shape("light", f"M{x-18} 118 Q{x} 112 {x+18} 118 Q{x} 121 {x-18} 118Z", shadow=False, line=False)
+    top()
+
+
+def tapas_pintxos(d: Drawing):
+    d.disc("glow", 100, 88, 58, line=False)
+    table(d, 132, "far", "mid", 12)
+    d.shape("light", rrect(18, 128, 164, 8, 4))
+    def p1():
+        d.shape("hero", "M30 116 C30 104 54 102 56 116Z", spot=True)
+        d.shape("hero", rrect(30, 104, 26, 13, 4))
+        d.stroke("mark", "M32 110 H54", 1.4, line=False)
+        d.stroke("ground", "M43 120 V84", 2.2)
+        d.shape("near", circle(43, 82, 5))
+    def p2():
+        d.shape("pop", "M76 116 C72 100 84 92 90 102 C96 90 112 96 110 108 C116 112 112 118 104 116Z", spot=True)
+        d.stroke("light", "M82 104 Q90 108 96 102 M96 110 Q104 112 108 106", 2, line=False)
+        d.stroke("ground", "M94 120 V78", 2.2)
+        d.shape("hero", "M88 80 C88 72 100 72 100 80Z", shadow=False)
+    def p3():
+        d.shape("pop", "M124 116 C126 104 156 100 164 112 C160 116 140 118 124 116Z")
+        d.shape("dark", "M128 110 C134 98 154 96 162 104 C152 104 140 108 134 112Z")
+        d.stroke("light", "M136 104 L152 102", 1.2, line=False)
+        d.stroke("ground", "M146 118 V80", 2.2)
+        d.shape("near", "M140 84 C142 76 150 76 152 84 L146 96Z")
+    pintxo(d, 43, p1)
+    pintxo(d, 94, p2)
+    pintxo(d, 146, p3)
+
+
+def tapas_jamon(d: Drawing):
+    d.disc("glow", 100, 88, 60, line=False)
+    table(d, 158, "far", "mid")
+    # jamonero stand
+    d.shape("ground", rrect(26, 146, 148, 12, 3))
+    d.limb("dark", "M52 146 V64", 6)
+    d.shape("dark", rrect(42, 56, 22, 12, 3))
+    d.limb("dark", "M146 146 V122 M136 122 H156", 6)
+    # the ham
+    d.shape("hero", "M158 118 C176 102 168 74 144 72 C122 70 100 82 80 76 L58 60 L50 68 L70 90 C66 112 86 134 114 138 C132 140 148 130 158 118Z", spot=True)
+    d.shape("light", "M78 88 C100 96 132 82 160 92 C156 104 112 110 82 100Z", shadow=False)
+    d.shape("pop", "M84 92 C104 98 132 88 154 96 C150 102 112 106 86 98Z", shadow=False)
+    d.stroke("light", "M92 96 Q112 98 124 94 M128 92 Q140 94 148 94", 1.4, line=False)
+    d.shape("dark", "M44 46 L58 56 L52 66 L38 60Z")
+    d.stroke("hero2", "M88 120 Q110 132 140 126", 2, line=False)
+    # knife resting in front
+    d.shape("sky2", "M60 150 L130 142 L134 146 C110 152 86 154 62 156Z", shadow=False)
+    d.shape("dark", rrect(34, 150, 28, 7, 3), shadow=False, extra='transform="rotate(-6 48 153)"')
+
+
+# ================================================================ PASTA MAKING
+def pasta_machine(d: Drawing):
+    d.disc("glow", 100, 80, 58, line=False)
+    table(d, 150, "far", "mid")
+    # sheet of dough coming out over the table
+    d.shape("hero", "M66 128 H118 L124 150 C102 160 64 146 24 156 L26 148 C58 140 64 144 66 128Z", spot=True)
+    # clamp
+    d.shape("dark", "M86 136 H104 V160 H86Z")
+    # body
+    d.shape("hero2", rrect(56, 76, 76, 58, 6))
+    d.shape("light", rrect(62, 82, 64, 10, 3), shadow=False, line=False)
+    d.shape("dark", rrect(64, 120, 60, 6, 3), shadow=False)
+    d.shape("mark", circle(54, 102, 9))
+    d.marks("light", circle(54, 102, 3))
+    d.stroke("mark", "M64 110 H124", 1.6, line=False)
+    # crank
+    d.limb("dark", "M132 104 H148 L156 72", 5)
+    d.shape("pop", rrect(150, 58, 12, 18, 5), spot=False)
+    # flour and a nest of tagliatelle
+    d.stroke("hero", "M140 148 C150 140 168 140 172 148 C168 156 150 156 144 150 C150 146 162 146 166 150", 3)
+    d.marks("light", circle(36, 140, 1.8) + circle(44, 136, 1.4) + circle(160, 132, 1.6))
+
+
+def pasta_well(d: Drawing):
+    d.band("ground", "M-30 -30 L230 -30", line=False)
+    d.stroke("deep", "M-30 40 Q100 36 230 42 M-30 170 Q100 164 230 172", 1.6, line=False)
+    # rolling pin
+    d.limb("mark", "M28 158 L168 176", 7)
+    d.limb("mark", "M28 158 L168 176", 2, shadow=False)
+    d.shape("hero", rrect(44, 156, 108, 18, 9), extra='transform="rotate(7.3 98 165)"', spot=True)
+    # flour well
+    d.shape("light", "M44 92 C40 56 80 40 104 44 C138 46 162 66 156 96 C152 124 126 142 98 140 C66 138 46 120 44 92Z")
+    d.shape("sky2", ellipse(100, 92, 30, 24), shadow=False)
+    for x, y in [(90, 88), (110, 96), (98, 104)]:
+        d.shape("light", circle(x, y, 9), shadow=False, line=False)
+        d.shape("hero2", circle(x, y, 6), shadow=False)
+    # eggshells and fork
+    for x, y in [(160, 128), (172, 110)]:
+        d.shape("light", f"M{x-10} {y} A10 10 0 0 0 {x+10} {y} L{x+6} {y-3} L{x+2} {y+1} L{x-2} {y-3} L{x-6} {y+1}Z")
+    d.marks("light", circle(36, 120, 2) + circle(28, 108, 1.6) + circle(150, 52, 1.8) + circle(166, 66, 1.4))
+
+
+def ravioli(d: Drawing, x, y, s=26):
+    h = s / 2
+    zig = ""
+    n = 6
+    pts = []
+    for side in range(4):
+        for i in range(n):
+            t = i / n
+            if side == 0:
+                px, py = x - h + s * t, y - h
+            elif side == 1:
+                px, py = x + h, y - h + s * t
+            elif side == 2:
+                px, py = x + h - s * t, y + h
+            else:
+                px, py = x - h, y + h - s * t
+            pts.append((px, py))
+    zig = "M" + " L".join(f"{px:.1f} {py:.1f}" for px, py in pts) + "Z"
+    d.shape("hero", zig)
+    d.shape("hero2", circle(x, y, s * 0.3), shadow=False)
+    d.stroke("light", f"M{x - s*0.2:.1f} {y - s*0.14:.1f} q{s*0.1:.1f} {-s*0.1:.1f} {s*0.22:.1f} {-s*0.06:.1f}", 1.6, line=False)
+
+
+def pasta_ravioli(d: Drawing):
+    d.band("ground", "M-30 -30 L230 -30", line=False)
+    d.stroke("deep", "M-30 40 Q100 36 230 42 M-30 170 Q100 164 230 172", 1.6, line=False)
+    def tray():
+        d.shape("mark", rrect(46, 46, 108, 108, 4), line=False)
+        for j in range(3):
+            for i in range(3):
+                ravioli(d, 64 + i * 36, 64 + j * 36, 30)
+    group(d, "rotate(-8 100 100)", tray)
+    # fluted cutter
+    d.limb("dark", "M150 150 L176 176", 7)
+    teeth = " ".join(f"L{150 + 13*math.cos(a*math.pi/8):.1f} {150 + 13*math.sin(a*math.pi/8):.1f} L{150 + 10.5*math.cos((a+.5)*math.pi/8):.1f} {150 + 10.5*math.sin((a+.5)*math.pi/8):.1f}" for a in range(16))
+    d.shape("sky2", "M163 150 " + teeth + "Z", spot=True)
+    d.marks("dark", circle(150, 150, 2.6))
+    # basil
+    d.shape("near", leaf(30, 90, 26, 14, -20))
+    d.shape("near", leaf(30, 90, 22, 12, 30))
+    d.marks("light", circle(170, 60, 1.8) + circle(160, 48, 1.4) + circle(36, 140, 1.8))
+
+
+# ================================================================ DIM SUM
+def steamer_tier(d: Drawing, x, y, w, h, spot=False):
+    d.shape("hero", rrect(x, y, w, h, 3), spot=spot)
+    d.shape("hero2", rrect(x - 2, y, w + 4, 5, 2), shadow=False)
+    d.stroke("mark", f"M{x+3} {y + h*0.62:.1f} H{x + w - 3}", 1.6, line=False)
+    for k in range(1, 6):
+        xx = x + w * k / 6
+        d.stroke("mark", f"M{xx:.1f} {y+7} V{y + h - 3}", 1, line=False)
+
+
+def dimsum_stack(d: Drawing):
+    d.disc("glow", 100, 80, 58, line=False)
+    table(d, 152, "far", "mid")
+    steam(d, [62, 138], 100, 22)
+    steam(d, [84, 116], 38, 22)
+    for i, y in enumerate([126, 100, 74]):
+        steamer_tier(d, 46, y, 108, 26, spot=i == 1)
+    # woven lid
+    d.shape("hero", "M44 76 C46 50 154 50 156 76Z")
+    d.stroke("mark", "M58 70 Q100 58 142 70 M70 62 Q100 54 130 62", 1.4, line=False)
+    d.stroke("mark", "M44 76 H156", 2)
+    d.shape("hero2", rrect(92, 50, 16, 6, 3))
+    # soy dish and chopsticks
+    d.shape("light", ellipse(34, 156, 16, 5))
+    d.shape("dark", ellipse(34, 155, 11, 3), shadow=False)
+    chopsticks(d, 128, 158, 182, 140, 6, "pop", 3.4)
+
+
+def bao(d: Drawing, x, y, s=1.0, split=False):
+    def f():
+        d.shape("light", "M-26 0 C-30 -32 30 -32 26 0 Q0 7 -26 0Z")
+        if split:
+            d.shape("pop", "M-12 -20 Q0 -28 13 -19 L8 -11 Q0 -6 -7 -11Z", shadow=False, spot=True)
+            d.stroke("mark", "M-12 -20 Q0 -28 13 -19", 1.4, line=False)
+        else:
+            d.stroke("mark", "M0 -21 l-8 6 M0 -21 l-3 8 M0 -21 l3 8 M0 -21 l8 6", 1.6)
+            d.marks("mark", circle(0, -21, 2))
+        d.stroke("sky2", "M-18 -2 Q0 3 18 -2", 1.4, line=False)
+    group(d, f"translate({x} {y}) scale({s})", f)
+
+
+def dimsum_bao(d: Drawing):
+    d.disc("glow", 100, 86, 58, line=False)
+    table(d, 150, "far", "mid")
+    # bamboo base and paper liner
+    d.shape("hero", "M24 132 H176 L170 152 H30Z")
+    d.stroke("mark", "M28 140 H172", 1.4, line=False)
+    d.shape("hero2", ellipse(100, 132, 76, 7), shadow=False)
+    steam(d, [74, 126], 78, 22)
+    bao(d, 70, 120, 1.05)
+    bao(d, 130, 120, 1.05)
+    bao(d, 100, 138, 1.2, split=True)
+
+
+def dimsum_cart(d: Drawing):
+    d.disc("glow", 100, 84, 60, line=False)
+    d.band("ground", "M-30 160 L230 160")
+    # hanging lantern
+    d.stroke("dark", "M40 10 V30", 1.4)
+    d.shape("pop", ellipse(40, 42, 11, 13), spot=True)
+    d.shape("dark", rrect(34, 27, 12, 4, 1), shadow=False)
+    d.shape("dark", rrect(34, 53, 12, 4, 1), shadow=False)
+    d.stroke("glow2", "M40 57 V66", 2)
+    steam(d, [70, 92], 74, 20)
+    steam(d, [130], 92, 18)
+    # stacked steamers on the trolley
+    steamer_tier(d, 54, 102, 54, 16)
+    steamer_tier(d, 54, 86, 54, 16)
+    d.shape("hero", "M52 88 C54 74 108 74 110 88Z")
+    steamer_tier(d, 112, 102, 46, 16)
+    d.shape("hero2", ellipse(135, 102, 23, 4.5), shadow=False)
+    for x in [124, 135, 146]:
+        d.shape("light", f"M{x-6} 102 C{x-6} 94 {x+6} 94 {x+6} 102Z", shadow=False)
+        d.marks("pop", circle(x, 96.5, 1.6))
+    # trolley
+    d.limb("dark", "M160 120 L176 98", 5)
+    d.shape("sky2", rrect(44, 116, 120, 8, 2))
+    d.shape("deep", rrect(48, 124, 112, 22, 3), spot=True)
+    d.stroke("glow2", "M54 135 H154", 2, line=False)
+    d.shape("sky2", rrect(44, 144, 120, 5, 2))
+    for x in [60, 148]:
+        d.shape("dark", circle(x, 154, 7))
+        d.marks("light", circle(x, 154, 2.2))
+
+
+# ================================================================ PUB CRAWL
+def pub_front(d: Drawing):
+    d.band("hero", "M-30 -30 L230 -30", line=False)
+    for y in range(14, 92, 9):
+        off = 0 if (y // 9) % 2 else 9
+        d.stroke("mark", " ".join(f"M{x} {y} h14" for x in range(-10 + off, 220, 18)), 1, line=False)
+    for x in [42, 86, 130]:
+        d.shape("light", rrect(x, 30, 28, 40, 2))
+        d.shape("sky2", rrect(x + 3, 33, 22, 16, 1), shadow=False)
+        d.shape("sky2", rrect(x + 3, 52, 22, 15, 1), shadow=False)
+    # green pub frontage
+    d.shape("deep", "M20 210 V88 H180 V210Z")
+    d.shape("dark", rrect(26, 92, 148, 14, 2))
+    d.stroke("hero2", rrect(29, 95, 142, 8, 1), 1.6, line=False)
+    for x in [32, 124]:
+        d.shape("glow2", rrect(x, 112, 44, 40, 3), spot=True)
+        d.stroke("deep", f"M{x+22} 112 V152 M{x} 128 H{x+44}", 2.6)
+    d.shape("dark", rrect(86, 112, 28, 54, 2))
+    d.shape("glow2", rrect(90, 116, 20, 14, 2), shadow=False)
+    d.marks("hero2", circle(108, 142, 1.8))
+    d.stroke("hero2", "M24 108 H176", 2, line=False)
+    # hanging baskets
+    for x in [28, 172]:
+        d.shape("near", "M" + f"{x-11} 84 a11 9 0 0 0 22 0Z")
+        d.marks("pop", circle(x - 6, 84, 2.6) + circle(x + 1, 88, 2.6) + circle(x + 7, 83, 2.4) + circle(x - 1, 81, 2.2))
+    # hanging sign on a bracket
+    d.stroke("dark", "M150 18 H182 M156 18 V24 M174 18 V24", 2.6)
+    d.shape("dark", rrect(150, 24, 30, 36, 3))
+    d.shape("deep", rrect(153, 27, 24, 30, 2), shadow=False)
+    d.stroke("hero2", rrect(155, 29, 20, 26, 1.5), 1.2, line=False)
+    d.shape("glow2", "M159 32 H171 L169 52 H161Z", shadow=False)
+    d.shape("light", "M159 32 H171 L170.5 37 H159.5Z", shadow=False)
+    d.band("ground", "M-30 168 L230 168")
+
+
+def pint(d: Drawing, x, base, beer="hero2", h=48, foam=6, spot=False):
+    d.shape("light", f"M{x-16} {base-h} H{x+16} L{x+12} {base} H{x-12}Z")
+    d.shape(beer, f"M{x-14.5} {base-h+foam+1} H{x+14.5} L{x+11} {base-2} H{x-11}Z", shadow=False, spot=spot)
+    d.stroke("light", f"M{x-8} {base-h+12} L{x-6} {base-6}", 2.2, line=False)
+
+
+def pub_taps(d: Drawing):
+    d.band("deep", "M-30 -30 L230 -30", line=False)
+    d.disc("glow", 100, 70, 46, line=False)
+    # tap handles on a chrome rail
+    for x, role in [(56, "pop"), (100, "hero"), (144, "light")]:
+        d.shape(role, f"M{x-6} 82 L{x-8} 44 C{x-8} 36 {x+8} 36 {x+8} 44 L{x+6} 82Z", spot=role == "pop")
+        d.shape("sky2", rrect(x - 5, 80, 10, 6, 1), shadow=False)
+        d.stroke("sky2", f"M{x} 96 V104 Q{x} 108 {x-4} 108", 4, shadow=True)
+    d.shape("sky2", rrect(34, 86, 132, 12, 4))
+    d.stroke("light", "M40 89 H160", 1.4, line=False)
+    # pint filling under the middle spout
+    d.stroke("hero2", "M96 108 V118", 3)
+    pint(d, 98, 160, h=44)
+    d.shape("light", "M83 118 C82 112 90 110 94 113 C98 109 106 110 108 114 C114 113 115 119 113 120 H83Z", shadow=False)
+    d.band("ground", "M-30 160 L230 160")
+    d.band("near", "M-30 172 L230 172", line=False)
+    d.shape("light", ellipse(150, 160, 14, 3), shadow=False, line=False)
+
+
+def wedge(cx, cy, r0, r1, a0, a1):
+    p = lambda r, a: (cx + r * math.cos(math.radians(a)), cy + r * math.sin(math.radians(a)))
+    (x0, y0), (x1, y1), (x2, y2), (x3, y3) = p(r0, a0), p(r1, a0), p(r1, a1), p(r0, a1)
+    return f"M{x0:.1f} {y0:.1f} L{x1:.1f} {y1:.1f} A{r1} {r1} 0 0 1 {x2:.1f} {y2:.1f} L{x3:.1f} {y3:.1f} A{r0} {r0} 0 0 0 {x0:.1f} {y0:.1f}Z"
+
+
+def pub_darts(d: Drawing):
+    d.band("deep", "M-30 -30 L230 -30", line=False)
+    for x in [-4, 40, 160, 204]:
+        d.stroke("dark", f"M{x} -10 V210", 2, line=False)
+    cx, cy = 96, 104
+    d.shape("dark", circle(cx, cy, 66))
+    for i in range(20):
+        a0, a1 = -99 + i * 18, -81 + i * 18
+        light = i % 2 == 0
+        d.shape("light" if light else "mark", wedge(cx, cy, 6, 52, a0, a1), shadow=False, line=False)
+        d.shape("pop" if light else "near", wedge(cx, cy, 48, 54, a0, a1), shadow=False, line=False)
+        d.shape("pop" if light else "near", wedge(cx, cy, 28, 32, a0, a1), shadow=False, line=False)
+    d.shape("near", circle(cx, cy, 6), shadow=False, line=False)
+    d.shape("pop", circle(cx, cy, 3), shadow=False, spot=True)
+    line_only(d, circle(cx, cy, 54) + circle(cx, cy, 48) + circle(cx, cy, 32) + circle(cx, cy, 28) + circle(cx, cy, 6), 1.6)
+    line_only(d, " ".join(f"M{cx + 6*math.cos(math.radians(-99 + i*18)):.1f} {cy + 6*math.sin(math.radians(-99 + i*18)):.1f} "
+                          f"L{cx + 54*math.cos(math.radians(-99 + i*18)):.1f} {cy + 54*math.sin(math.radians(-99 + i*18)):.1f}" for i in range(20)), 1.2)
+    for x, y, ang in [(cx + 2, cy - 2, -40), (cx + 22, cy - 30, -55), (cx - 18, cy + 18, -30)]:
+        def dart():
+            d.stroke("dark", "M0 0 L10 0", 1.6)
+            d.limb("sky2", "M10 0 L28 0", 5)
+            d.stroke("dark", "M28 0 L42 0", 2)
+            d.shape("hero", "M38 0 L52 -9 L56 -9 L50 0 L56 9 L52 9Z", spot=True)
+        group(d, f"translate({x} {y}) rotate({ang})", dart)
+
+
+# ================================================================ BEER GARDEN
+def stein(d: Drawing):
+    d.limb("light", "M24 -22 C42 -22 42 18 24 18", 7)
+    d.shape("light", rrect(-26, -38, 52, 78, 7))
+    d.shape("hero2", rrect(-22, -28, 44, 62, 4), shadow=False, spot=True)
+    for x, y in [(-12, -14), (0, -14), (12, -14), (-12, 0), (0, 0), (12, 0), (-12, 14), (0, 14), (12, 14)]:
+        d.shape("hero", ellipse(x, y, 4.2, 5.4), shadow=False, line=False)
+    d.shape("light", "M-30 -34 C-34 -46 -20 -52 -12 -46 C-6 -54 8 -54 12 -46 C20 -52 34 -46 30 -34 C30 -26 24 -26 22 -30 Q0 -26 -22 -30 C-26 -22 -30 -26 -30 -34Z", shadow=False)
+    d.shape("light", rrect(-28, 34, 56, 8, 3), shadow=False)
+
+
+def bavarian_bunting(d: Drawing, y=24):
+    d.stroke("dark", f"M-30 {y} Q100 {y+26} 230 {y}", 1.4)
+    for i, x in enumerate(range(18, 200, 18)):
+        t = (x + 30) / 260
+        yy = (1 - t) ** 2 * y + 2 * (1 - t) * t * (y + 26) + t * t * y
+        d.shape("pop" if i % 2 == 0 else "light", f"M{x-6} {yy:.1f} H{x+6} L{x} {yy+12:.1f}Z", shadow=False, spot=i % 2 == 0)
+
+
+def bgarden_steins(d: Drawing):
+    d.disc("glow", 100, 100, 62, line=False)
+    bavarian_bunting(d)
+    table(d, 160, "far", "mid")
+    group(d, "translate(66 118) rotate(-12)", stein)
+    group(d, "translate(134 118) scale(-1 1) rotate(-12)", stein)
+    for x, y, r in [(100, 64, 3.4), (92, 56, 2.4), (110, 54, 2.8), (100, 46, 2)]:
+        d.shape("light", circle(x, y, r), shadow=False)
+
+
+def bgarden_tables(d: Drawing):
+    d.disc("glow", 60, 70, 20)
+    # maypole with blue and white twist
+    d.limb("pop", "M42 30 V150", 5)
+    d.stroke("light", " ".join(f"M39.5 {y} L44.5 {y-6}" for y in range(40, 150, 10)), 2.2, line=False)
+    d.shape("near", ellipse(42, 30, 10, 4))
+    d.band("far", hills(132, 6))
+    # chestnut tree
+    d.limb("dark", "M164 160 V90", 8)
+    d.shape("near", "M96 70 C88 46 116 22 146 30 C166 12 206 26 204 58 C214 76 196 96 172 90 C156 102 126 96 118 86 C100 92 88 82 96 70Z", spot=True)
+    d.shape("deep", "M120 68 C130 58 146 62 150 70 C140 76 128 76 120 68Z", shadow=False, line=False)
+    # string lights from tree to pole
+    d.stroke("dark", "M44 66 Q90 96 130 84", 1.2)
+    for t in [0.15, 0.35, 0.55, 0.75, 0.92]:
+        x = (1 - t) ** 2 * 44 + 2 * (1 - t) * t * 90 + t * t * 130
+        y = (1 - t) ** 2 * 66 + 2 * (1 - t) * t * 96 + t * t * 84
+        d.marks("glow2", circle(x, y + 3, 3))
+    d.band("ground", "M-30 150 L230 150")
+    # long table with steins
+    for x in [72, 100, 128]:
+        d.shape("light", rrect(x - 7, 106, 14, 20, 2))
+        d.shape("hero2", rrect(x - 5.5, 110, 11, 14, 1.5), shadow=False)
+        d.shape("light", ellipse(x, 106, 8, 3.5), shadow=False)
+        d.stroke("light", f"M{x+7} 110 q6 0 6 6 q0 6 -6 6", 2.2)
+    d.shape("hero", rrect(36, 124, 128, 8, 2), spot=False)
+    d.stroke("hero", "M48 132 L64 158 M64 132 L48 158 M136 132 L152 158 M152 132 L136 158", 4)
+    d.shape("hero", rrect(30, 150, 140, 6, 2))
+    d.stroke("hero", "M42 156 V170 M158 156 V170", 4)
+
+
+PRETZEL = "M52 98 C88 112 116 130 136 140 C178 120 172 50 100 52 C28 50 22 120 64 140 C84 130 112 112 148 98"
+
+
+def bgarden_pretzel(d: Drawing):
+    d.band("light", "M-30 -30 L230 -30", line=False)
+    for j in range(-1, 9):
+        for i in range(-1, 9):
+            if (i + j) % 2 == 0:
+                x, y = i * 24 + (12 if j % 2 else 0), j * 24
+                d.shape("pop", f"M{x} {y-12} L{x+12} {y} L{x} {y+12} L{x-12} {y}Z", shadow=False, line=False)
+    d.disc("glow", 100, 100, 70, line=False)
+    d.shape("light", ellipse(100, 152, 70, 12))
+    d.limb("hero", PRETZEL, 18)
+    d.stroke("hero2", "M40 96 C34 70 60 56 100 58 C140 56 166 70 160 96", 3, line=False)
+    d.stroke("hero2", "M70 120 Q100 106 128 122", 2.4, line=False)
+    for x, y in [(60, 62), (84, 52), (112, 52), (138, 60), (156, 80), (44, 80), (86, 116), (116, 116), (150, 116), (50, 116), (100, 100)]:
+        d.marks("light", rrect(x - 1.8, y - 1.8, 3.6, 3.6, 0.6))
+
+
+# ================================================================ FOOD TRUCK
+def ftruck_van(d: Drawing):
+    d.disc("glow", 150, 46, 15)
+    # string lights
+    d.stroke("dark", "M-30 30 Q60 52 110 36 T230 40", 1.2)
+    for x, y in [(10, 40), (36, 45), (62, 46), (88, 42), (130, 34), (156, 37), (182, 42)]:
+        d.marks("glow2", circle(x, y + 4, 2.8))
+    d.band("far", "M-30 140 Q100 132 230 140")
+    d.band("ground", "M-30 156 L230 156")
+    # rounded corrugated van
+    d.shape("hero", "M28 146 V84 C28 70 38 62 54 62 H136 C154 62 164 74 170 92 L176 118 V146Z", spot=True)
+    for x in range(36, 170, 7):
+        d.stroke("mark", f"M{x} 116 V142", 1.3, line=False)
+    d.shape("light", "M146 72 H158 C162 78 166 88 168 98 H146Z", shadow=False)
+    d.shape("dark", rrect(48, 80, 70, 30, 2))
+    d.shape("light", rrect(44, 108, 78, 6, 2))
+    d.shape("pop", "M44 80 L122 80 L128 64 L50 64Z")
+    for i in range(4):
+        x = 50 + i * 20
+        d.shape("light", f"M{x+10} 64 H{x+20} L{x+16} 80 H{x+6}Z", shadow=False, line=False)
+    d.stroke("dark", "M48 80 L44 106 M118 80 L122 106", 1.4, line=False)
+    d.shape("hero2", circle(70, 104, 4), shadow=False)
+    d.shape("light", rrect(88, 98, 10, 10, 2), shadow=False)
+    d.shape("glow2", circle(172, 128, 4.5), shadow=False)
+    for x in [60, 146]:
+        d.shape("dark", circle(x, 148, 13))
+        d.shape("light", circle(x, 148, 5), shadow=False)
+    # chalkboard A-frame
+    d.stroke("dark", "M10 166 L18 130 L26 166", 2.6)
+    d.shape("dark", rrect(8, 128, 22, 26, 2))
+    d.stroke("light", "M12 136 h12 M12 142 h9 M12 148 h11", 1.4)
+
+
+def ftruck_burger(d: Drawing):
+    d.disc("glow", 100, 86, 60, line=False)
+    table(d, 152, "far", "mid")
+    # fries carton
+    for x, rot in [(134, -8), (142, -2), (150, 4), (158, 10), (146, 2), (154, 6)]:
+        d.shape("hero", rrect(x - 3.5, 62, 7, 48, 2), extra=f'transform="rotate({rot} {x} 110)"')
+    d.shape("pop", "M124 96 H172 L164 152 H132Z", spot=True)
+    d.shape("pop", "M124 96 Q148 108 172 96 L170 106 Q148 116 126 106Z", shadow=False)
+    # burger
+    d.shape("hero2", "M30 136 Q30 152 46 152 H114 Q130 152 130 136Z")
+    d.shape("deep", rrect(26, 120, 108, 16, 8))
+    d.shape("hero", "M30 120 L130 120 L124 128 L114 136 L108 128 L96 130 L86 128 L72 138 L64 128 L48 128 L40 134 L34 126Z", shadow=False, spot=False)
+    d.shape("pop", rrect(32, 110, 96, 9, 4), shadow=False)
+    d.shape("near", "M26 112 Q34 102 42 110 Q50 100 58 110 Q66 100 74 110 Q82 100 90 110 Q98 100 106 110 Q114 100 122 110 Q130 100 136 112 Q80 118 26 112Z", shadow=False)
+    d.shape("hero2", "M28 104 C28 66 132 66 132 104Z", spot=True)
+    for x, y, r in [(56, 84, -20), (74, 78, 0), (92, 80, 20), (110, 88, 30), (66, 94, -10), (98, 92, 10), (82, 88, 0)]:
+        d.shape("light", ellipse(x, y, 1.7, 3.2), shadow=False, line=False, extra=f'transform="rotate({r} {x} {y})"')
+
+
+def ftruck_window(d: Drawing):
+    d.band("hero", "M-30 -30 L230 -30", line=False)
+    # awning
+    d.shape("pop", "M22 72 L178 72 L188 44 L12 44Z", spot=True)
+    for i in range(5):
+        x = 22 + i * 31.2
+        d.shape("light", f"M{x+15.6:.1f} 72 H{x+31.2:.1f} L{100 + (x + 31.2 - 100) * 1.13:.1f} 44 H{100 + (x + 15.6 - 100) * 1.13:.1f}Z", shadow=False, line=False)
+    d.stroke("dark", "M30 72 L22 112 M170 72 L178 112", 2)
+    # serving hatch
+    d.shape("dark", rrect(30, 76, 140, 54, 3))
+    d.stroke("light", "M60 76 V86 M140 76 V86", 1.2)
+    d.shape("glow2", "M54 86 H66 L64 92 H56Z", shadow=False)
+    d.shape("glow2", "M134 86 H146 L144 92 H136Z", shadow=False)
+    d.shape("sky2", "M100 128 C100 106 108 98 118 98 C128 98 136 106 136 128Z", shadow=False, line=False)
+    d.shape("sky2", ellipse(118, 98, 8, 3), shadow=False, line=False)
+    # counter with orders
+    d.shape("sky2", rrect(22, 126, 156, 9, 3))
+    d.shape("ground", "M44 126 V100 L48 96 H66 L70 100 V126Z")
+    d.stroke("mark", "M44 100 H70", 1.4)
+    d.shape("light", "M82 126 L80 104 H96 L94 126Z")
+    d.shape("pop", rrect(79, 101, 18, 5, 2), shadow=False)
+    d.stroke("dark", "M90 101 L94 92", 1.6)
+    d.shape("hero2", "M142 126 C142 114 166 114 166 126Z", spot=False)
+    d.marks("hero2", circle(154, 114, 2))
+    # lower panel
+    d.stroke("mark", "M-30 150 H230", 2, line=False)
+    d.shape("dark", rrect(40, 144, 54, 34, 3))
+    d.stroke("light", "M47 153 h22 M47 161 h32 M47 169 h26", 1.6)
+    d.stroke("mark", "M118 156 H160 M118 164 H160 M118 172 H160", 2.4)
+
+
 # ================================================================ catalogue
 WOOD = "#C68B59"
 GRAPE = "#6B3F7A"
@@ -697,4 +1392,113 @@ CONCEPTS = [
             overrides={"hero": "#E8B04B", "hero2": "#F5CF7A", "pop": "#C98A2E", "ground": "#9A6338", "dark": "#5A3A22"},
             checks=[("hero", "deep"), ("pop", "deep"), ("ground", "deep")],
             fixes={"deep": ["dark", "mark", "near"]}),
+]
+
+
+PICNIC = {"pop": "#D7263D", "mid": "#8CC084", "near": "#5E9C6A"}
+WICKER = {"hero": "#C9A46E", "mark": "#9A7444"}
+FRUIT = {"hero": "#F28C28", "pop": "#D7263D", "hero2": "#F6D743"}
+BOARD = {"ground": "#C68B59", "deep": "#A8743F"}
+BAMBOO = {"hero": "#D9B26F", "hero2": "#B88A44", "mark": "#9A7038"}
+BEER = {"hero2": "#F2B33D", "hero": "#F7CD6B"}
+
+CONCEPTS += [
+    # picnic
+    Concept("picnic-blanket", "picnic", "Gingham spread", picnic_blanket,
+            overrides={**PICNIC, "hero": "#F2545B", "hero2": "#E8C07A", "ground": "#4AA3DF", "glow2": "#F6D365", "light": "#FFFDF7", "sky2": "#D9DCE3"},
+            checks=[("light", "mid"), ("near", "light")]),
+    Concept("picnic-basket", "picnic", "Picnic hamper", picnic_basket,
+            overrides={**PICNIC, **WICKER, "hero2": "#E0A458", "deep": "#2F5D3A", "ground": "#7A4A2A", "light": "#FFFDF7"},
+            checks=[("hero", "glow"), ("hero", "mid"), ("hero2", "glow"), ("deep", "glow"), ("hero", "sky")],
+            fixes={"glow": ["light", "sky2", "far", "#F1E6CF"]}),
+    Concept("picnic-tree", "picnic", "Under the tree", picnic_tree,
+            overrides={**PICNIC, **WICKER, "near": "#4F8A3C", "deep": "#3A6B2E", "light": "#FFFDF7"},
+            checks=[("near", "sky"), ("mid", "far"), ("light", "mid"), ("hero2", "sky"), ("near", "far")],
+            fixes={"far": ["#D9C38C", "light", "deep"], "hero2": ["pop", "hero", "deep"]}),
+    # fruit market
+    Concept("fruit-stall", "fruit-market", "Market stall", fruit_stall,
+            overrides={**FRUIT, "ground": "#C68B59", "mark": "#8A5A3B", "near": "#8A5A3B"},
+            checks=[("mid", "light"), ("mid", "sky"), ("ground", "far"), ("hero", "far"), ("pop", "far")],
+            fixes={"mid": ["near", "deep", "pop"], "far": ["mid", "deep", "sky2"]}),
+    Concept("fruit-tropical", "fruit-market", "Tropical fruit", fruit_tropical,
+            overrides={"ground": "#E8A93A", "mark": "#A86E1E", "near": "#4F8A3C", "hero": "#F2545B", "hero2": "#F6D743", "pop": "#F4A23A"},
+            checks=[("ground", "glow"), ("hero2", "glow"), ("near", "glow"), ("pop", "far")],
+            fixes={"glow": ["light", "sky2", "#7FB7BE", "deep"], "far": ["mid", "deep"]}),
+    Concept("fruit-boat", "fruit-market", "Floating market", fruit_boat,
+            overrides={**FRUIT, "ground": "#A0673F", "mark": "#3E5F8A", "glow2": "#8DBF4A", "light": "#F3E6C4"},
+            checks=[("ground", "mid"), ("ground", "near"), ("light", "far"), ("far", "sky")],
+            fixes={"mid": ["far", "light"], "near": ["deep", "far"]}),
+    # tapas crawl
+    Concept("tapas-plates", "tapas-crawl", "Cazuelas", tapas_plates,
+            overrides={**BOARD, "hero": "#C1663F", "mark": "#9C4A2C", "hero2": "#F2C14E", "pop": "#D7263D", "near": "#7A9A3A", "sky2": "#F49A7A", "glow2": "#E8B04B", "light": "#FFF6E6"},
+            checks=[("hero", "ground")], fixes={"ground": ["#E3C08F"]}),
+    Concept("tapas-pintxos", "tapas-crawl", "Pintxos bar", tapas_pintxos,
+            overrides={"hero2": "#D9A066", "light": "#FFF6E6", "hero": "#F2C14E", "mark": "#C99A2E", "near": "#6B7F2A", "pop": "#C8414B", "dark": "#4A4E5A", "ground": "#E8D3A8"},
+            checks=[("hero2", "glow"), ("light", "glow"), ("pop", "glow"), ("hero", "glow")],
+            fixes={"glow": ["mid", "near", "deep", "#7FB7BE"]}),
+    Concept("tapas-jamon", "tapas-crawl", "Jamón on the stand", tapas_jamon,
+            overrides={"hero": "#8A4A2B", "hero2": "#A8603A", "pop": "#B5303A", "light": "#FFF4E6", "dark": "#3B2A20", "ground": "#C68B59", "sky2": "#C9CED6"},
+            checks=[("hero", "glow"), ("dark", "glow"), ("ground", "far")],
+            fixes={"glow": ["light", "sky2", "#F1E6CF", "far"], "far": ["mid", "deep"]}),
+    # pasta making
+    Concept("pasta-machine", "pasta-making", "Pasta machine", pasta_machine,
+            overrides={"hero": "#F6D58A", "hero2": "#C9D1D8", "mark": "#8A949E", "pop": "#B5302A"},
+            checks=[("hero2", "glow"), ("hero", "far"), ("hero2", "sky")],
+            fixes={"glow": ["mid", "near", "deep"], "far": ["mid", "deep", "near"]}),
+    Concept("pasta-well", "pasta-making", "Flour & eggs", pasta_well,
+            overrides={**BOARD, "hero": "#D9A066", "mark": "#B07A45", "light": "#FBF5E8", "sky2": "#EADFC6", "hero2": "#F6B82A"},
+            checks=[("light", "ground")]),
+    Concept("pasta-ravioli", "pasta-making", "Ravioli tray", pasta_ravioli,
+            overrides={**BOARD, "mark": "#F3E3B4", "hero": "#F6D58A", "hero2": "#EBC46A", "sky2": "#C9CED6", "near": "#3F8A3F", "light": "#FFFBF0"},
+            checks=[("mark", "ground")]),
+    # dim sum
+    Concept("dimsum-stack", "dim-sum", "Steamer tower", dimsum_stack,
+            overrides={**BAMBOO, "pop": "#B5302A"},
+            checks=[("hero", "glow"), ("hero", "far"), ("hero", "sky")],
+            fixes={"glow": ["mid", "near", "deep", "#7FB7BE"], "far": ["mid", "deep"]}),
+    Concept("dimsum-bao", "dim-sum", "Char siu bao", dimsum_bao,
+            overrides={**BAMBOO, "hero2": "#EFE3C8", "light": "#FFFBF2", "pop": "#B5302A", "sky2": "#E6DCC8"},
+            checks=[("light", "glow"), ("hero", "glow"), ("hero", "far")],
+            fixes={"glow": ["mid", "near", "deep", "#7FB7BE"], "far": ["mid", "deep"]}),
+    Concept("dimsum-cart", "dim-sum", "Dim sum trolley", dimsum_cart,
+            overrides={**BAMBOO, "pop": "#C8302E", "sky2": "#C9D1D8", "light": "#FFFBF2"},
+            checks=[("deep", "ground"), ("hero", "glow"), ("sky2", "glow"), ("deep", "glow")],
+            fixes={"glow": ["mid", "near", "#7FB7BE"], "ground": ["far", "mid"]}),
+    # pub crawl
+    Concept("pub-front", "pub-crawl", "Corner pub", pub_front,
+            overrides={"hero": "#A84A32", "mark": "#8A3A26", "sky2": "#9FB8C8", "deep": "#1F4D3A", "dark": "#14261E", "hero2": "#D4A84B",
+                       "glow2": "#F6D27A", "near": "#4F8A3C", "pop": "#E84A6B", "light": "#F5F0E6"},
+            checks=[("deep", "ground"), ("deep", "hero")], fixes={"ground": ["far", "light", "#BFB8AA"]}),
+    Concept("pub-taps", "pub-crawl", "Pulling a pint", pub_taps,
+            overrides={"deep": "#3B2A20", "sky2": "#C9D1D8", "hero2": "#E39B32", "ground": "#8A5432", "near": "#5A3420"},
+            checks=[("glow", "deep"), ("sky2", "glow"), ("hero", "glow"), ("light", "glow"), ("pop", "glow")],
+            fixes={"glow": ["mid", "far", "near", "#7FB7BE"], "hero": ["hero2", "near"]}),
+    Concept("pub-darts", "pub-crawl", "Darts", pub_darts,
+            overrides={"deep": "#8A5A3B", "dark": "#1E1E1E", "light": "#F3E3C0", "mark": "#2A2A2A", "pop": "#D7263D", "near": "#2E8B57", "sky2": "#C9CED6"},
+            checks=[("hero", "light"), ("hero", "dark"), ("hero", "deep")], fixes={"hero": ["hero2", "glow", "#4AA3DF"]}),
+    # beer garden
+    Concept("bgarden-steins", "beer-garden", "Prost!", bgarden_steins,
+            overrides={**BEER, "pop": "#3E8ED0", "light": "#FFFDF7"},
+            checks=[("light", "glow"), ("hero2", "glow"), ("pop", "sky"), ("light", "far")],
+            fixes={"glow": ["#7FB7BE", "mid", "near", "deep"], "far": ["mid", "deep", "near"]}),
+    Concept("bgarden-tables", "beer-garden", "Under the chestnuts", bgarden_tables,
+            overrides={**BEER, "pop": "#3E8ED0", "near": "#4F8A3C", "deep": "#3A6B2E", "hero": "#A0673F", "glow2": "#FFD98A", "light": "#FFFDF7"},
+            checks=[("near", "sky"), ("hero", "ground"), ("pop", "sky"), ("near", "far"), ("light", "ground")],
+            fixes={"ground": ["far", "mid", "deep"], "far": ["mid", "light", "#D9C38C"]}),
+    Concept("bgarden-pretzel", "beer-garden", "Giant pretzel", bgarden_pretzel,
+            overrides={"hero": "#A0592A", "hero2": "#C47A3F", "pop": "#7DB9E8", "light": "#FFFFFF"},
+            checks=[("hero", "glow"), ("light", "glow")], fixes={"glow": ["glow2", "far", "sky2", "#F6D58A"]}),
+    # food truck
+    Concept("ftruck-van", "food-truck", "Vintage food van", ftruck_van,
+            overrides={"glow2": "#FFD98A"},
+            checks=[("hero", "far"), ("hero", "sky"), ("pop", "hero"), ("hero", "ground")],
+            fixes={"hero": ["pop", "deep", "near", "hero2"], "far": ["mid", "deep"]}),
+    Concept("ftruck-burger", "food-truck", "Burger & fries", ftruck_burger,
+            overrides={"hero": "#F6C945", "hero2": "#E0A458", "deep": "#5A3420", "pop": "#D7263D", "near": "#6FAE3A", "light": "#FFF6E0"},
+            checks=[("hero2", "glow"), ("pop", "glow"), ("hero", "glow")],
+            fixes={"glow": ["mid", "near", "#7FB7BE", "deep"]}),
+    Concept("ftruck-window", "food-truck", "Order hatch", ftruck_window,
+            overrides={"sky2": "#C9D1D8", "ground": "#C9A46E", "hero2": "#D4A84B", "glow2": "#FFD98A"},
+            checks=[("pop", "hero"), ("dark", "hero"), ("sky2", "hero"), ("light", "hero")],
+            fixes={"hero": ["mid", "near", "deep", "far"]}),
 ]

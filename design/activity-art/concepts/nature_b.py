@@ -102,7 +102,7 @@ def walksafari_rhino(d: Drawing):
     d.disc("glow", 128, 70, 34)
     birds(d, [(40, 48, 1), (56, 40, 0.8)])
     d.band("far", hills(140, 8))
-    acacia(d, -70, 6, 0.55)
+    acacia(d, -54, 2, 0.5)
     d.stroke("hero", "M170 104 C178 110 180 120 177 128", 2.4)
     d.shape("mark", ellipse(177, 130, 2.4, 4), shadow=False)
     d.shape("hero", RHINO)
@@ -150,7 +150,7 @@ def walksafari_tracks(d: Drawing):
     acacia(d, 60, -2, 0.5)
     d.band("ground", "M-30 70 Q100 64 230 70")
     d.stroke("mid", "M20 92 q10 -3 20 0 M150 86 q10 -3 20 0 M150 186 q10 -3 20 0 M28 170 q8 -3 16 0", 2, line=False)
-    paw(d, 44, 96, 0.55, -20)
+    paw(d, 40, 98, 0.62, -20)
     paw(d, 76, 140, 1.3, -14)
     boot(d, 136, 112, 1.0, 12)
     boot(d, 150, 174, 0.85, 18)
@@ -513,24 +513,23 @@ def migration_herd(d: Drawing):
 
 
 def migration_river(d: Drawing):
-    d.disc("glow", 150, 46, 18)
-    d.band("far", hills(80, 6))
-    # far bank with waiting herd
-    d.shape("ground", "M120 200 L120 100 C140 92 180 90 230 92 L230 200Z")
-    for x, y, s in [(140, 74, .24), (166, 72, .24), (188, 76, .22)]:
-        group(d, f"translate({x} {y}) scale({s})", lambda: d.marks("dark", WILDEBEEST + GNU_EXTRA))
-    d.band("water", "M-30 118 Q40 112 100 118 T230 116")
-    d.stroke("water2", "M10 140 q8 -4 16 0 M60 150 q8 -4 16 0 M130 134 q8 -4 16 0 M30 170 q8 -4 16 0", 2, line=False)
-    # swimming heads
-    for x, y in [(30, 132), (60, 126)]:
-        d.shape("hero", f"M{x} {y} C{x - 2} {y - 8} {x + 10} {y - 12} {x + 12} {y - 4} L{x + 14} {y} Z")
-        d.stroke("hero", f"M{x + 4} {y - 9} q-4 -6 1 -9", 2)
+    d.disc("glow", 150, 40, 15)
+    d.band("far", hills(66, 5))
+    # far bank with the waiting herd
+    d.band("ground", "M-30 88 Q60 80 120 86 T230 82")
+    for x, y in [(14, 68), (34, 70), (128, 66), (148, 64), (168, 66), (186, 68)]:
+        group(d, f"translate({x} {y}) scale(.16)", lambda: d.marks("dark", WILDEBEEST + GNU_EXTRA))
+    d.band("water", "M-30 100 Q40 96 100 100 T230 98")
+    d.stroke("water2", "M120 118 q8 -4 16 0 M150 132 q8 -4 16 0 M40 150 q8 -4 16 0 M140 176 q8 -4 16 0", 2, line=False)
+    # near bank they jump from
+    d.shape("ground", "M-30 210 V120 C0 116 30 118 46 124 C54 140 60 170 70 210Z")
+    d.stroke("deep", "M10 134 L30 136 M20 150 L44 154 M8 170 L40 172", 1.6, line=False)
     # croc eyes
-    d.shape("dark", "M30 168 C34 160 44 160 48 166 L60 166 C62 160 70 160 74 166 L84 168Z")
-    # leaping wildebeest
-    group(d, "translate(140 88) rotate(-24) scale(-1.05 1.05) translate(-60 -100)", lambda: wildebeest(d))
-    d.shape("water2", "M66 138 C70 126 80 124 84 132 C88 122 98 122 100 132 C104 126 112 128 112 138Z", shadow=False)
-    d.band("deep", waves(184, 3, 30), line=False)
+    d.shape("dark", "M118 178 C122 170 132 170 136 176 L148 176 C150 170 158 170 162 176 L172 178Z")
+    # splash where the leader lands
+    d.shape("water2", "M136 150 C138 136 148 134 152 142 C156 130 168 130 170 142 C174 136 182 138 182 150Z")
+    group(d, "translate(102 100) rotate(-16) scale(-.95 .95) translate(-65 -100)", lambda: wildebeest(d))
+    d.band("deep", waves(190, 3, 30), line=False)
 
 
 def migration_face(d: Drawing):
@@ -742,7 +741,8 @@ def botanic_lily(d: Drawing):
 
 
 def botanic_strelitzia(d: Drawing):
-    d.disc("glow", 100, 100, 70, line=False)
+    d.shape("leaf2", "M120 200 C120 140 140 80 176 40 C190 80 176 150 150 200Z", line=False)
+    d.shape("leaf", "M60 200 C50 150 30 100 0 70 C-10 110 10 170 40 200Z", line=False)
     d.shape("leaf", "M150 200 C160 140 176 100 196 80 C204 110 190 160 166 200Z")
     d.shape("leaf2", "M38 200 C30 150 12 110 -4 96 C-8 130 6 170 24 200Z")
     d.limb("leaf2", "M102 200 C100 170 100 150 104 128", 7)
@@ -801,15 +801,20 @@ def lakeday_canoe(d: Drawing):
     d.stroke("water2", "M24 168 H48 M150 172 H176", 2, line=False)
     # reflection
     d.raw('<g opacity=".3">', "")
-    d.shape("hero", "M20 140 C50 146 150 146 180 140 C176 152 150 160 100 160 C50 160 24 152 20 140Z", shadow=False, line=False)
+    d.shape("hero", "M30 144 C60 148 140 148 170 144 C164 154 140 160 100 160 C60 160 36 154 30 144Z", shadow=False, line=False)
     d.raw("</g>", "")
-    # paddle
-    d.limb("wood2", "M128 92 L160 150", 3.2)
-    d.shape("wood", "M156 142 C162 140 170 150 168 160 C166 170 160 168 156 160Z", extra='transform="rotate(-28 162 155)"')
-    d.shape("hero", "M14 120 C30 128 60 132 100 132 C140 132 170 128 186 120 C184 132 170 142 150 144 L50 144 C30 142 16 132 14 120Z", spot=True)
-    d.shape("hero2", "M14 120 C30 128 60 132 100 132 C140 132 170 128 186 120 L184 126 C170 132 140 136 100 136 C60 136 30 132 16 126Z", shadow=False)
-    d.stroke("wood2", "M60 132 V138 M100 133 V140 M140 132 V138", 2.2, line=False)
-    d.limb("wood2", "M150 128 L162 104", 2.6)
+    def canoe():
+        d.limb("wood2", "M56 126 L128 96", 3.2)
+        d.shape("wood", ellipse(140, 91, 14, 5.5), extra='transform="rotate(-22 140 91)"')
+        d.shape("hero", "M8 106 C14 124 24 134 44 138 L156 138 C176 134 186 124 192 106 C176 118 140 124 100 124 "
+                        "C60 124 24 118 8 106Z", spot=True)
+        d.shape("hero2", "M8 106 C24 118 60 124 100 124 C140 124 176 118 192 106 L190 112 C174 124 140 129 100 129 "
+                         "C60 129 26 124 10 112Z", shadow=False)
+        d.stroke("wood2", "M60 127 V134 M100 129 V136 M140 127 V134", 2.2, line=False)
+    group(d, "translate(20 32) scale(.8)", canoe)
+    d.band("shore", "M-30 178 Q40 168 100 176 T230 172")
+    d.stroke("pine", "M24 176 Q22 158 16 148 M30 176 Q30 156 34 144 M36 176 Q40 162 46 156 M168 172 Q166 156 160 148 M174 172 Q176 154 182 146", 2.4)
+    d.shape("dark", ellipse(16, 148, 2.4, 6) + ellipse(34, 144, 2.4, 6) + ellipse(182, 146, 2.4, 6), shadow=False)
 
 
 def lakeday_swan(d: Drawing):
@@ -1070,13 +1075,15 @@ def bee(d: Drawing, x, y, s=1.0, rot=0):
 def lavender_bee(d: Drawing):
     d.disc("glow", 150, 50, 20)
     d.band("far", hills(150, 6))
-    for x, h, r in [(20, 90, -10), (44, 70, 6), (168, 80, 8), (186, 100, -4), (150, 60, -12)]:
+    for x, h, r in [(10, 96, -10), (28, 84, -4), (44, 70, 6), (168, 80, 8), (184, 100, -4), (150, 66, -12), (138, 56, 10)]:
         lav_spike(d, x, 200, h, r, "lavdeep", "lav")
+    d.band("lavdeep", "M-30 176 Q0 160 30 170 Q60 158 90 170 Q120 158 150 170 Q180 158 230 170", line=False)
     lav_spike(d, 92, 200, 150, -4, spot=True)
     lav_spike(d, 120, 200, 120, 8)
     lav_spike(d, 66, 200, 112, -12)
+    for x, h, r in [(20, 50, -6), (46, 44, 4), (150, 46, -4), (178, 52, 8), (106, 40, 0)]:
+        lav_spike(d, x, 196, h, r)
     bee(d, 116, 74, 1.25, -10)
-    d.stroke("beeD", "M150 104 q8 -6 14 2 q6 8 14 0", 1.4, line=False)
 
 
 # ================================================================ RAINBOW CHASING
@@ -1138,8 +1145,8 @@ def rainbow_road(d: Drawing):
 
 # ================================================================ FIREFLIES
 FLY = {"sky": "#1F2A44", "sky2": "#2E3B5E", "light": "#E8EDF7", "bug": "#F7F06B", "bug2": "#FFFBC9", "fly": "#6B5A4A", "flyR": "#E0584A", "wing": "#EEF2F4", "jar": "#CFE5E8",
-       "lid": "#B9A27A", "trunkN": "#2A2F3A", "grassN": "#2F4A3A"}
-NIGHT_PAL = ["dusk", "coastal", "meadow", "blush"]
+       "lid": "#B9A27A", "trunkN": "#121620", "grassN": "#2F4A3A"}
+NIGHT_PAL = ["dusk", "coastal", "meadow", "blush", "golden"]
 
 
 def glows(d: Drawing, pts, r=2.2):
@@ -1259,11 +1266,11 @@ CONCEPTS = [
             checks=[("pad2", "water"), ("light", "pad")]),
     Concept("botanic-bird-of-paradise", "botanical-gardens", "Bird of paradise", botanic_strelitzia,
             overrides={**GARDEN, "spathe": "#4F7A5E", "spathe2": "#9E4A6A", "orange": "#F4892E", "blue": "#3C5DC8"},
-            checks=[("orange", "glow"), ("orange", "sky"), ("spathe", "glow")], fixes={"glow": ["light", "sky2", "far"]}),
+            checks=[("orange", "sky"), ("blue", "sky"), ("spathe", "sky"), ("orange", "leaf2"), ("spathe", "leaf")], fixes={"sky": ["sky2", "far"]}),
     Concept("lakeday-dock-chairs", "lake-day", "Dock chairs", lakeday_dock, ["coastal", "meadow", "blush", "dusk"], {**LAKE, "chairA": "#C23B2E", "chairB": "#F7F3EA"},
             checks=[("chairA", "wood"), ("chairB", "wood"), ("wood", "water"), ("chairA", "water"), ("chairB", "water")]),
-    Concept("lakeday-canoe", "lake-day", "Red canoe", lakeday_canoe, ["coastal", "meadow", "blush", "dusk"], {**LAKE, "hero": "#D64545", "hero2": "#F4E3C1"},
-            checks=[("hero", "water"), ("hero", "pine")]),
+    Concept("lakeday-canoe", "lake-day", "Red canoe", lakeday_canoe, ["coastal", "meadow", "blush", "dusk"], {**LAKE, "hero": "#D64545", "hero2": "#F4E3C1", "shore": "#D9BC8C"},
+            checks=[("hero", "water"), ("hero", "pine"), ("shore", "water")]),
     Concept("lakeday-swan-pedalo", "lake-day", "Swan pedalo", lakeday_swan, ["coastal", "meadow", "blush", "dusk"],
             {**LAKE, "swan": "#FFFFFF", "swan2": "#E8EEF2", "beak": "#F28C28", "mark": "#1F1F24"},
             checks=[("swan", "water"), ("swan", "pine"), ("swan", "far")], fixes={"far": ["mid", "near"]}),
@@ -1295,13 +1302,8 @@ CONCEPTS = [
             fixes={"sky": ["sky2", "#DCE9F2"], "hero": ["pop", "hero2", "light"]}),
     Concept("firefly-jar", "fireflies", "Jar of fireflies", firefly_jar, NIGHT_PAL, overrides=FLY,
             checks=[("jar", "sky"), ("lid", "sky"), ("far", "sky")], fixes={"far": ["mid", "near"]}),
-    Concept("firefly-forest", "fireflies", "Glowing forest", firefly_forest, NIGHT_PAL, overrides=FLY,
-            overrides={**FLY, "hillN": "#273150"}.items() and {**FLY, "hillN": "#273150"},
+    Concept("firefly-forest", "fireflies", "Glowing forest", firefly_forest, NIGHT_PAL, overrides={**FLY, "hillN": "#34406A"},
             checks=[("deep", "sky"), ("trunkN", "hillN"), ("deep", "hillN")], fixes={"deep": ["near", "mid"]}),
     Concept("firefly-closeup", "fireflies", "Firefly", firefly_bug, NIGHT_PAL, overrides=FLY,
             checks=[("fly", "sky"), ("bug", "sky"), ("grassN", "far")], fixes={"far": ["mid", "near", "far"]}),
 ]
-
-
-def _sk_gnu(d):
-    group(d, "translate(10 -60) scale(1.5)", lambda: wildebeest(d))

@@ -653,14 +653,12 @@ def onsen_rotenburo(d: Drawing):
     d.band("near", "M-30 104 Q40 86 100 98 T230 92")
     _pines(d, "deep", [(120, 110, 30), (140, 112, 24), (102, 112, 20)])
     d.band("light", "M-30 110 Q100 102 230 112")
-    d.shape("ground", "M-30 66 L70 74 L70 126 L-30 126Z")
-    d.stroke("near", " ".join(f"M{x} {66 + (x + 30) * .08:.1f} V126" for x in range(-22, 70, 8)), 1.4, line=False)
-    _ink(d, " ".join(f"M{x} {66 + (x + 30) * .08:.1f} V126" for x in range(-14, 70, 16)), 1.4)
-    d.limb("dark", "M-30 84 L70 90 M-30 108 L70 112", 3, shadow=False)
-    d.shape("light", "M-30 62 L72 70 L72 75 L-30 68Z", shadow=False)
-    d.shape("hero", ellipse(100, 150, 80, 24))
-    d.stroke("light", "M60 148 Q70 144 80 148 M120 156 Q132 152 144 156", 2, line=False)
-    for x, y, rx, ry in [(26, 136, 16, 9), (50, 128, 14, 7), (152, 128, 14, 7), (176, 140, 16, 9), (34, 170, 18, 9), (166, 172, 18, 8), (100, 180, 22, 7)]:
+    d.shape("deep", _pine(30, 128, 76))
+    d.shape("light", "M30 52 L41 76 L30 70 L19 76Z M8 98 Q20 90 30 96 Q40 90 54 98 L50 100 Q40 94 30 100 Q20 94 10 100Z", shadow=False)
+    d.shape("hero", ellipse(104, 152, 82, 28))
+    d.stroke("light", "M64 150 Q74 146 84 150 M122 160 Q134 156 146 160 M92 170 Q100 167 108 170", 2, line=False)
+    for x, y, rx, ry in [(24, 140, 18, 10), (50, 128, 14, 7), (84, 122, 12, 6), (130, 122, 12, 6), (158, 128, 14, 7), (184, 142, 16, 10),
+                         (30, 174, 20, 10), (172, 176, 20, 9), (100, 184, 24, 8)]:
         d.shape("mid", ellipse(x, y, rx, ry))
         d.shape("light", f"M{x - rx * .7:.1f} {y - ry * .5:.1f} Q{x} {y - ry * 1.3:.1f} {x + rx * .7:.1f} {y - ry * .5:.1f} Q{x} {y - ry * .9:.1f} {x - rx * .7:.1f} {y - ry * .5:.1f}Z", shadow=False)
 
@@ -1077,7 +1075,7 @@ CONCEPTS = [
     C("iceclimb-crampon", "ice-climbing", "Crampon kick", iceclimb_crampon, overrides={"glow2": ICE, "mark": "#8D99AE"},
       checks=[("hero", "sky"), ("hero", "glow2"), ("mark", "glow2"), ("light", "far"), ("far", "sky"), ("pop", "dark")],
       fixes={"hero": ["pop", "deep"], "far": ["mid", "near"]}),
-    C("icefish-hole", "ice-fishing", "Under the ice", icefish_hole, ALL, {"glow2": ICE, "mid": "#4AA6B8", "near": "#2F8FA3"},
+    C("icefish-hole", "ice-fishing", "Under the ice", icefish_hole, ALL, {"glow2": ICE, "mid": "#4AA6B8", "near": "#2F8FA3", "hero": "#F2913D"},
       checks=[("light", "far"), ("hero", "mid"), ("pop", "mid"), ("glow2", "mid"), ("far", "sky"), ("hero2", "mid")],
       fixes={"far": ["near", "deep"], "mid": ["near"], "hero": ["pop", "light"], "hero2": ["light", "glow"], "pop": ["hero2", "light"]}),
     C("icefish-shacks", "ice-fishing", "Shacks on the lake", icefish_shacks, overrides={"glow2": ICE},
@@ -1127,8 +1125,8 @@ CONCEPTS = [
       checks=[("ground", "sky"), ("ground", "far"), ("light", "mid"), ("dark", "sky"), ("ground", "mid")], fixes={"sky": ["#9CC6E2", "#8DBBDB"]}),
     C("thermal-chess", "thermal-baths", "Chess in the pool", thermal_chess, NO_GOLD, {**POOL, "ground": "#C9955A", "hero2": "#F3C350"},
       checks=[("dark", "mid"), ("light", "mid"), ("ground", "mid"), ("hero2", "far")], fixes={"far": ["sky", "light"]}),
-    C("onsen-rotenburo", "onsen", "Rock pool & lantern", onsen_rotenburo, overrides={"hero": "#86CFD3", "mid": "#9AA3AE", "ground": "#B07F50"},
-      checks=[("light", "sky"), ("hero", "mid"), ("dark", "light"), ("mid", "light"), ("near", "sky"), ("light", "near"), ("ground", "light")],
+    C("onsen-rotenburo", "onsen", "Rock pool & lantern", onsen_rotenburo, overrides={"hero": "#5FB8C2", "mid": "#7B8490"},
+      checks=[("light", "sky"), ("hero", "mid"), ("dark", "light"), ("mid", "light"), ("near", "sky"), ("light", "near"), ("deep", "light"), ("deep", "near")],
       fixes={**SNOW_FIX, "near": ["far", "mid"]}),
     C("onsen-noren", "onsen", "Noren curtain", onsen_noren, overrides={"ground": "#C8955F"},
       checks=[("hero", "dark"), ("light", "hero"), ("pop", "ground"), ("dark", "ground")], fixes={"hero": ["pop", "mid", "near"], "pop": ["#D7263D"]}),

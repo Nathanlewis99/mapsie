@@ -30,9 +30,21 @@ def all_modules():
     return sorted(p.stem for p in (HERE / "concepts").glob("*.py") if not p.stem.startswith("_"))
 
 
+def ids_in_other_modules(mod: str) -> dict[str, str]:
+    """Concept ids already built by other modules (from their manifests), to catch clashes early."""
+    taken = {}
+    for f in OUT.glob("manifest-*.json"):
+        other = f.stem.removeprefix("manifest-")
+        if other != mod:
+            for c in json.loads(f.read_text()):
+                taken[c["id"]] = other
+    return taken
+
+
 def build_module(mod: str, seen: set[str]) -> list[dict]:
     m = importlib.import_module(mod)
     manifest = []
+    taken = ids_in_other_modules(mod)
     for c in m.CONCEPTS:
         polish.apply(c)
         problems = []
@@ -40,6 +52,8 @@ def build_module(mod: str, seen: set[str]) -> list[dict]:
             problems.append(f"unknown activity '{c.activity}'")
         if c.id in seen:
             problems.append(f"duplicate concept id '{c.id}'")
+        if c.id in taken:
+            problems.append(f"concept id '{c.id}' is already used by module '{taken[c.id]}': rename yours")
         seen.add(c.id)
         good = c.good_palettes()
         if len(good) < 2:
@@ -82,6 +96,7 @@ def export():
         shutil.copytree(OUT / it["id"], dest / it["id"])
     catalogue = [{"id": it["id"], "activity": it["activity"], "title": it["title"],
                   "label": ACTIVITIES[it["activity"]]["label"], "category": ACTIVITIES[it["activity"]]["category"],
+                  "keywords": ACTIVITIES[it["activity"]].get("keywords", ""),
                   "papercut": it["papercut"], "line": it["line"]} for it in items]
     catalogue.sort(key=lambda x: (x["category"], x["label"], x["id"]))
     (ROOT / "src" / "lib" / "originals.json").write_text(json.dumps(catalogue))

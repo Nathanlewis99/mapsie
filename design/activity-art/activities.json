@@ -1612,5 +1612,831 @@
   "label": "Reunion",
   "category": "Moments",
   "tier": 2
+ },
+ {
+  "id": "animal-lion",
+  "label": "Lion",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-leopard",
+  "label": "Leopard",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-cheetah",
+  "label": "Cheetah",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-african-elephant",
+  "label": "African elephant",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-giraffe",
+  "label": "Giraffe",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-zebra",
+  "label": "Zebra",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-rhino",
+  "label": "Rhino",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-hippo",
+  "label": "Hippo",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-cape-buffalo",
+  "label": "Cape buffalo",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-wildebeest-migration",
+  "label": "Wildebeest migration",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-hyena",
+  "label": "Hyena",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-african-wild-dog",
+  "label": "African wild dog",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-meerkat",
+  "label": "Meerkat",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-chimpanzee",
+  "label": "Chimpanzee",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-warthog",
+  "label": "Warthog",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-ostrich",
+  "label": "Ostrich",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-lemur",
+  "label": "Lemur",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-shoebill",
+  "label": "Shoebill",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-vulture",
+  "label": "Vulture",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-nile-crocodile",
+  "label": "Nile crocodile",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Africa wildlife animal"
+ },
+ {
+  "id": "animal-sloth-bear",
+  "label": "Sloth bear",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Sri Lanka & India wildlife animal"
+ },
+ {
+  "id": "animal-asian-elephant",
+  "label": "Asian elephant",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Sri Lanka & India wildlife animal"
+ },
+ {
+  "id": "animal-sri-lankan-leopard",
+  "label": "Sri Lankan leopard",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Sri Lanka & India wildlife animal"
+ },
+ {
+  "id": "animal-bengal-tiger",
+  "label": "Bengal tiger",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Sri Lanka & India wildlife animal"
+ },
+ {
+  "id": "animal-peacock",
+  "label": "Peacock",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Sri Lanka & India wildlife animal"
+ },
+ {
+  "id": "animal-langur-monkey",
+  "label": "Langur monkey",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Sri Lanka & India wildlife animal"
+ },
+ {
+  "id": "animal-indian-rhino",
+  "label": "Indian rhino",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Sri Lanka & India wildlife animal"
+ },
+ {
+  "id": "animal-water-buffalo",
+  "label": "Water buffalo",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Sri Lanka & India wildlife animal"
+ },
+ {
+  "id": "animal-blue-whale",
+  "label": "Blue whale",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Sri Lanka & India wildlife animal"
+ },
+ {
+  "id": "animal-king-cobra",
+  "label": "King cobra",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Sri Lanka & India wildlife animal"
+ },
+ {
+  "id": "animal-orangutan",
+  "label": "Orangutan",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Asia wildlife animal"
+ },
+ {
+  "id": "animal-proboscis-monkey",
+  "label": "Proboscis monkey",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Asia wildlife animal"
+ },
+ {
+  "id": "animal-giant-panda",
+  "label": "Giant panda",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Asia wildlife animal"
+ },
+ {
+  "id": "animal-red-panda",
+  "label": "Red panda",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Asia wildlife animal"
+ },
+ {
+  "id": "animal-komodo-dragon",
+  "label": "Komodo dragon",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Asia wildlife animal"
+ },
+ {
+  "id": "animal-hornbill",
+  "label": "Hornbill",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Asia wildlife animal"
+ },
+ {
+  "id": "animal-snow-leopard",
+  "label": "Snow leopard",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Asia wildlife animal"
+ },
+ {
+  "id": "animal-macaque",
+  "label": "Macaque",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Asia wildlife animal"
+ },
+ {
+  "id": "animal-clouded-leopard",
+  "label": "Clouded leopard",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Asia wildlife animal"
+ },
+ {
+  "id": "animal-black-bear",
+  "label": "Black bear",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-grizzly-bear",
+  "label": "Grizzly bear",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-moose",
+  "label": "Moose",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-elk",
+  "label": "Elk",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-grey-wolf",
+  "label": "Grey wolf",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-bald-eagle",
+  "label": "Bald eagle",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-sea-otter",
+  "label": "Sea otter",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-beaver",
+  "label": "Beaver",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-raccoon",
+  "label": "Raccoon",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-mountain-goat",
+  "label": "Mountain goat",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-alligator",
+  "label": "Alligator",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-manatee",
+  "label": "Manatee",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-orca",
+  "label": "Orca",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-hummingbird",
+  "label": "Hummingbird",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "North America wildlife animal"
+ },
+ {
+  "id": "animal-polar-bear",
+  "label": "Polar bear",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Arctic wildlife animal"
+ },
+ {
+  "id": "animal-arctic-fox",
+  "label": "Arctic fox",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Arctic wildlife animal"
+ },
+ {
+  "id": "animal-walrus",
+  "label": "Walrus",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Arctic wildlife animal"
+ },
+ {
+  "id": "animal-narwhal",
+  "label": "Narwhal",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Arctic wildlife animal"
+ },
+ {
+  "id": "animal-reindeer",
+  "label": "Reindeer",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Arctic wildlife animal"
+ },
+ {
+  "id": "animal-snowy-owl",
+  "label": "Snowy owl",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Arctic wildlife animal"
+ },
+ {
+  "id": "animal-puffin",
+  "label": "Puffin",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Arctic wildlife animal"
+ },
+ {
+  "id": "animal-beluga-whale",
+  "label": "Beluga whale",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Arctic wildlife animal"
+ },
+ {
+  "id": "animal-kangaroo",
+  "label": "Kangaroo",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-koala",
+  "label": "Koala",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-wombat",
+  "label": "Wombat",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-tasmanian-devil",
+  "label": "Tasmanian devil",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-platypus",
+  "label": "Platypus",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-echidna",
+  "label": "Echidna",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-quokka",
+  "label": "Quokka",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-cassowary",
+  "label": "Cassowary",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-emu",
+  "label": "Emu",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-kookaburra",
+  "label": "Kookaburra",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-wallaby",
+  "label": "Wallaby",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-dingo",
+  "label": "Dingo",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-saltwater-crocodile",
+  "label": "Saltwater crocodile",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-frilled-lizard",
+  "label": "Frilled lizard",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-cockatoo",
+  "label": "Cockatoo",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-rainbow-lorikeet",
+  "label": "Rainbow lorikeet",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-little-penguin",
+  "label": "Little penguin",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-sugar-glider",
+  "label": "Sugar glider",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Australia & Tasmania wildlife animal"
+ },
+ {
+  "id": "animal-sloth",
+  "label": "Sloth",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-jaguar",
+  "label": "Jaguar",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-macaw",
+  "label": "Macaw",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-capybara",
+  "label": "Capybara",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-alpaca",
+  "label": "Alpaca",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-andean-condor",
+  "label": "Andean condor",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-giant-tortoise",
+  "label": "Giant tortoise",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-blue-footed-booby",
+  "label": "Blue-footed booby",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-marine-iguana",
+  "label": "Marine iguana",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-sea-lion",
+  "label": "Sea lion",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-pink-river-dolphin",
+  "label": "Pink river dolphin",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-poison-dart-frog",
+  "label": "Poison dart frog",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-toucan",
+  "label": "Toucan",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "South America & Gal\u00e1pagos wildlife animal"
+ },
+ {
+  "id": "animal-manta-ray",
+  "label": "Manta ray",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Oceans wildlife animal"
+ },
+ {
+  "id": "animal-sea-turtle",
+  "label": "Sea turtle",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Oceans wildlife animal"
+ },
+ {
+  "id": "animal-seahorse",
+  "label": "Seahorse",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Oceans wildlife animal"
+ },
+ {
+  "id": "animal-octopus",
+  "label": "Octopus",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Oceans wildlife animal"
+ },
+ {
+  "id": "animal-whale-shark",
+  "label": "Whale shark",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Oceans wildlife animal"
+ },
+ {
+  "id": "animal-hammerhead-shark",
+  "label": "Hammerhead shark",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Oceans wildlife animal"
+ },
+ {
+  "id": "animal-jellyfish",
+  "label": "Jellyfish",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Oceans wildlife animal"
+ },
+ {
+  "id": "animal-clownfish",
+  "label": "Clownfish",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Oceans wildlife animal"
+ },
+ {
+  "id": "animal-red-deer",
+  "label": "Red deer",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Europe wildlife animal"
+ },
+ {
+  "id": "animal-highland-cow",
+  "label": "Highland cow",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Europe wildlife animal"
+ },
+ {
+  "id": "animal-hedgehog",
+  "label": "Hedgehog",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Europe wildlife animal"
+ },
+ {
+  "id": "animal-red-fox",
+  "label": "Red fox",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Europe wildlife animal"
+ },
+ {
+  "id": "animal-brown-bear",
+  "label": "Brown bear",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Europe wildlife animal"
+ },
+ {
+  "id": "animal-lynx",
+  "label": "Lynx",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Europe wildlife animal"
+ },
+ {
+  "id": "animal-ibex",
+  "label": "Ibex",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Europe wildlife animal"
+ },
+ {
+  "id": "animal-red-squirrel",
+  "label": "Red squirrel",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Europe wildlife animal"
+ },
+ {
+  "id": "animal-golden-eagle",
+  "label": "Golden eagle",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Birds of the world wildlife animal"
+ },
+ {
+  "id": "animal-barn-owl",
+  "label": "Barn owl",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Birds of the world wildlife animal"
+ },
+ {
+  "id": "animal-albatross",
+  "label": "Albatross",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Birds of the world wildlife animal"
+ },
+ {
+  "id": "animal-pelican",
+  "label": "Pelican",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Birds of the world wildlife animal"
+ },
+ {
+  "id": "animal-swan",
+  "label": "Swan",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Birds of the world wildlife animal"
+ },
+ {
+  "id": "animal-heron",
+  "label": "Heron",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Birds of the world wildlife animal"
+ },
+ {
+  "id": "animal-peregrine-falcon",
+  "label": "Peregrine falcon",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Birds of the world wildlife animal"
+ },
+ {
+  "id": "animal-kingfisher",
+  "label": "Kingfisher",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Birds of the world wildlife animal"
+ },
+ {
+  "id": "animal-flamingo",
+  "label": "Flamingo",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Birds of the world wildlife animal"
+ },
+ {
+  "id": "animal-parrot",
+  "label": "Parrot",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Birds of the world wildlife animal"
  }
 ]

@@ -14,6 +14,7 @@ export interface OriginalDef {
   title: string; // the concept, e.g. "Safari jeep"
   label: string; // the activity, e.g. "Safari"
   category: string;
+  keywords?: string; // e.g. the region for animals: "Africa wildlife animal"
   papercut: string[];
   line: string[];
 }
@@ -73,7 +74,7 @@ export function searchOriginals(q: string): OriginalDef[] {
   const words = q.toLowerCase().trim().split(/\s+/).filter(Boolean);
   if (!words.length) return ORIGINALS;
   return ORIGINALS.filter((o) => {
-    const hay = `${o.label} ${o.title} ${o.category} ${o.activity.replace(/-/g, " ")}`.toLowerCase();
+    const hay = `${o.label} ${o.title} ${o.category} ${o.keywords ?? ""} ${o.activity.replace(/-/g, " ")}`.toLowerCase();
     return words.every((w) => hay.includes(w));
   });
 }

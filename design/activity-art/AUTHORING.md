@@ -66,6 +66,35 @@ become single lines, `disc`s become solid spot colour. To make it look good:
 - Check the line versions in the preview. Overlapping shapes can get busy; drop minor background
   layers from line style with `line=False`.
 
+## Animals
+
+Activities in the "Animals" category (ids start with `animal-`) get **two** concepts, not three:
+
+1. **Portrait**: the animal big and bold, filling the circle, with its most recognisable features
+   exaggerated (the sloth bear's shaggy coat and pale snout, the shoebill's huge bill, the platypus's
+   bill and flat tail). Side-on or front-on, whichever reads instantly.
+2. **In its habitat**: the animal in a scene that says where tourists see it (grizzly catching a salmon
+   at a waterfall, polar bear on an ice floe, leopard draped on a branch at Yala, puffin on a cliff).
+
+Use `overrides` for natural colours (a lion is tawny in every palette) and `checks`/`fixes` so the
+animal never blends into the sun or ground. Silhouette accuracy matters most: get the proportions,
+ears, tails, horns and posture right. Look at the pilot giraffe and elephant and the finished
+`concepts/wildlife.py` for the quality bar.
+
+## Lessons from the first round
+
+- **Ids must be unique across all modules.** Prefix every concept id with your activity's short name
+  (`slothbear-portrait`, `onsen-bucket`). The build now flags ids already used by another module.
+- **Sea and lake scenes:** leave `"golden"` out of `palettes`: its water reads as brown desert.
+- The kit now clips line style to the circle and gives straight strokes a working shadow, so you
+  don't need workarounds for either. Shapes inside `group()` transforms are fine too.
+- Don't pass `fill`, `stroke` or `filter` through `extra=`: it duplicates attributes and makes invalid
+  SVG. The build checks every file and flags this.
+- Every concept needs **at least 2** papercut palettes after the clash check.
+- Use your own file names for temporary files (`/tmp/<your_module>-*`). Other illustrators share
+  the machine.
+- Reuse helpers from finished modules by copying them into yours (don't import from another batch).
+
 ## Workflow
 
 1. Write your module: `design/activity-art/concepts/<your_module>.py`, exporting `CONCEPTS`

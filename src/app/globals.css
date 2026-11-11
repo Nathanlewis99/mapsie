@@ -124,6 +124,9 @@ body {
   filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.25));
   pointer-events: none;
 }
+/* finishes like watercolour and ink stamp soak into the paper */
+.mapsie-sticker.is-multiply { mix-blend-mode: multiply; }
+.mapsie-sticker.is-multiply img { filter: none; }
 .mapsie-sticker.is-text { width: auto; height: auto; }
 .mapsie-sticker.is-photo img {
   object-fit: cover;

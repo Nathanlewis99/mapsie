@@ -17,7 +17,8 @@ Open http://localhost:3000. With no keys set, checkout uses a built-in **test ch
 - **Travel modes per leg:** flight (curved arc), drive/bus (follows real roads via OSRM), train, boat, hike. Each has its own line style and an optional icon.
 - **Styling:** 6 presets, 9 editable colours, terrain shading, paper texture, place names, and highlighting of visited countries.
 - **Markers:** numbers, pins, hearts or dots, with optional dates.
-- **Decorations:** 100+ stickers, your own photos and handwritten text notes. Resize and rotate them with handles on the map.
+- **Decorations:** 93 stickers in 10 art styles (Illustrated, Watercolour, Vintage stamp, Fine line, Gold foil, Retro print, Die-cut sticker, Neon, Flat, Cartoon), plus your own photos and handwritten text notes. Resize and rotate them with handles on the map.
+- **Sticker search:** results show every style of each match. Each map style suggests a matching sticker style (Vintage gets Vintage stamp, Midnight gets Gold foil, and so on).
 - **Undo/redo** (Ctrl+Z / Ctrl+Shift+Z), with autosave in the browser.
 - **Products:** A4 to A1, portrait or landscape, no frame or black/white/oak frames, priced in GBP, USD or AUD.
 - **"On the wall" preview:** shows the poster at true scale above a sideboard.
@@ -35,6 +36,7 @@ Open http://localhost:3000. With no keys set, checkout uses a built-in **test ch
 | Print render | `src/lib/server/render.ts`, `/print/[id]` | Headless Chromium lays the poster out at the customer's on-screen width, then raises pixel density to reach 300 dpi. |
 | Payments | `/api/checkout`, `/api/webhooks/stripe` | Stripe Checkout (GBP, UK shipping). |
 | Fulfilment | `src/lib/server/fulfil.ts`, `prodigi.ts` | Prodigi v4 API (sandbox by default). |
+| Sticker art | `src/lib/stickers.ts`, `StickerFilters.tsx` | Artwork sets from `scripts/fetch-stickers.mjs` (Fluent Emoji, MIT; Twemoji, CC-BY). Finishes are SVG filters in the poster's colours, so they stay vector-sharp in print. |
 | Road routing | `/api/route` | Proxies OSRM with a cache and a queue. Set `OSRM_URL` for a self-hosted or paid router. |
 | Admin | `/admin` | Basic-auth protected with `ADMIN_PASSWORD`. Open without a password in local dev only. |
 | Storage | `src/lib/server/db.ts` | JSON files in `./data` for now. Replace before deploying. |
@@ -59,4 +61,4 @@ OSRM_URL=https://router.project-osrm.org   # road routing (public demo server; f
 - Print files are always full size at 300 dpi. On the largest sizes the map layer underneath is drawn at up to `PRINT_MAX_PX` and gently upscaled (A1 ≈ 230 dpi for the map only). Text, stickers and markers stay at 300 dpi.
 - The public OSRM server is for light use only. Self-host it, or switch to a paid router, before launch. The same goes for Photon place search.
 
-Credits: map data © OpenStreetMap contributors, tiles by OpenFreeMap, stickers by Twemoji (CC-BY 4.0).
+Credits: map data © OpenStreetMap contributors, tiles by OpenFreeMap, stickers by Microsoft Fluent Emoji (MIT) and Twemoji (CC-BY 4.0).

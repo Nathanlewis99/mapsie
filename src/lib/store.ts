@@ -7,6 +7,7 @@ import { PRESETS, themeFromPreset } from "./themes";
 import { fetchRoad, guessMode, legKey } from "./geo";
 import { guessRegion, type RegionId } from "./products";
 import { templateStops, type TripTemplate } from "./templates";
+import { suggestedStyleFor, stickerSrc, type ArtStyleId } from "./stickers";
 
 export function newDesign(): Design {
   return normalizeDesign({
@@ -22,6 +23,7 @@ export function newDesign(): Design {
     view: { center: [100, 5], zoom: 2.2, bearing: 0, refWidth: 600 },
     stops: [],
     stickers: [],
+    stickerStyle: suggestedStyleFor(PRESETS[0].id),
   });
 }
 
@@ -59,6 +61,8 @@ interface EditorState {
   load: (d: Design) => void;
   applyTemplate: (t: TripTemplate) => void;
   setRegion: (r: RegionId) => void;
+  /** Change the default sticker style; optionally restyle every sticker already placed. */
+  setStickerStyle: (style: ArtStyleId, applyToAll: boolean) => void;
   ensureRoads: () => Promise<void>;
 }
 
@@ -168,19 +172,28 @@ export const useEditor = create<EditorState>()(
           const lngs = stops.map((s) => s.lng);
           const lats = stops.map((s) => s.lat);
           const span = Math.max(Math.max(...lngs) - Math.min(...lngs), Math.max(...lats) - Math.min(...lats), 2);
+          const art = suggestedStyleFor(preset.id);
           const stickers: Sticker[] = t.stickers.map((name, i) => {
             const at = stops[Math.round((i / Math.max(1, t.stickers.length - 1)) * (stops.length - 1))];
             const side = i % 2 ? 1 : -1;
-            return { id: nanoid(8), kind: "sticker", src: `/stickers/${name}.svg`, lng: at.lng + side * span * 0.16, lat: at.lat + span * 0.05, size: 9, rotation: side * 8 };
+            return { id: nanoid(8), kind: "sticker", name, art, src: stickerSrc(name, art), lng: at.lng + side * span * 0.16, lat: at.lat + span * 0.05, size: 9, rotation: side * 8 };
           });
           commit(
-            (d) => ({ ...d, title: t.title, subtitle: t.subtitle, theme: themeFromPreset(preset), stops, stickers }),
+            (d) => ({ ...d, title: t.title, subtitle: t.subtitle, theme: themeFromPreset(preset), stops, stickers, stickerStyle: art }),
             "edit",
             { fitRequest: get().fitRequest + 1, selectedSticker: null },
           );
           afterStopsChange();
         },
         setRegion: (region) => set({ region }),
+        setStickerStyle: (style, applyToAll) =>
+          commit((d) => ({
+            ...d,
+            stickerStyle: style,
+            stickers: applyToAll
+              ? d.stickers.map((x) => (x.kind === "sticker" && x.name ? { ...x, art: style, src: stickerSrc(x.name, style) } : x))
+              : d.stickers,
+          })),
 
         /** Fetch road geometry for any car/bus leg that doesn't have it yet. */
         ensureRoads: async () => {

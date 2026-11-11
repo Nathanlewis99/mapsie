@@ -7,6 +7,8 @@ import { buildStyle, loadBaseStyle } from "@/lib/themes";
 import { buildLegs, routeGeoJSON, stopsBounds, MODES } from "@/lib/geo";
 import { loadCountries, visitedCountries } from "@/lib/countries";
 import { fontCss } from "@/lib/fonts";
+import { getArtStyle, stickerSrc } from "@/lib/stickers";
+import { filterId } from "./StickerFilters";
 
 export interface MapHandlers {
   onView?: (v: Design["view"]) => void;
@@ -28,6 +30,7 @@ interface Props {
   selectedSticker?: string | null;
   fitRequest?: number;
   handlers?: MapHandlers;
+  filterPrefix?: string; // id prefix of this poster's sticker filters
   onReady?: () => void;
 }
 
@@ -54,6 +57,12 @@ declare global {
 /** Largest map canvas for print renders; the renderer can override it. */
 const glMax = () => (typeof window !== "undefined" && window.__MAPSIE_GLMAX) || 7680;
 
+/** Multiply-blending only works on light backgrounds. */
+const isLight = (hex: string) => {
+  const n = parseInt(hex.replace("#", "").slice(0, 6), 16);
+  return 0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255) > 140;
+};
+
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
 function markerSvg(style: Design["markers"]["style"], fill: string, stroke: string) {
@@ -65,7 +74,7 @@ function markerSvg(style: Design["markers"]["style"], fill: string, stroke: stri
 }
 
 export default function MapView(props: Props) {
-  const { design, width, height, mapWidth, editable, print, selectedSticker, fitRequest, handlers, onReady } = props;
+  const { design, width, height, mapWidth, editable, print, selectedSticker, fitRequest, handlers, onReady, filterPrefix = "mapsie" } = props;
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
   const stopMarkers = useRef<Marker[]>([]);
@@ -301,7 +310,7 @@ export default function MapView(props: Props) {
   );
 
   // --- stickers, photos and text notes, pinned to a place on the map
-  const stickersKey = JSON.stringify([design.stickers, selectedSticker, width, editable]);
+  const stickersKey = JSON.stringify([design.stickers, selectedSticker, width, editable, design.theme.colors.land]);
   useEffect(
     () =>
       whenMap((mm) => {
@@ -309,7 +318,8 @@ export default function MapView(props: Props) {
         stickerMarkers.current = design.stickers.map((st: Sticker) => {
           const selected = st.id === selectedSticker && editable;
           const node = document.createElement("div");
-          node.className = `mapsie-sticker is-${st.kind}` + (selected ? " is-selected" : "");
+          const art = st.kind === "sticker" ? getArtStyle(st.art) : null;
+          node.className = `mapsie-sticker is-${st.kind}` + (selected ? " is-selected" : "") + (art?.blend && isLight(design.theme.colors.land) ? " is-multiply" : "");
           const px = st.size * u;
           let inner: HTMLElement;
           if (st.kind === "text") {
@@ -321,7 +331,8 @@ export default function MapView(props: Props) {
             node.style.width = `${px}px`;
             node.style.height = `${px}px`;
             const img = document.createElement("img");
-            img.src = st.src;
+            img.src = st.kind === "sticker" && st.name ? stickerSrc(st.name, st.art) : st.src;
+            if (art && art.finish !== "none") img.style.filter = `url(#${filterId(filterPrefix, art.finish)})`;
             img.draggable = false;
             img.alt = "";
             if (st.kind === "photo") img.style.borderWidth = `${Math.max(2, px * 0.05)}px`;

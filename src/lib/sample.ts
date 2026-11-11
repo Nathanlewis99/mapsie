@@ -20,11 +20,12 @@ export const SAMPLE: Design = normalizeDesign({
   ],
   route: { show: true, style: "auto", curved: true, width: 0.5, modeIcons: false },
   visited: { show: true, opacity: 0.25 },
+  stickerStyle: "stamp",
   stickers: [
-    { id: "s1", kind: "sticker", src: "/stickers/elephant.svg", lng: 82, lat: 12, size: 9, rotation: -8 },
-    { id: "s2", kind: "sticker", src: "/stickers/snowy-mountain.svg", lng: 90.5, lat: 33, size: 10, rotation: 0 },
-    { id: "s3", kind: "sticker", src: "/stickers/diving-mask.svg", lng: 150, lat: -12, size: 9, rotation: 10 },
-    { id: "s4", kind: "sticker", src: "/stickers/crocodile.svg", lng: 136, lat: -20, size: 11, rotation: -6 },
+    { id: "s1", kind: "sticker", name: "elephant", art: "stamp", src: "", lng: 82, lat: 12, size: 9, rotation: -8 },
+    { id: "s2", kind: "sticker", name: "snowy-mountain", art: "stamp", src: "", lng: 90.5, lat: 33, size: 10, rotation: 0 },
+    { id: "s3", kind: "sticker", name: "diving-mask", art: "stamp", src: "", lng: 150, lat: -12, size: 9, rotation: 10 },
+    { id: "s4", kind: "sticker", name: "crocodile", art: "stamp", src: "", lng: 136, lat: -20, size: 11, rotation: -6 },
     { id: "s5", kind: "text", src: "", text: "best trip ever!", font: "caveat", lng: 127, lat: 21, size: 5, rotation: -8 },
   ],
 });

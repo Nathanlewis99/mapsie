@@ -1,3 +1,5 @@
+import type { ArtStyleId } from "./stickers";
+
 // The whole poster is described by one JSON "design". The editor and the
 // print renderer both draw from it, so what you see is what gets printed.
 
@@ -22,7 +24,9 @@ export interface Stop {
 export interface Sticker {
   id: string;
   kind: "sticker" | "photo" | "text";
-  src: string; // /stickers/x.svg, a data: URL for photos, "" for text
+  src: string; // a data: URL for photos; for stickers, derived from name + art
+  name?: string; // sticker artwork name, e.g. "crocodile"
+  art?: ArtStyleId; // sticker art style
   lng: number;
   lat: number;
   size: number; // % of poster width (for text: font size)
@@ -77,6 +81,7 @@ export interface Design {
   markers: { style: MarkerStyle; showDates: boolean };
   visited: { show: boolean; opacity: number };
   stickers: Sticker[];
+  stickerStyle: ArtStyleId; // default style for new stickers
 }
 
 export type FontId = "playfair" | "caveat" | "montserrat" | "pacifico" | "bebas";
@@ -93,7 +98,11 @@ export function normalizeDesign(d: Partial<Design> & Pick<Design, "id">): Design
     route: { show: r.show ?? true, style: r.style ?? "auto", curved: r.curved ?? true, width: r.width ?? 0.45, modeIcons: r.modeIcons ?? true },
     markers: { style: m.style ?? "number", showDates: m.showDates ?? false },
     visited: { show: v.show ?? false, opacity: v.opacity ?? 0.35 },
-    stickers: x.stickers ?? [],
+    stickerStyle: x.stickerStyle ?? "cartoon",
+    // Older designs only stored a path; recover the artwork name from it.
+    stickers: (x.stickers ?? []).map((st) =>
+      st.kind === "sticker" && !st.name ? { ...st, name: /\/([a-z0-9-]+)\.svg$/.exec(st.src)?.[1], art: st.art ?? "cartoon" } : st,
+    ),
     stops: x.stops ?? [],
   };
 }

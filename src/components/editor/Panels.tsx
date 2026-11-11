@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/lib/store";
 import { searchPlaces, MODES, type PlaceResult } from "@/lib/geo";
 import { PRESETS, themeFromPreset } from "@/lib/themes";
-import { STICKER_PACKS } from "@/lib/stickers";
+import { ART_STYLES, PACKS, STICKERS, getArtStyle, searchStickers, stickerSrc, suggestedStyleFor, type ArtStyleId } from "@/lib/stickers";
+import StickerFilters, { filterId } from "@/components/StickerFilters";
 import { FONTS } from "@/lib/fonts";
 import { PRODUCTS, FRAMES, money, getRegion, REGIONS } from "@/lib/products";
 import { TEMPLATES } from "@/lib/templates";
@@ -294,6 +295,8 @@ export function StylePanel() {
         </div>
       </div>
 
+      <SuggestionCard />
+
       <div>
         <Label>Make it yours</Label>
         <div className="grid grid-cols-3 gap-2">
@@ -333,16 +336,66 @@ export function StylePanel() {
 }
 
 // ---------------------------------------------------------------- Stickers
+/** A sticker drawn in a given art style (uses the panel's own filter defs). */
+export function StickerThumb({ name, style, className = "" }: { name: string; style: ArtStyleId; className?: string }) {
+  const art = getArtStyle(style);
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={stickerSrc(name, style)}
+      alt=""
+      draggable={false}
+      className={`w-full h-full pointer-events-none ${className}`}
+      style={{ filter: art.finish !== "none" ? `url(#${filterId(PANEL_FILTERS, art.finish)})` : undefined, mixBlendMode: art.blend }}
+    />
+  );
+}
+const PANEL_FILTERS = "mapsie-panel";
+
+/** Drag payload for dropping a sticker onto the map: "name|style". */
+export const stickerDragType = "text/mapsie-sticker";
+
+function SuggestionCard() {
+  const { design, setStickerStyle } = useEditor();
+  const suggested = suggestedStyleFor(design.theme.presetId);
+  const preset = PRESETS.find((p) => p.id === design.theme.presetId);
+  if (!preset || design.stickerStyle === suggested) return null;
+  const count = design.stickers.filter((s) => s.kind === "sticker").length;
+  return (
+    <div className="rounded-2xl border-2 border-coral/30 bg-coral/5 p-3 flex items-center gap-3">
+      <div className="w-12 h-12 shrink-0 rounded-xl p-1.5" style={{ background: design.theme.colors.land }}>
+        <StickerThumb name="elephant" style={suggested} />
+      </div>
+      <div className="flex-1 text-sm">
+        <div className="font-extrabold">✨ Suggested: {getArtStyle(suggested).name}</div>
+        <div className="text-ink/60">Made to match your {preset.name} map.</div>
+      </div>
+      <button onClick={() => setStickerStyle(suggested, true)} className="rounded-full bg-coral text-white px-3 py-1.5 text-sm font-extrabold shrink-0">
+        {count ? "Use it" : "Use"}
+      </button>
+    </div>
+  );
+}
+
 export function StickersPanel() {
-  const { design, addSticker } = useEditor();
+  const { design, addSticker, setStickerStyle } = useEditor();
   const fileRef = useRef<HTMLInputElement>(null);
+  const [q, setQ] = useState("");
+  const [showAllStyles, setShowAllStyles] = useState(false);
   const [cx, cy] = design.view.center;
+  const style = design.stickerStyle;
+  const suggested = suggestedStyleFor(design.theme.presetId);
+  const results = searchStickers(q);
+  const bg = design.theme.colors.land;
+  const placed = design.stickers.filter((s) => s.kind === "sticker");
+  const mixed = placed.some((s) => s.art !== style);
+
   // Scatter new stickers around the middle of the map so they don't stack up.
   const degPerPx = 360 / (512 * 2 ** design.view.zoom);
   const jitter = () => (Math.random() - 0.5) * 220 * degPerPx;
   const at = () => ({ lng: cx + jitter(), lat: cy + jitter() * 0.7 });
-  const place = (src: string, kind: "sticker" | "photo" = "sticker") =>
-    addSticker({ src, kind, ...at(), size: kind === "photo" ? 16 : 9, rotation: kind === "photo" ? -4 : 0 });
+  const place = (name: string, art: ArtStyleId = style) =>
+    addSticker({ kind: "sticker", name, art, src: stickerSrc(name, art), ...at(), size: 9, rotation: 0 });
 
   const onFile = async (f: File) => {
     const img = await createImageBitmap(f);
@@ -351,14 +404,61 @@ export function StickersPanel() {
     c.width = Math.round(img.width * scale);
     c.height = Math.round(img.height * scale);
     c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
-    place(c.toDataURL("image/jpeg", 0.88), "photo");
+    addSticker({ kind: "photo", src: c.toDataURL("image/jpeg", 0.88), ...at(), size: 16, rotation: -4 });
   };
+
+  const tile = (name: string, art: ArtStyleId, title?: string) => (
+    <button
+      key={`${name}-${art}`}
+      title={title}
+      draggable
+      onDragStart={(e) => e.dataTransfer.setData(stickerDragType, `${name}|${art}`)}
+      onClick={() => place(name, art)}
+      className="aspect-square rounded-xl border border-ink/5 p-1.5 hover:scale-110 hover:-rotate-6 transition"
+      style={{ background: bg }}
+    >
+      <StickerThumb name={name} style={art} />
+    </button>
+  );
+
+  const styles = showAllStyles ? ART_STYLES : ART_STYLES.slice(0, 6);
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl bg-sand/60 p-3 text-sm text-ink/70">
-        Tap a sticker to add it, or drag it onto the map. Drag the corner handle to resize, the top one to rotate.
+      <StickerFilters prefix={PANEL_FILTERS} colors={design.theme.colors} />
+
+      <div>
+        <Label>Sticker style</Label>
+        <div className="grid grid-cols-3 gap-2">
+          {styles.map((a) => (
+            <button
+              key={a.id}
+              onClick={() => setStickerStyle(a.id, true)}
+              title={a.blurb}
+              className={`relative rounded-2xl border-2 p-1.5 transition text-left ${style === a.id ? "border-coral bg-white" : "border-transparent bg-white/60 hover:border-ink/15"}`}
+            >
+              {a.id === suggested && <span className="absolute -top-2 -right-1 rounded-full bg-coral text-white text-[10px] font-extrabold px-1.5 py-0.5 z-10">✨ Match</span>}
+              <div className="aspect-[4/3] rounded-xl grid grid-cols-2 gap-1 p-1.5" style={{ background: bg }}>
+                <StickerThumb name="crocodile" style={a.id} />
+                <StickerThumb name="palm-tree" style={a.id} />
+              </div>
+              <div className="text-xs font-extrabold mt-1 leading-tight">{a.name}</div>
+            </button>
+          ))}
+        </div>
+        <button onClick={() => setShowAllStyles(!showAllStyles)} className="mt-2 text-xs font-bold text-coral">
+          {showAllStyles ? "Fewer styles" : `More styles (${ART_STYLES.length - 6})`}
+        </button>
+        <p className="text-xs text-ink/50 mt-1">{getArtStyle(style).blurb}. Changing style updates the stickers already on your map.</p>
+        {mixed && placed.length > 0 && (
+          <button onClick={() => setStickerStyle(style, true)} className="mt-2 text-xs font-bold text-ink/60 underline">
+            Make all {placed.length} stickers {getArtStyle(style).name}
+          </button>
+        )}
       </div>
+
+      <SuggestionCard />
+
       <div className="grid grid-cols-2 gap-2">
         <button onClick={() => fileRef.current?.click()} className="rounded-2xl border-2 border-dashed border-ink/15 px-3 py-3 font-bold text-ink/70 hover:border-coral hover:text-coral">
           📸 Your photo
@@ -371,25 +471,38 @@ export function StickersPanel() {
         </button>
       </div>
       <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
-      {STICKER_PACKS.map((pack) => (
-        <div key={pack.name}>
-          <Label>{pack.name}</Label>
-          <div className="grid grid-cols-6 gap-1.5">
-            {pack.items.map((src) => (
-              <button
-                key={src}
-                draggable
-                onDragStart={(e) => e.dataTransfer.setData("text/mapsie-sticker", src)}
-                onClick={() => place(src)}
-                className="aspect-square rounded-xl bg-white border border-ink/5 p-1.5 hover:scale-110 hover:-rotate-6 transition"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="" className="w-full h-full pointer-events-none" />
-              </button>
-            ))}
-          </div>
+
+      <div className="relative">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="🔍 Search stickers: turtle, temple, surf…"
+          className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral"
+        />
+        {q && <button onClick={() => setQ("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/40 font-bold px-2">✕</button>}
+      </div>
+
+      {q ? (
+        <div className="space-y-4">
+          {results.length === 0 && <div className="text-sm text-ink/50">No stickers match “{q}” yet. Try a broader word like “animal” or “beach”.</div>}
+          {results.slice(0, 12).map((s) => (
+            <div key={s.name}>
+              <div className="text-sm font-extrabold mb-1.5">{s.label} <span className="text-ink/40 font-semibold">· tap any style</span></div>
+              <div className="grid grid-cols-5 gap-1.5">
+                {ART_STYLES.map((a) => tile(s.name, a.id, a.name))}
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
+      ) : (
+        PACKS.map((pack) => (
+          <div key={pack}>
+            <Label>{pack}</Label>
+            <div className="grid grid-cols-6 gap-1.5">{STICKERS.filter((s) => s.pack === pack).map((s) => tile(s.name, style, s.label))}</div>
+          </div>
+        ))
+      )}
+      <p className="text-[11px] text-ink/40">Artwork: Microsoft Fluent Emoji (MIT) and Twemoji (CC-BY 4.0).</p>
     </div>
   );
 }

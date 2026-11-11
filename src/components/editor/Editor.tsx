@@ -8,6 +8,7 @@ import { useEditor } from "@/lib/store";
 import { reverseGeocode } from "@/lib/geo";
 import { itemPrice, money, posterAspect } from "@/lib/products";
 import { FONTS } from "@/lib/fonts";
+import { ART_STYLES, stickerSrc, type ArtStyleId } from "@/lib/stickers";
 import { normalizeDesign, type Design } from "@/lib/types";
 import { TripPanel, StylePanel, StickersPanel, TextPanel, SizePanel } from "./Panels";
 
@@ -171,7 +172,10 @@ export default function Editor() {
                   onStickerMove: (id, lng, lat) => store.updateSticker(id, { lng, lat }),
                   onStickerChange: (id, patch) => store.updateSticker(id, patch),
                   onStickerSelect: (id) => store.select(id),
-                  onDropSticker: (src, lng, lat) => store.addSticker({ src, kind: "sticker", lng, lat, size: 9, rotation: 0 }),
+                  onDropSticker: (payload, lng, lat) => {
+                    const [name, art] = payload.split("|") as [string, ArtStyleId];
+                    store.addSticker({ kind: "sticker", name, art, src: stickerSrc(name, art), lng, lat, size: 9, rotation: 0 });
+                  },
                   onMapClick: async (lng, lat) => {
                     if (!pickMode) return;
                     const name = await reverseGeocode(lng, lat);
@@ -201,6 +205,19 @@ export default function Editor() {
                     {FONTS.map((f) => <option key={f.id} value={f.id} className="text-ink">{f.name}</option>)}
                   </select>
                   <input type="color" value={sel.color ?? design.theme.colors.ink} onChange={(e) => store.updateSticker(sel.id, { color: e.target.value }, `color-${sel.id}`)} className="w-7 h-7 rounded-full bg-transparent border-0 p-0" />
+                  <span className="w-px h-5 bg-white/20 mx-1" />
+                </>
+              )}
+              {sel.kind === "sticker" && sel.name && (
+                <>
+                  <select
+                    title="Art style for this sticker"
+                    value={sel.art ?? design.stickerStyle}
+                    onChange={(e) => store.updateSticker(sel.id, { art: e.target.value as ArtStyleId, src: stickerSrc(sel.name!, e.target.value as ArtStyleId) })}
+                    className="bg-white/10 rounded-full px-2 py-1 outline-none"
+                  >
+                    {ART_STYLES.map((a) => <option key={a.id} value={a.id} className="text-ink">{a.name}</option>)}
+                  </select>
                   <span className="w-px h-5 bg-white/20 mx-1" />
                 </>
               )}

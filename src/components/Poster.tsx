@@ -1,5 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
+import { useId } from "react";
+import StickerFilters from "./StickerFilters";
 import type { Design } from "@/lib/types";
 import { posterAspect } from "@/lib/products";
 import { fontCss } from "@/lib/fonts";
@@ -22,6 +24,8 @@ interface Props {
 export default function Poster({ design, width, editable = false, print, selectedSticker, fitRequest, handlers, onReady }: Props) {
   const height = Math.round(width * posterAspect(design.productId, design.orientation));
   const u = width / 100;
+  // Each poster gets its own filter ids, since thumbnails may show different themes.
+  const filterPrefix = `mf${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const c = design.theme.colors;
   const landscape = design.orientation === "landscape";
   const bandH = design.layout === "overlay" ? 0 : u * (landscape ? 11 : 17);
@@ -55,6 +59,7 @@ export default function Poster({ design, width, editable = false, print, selecte
       className="relative overflow-hidden select-none"
       style={{ width, height, background: c.paper, ["--u" as string]: `${u}px` }}
     >
+      <StickerFilters prefix={filterPrefix} colors={c} />
       <div
         className="absolute overflow-hidden"
         style={{
@@ -76,6 +81,7 @@ export default function Poster({ design, width, editable = false, print, selecte
           fitRequest={fitRequest}
           handlers={handlers}
           onReady={onReady}
+          filterPrefix={filterPrefix}
         />
       </div>
 

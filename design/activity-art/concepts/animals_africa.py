@@ -778,6 +778,313 @@ def gnu_crossing(d: Drawing):
     d.band("deep", waves(188, 3, 38), line=False)
 
 
+# ================================================================ HYENA
+def hyena_face(d: Drawing):
+    d.disc("glow", 100, 104, 78, line=False)
+    grass(d, -10, 210, 198, 36, "mid", 12)
+    d.shape("hero", "M40 210 C40 170 64 136 100 132 C136 136 160 170 160 210Z", line=False)
+    d.shape("mark", "M88 132 C92 128 108 128 112 132 L110 150 L90 150Z", shadow=False, line=False)
+    for k in (1, -1):
+        def ear():
+            d.shape("hero", ellipse(64, 60, 17, 20), extra='transform="rotate(-24 64 60)"')
+            d.shape("mark", ellipse(65, 62, 9, 12), shadow=False, extra='transform="rotate(-24 65 62)"')
+        ear() if k == 1 else flip(d, ear)
+    head = ("M100 58 C126 58 144 74 144 98 C144 116 134 128 124 136 C118 148 110 160 100 160 "
+            "C90 160 82 148 76 136 C66 128 56 116 56 98 C56 74 74 58 100 58Z")
+    d.shape("hero", head)
+    clipped(d, head, lambda: d.marks("mark", spots([(64, 96), (70, 108), (60, 110), (136, 96), (130, 108), (140, 110),
+                                                   (74, 122), (126, 122), (92, 66), (108, 66), (100, 72)], 3)))
+    d.shape("muzzle", "M84 116 C84 104 116 104 116 116 C118 136 112 154 100 156 C88 154 82 136 84 116Z", shadow=False, spot=True)
+    for x in (84, 116):
+        d.marks("light", circle(x, 96, 5))
+        d.marks("mark", circle(x, 96, 3.2))
+        d.marks("light", circle(x + 1, 95, 1))
+    d.marks("mark", "M90 118 C90 112 110 112 110 118 C110 124 104 128 100 128 C96 128 90 124 90 118Z")
+    # the famous grin
+    d.shape("mouth", "M80 140 Q100 156 120 140 Q118 160 100 162 Q82 160 80 140Z", shadow=False)
+    d.shape("light", "M84 142 L88 148 L91 145 L95 150 L100 147 L105 150 L109 145 L112 148 L116 142 Q100 152 84 142Z", shadow=False)
+
+
+HYENA_BODY = ("M60 92 C70 82 90 80 108 86 C124 92 138 102 146 112 C150 120 146 128 138 128 L80 126 "
+              "C66 122 58 106 60 92Z")
+
+
+def hyena(d: Drawing):
+    d.shape("mark", "M144 112 C152 116 158 124 156 134 C150 132 144 124 140 118Z")
+    for p in ["M72 112 L70 164", "M84 116 L88 164", "M130 120 L136 142 L130 164", "M140 118 L148 142 L144 164"]:
+        d.limb("hero", p, 8)
+    d.shape("hero", HYENA_BODY)
+    d.shape("hero", "M66 80 C58 72 46 72 38 78 C32 82 28 88 24 94 C22 98 24 104 30 104 C38 104 46 104 54 106 "
+                    "C62 104 70 96 66 80Z")
+    d.shape("muzzle", "M24 94 C22 98 24 104 30 104 L36 104 C36 98 32 92 28 90Z", shadow=False, line=False)
+    d.shape("hero", ellipse(54, 70, 6, 8), shadow=False)
+    d.marks("mark", ellipse(54, 71, 3, 5))
+    d.limb("mark", "M58 76 C74 76 90 80 104 86", 4, shadow=False)
+    clipped(d, HYENA_BODY, lambda: d.marks("mark", spots([(80, 94), (92, 92), (104, 96), (116, 100), (128, 106),
+                                                         (86, 106), (100, 106), (112, 110), (124, 114), (136, 116),
+                                                         (94, 118), (110, 120)], 3)))
+    d.marks("mark", spots([(72, 128), (70, 140), (86, 130), (87, 142), (134, 132), (144, 132)], 2.2))
+    d.marks("mark", circle(44, 84, 1.8) + "M22 93 L26 92 L25 96Z")
+
+
+def hyena_dusk(d: Drawing):
+    d.disc("glow", 118, 76, 34)
+    d.disc("sky", 140, 66, 6, shadow=False, line=False)
+    d.disc("sky", 104, 92, 4, shadow=False, line=False)
+    d.disc("sky", 124, 96, 3, shadow=False, line=False)
+    d.band("far", hills(130, 8))
+    acacia(d, -82, 2, 0.66)
+    d.band("mid", hills(146, 5, 30))
+    group(d, "translate(102 162) scale(1.12) translate(-90 -164)", lambda: hyena(d))
+    d.band("ground", hills(172, 4))
+    grass(d, -10, 210, 176, 12, "near", 18)
+    d.band("deep", hills(190, 4, 30), line=False)
+
+
+# ================================================================ AFRICAN WILD DOG
+def wilddog_face(d: Drawing):
+    d.disc("glow", 100, 108, 70, line=False)
+    d.band("far", hills(182, 5), line=False)
+    d.shape("hero", "M50 210 C52 172 72 146 100 142 C128 146 148 172 150 210Z", line=False)
+    clipped(d, "M50 210 C52 172 72 146 100 142 C128 146 148 172 150 210Z",
+            lambda: d.marks("mark", ellipse(70, 180, 14, 10) + ellipse(126, 168, 10, 14) + ellipse(100, 200, 16, 8)))
+    d.marks("light", ellipse(84, 160, 8, 6) + ellipse(140, 192, 8, 6))
+    # the huge round ears
+    for k in (1, -1):
+        def ear():
+            d.shape("hero", "M76 80 C62 74 48 62 46 40 C46 28 56 22 66 28 C80 36 88 58 86 76Z")
+            d.shape("mark", "M76 74 C66 70 56 60 54 44 C54 36 60 32 66 36 C76 44 82 58 80 72Z", shadow=False)
+            d.stroke("light", "M60 54 l8 4 M58 46 l8 2 M64 64 l8 4", 2, line=False)
+        ear() if k == 1 else flip(d, ear)
+    head = ("M100 64 C122 64 136 78 136 98 C136 114 128 124 122 132 C116 146 110 158 100 158 "
+            "C90 158 84 146 78 132 C72 124 64 114 64 98 C64 78 78 64 100 64Z")
+    d.shape("hero", head)
+    clipped(d, head, lambda: (d.marks("mark", ellipse(70, 116, 9, 7) + ellipse(134, 108, 7, 10) + "M96 60 H104 V104 H96Z"),
+                              d.marks("light", ellipse(128, 124, 6, 4) + ellipse(68, 100, 5, 4))))
+    d.shape("mark", "M90 104 C94 100 106 100 110 104 C116 120 112 150 100 158 C88 150 84 120 90 104Z", shadow=False)
+    d.marks("eye", circle(84, 96, 4.4) + circle(116, 96, 4.4))
+    d.marks("mark", circle(84, 96, 2.4) + circle(116, 96, 2.4))
+    d.shape("mark", "M90 132 C92 126 108 126 110 132 C110 138 104 142 100 142 C96 142 90 138 90 132Z", shadow=False)
+    d.marks("light", ellipse(96, 131, 2.5, 1.5))
+
+
+WDOG_BODY = ("M50 96 C58 88 80 86 104 88 C120 88 134 90 140 96 C144 102 140 110 132 112 C112 116 86 114 66 112 "
+             "C56 110 50 104 50 96Z")
+
+
+def wilddog(d: Drawing, phase=0):
+    legs = [["M132 104 L150 116 L164 116", "M126 106 L134 126 L144 132", "M62 104 L44 114 L30 110", "M70 106 L60 126 L50 132"],
+            ["M132 104 L140 124 L150 132", "M126 106 L146 112 L160 108", "M62 104 L54 124 L44 132", "M70 106 L50 110 L36 104"]][phase]
+    for p in legs[1::2]:
+        d.limb("hero2", p, 5)
+    d.limb("hero", "M54 94 C40 96 32 102 26 100", 6)
+    d.shape("light", circle(24, 100, 5.5), shadow=False)
+    for p in legs[0::2]:
+        d.limb("hero", p, 5.5)
+    d.shape("hero", WDOG_BODY)
+    clipped(d, WDOG_BODY, lambda: (d.marks("mark", ellipse(66, 96, 9, 7) + ellipse(96, 104, 11, 6) + ellipse(122, 94, 7, 6)
+                                           + ellipse(84, 90, 5, 4)),
+                                   d.marks("light", ellipse(80, 106, 6, 4) + ellipse(110, 92, 6, 4) + ellipse(134, 104, 4, 3))))
+    for x in (144, 152):
+        d.shape("hero", ellipse(x, 72, 5.5, 9.5), extra=f'transform="rotate({(x - 148) * 3} {x} 72)"')
+        d.marks("mark", ellipse(x, 73, 3, 6.5))
+    d.shape("hero", "M136 92 C138 82 148 78 156 80 C162 82 168 86 174 90 C176 94 172 98 166 98 C158 98 146 100 140 100Z")
+    d.shape("mark", "M160 84 C166 86 172 88 174 90 C176 94 172 98 166 98 L158 96Z", shadow=False)
+    d.marks("eye", circle(154, 86, 1.8))
+
+
+def wilddog_pack(d: Drawing):
+    d.disc("glow", 60, 60, 26)
+    birds(d, [(130, 46, 1), (146, 54, 0.8)])
+    d.band("far", hills(108, 8))
+    acacia(d, 34, -40, 0.56)
+    d.band("mid", hills(124, 5, 30))
+    group(d, "translate(86 50) scale(.62)", lambda: wilddog(d, 1))
+    group(d, "translate(-14 78) scale(.7)", lambda: wilddog(d, 0))
+    d.band("ground", hills(150, 4))
+    group(d, "translate(54 82) scale(.78)", lambda: wilddog(d, 1))
+    grass(d, -10, 210, 178, 12, "near", 20)
+    d.band("deep", hills(188, 4, 30), line=False)
+
+
+# ================================================================ MEERKAT
+def meerkat(d: Drawing, look=0):
+    """An upright meerkat, front-on, standing on its back legs. Feet at y=188, about 150 tall."""
+    d.limb("hero", "M122 178 C140 182 150 176 156 166", 7)
+    d.shape("mark", ellipse(156, 164, 4, 6), shadow=False, extra='transform="rotate(30 156 164)"')
+    d.shape("hero", "M84 92 C70 104 64 130 66 156 C68 176 80 188 100 188 C120 188 132 176 134 156 "
+                    "C136 130 130 104 116 92Z")
+    d.shape("hero2", "M90 104 C82 116 80 140 82 160 C84 176 92 184 100 184 C108 184 116 176 118 160 "
+                     "C120 140 118 116 110 104Z", shadow=False, line=False)
+    d.shape("hero", ellipse(82, 186, 9, 4.5), shadow=False)
+    d.shape("hero", ellipse(118, 186, 9, 4.5), shadow=False)
+    d.limb("hero", "M84 108 C80 118 84 126 92 126", 8)
+    d.limb("hero", "M116 108 C120 118 116 126 108 126", 8)
+    d.shape("mark", ellipse(93, 128, 4, 3), shadow=False, line=False)
+    d.shape("mark", ellipse(107, 128, 4, 3), shadow=False, line=False)
+
+    def head():
+        d.shape("mark", ellipse(74, 58, 4, 6), extra='transform="rotate(-20 74 58)"')
+        d.shape("mark", ellipse(126, 58, 4, 6), extra='transform="rotate(20 126 58)"')
+        d.shape("hero", "M100 34 C116 34 126 46 126 58 C126 70 118 80 110 88 C106 92 103 96 100 100 "
+                        "C97 96 94 92 90 88 C82 80 74 70 74 58 C74 46 84 34 100 34Z")
+        d.shape("hero2", "M88 74 C92 70 108 70 112 74 C112 82 106 92 100 98 C94 92 88 82 88 74Z", shadow=False, line=False)
+        d.marks("mark", ellipse(88, 62, 6, 8.5) + ellipse(112, 62, 6, 8.5))
+        d.marks("light", circle(89 + look, 61, 2.4) + circle(113 + look, 61, 2.4))
+        d.marks("mark", "M95 94 C95 92 105 92 105 94 L100 100Z")
+    group(d, f"rotate({look * 3} 100 92)", head)
+
+
+def meerkat_sentry(d: Drawing):
+    d.disc("glow", 100, 96, 80, line=False)
+    d.band("far", hills(170, 6), line=False)
+    group(d, "translate(100 178) scale(.96) translate(-100 -188)", lambda: meerkat(d))
+    d.band("ground", hills(178, 6))
+    d.band("deep", hills(192, 4, 30), line=False)
+
+
+def meerkat_family(d: Drawing):
+    d.disc("glow", 150, 52, 22)
+    # a hawk overhead: the reason for the lookout
+    d.shape("dark", "M44 46 C52 40 60 40 64 44 C68 40 76 40 84 46 C76 46 70 48 66 52 L64 56 L62 52 C58 48 52 46 44 46Z",
+            shadow=False)
+    d.band("far", hills(124, 8))
+    acacia(d, 88, 12, 0.52)
+    d.band("mid", hills(140, 5, 30))
+    # sandy burrow mound
+    d.shape("ground", "M10 200 C20 168 50 150 100 150 C150 150 180 168 190 200Z")
+    d.shape("deep", ellipse(150, 170, 10, 6), shadow=False, line=False)
+    group(d, "translate(62 158) scale(.5) translate(-100 -188)", lambda: meerkat(d, look=-2))
+    group(d, "translate(136 166) scale(.42) translate(-100 -188)", lambda: meerkat(d, look=2))
+    group(d, "translate(100 156) scale(.66) translate(-100 -188)", lambda: meerkat(d, look=-2))
+    group(d, "translate(150 168) scale(.26) translate(-100 -188)", lambda: meerkat(d))
+    d.band("deep", hills(190, 4, 30), line=False)
+
+
+# ================================================================ CHIMPANZEE
+def chimp_face(d: Drawing):
+    for x, y, a in [(-6, 46, 20), (-4, 100, 0), (2, 156, -20), (206, 46, 160), (204, 100, 180), (198, 156, -160)]:
+        d.shape("near", leaf(x, y, 60, 15, a), line=False)
+    d.shape("hero", "M30 210 C34 170 60 146 100 144 C140 146 166 170 170 210Z", line=False)
+    for k in (1, -1):
+        def ear():
+            d.shape("face2", "M58 86 C40 80 32 98 38 112 C42 122 52 124 60 118Z")
+            d.stroke("mark", "M52 96 C44 98 44 110 52 114", 2, line=False)
+        ear() if k == 1 else flip(d, ear)
+    d.shape("hero", scallop(100, 96, 46, 16, 0.08, ry=56))
+    face = ("M100 66 C114 66 128 70 132 82 C136 94 134 106 128 116 C136 126 136 142 126 152 C118 160 108 162 100 162 "
+            "C92 162 82 160 74 152 C64 142 64 126 72 116 C66 106 64 94 68 82 C72 70 86 66 100 66Z")
+    d.shape("face", face)
+    # heavy brow ridge
+    d.shape("face2", "M68 88 C72 76 88 74 100 82 C112 74 128 76 132 88 C126 86 114 86 100 92 C86 86 74 86 68 88Z", shadow=False)
+    for x in (86, 114):
+        d.marks("mark", ellipse(x, 98, 5, 4.4))
+        d.marks("light", circle(x + 1.4, 96.6, 1.3))
+    d.stroke("face2", "M80 108 Q86 112 92 108 M108 108 Q114 112 120 108", 1.6, line=False)
+    d.marks("mark", ellipse(94, 120, 2.4, 1.6) + ellipse(106, 120, 2.4, 1.6))
+    d.stroke("mark", "M96 104 Q100 112 104 104", 1.4, line=False)
+    d.shape("face2", "M76 134 C80 128 120 128 124 134 C126 146 114 156 100 156 C86 156 74 146 76 134Z", shadow=False)
+    d.stroke("mark", "M78 136 Q100 146 122 136", 2.2)
+
+
+def chimp_termites(d: Drawing):
+    d.band("far", hills(104, 10))
+    mist(d, 116, 4, 40)
+    for x, y, r in [(16, 90, 22), (52, 76, 20), (186, 80, 24), (156, 66, 18)]:
+        d.shape("mid", scallop(x, y, r, 9, 0.14), shadow=False, line=False)
+    d.limb("dark", "M24 210 L22 70 M182 210 L184 72", 8)
+    d.band("mid", hills(150, 5, 30))
+    # termite mound
+    d.shape("mound", "M118 190 L128 136 C130 120 134 104 138 92 C140 84 146 84 148 92 C152 106 156 122 160 140 "
+                     "L172 190Z", spot=True)
+    d.stroke("mark", "M136 120 l6 2 M140 144 l6 -2 M150 112 l4 4 M152 158 l6 2", 1.6, line=False)
+    d.marks("mark", ellipse(146, 130, 2.6, 3.4))
+
+    def chimp():
+        # sitting, side-on, facing right, poking a grass stem into the mound
+        d.shape("hero", "M48 182 C40 160 44 132 60 116 C70 106 86 104 96 112 C104 120 106 140 104 160 L104 182Z")
+        d.limb("hero", "M60 170 C74 168 86 172 92 182", 16)
+        d.limb("hero", "M86 124 C100 132 110 140 120 138", 10)
+        d.shape("face", ellipse(124, 138, 5, 4.4), shadow=False)
+        d.stroke("dark", "M122 140 L150 128", 1.8)
+        d.shape("hero", "M74 86 C74 74 84 66 96 66 C108 66 118 76 116 90 C114 100 104 106 94 106 C82 106 74 98 74 86Z")
+        d.shape("face", "M98 78 C106 76 116 80 120 88 C124 96 120 104 112 106 C104 108 98 102 98 96Z")
+        d.shape("face", ellipse(84, 84, 6, 8), shadow=False)
+        d.shape("face2", "M98 80 C104 76 116 78 118 84 C112 84 104 86 98 86Z", shadow=False)
+        d.marks("mark", circle(109, 88, 1.8))
+        d.stroke("mark", "M108 100 Q114 102 120 98", 1.4)
+    group(d, "translate(-4 2)", chimp)
+    for x, y in [(152, 126), (156, 132), (147, 122)]:
+        d.marks("mark", ellipse(x, y, 1.6, 1))
+    d.band("near", hills(184, 4))
+    for x, y, a in [(4, 200, -60), (20, 204, -90), (190, 204, -110), (178, 200, -90)]:
+        d.shape("near", leaf(x, y, 40, 9, a), line=False)
+
+
+# ================================================================ WARTHOG
+def warthog_face(d: Drawing):
+    d.disc("glow", 100, 100, 80, line=False)
+    d.band("far", hills(176, 6), line=False)
+    d.shape("hero", "M40 210 C44 170 68 140 100 138 C132 140 156 170 160 210Z", line=False)
+    # bristly mane, ears
+    d.shape("mane", "M84 54 L80 30 L90 44 L94 22 L100 42 L106 22 L110 44 L120 30 L116 54Z")
+    for k in (1, -1):
+        def side():
+            d.shape("hero", leaf(76, 62, 30, 10, -150))
+            d.shape("mark", leaf(74, 62, 18, 4, -150), shadow=False, line=False)
+            # tusks curling up and out from the snout
+            d.shape("light", "M84 150 C64 150 50 136 48 108 C46 102 52 100 54 106 C58 126 68 136 84 140Z")
+        side() if k == 1 else flip(d, side)
+    d.shape("hero", "M100 46 C118 46 130 56 132 72 C134 90 128 106 124 122 C122 134 122 146 120 154 L80 154 "
+                    "C78 146 78 134 76 122 C72 106 66 90 68 72 C70 56 82 46 100 46Z")
+    # warts: the knobbly bumps on the face
+    for k in (1, -1):
+        def wart():
+            d.shape("hero", "M72 98 C64 96 58 102 60 108 C62 112 68 112 74 110Z")
+            d.shape("hero", "M78 126 C72 126 70 132 72 136 C74 138 78 138 80 136Z", shadow=False)
+        wart() if k == 1 else flip(d, wart)
+    d.stroke("hero2", "M86 96 C90 110 92 130 90 146 M114 96 C110 110 108 130 110 146", 2, line=False)
+    d.marks("mark", circle(86, 82, 3) + circle(114, 82, 3))
+    d.stroke("mark", "M80 76 Q86 72 92 76 M108 76 Q114 72 120 76", 1.6)
+    d.shape("hero2", ellipse(100, 156, 24, 13))
+    d.marks("mark", ellipse(92, 156, 3.4, 4.4) + ellipse(108, 156, 3.4, 4.4))
+    d.stroke("light", "M66 116 Q60 126 62 136 M134 116 Q140 126 138 136", 2.2, line=False)
+
+
+WARTHOG_BODY = ("M54 104 C56 88 72 80 92 80 C112 80 130 84 142 92 C150 98 152 110 146 120 C140 128 128 130 116 130 "
+                "L72 130 C60 126 52 116 54 104Z")
+
+
+def warthog(d: Drawing, tail="hero"):
+    d.stroke(tail, "M144 96 L150 54", 2.2)
+    d.shape("mane", leaf(150, 54, 12, 3.4, -80), shadow=False)
+    for x0, x1, y1 in [(76, 72, 160), (90, 94, 158), (126, 130, 160), (138, 134, 158)]:
+        d.limb("hero", f"M{x0} 120 L{x1} {y1}", 8)
+    d.shape("hero", WARTHOG_BODY)
+    d.shape("mane", "M60 84 L64 72 L70 82 L76 70 L82 80 L90 70 L96 80 L104 72 L110 82 L118 76 L120 86 Z", shadow=False)
+    # head, low and long, facing left
+    d.shape("hero", "M68 88 C60 82 50 84 44 92 C38 100 32 112 28 122 C26 128 30 134 36 132 C44 130 52 124 60 118 "
+                    "C68 112 74 100 68 88Z")
+    d.shape("hero2", ellipse(30, 128, 5, 6), shadow=False)
+    d.shape("light", "M36 122 C30 116 28 106 32 98 C34 96 36 98 35 100 C34 108 36 114 40 118Z")
+    d.shape("hero", leaf(62, 86, 14, 5, -120), shadow=False)
+    d.shape("hero", ellipse(48, 112, 4, 5), shadow=False)
+    d.marks("mark", circle(54, 98, 1.8))
+
+
+def warthog_run(d: Drawing):
+    d.disc("glow", 150, 60, 28)
+    d.band("far", hills(124, 8))
+    acacia(d, -62, 6, 0.6)
+    d.band("mid", hills(142, 5, 30))
+    group(d, "translate(96 160) scale(1.0) translate(-100 -160)", lambda: warthog(d))
+    for x in (156, 182):
+        group(d, f"translate({x} 162) scale(.34) translate(-100 -160)", lambda: warthog(d))
+    d.band("ground", hills(168, 4))
+    grass(d, -10, 210, 172, 12, "near", 19)
+    d.band("deep", hills(188, 4, 30), line=False)
+
+
 # ================================================================ colours
 LION_C = {"hero": "#E0A458", "hero2": "#8A4A22", "mane2": "#B8702E", "mark": "#3B2A20", "light": "#F8E9CF",
           "eye": "#F2B33D", "nose": "#B5624A"}
@@ -801,6 +1108,13 @@ BUFFALO_C = {"hero": "#3E3836", "hero2": "#6A625D", "horn": "#8C8178", "horn2": 
 BUFFALO_M = {**BUFFALO_C, "egret": "#FFFFFF", "bill": "#F2B33D", "water": "#7CB8D0"}
 GNU_C = {"hero": "#6F6C74", "mark": "#2A2628", "horn": "#3A3436", "light": "#FFFFFF"}
 GNU_X = {**GNU_C, "water": "#C9A878", "water2": "#B39064", "light": "#FBF6EC"}
+
+HYENA_C = {"hero": "#B89A72", "mark": "#3A2C22", "muzzle": "#4A3A30", "mouth": "#7A2E2E", "light": "#FBF3E4"}
+WDOG_C = {"hero": "#C99A55", "hero2": "#A87C40", "mark": "#2A221C", "light": "#F4E8CF", "eye": "#C98A3A"}
+MEERKAT_C = {"hero": "#C9A27A", "hero2": "#ECDAC0", "mark": "#3A2A20", "light": "#FFFFFF"}
+CHIMP_C = {"hero": "#2E2622", "face": "#D8B49A", "face2": "#B98C74", "mark": "#1A1412", "light": "#FFFFFF",
+           "mound": "#B9764A", "dark": "#3A2A20"}
+WARTHOG_C = {"hero": "#8A7468", "hero2": "#B08A7A", "mane": "#4A3628", "mark": "#2A1E18", "light": "#F4EAD2"}
 
 SAVANNA_FIX = {"glow": ["glow2", "light", "#E07A5F", "far"], "sky": ["sky2", "far"]}
 
@@ -857,4 +1171,29 @@ CONCEPTS = [
     Concept("wildebeest-crossing", "animal-wildebeest-migration", "River crossing", gnu_crossing, overrides=GNU_X,
             checks=[("hero", "sky"), ("hero", "water"), ("hero", "ground"), ("dark", "far")],
             fixes={"sky": ["sky2", "glow2"], "far": ["mid", "ground"]}),
+    Concept("hyena-grin", "animal-hyena", "Laughing hyena", hyena_face, overrides=HYENA_C,
+            checks=[("hero", "glow"), ("hero", "sky"), ("hero", "mid")], fixes={"glow": ["glow2", "far", "light", "#E07A5F"], "mid": ["near", "deep"]}),
+    Concept("hyena-dusk", "animal-hyena", "Hyena at dusk", hyena_dusk, overrides=HYENA_C,
+            checks=[("hero", "glow"), ("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("hero", "ground")],
+            fixes={"glow": ["glow2", "light", "#E07A5F"], "far": ["near", "deep", "mid"], "mid": ["near", "deep"], "ground": ["near", "deep"]}),
+    Concept("african-wild-dog-ears", "animal-african-wild-dog", "Wild dog", wilddog_face, overrides=WDOG_C,
+            checks=[("hero", "glow"), ("hero", "sky"), ("mark", "glow")], fixes={"glow": ["glow2", "light", "far", "#E07A5F"]}),
+    Concept("african-wild-dog-pack", "animal-african-wild-dog", "Painted wolves", wilddog_pack, overrides=WDOG_C,
+            checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("hero", "ground")],
+            fixes={"far": ["near", "deep"], "mid": ["near", "deep"], "ground": ["near", "deep"], "sky": ["sky2"]}),
+    Concept("meerkat-sentry", "animal-meerkat", "Meerkat on guard", meerkat_sentry, overrides=MEERKAT_C,
+            checks=[("hero", "glow"), ("hero", "sky"), ("hero2", "hero")], fixes={"glow": ["far", "mid", "near", "#E07A5F"]}),
+    Concept("meerkat-family", "animal-meerkat", "Meerkat lookout", meerkat_family, overrides=MEERKAT_C,
+            checks=[("hero", "sky"), ("hero", "ground"), ("hero", "far"), ("hero", "mid")],
+            fixes={"ground": ["near", "deep"], "far": ["near", "mid", "deep"], "mid": ["near", "deep"], "sky": ["sky2"]}),
+    Concept("chimpanzee-face", "animal-chimpanzee", "Chimpanzee", chimp_face, overrides=CHIMP_C,
+            checks=[("hero", "sky"), ("hero", "near"), ("face2", "hero")], fixes={"near": ["mid", "far"]}),
+    Concept("chimpanzee-termites", "animal-chimpanzee", "Termite fishing", chimp_termites, overrides=CHIMP_C,
+            checks=[("hero", "far"), ("hero", "mid"), ("hero", "sky"), ("mound", "mid"), ("mound", "far")],
+            fixes={"mid": ["far", "ground", "glow2"], "far": ["sky2", "glow2", "mid"]}),
+    Concept("warthog-tusks", "animal-warthog", "Warthog", warthog_face, overrides=WARTHOG_C,
+            checks=[("hero", "glow"), ("hero", "sky"), ("light", "glow")], fixes={"glow": ["mid", "near", "far", "#E07A5F"]}),
+    Concept("warthog-tails-up", "animal-warthog", "Tails up!", warthog_run, overrides=WARTHOG_C,
+            checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("hero", "ground")],
+            fixes={"far": ["near", "mid", "deep"], "mid": ["near", "deep", "far"], "ground": ["near", "deep"], "sky": ["sky2"]}),
 ]

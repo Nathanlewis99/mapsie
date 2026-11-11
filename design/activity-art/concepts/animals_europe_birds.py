@@ -296,7 +296,7 @@ def roaring_stag(d: Drawing):
                     ([(104, 14), (117, 12)], 3.2)]:
         d.limb("horn", P(path, False), w, shadow=w > 4)
     # thick shaggy neck, stretched up
-    neck = [(98, 96), (84, 80), (70, 62), (62, 52), (50, 56), (44, 66)] + zig([(44, 68), (46, 88), (54, 108), (64, 124)], 7, -6)[1:] + [(80, 112)]
+    neck = [(98, 96), (84, 80), (70, 62), (62, 52), (50, 56), (44, 66)] + zig([(44, 68), (46, 88), (54, 108), (64, 124)], 9, -4.5)[1:] + [(80, 112)]
     d.shape("mane", P(neck))
     d.shape("hero", P([(58, 50, 1), (72, 38), (77, 42, 1), (68, 54, 1)]))
     # head raised, mouth wide open
@@ -325,9 +325,9 @@ def reddeer_roar(d: Drawing):
 
 # ================================================================ HIGHLAND COW
 def coo_horn(d: Drawing):
-    pts = [(70, 92), (52, 90), (34, 84), (24, 70), (24, 56)]
-    d.shape("horn", taper(pts, 6.5, 1.4))
-    clipped(d, taper(pts, 6.5, 1.4), lambda: d.shape("horntip", "M10 30 H40 V64 H10Z", shadow=False, line=False))
+    pts = [(74, 94), (54, 92), (36, 86), (24, 72), (22, 52)]
+    d.shape("horn", taper(pts, 9, 2))
+    clipped(d, taper(pts, 9, 2), lambda: d.shape("horntip", "M6 30 H40 V60 H6Z", shadow=False, line=False))
 
 
 def highlandcow_portrait(d: Drawing):
@@ -517,7 +517,7 @@ def redfox_snow(d: Drawing):
         pine(d, x, 132, h, "near", snow=True)
     d.band("far", hills(130, 4), line=False)
     d.band("light", "M-30 146 Q40 132 100 140 T230 136")
-    group(d, "translate(98 154) scale(1.02) translate(-100 -150)", lambda: fox_side(d))
+    group(d, "translate(96 156) scale(1.14) translate(-100 -150)", lambda: fox_side(d))
     d.stroke("far", "M30 166 h8 M50 172 h6 M150 168 h8 M170 160 h6", 2, line=False)
     d.band("far", hills(186, 3, 20), line=False)
 
@@ -582,6 +582,10 @@ def lynx_portrait(d: Drawing):
     for x, h in [(12, 100), (32, 80), (170, 84), (190, 104)]:
         pine(d, x, 190, h, "near", snow=True)
     d.band("light", hills(184, 4), line=False)
+    group(d, "translate(100 120) scale(.88) translate(-100 -112)", lambda: lynx_face(d))
+
+
+def lynx_face(d: Drawing):
     d.shape("hero", P(zig([(24, 210), (36, 172), (66, 156)], 4, 6) + [(134, 156)] + zig([(134, 156), (164, 172), (176, 210)], 4, 6)[1:]))
     for side in (0, 1):
         def ear():
@@ -593,8 +597,8 @@ def lynx_portrait(d: Drawing):
     # ruff
     ruff = [(100, 112)] + zig([(134, 98), (160, 120), (164, 146), (146, 162)], 6, 9)[1:] + [(100, 172)]
     d.shape("hero2", P(sym(ruff)))
-    d.stroke("mark", "M146 112 L158 128 M150 136 L162 146 M142 148 L150 160", 2.4)
-    flip(d, lambda: d.stroke("mark", "M146 112 L158 128 M150 136 L162 146 M142 148 L150 160", 2.4))
+    d.stroke("mark", "M148 116 L156 128 M152 138 L160 146", 2)
+    flip(d, lambda: d.stroke("mark", "M148 116 L156 128 M152 138 L160 146", 2))
     head = sym([(100, 60), (122, 64), (138, 78), (142, 98), (138, 118), (124, 136), (112, 148), (100, 150)])
     d.shape("hero", P(head))
     d.shape("light", P(sym([(100, 112), (110, 112), (122, 122), (124, 134), (114, 146), (100, 150)])), shadow=False, line=False)
@@ -609,28 +613,35 @@ def lynx_portrait(d: Drawing):
 
 
 def lynx_side(d: Drawing):
-    d.limb("hero2", P([(80, 122), (78, 150), (80, 166)], False), 6.5)
-    d.limb("hero2", P([(130, 118), (138, 146), (132, 166)], False), 6.5)
-    d.shape("hero", P([(56, 104), (70, 92), (104, 94), (134, 90), (146, 98), (148, 112), (138, 124), (106, 126), (76, 126), (60, 120)]))
-    d.shape("hero", P([(144, 96), (154, 92, 1), (157, 98), (148, 106)]))
-    d.shape("mark", P([(150, 92), (154, 92, 1), (157, 98), (152, 99)]), shadow=False)
-    d.limb("hero", P([(68, 118), (66, 148), (64, 166)], False), 7)
-    d.limb("hero", P([(142, 110), (152, 140), (148, 166)], False), 7)
-    d.marks("mark", "".join(circle(x, y, 1.8) for x, y in [(80, 102), (92, 100), (104, 104), (116, 100), (128, 102), (88, 112),
-                                                          (100, 114), (112, 112), (124, 112), (136, 108), (146, 120), (70, 106)]))
-    for x in (64, 148):
-        d.shape("hero", ellipse(x, 168, 8, 4), shadow=False)
-    # head with ruff and tufts
-    d.shape("hero", P([(60, 108), (56, 92), (48, 82), (38, 82), (34, 96), (44, 112)]))
-    d.shape("hero", P([(48, 70, 1), (52, 52, 1), (60, 72, 1)]))
-    d.stroke("mark", "M52 53 L53 40", 2.2)
-    d.shape("hero2", P([(52, 92)] + zig([(56, 100), (50, 116), (34, 116)], 4, -5)[1:] + [(30, 104)]), shadow=False)
-    d.shape("hero", P([(58, 78), (46, 68), (34, 70), (24, 80), (20, 86, 1), (26, 94), (40, 98), (54, 94)]))
-    d.shape("light", P([(22, 88), (26, 94), (40, 98), (34, 90)]), shadow=False, line=False)
-    d.marks("mark", P([(20, 85), (25, 84), (24, 89)]))
-    d.shape("eye", ellipse(36, 79, 3.2, 2.4), shadow=False)
-    d.marks("mark", circle(35.5, 79, 1.3))
-    d.stroke("mark", "M44 98 L52 110 M50 96 L58 106", 1.6, line=False)
+    d.limb("hero2", P([(84, 116), (86, 146), (87, 162)], False), 8)
+    d.limb("hero2", P([(126, 112), (132, 138), (128, 162)], False), 8)
+    d.shape("hero2", ellipse(88, 164, 7, 4), shadow=False)
+    d.shape("hero2", ellipse(128, 164, 7, 4), shadow=False)
+    d.limb("hero", P([(146, 98), (156, 94), (160, 92)], False), 8)
+    d.limb("mark", P([(157, 93), (160, 92)], False), 8, shadow=False)
+    d.shape("hero", P([(58, 102), (72, 92), (104, 94), (130, 86), (146, 92), (150, 106), (140, 120), (108, 122), (78, 122), (60, 118)]))
+    d.limb("hero", P([(68, 112), (66, 144), (64, 162)], False), 9.5)
+    d.limb("hero", P([(140, 108), (148, 136), (144, 162)], False), 9.5)
+    for x in (64, 144):
+        d.shape("hero", ellipse(x - 2, 164, 9, 5), shadow=False)
+        d.stroke("mark", f"M{x - 6} 166 v-3 M{x - 2} 167 v-3 M{x + 2} 166 v-3", 1.2, line=False)
+    d.marks("mark", "".join(circle(x, y, 1.6) for x, y in [(84, 102), (98, 100), (112, 102), (124, 98), (136, 100), (92, 112),
+                                                          (106, 112), (120, 110), (134, 110), (146, 116), (70, 128), (144, 128)]))
+    # big round head, tufted ears, ruff
+    d.shape("hero", P([(46, 72, 1), (44, 52, 1), (56, 70, 1)]))
+    d.stroke("mark", "M44 53 L43 40", 2.4)
+    d.shape("hero", P([(58, 76, 1), (60, 56, 1), (68, 76, 1)]))
+    d.stroke("mark", "M60 57 L62 44", 2.4)
+    d.shape("mark", P([(44, 53, 1), (46, 62, 1), (42, 60, 1)]), shadow=False)
+    d.shape("hero", P([(66, 80), (60, 70), (46, 68), (34, 74), (28, 84), (30, 96), (42, 104), (58, 104), (68, 94)]))
+    ruff = [(64, 86)] + zig([(68, 96), (62, 110), (44, 114), (32, 106)], 5, -6)[1:] + [(38, 98), (56, 98)]
+    d.shape("hero2", P(ruff), shadow=False)
+    d.stroke("mark", "M60 104 L64 112 M50 106 L50 114", 1.8, line=False)
+    d.shape("light", P([(30, 90), (34, 98), (44, 100), (40, 92)]), shadow=False, line=False)
+    d.marks("pop", P([(27, 86), (32, 85), (30, 90)]))
+    d.shape("eye", ellipse(38, 80, 3.4, 2.6), shadow=False)
+    d.marks("mark", ellipse(38, 80, 1.1, 2.2))
+    d.stroke("mark", "M30 92 Q34 95 38 93", 1.3)
 
 
 def lynx_snow(d: Drawing):
@@ -666,7 +677,11 @@ def ibex_portrait(d: Drawing):
     peaks(d, "M-30 150 L20 112 L50 130 L84 96 L118 128 L150 104 L230 140",
           ["M84 96 L96 108 L89 107 L84 112 L78 106 L72 109Z", "M150 104 L160 112 L154 111 L150 115 L144 110Z"])
     d.band("mid", hills(176, 6))
-    d.shape("hero", P([(84, 120), (110, 80), (134, 80), (156, 120), (172, 160), (184, 210, 1), (70, 210, 1), (74, 160)]))
+    group(d, "translate(96 128) scale(.8) translate(-100 -110)", lambda: ibex_head(d))
+
+
+def ibex_head(d: Drawing):
+    d.shape("hero", P([(84, 120), (110, 80), (134, 80), (156, 120), (172, 160), (184, 230, 1), (70, 230, 1), (74, 160)]))
     d.shape("hero", P([(120, 70, 1), (142, 56), (150, 64), (130, 82, 1)]))
     ibex_horns(d, [(108, 62), (112, 36), (130, 18), (156, 18), (176, 34), (184, 62), (178, 92)], 13)
     head = [(122, 82), (112, 60), (96, 58), (80, 70), (60, 92), (44, 108), (40, 118, 1), (46, 126), (62, 128), (82, 120), (104, 116), (126, 110)]
@@ -681,13 +696,12 @@ def ibex_portrait(d: Drawing):
 
 
 def ibex_side(d: Drawing):
-    d.limb("hero2", P([(82, 126), (84, 146), (82, 160)], False), 6)
-    d.limb("hero2", P([(130, 124), (138, 142), (132, 160)], False), 6)
+    d.limb("hero2", P([(82, 126), (84, 146), (82, 160)], False), 7.5)
+    d.limb("hero2", P([(130, 124), (138, 142), (132, 160)], False), 7.5)
     d.shape("hero", P([(60, 104), (72, 94), (104, 96), (132, 92), (146, 100), (146, 116), (136, 128), (106, 130), (78, 130), (62, 122)]))
     d.shape("hero", P([(144, 98), (152, 92, 1), (150, 104)]))
-    d.shape("light", P([(80, 128), (106, 128), (130, 126), (120, 122), (90, 122)]), shadow=False, line=False)
-    d.limb("hero", P([(70, 124), (68, 146), (70, 160)], False), 7)
-    d.limb("hero", P([(140, 116), (148, 142), (144, 160)], False), 7)
+    d.limb("hero", P([(70, 124), (68, 146), (70, 160)], False), 8.5)
+    d.limb("hero", P([(140, 116), (148, 142), (144, 160)], False), 8.5)
     d.marks("mark", "M64 158 h10 l1 4 h-12Z M138 158 h10 l1 4 h-12Z")
     d.shape("hero", P([(74, 100), (64, 84), (58, 74), (50, 76), (52, 96), (62, 116)]))
     ibex_horns(d, [(58, 70), (58, 48), (70, 32), (90, 28), (106, 38), (112, 56)], 6.5)
@@ -741,7 +755,7 @@ def redsquirrel_portrait(d: Drawing):
         d.shape("near", leaf(x, y, 40, 9, a), line=False)
     d.band("far", hills(176, 4))
     d.limb("dark", "M-10 180 C40 174 120 176 210 168", 10)
-    group(d, "translate(102 174) scale(1.0) translate(-100 -172)", lambda: squirrel(d))
+    group(d, "translate(94 174) scale(.92) translate(-100 -172)", lambda: squirrel(d))
 
 
 def needles(d: Drawing, x, y, s=1.0, role="near"):
@@ -767,7 +781,7 @@ def redsquirrel_pine(d: Drawing):
         needles(d, x, y)
     cone(d, 40, 130, 1.0)
     cone(d, 120, 132, 0.9)
-    group(d, "translate(96 126) scale(.62) translate(-100 -172)", lambda: squirrel(d))
+    group(d, "translate(94 127) scale(.78) translate(-100 -172)", lambda: squirrel(d))
     for x, y in [(150, 128), (186, 80)]:
         needles(d, x, y, 1.1)
     d.band("near", hills(190, 3), line=False)

@@ -509,8 +509,9 @@ def fun_mountain(d: Drawing):
     for x, yy, s in [(24, 190, 1.0), (62, 172, 1.2), (110, 150, 0.9), (180, 150, 1.4)]:
         d.shape("deep", _pine(x, yy, s), shadow=False)
     # top station
-    d.shape("hero2", f"M142 {y(150) - 10:.0f} V{y(150) - 30:.0f} L156 {y(150) - 40:.0f} L170 {y(150) - 30:.0f} V{y(150) - 10:.0f}Z")
-    d.shape("dark", f"M139 {y(150) - 29:.0f} L156 {y(150) - 43:.0f} L173 {y(150) - 29:.0f}Z")
+    d.shape("hero2", f"M140 {y(150) + 14:.0f} V{y(150) - 20:.0f} H172 V{y(150) + 14:.0f}Z")
+    d.shape("dark", f"M136 {y(150) - 18:.0f} L156 {y(150) - 34:.0f} L176 {y(150) - 18:.0f}Z")
+    d.shape("dark", rrect(150, round(y(150) - 10), 12, 16, 2), shadow=False)
     d.stroke("dark", f"M-30 {y(-30):.1f} L150 {y(150):.1f}", 2.6)
     _funicar(d, 54, y(54) - 3, 3, 22, 28, 0.62)
 
@@ -520,7 +521,7 @@ def fun_street(d: Drawing):
     d.disc("glow", 152, 44, 14)
     k = 0.5
     y = lambda x: 176 - k * x
-    roles = ["far", "light", "mid", "glow2", "far", "light"]
+    roles = ["far", "pop", "mid", "far", "pop", "mid", "far"]
     for i, x in enumerate(range(-24, 200, 36)):
         base = y(x + 36) + 4
         top = base - 66 - (i % 2) * 10
@@ -904,7 +905,7 @@ CONCEPTS = [
     Concept("funicular-mountain", "funicular", "Up the mountain", fun_mountain,
             checks=[("hero", "near"), ("hero", "far"), ("hero", "sky")], fixes={"hero": ["pop", "hero2", "light"]}),
     Concept("funicular-street", "funicular", "Steep city street", fun_street, overrides=LISBON,
-            checks=[("hero", "far"), ("hero", "mid"), ("hero", "ground"), ("light", "sky")], fixes={"far": ["near", "deep"], "ground": ["near", "deep"]}),
+            checks=[("hero", "far"), ("hero", "mid"), ("hero", "ground"), ("hero", "pop"), ("far", "sky")], fixes={"far": ["near", "deep"], "ground": ["near", "deep"], "pop": ["near", "deep"]}),
     Concept("funicular-carriage", "funicular", "Stepped carriage", fun_close,
             checks=[("hero", "mid"), ("hero", "far"), ("hero", "sky")], fixes={"hero": ["pop", "hero2"]}),
     Concept("rickshaw-cycle", "rickshaw", "Cycle rickshaw", rk_cycle,

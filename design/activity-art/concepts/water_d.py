@@ -519,7 +519,7 @@ def sunbathe_lounger(d: Drawing):
     d.shape("hair", "M28 98 A10 10 0 0 1 44 87 Q34 90 28 98Z", shadow=False)
     d.marks("dark", "M34 96 H46 Q46 102 41 102 Q37 102 36 98Z")
     d.stroke("dark", "M36 104 Q40 106 44 104", 1.3, line=False)
-    # hat resting on the knees... no: on the sand, and a drink
+    # straw hat on the sand
     d.shape("glow2", ellipse(176, 152, 16, 4))
     d.shape("glow2", "M166 152 Q166 138 176 138 Q186 138 186 152Z")
     d.shape("pop", "M166 148 H186 V151 H166Z", shadow=False)
@@ -786,11 +786,13 @@ CONCEPTS = [
             checks=[("hero", "mid"), ("light", "mid"), ("near", "far"), ("deep", "far")], fixes={"hero": ["pop", "deep"], "far": ["sky2", "light"]}),
     # wild swimming
     Concept("wildswim-lake", "wild-swimming", "Mountain lake", wildswim_lake, SEA, ov(),
-            checks=[("pop", "mid"), ("hero", "mid"), ("skin", "mid"), ("far", "sky")], fixes={"hero": ["pop", "light"]}),
+            checks=[("pop", "near"), ("hero", "near"), ("skin", "near"), ("mid", "sky"), ("dark", "near")],
+            fixes={"hero": ["pop", "light"], "pop": ["hero2", "glow2"]}),
     Concept("wildswim-jetty", "wild-swimming", "Jetty dip", wildswim_jetty, SEA, ov(),
-            checks=[("hero", "near"), ("wood2", "near"), ("mid", "far"), ("skin", "near")], fixes={"hero": ["pop", "light"]}),
+            checks=[("hero", "near"), ("wood2", "near"), ("deep", "far"), ("skin", "near"), ("deep", "near")],
+            fixes={"hero": ["pop", "light"], "wood2": ["#E3B27A", "wood"]}),
     Concept("wildswim-icedip", "wild-swimming", "Ice dip", wildswim_icedip, SEA, ov(),
-            checks=[("light", "near"), ("light", "sky"), ("pop", "near"), ("skin", "near")], fixes={"sky": ["sky2", "far"]}),
+            checks=[("light", "near"), ("light", "sky"), ("pop", "near"), ("skin", "near")], fixes={"sky": ["sky2", "far"], "pop": ["hero", "deep"]}),
     # deep-sea fishing
     Concept("deepsea-marlin", "deep-sea-fishing", "Blue marlin", deepsea_marlin, SEA,
             ov(marlin="#2C5F8E", marlin2="#1E3F66", marlin3="#8FC1E8"),
@@ -801,9 +803,9 @@ CONCEPTS = [
             checks=[("hero", "mid"), ("hero", "far"), ("hero2", "sky"), ("dark", "sky")], fixes={"hero": ["pop", "deep"], "hero2": ["light", "glow2"]}),
     # glass-bottom boat
     Concept("glassboat-window", "glass-bottom-boat", "Window to the reef", glassboat_window, UNDERWATER + ["blush"], ov(),
-            checks=[("hero2", "mid"), ("hero", "mid"), ("pop", "near")], fixes={"hero2": ["light", "glow2"]}),
+            checks=[("hero2", "mid"), ("hero", "mid"), ("pop", "near")], fixes={"hero2": ["light", "glow2"], "pop": ["hero", "deep"]}),
     Concept("glassboat-section", "glass-bottom-boat", "Glass-bottom boat", glassboat_section, SEA, ov(),
-            checks=[("hero", "mid"), ("hero", "far"), ("light", "sky"), ("hero2", "near")], fixes={"hero": ["pop", "deep"]}),
+            checks=[("hero", "mid"), ("hero", "far"), ("hero2", "sky"), ("hero2", "near")], fixes={"hero": ["pop", "deep"], "hero2": ["glow2", "pop", "deep"]}),
     Concept("glassboat-below", "glass-bottom-boat", "Faces at the glass", glassboat_below, UNDERWATER, ov(),
             checks=[("hero", "far"), ("hero2", "mid"), ("hero2", "near")], fixes={"hero": ["pop", "deep"], "hero2": ["glow2", "light"]}),
     # banana boat
@@ -812,28 +814,31 @@ CONCEPTS = [
     Concept("banana-aerial", "banana-boat", "Towed from above", banana_aerial, SEA, ov(banana="#FFD43B", banana2="#E9AE12"),
             checks=[("banana", "mid"), ("light", "mid"), ("hero", "banana")], fixes={"hero": ["pop", "deep"]}),
     Concept("banana-wipeout", "banana-boat", "Wipeout", banana_wipeout, SEA, ov(banana="#FFD43B", banana2="#E9AE12"),
-            checks=[("banana", "mid"), ("banana", "far"), ("pop", "near"), ("hero", "near")], fixes={"hero": ["pop", "light"]}),
+            checks=[("banana", "mid"), ("banana", "far"), ("pop", "near"), ("hero", "near")], fixes={"hero": ["pop", "light"], "pop": ["hero2", "light"]}),
     # sunbathing
-    Concept("sunbathe-lounger", "sunbathing", "On the lounger", sunbathe_lounger, ALL, ov(),
-            checks=[("hero2", "ground"), ("skin", "ground"), ("glow2", "far"), ("pop", "skin")], fixes={"hero2": ["hero", "pop", "deep"], "glow2": ["hero2", "light"]}),
+    Concept("sunbathe-lounger", "sunbathing", "On the lounger", sunbathe_lounger, ALL, ov(suit="#E4572E"),
+            checks=[("hero2", "ground"), ("skin", "far"), ("skin", "hero2"), ("glow2", "ground"), ("suit", "skin"), ("suit", "far")],
+            fixes={"hero2": ["hero", "pop", "deep"], "glow2": ["hero2", "pop", "near"], "suit": ["#2E86AB", "#1D3557"]}),
     Concept("sunbathe-lotion", "sunbathing", "Sun cream", sunbathe_lotion, ALL, ov(),
             checks=[("hero", "ground"), ("hero", "hero2"), ("hero", "sky"), ("hero2", "ground")], fixes={"hero2": ["pop", "far", "mid"], "hero": ["deep", "pop"]}),
     Concept("sunbathe-sun", "sunbathing", "Sun in shades", sunbathe_sun, ALL,
             checks=[("glow", "sky"), ("glow2", "sky"), ("glow", "glow2")], fixes={"glow2": ["hero2", "pop", "light"], "sky": ["sky2", "far", "deep"]}),
     # river tubing
     Concept("tubing-float", "river-tubing", "Lazy float", tubing_float, ALL, ov(tube="#30343A", **TEAL),
-            checks=[("tube", "teal"), ("skin", "teal"), ("pop", "skin")]),
-    Concept("tubing-karst", "river-tubing", "Karst river", tubing_karst, ALL, ov(**TEAL),
-            checks=[("far", "sky"), ("hero", "teal"), ("pop", "teal"), ("hero2", "teal")], fixes={"hero2": ["light", "glow2"], "hero": ["pop", "deep"]}),
+            checks=[("tube", "teal"), ("skin", "teal"), ("pop", "skin")], fixes={"pop": ["hero", "deep", "mark"]}),
+    Concept("tubing-karst", "river-tubing", "Karst river", tubing_karst, ALL, ov(jungle="#5E9C5A", **TEAL),
+            checks=[("far", "sky"), ("mid", "far"), ("hero", "teal"), ("pop", "teal"), ("hero2", "teal")],
+            fixes={"far": ["mid", "near"], "mid": ["near", "deep"], "hero2": ["light", "glow2"], "hero": ["pop", "deep"]}),
     Concept("tubing-train", "river-tubing", "Tube train", tubing_train, ALL, ov(**TEAL),
             checks=[("hero", "teal"), ("pop", "teal"), ("hero2", "teal"), ("near", "teal")], fixes={"hero2": ["light", "glow2"], "hero": ["pop", "deep"]}),
     # pool day
     Concept("pool-ladder", "pool-day", "Pool ladder", pool_ladder, ALL, ov(**POOL),
-            checks=[("pop", "pool"), ("ground", "light")], fixes={"ground": ["far", "mid"]}),
+            checks=[("pop", "pool"), ("ground", "light"), ("steel", "pool")], fixes={"ground": ["far", "mid"]}),
     Concept("pool-flamingo", "pool-day", "Flamingo float", pool_flamingo, ALL, ov(**POOL, **PINK),
             checks=[("flam", "sky"), ("flam", "pool"), ("dark", "sky")]),
-    Concept("pool-dive", "pool-day", "Off the board", pool_dive, ALL, ov(**POOL),
-            checks=[("skin", "sky"), ("skin", "far"), ("hero2", "sky"), ("pop", "sky")], fixes={"hero2": ["hero", "pop", "deep"]}),
+    Concept("pool-dive", "pool-day", "Off the board", pool_dive, ALL, ov(suit="#E4572E", **POOL),
+            checks=[("skin", "sky"), ("hero2", "sky"), ("suit", "skin"), ("ground", "sky")],
+            fixes={"hero2": ["hero", "pop", "deep"], "suit": ["#2E86AB"], "ground": ["far", "mid"]}),
     # lagoon swim
     Concept("lagoon-cliffs", "lagoon-swim", "Hidden lagoon", clipped(lagoon_cliffs), SEA,
             ov(lagoon="#5ED0C8", lagoon2="#36B0B0", jungle="#5E9C5A"),

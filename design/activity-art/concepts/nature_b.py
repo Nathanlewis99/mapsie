@@ -559,6 +559,443 @@ def migration_face(d: Drawing):
     d.marks("mark", ellipse(93, 148, 2.2, 3) + ellipse(107, 148, 2.2, 3))
 
 
+
+# ================================================================ REEF EXPLORING
+REEF = {"coral": "#F27A6B", "coral2": "#F6B04A", "fan": "#A65AA0", "sponge": "#4FB0A0"}
+
+
+def seafan(d: Drawing, x, y, h, role="fan", spot=False):
+    w = h * 0.55
+    d.shape(role, f"M{x - 3} {y} L{x - 3} {y - h * 0.3} C{x - w} {y - h * 0.4} {x - w} {y - h} {x} {y - h} "
+                  f"C{x + w} {y - h} {x + w} {y - h * 0.4} {x + 3} {y - h * 0.3} L{x + 3} {y}Z", spot=spot)
+    lat = ""
+    for i in range(-3, 4):
+        lat += f"M{x} {y - h * 0.3} L{x + i * w * 0.26:.1f} {y - h * 0.92:.1f} "
+    for k in (0.5, 0.68, 0.84):
+        lat += f"M{x - w * 0.62:.1f} {y - h * k:.1f} Q{x} {y - h * (k + 0.08):.1f} {x + w * 0.62:.1f} {y - h * k:.1f} "
+    d.stroke("light", lat, 1.1, line=False)
+
+
+def staghorn(d: Drawing, x, y, s=1.0, role="coral", spot=False):
+    d.limb(role, f"M{x} {y} L{x} {y - 30 * s} M{x} {y - 14 * s} L{x - 16 * s} {y - 32 * s} L{x - 18 * s} {y - 46 * s} "
+                 f"M{x - 16 * s} {y - 32 * s} L{x - 28 * s} {y - 38 * s} M{x} {y - 30 * s} L{x + 6 * s} {y - 50 * s} "
+                 f"M{x} {y - 22 * s} L{x + 18 * s} {y - 34 * s} L{x + 22 * s} {y - 48 * s}", 7 * s, spot=spot)
+
+
+def brain(d: Drawing, x, y, r, role="coral2"):
+    d.shape(role, f"M{x - r} {y} A{r} {r * 0.8} 0 0 1 {x + r} {y}Z")
+    d.stroke("coral", f"M{x - r * 0.75} {y - 2} q{r * 0.12} {-r * 0.3} {r * 0.25} 0 t{r * 0.25} 0 t{r * 0.25} 0 t{r * 0.25} 0 t{r * 0.25} 0 "
+                      f"M{x - r * 0.5} {y - r * 0.38} q{r * 0.12} {-r * 0.25} {r * 0.25} 0 t{r * 0.25} 0 t{r * 0.25} 0 t{r * 0.25} 0", 1.5, line=False)
+
+
+def sea_bg(d: Drawing, floor=164):
+    d.band("sky2", waves(30, 4, 26))
+    d.band("far", waves(56, 4, 28))
+    d.band("mid", waves(86, 5, 30))
+    d.band("near", waves(122, 5, 34))
+    d.band("ground", f"M-30 {floor} Q40 {floor - 12} 80 {floor - 2} T160 {floor - 4} T230 {floor - 2}")
+    d.raw('<g opacity=".16" fill="#fff"><path d="M50 0 L70 0 L110 200 L90 200Z"/><path d="M120 0 L130 0 L168 200 L158 200Z"/></g>', "")
+
+
+def reef_garden(d: Drawing):
+    sea_bg(d, 168)
+    for x, y, s in [(120, 48, 0.8), (134, 42, 0.7), (136, 56, 0.75), (150, 48, 0.7), (60, 70, 0.7)]:
+        d.shape("hero2", fish(x, y, s), shadow=False)
+    seafan(d, 50, 168, 82, spot=True)
+    for x, h in [(84, 40), (94, 52), (104, 36)]:
+        d.shape("sponge", rrect(x - 5, 168 - h, 10, h, 5))
+        d.shape("deep", ellipse(x, 168 - h + 3, 3, 2), shadow=False)
+    staghorn(d, 156, 170, 1.15)
+    brain(d, 120, 176, 26)
+    d.shape("hero", fish(98, 104, 1.4, right=True))
+    d.marks("mark", circle(106, 103, 1.6))
+    d.stroke("light", "M30 70 a3 3 0 1 0 0.1 0 M36 56 a2 2 0 1 0 0.1 0 M170 100 a3 3 0 1 0 0.1 0", 1.6)
+    d.shape("pop", "M30 186 l3 -8 l3 8 l8 0 l-6 5 l3 8 l-8 -5 l-8 5 l3 -8 l-6 -5Z")
+
+
+IDOL = ("M34 104 L48 98 C56 80 72 62 96 50 C122 38 152 34 180 40 C150 42 126 50 114 62 C126 74 136 88 140 98 "
+        "L150 96 L168 82 L170 104 L168 126 L150 112 L140 110 C134 124 120 140 104 152 L92 158 "
+        "C86 140 70 124 56 114 L48 110 L34 106Z")
+
+
+def reef_idol(d: Drawing):
+    sea_bg(d, 176)
+    staghorn(d, 30, 180, 0.9)
+    brain(d, 170, 184, 22)
+    for x, y, s in [(160, 160, 0.6), (172, 152, 0.55), (40, 60, 0.6)]:
+        d.shape("hero2", fish(x, y, s), shadow=False)
+    d.shape("light", IDOL)
+
+    def bands():
+        d.shape("mark", "M58 20 L82 20 L80 190 L56 190Z", shadow=False, spot=True)
+        d.shape("mark", "M98 20 L124 20 L122 190 L96 190Z", shadow=False, spot=True)
+        d.shape("hero", "M124 20 L200 20 L200 190 L122 190Z", shadow=False)
+        d.shape("mark", "M150 20 L200 20 L200 190 L150 190Z", shadow=False)
+        d.shape("light", "M164 20 L172 20 L172 190 L164 190Z", shadow=False, line=False)
+        d.shape("hero", "M80 20 L98 20 L96 60 L80 60Z", shadow=False)
+    clipped(d, IDOL, bands)
+    d.stroke("mark", IDOL, 1.2, line=False)
+    d.shape("hero", "M34 104 L44 99 L46 108Z", shadow=False)
+    d.marks("light", circle(64, 96, 4))
+    d.marks("mark", circle(64, 96, 2.4))
+    bubbles = "M28 92 a3 3 0 1 0 0.1 0 M22 80 a2 2 0 1 0 0.1 0"
+    d.stroke("light", bubbles, 1.6)
+
+
+def reef_glassboat(d: Drawing):
+    d.disc("glow", 150, 34, 15)
+    d.shape("light", cloud(28, 40, 0.9), shadow=False)
+    d.band("far", "M-30 74 H230")
+    d.band("mid", waves(86, 3, 26))
+    d.band("near", waves(118, 4, 30))
+    d.band("deep", waves(150, 4, 34), line=False)
+    d.band("ground", "M-30 178 Q40 168 100 176 T230 174")
+    seafan(d, 36, 180, 44)
+    staghorn(d, 164, 182, 0.8)
+    brain(d, 100, 186, 22)
+    for x, y, s in [(64, 140, 0.9), (78, 134, 0.8), (130, 150, 0.9)]:
+        d.shape("hero2", fish(x, y, s), shadow=False)
+    # light through the glass
+    d.raw('<path d="M70 104 L130 104 L146 176 L54 176Z" fill="#fff" opacity=".22"/>', "")
+    # boat
+    d.stroke("dark", "M44 60 V82 M156 60 V82 M100 60 V82", 2.2)
+    d.shape("pop", "M34 58 Q100 46 166 58 L166 64 Q100 54 34 64Z", spot=True)
+    for x in (62, 82, 118, 138):
+        d.shape("dark", circle(x, 76, 5), shadow=False)
+    d.shape("hero", "M22 82 H182 L170 104 Q100 110 34 104Z")
+    d.shape("light", "M70 96 H130 L128 106 Q100 108 72 106Z", shadow=False)
+    d.stroke("hero2", "M26 88 H178", 3, line=False)
+
+
+# ================================================================ BOTANICAL GARDENS
+GARDEN = {"glass": "#CFE8E4", "leaf": "#5E9C6A", "leaf2": "#3F7A52", "bloom": "#E76F6F", "bloom2": "#F6C445",
+          "water": "#6FB7C9", "water2": "#9FD3DE", "pad": "#5E9C4A", "pad2": "#86BE62", "lily": "#F7B7CB"}
+
+
+def botanic_glasshouse(d: Drawing):
+    d.shape("light", cloud(18, 46, 1.0))
+    d.shape("light", cloud(150, 36, 0.8))
+    d.band("far", hills(132, 6))
+    # palms behind the glass
+    for x, y in [(52, 96), (100, 60), (148, 96)]:
+        for a in (-150, -110, -70, -30):
+            d.shape("leaf2", leaf(x, y, 26, 6, a), shadow=False, line=False)
+    d.raw('<g opacity=".82">', "")
+    d.shape("glass", "M18 136 V104 C18 88 30 82 44 82 H70 V136Z")
+    d.shape("glass", "M182 136 V104 C182 88 170 82 156 82 H130 V136Z")
+    d.shape("glass", "M68 136 V78 C68 58 82 46 100 46 C118 46 132 58 132 78 V136Z")
+    d.shape("glass", "M86 50 C86 40 92 34 100 34 C108 34 114 40 114 50Z")
+    d.raw("</g>", "")
+    bars = "M28 136 V88 M40 136 V83 M54 136 V82 M146 136 V82 M160 136 V83 M172 136 V88 " \
+           "M18 110 H70 M130 110 H182 M80 136 V56 M92 136 V48 M108 136 V48 M120 136 V56 M68 96 H132 M68 116 H132 M70 74 H130 " \
+           "M94 34 V48 M106 34 V48"
+    d.stroke("light", bars, 1.6)
+    d.stroke("light", "M18 136 V104 C18 88 30 82 44 82 H70 M182 136 V104 C182 88 170 82 156 82 H130 "
+                      "M68 136 V78 C68 58 82 46 100 46 C118 46 132 58 132 78 V136 M86 50 C86 40 92 34 100 34 C108 34 114 40 114 50", 2.6)
+    d.shape("light", rrect(96, 26, 8, 8, 2))
+    d.shape("dark", rrect(90, 112, 20, 24, 3), shadow=False)
+    d.band("near", "M-30 136 H230")
+    d.band("mid", "M-30 150 Q100 142 230 150")
+    for x in (20, 44, 156, 180):
+        d.shape("bloom", scallop(x, 150, 8, 7, 0.2), shadow=False, spot=True)
+    for x in (32, 168):
+        d.shape("bloom2", scallop(x, 154, 7, 7, 0.2), shadow=False)
+    d.shape("ground", "M84 200 L94 136 H106 L116 200Z")
+    d.band("deep", hills(186, 3, 20), line=False)
+
+
+def lilypad(d: Drawing, x, y, r, rot=0, spot=False):
+    notch = math.radians(rot)
+    a1, a2 = notch - 0.08, notch + 0.08
+    p1 = (x + r * math.cos(a1), y + r * 0.82 * math.sin(a1))
+    p2 = (x + r * math.cos(a2), y + r * 0.82 * math.sin(a2))
+    d.shape("pad2", f"M{pt(x, y)} L{pt(*p2)} A{r} {r * 0.82} 0 1 1 {pt(*p1)}Z", spot=spot)
+    rr = r * 0.86
+    q1 = (x + rr * math.cos(a1), y + rr * 0.82 * math.sin(a1))
+    q2 = (x + rr * math.cos(a2), y + rr * 0.82 * math.sin(a2))
+    d.shape("pad", f"M{pt(x, y)} L{pt(*q2)} A{rr} {rr * 0.82} 0 1 1 {pt(*q1)}Z", shadow=False, line=False)
+    v = ""
+    for i in range(1, 12):
+        a = notch + 2 * math.pi * i / 12
+        v += f"M{pt(x, y)} L{pt(x + rr * 0.9 * math.cos(a), y + rr * 0.82 * 0.9 * math.sin(a))} "
+    d.stroke("pad2", v, 1.2, line=False)
+
+
+def botanic_lily(d: Drawing):
+    d.band("water", "M-30 -10 H230")
+    d.stroke("water2", "M20 40 q10 -4 20 0 M140 30 q10 -4 20 0 M150 120 q10 -4 20 0 M30 150 q10 -4 20 0 M90 186 q10 -4 20 0", 2.2, line=False)
+    lilypad(d, 64, 72, 52, 40)
+    lilypad(d, 148, 150, 46, 200)
+    lilypad(d, 158, 52, 26, 120)
+    lilypad(d, 34, 170, 24, -60)
+    # flower
+    cx, cy = 100, 124
+    for i in range(10):
+        a = 2 * math.pi * i / 10
+        d.shape("light", leaf(cx, cy, 30, 9, math.degrees(a)), shadow=i == 0)
+    for i in range(8):
+        a = 2 * math.pi * (i + 0.5) / 8
+        d.shape("lily", leaf(cx, cy, 20, 7, math.degrees(a)), shadow=False, spot=True)
+    d.shape("bloom2", circle(cx, cy, 6), shadow=False)
+    # koi
+    d.shape("hero", fish(170, 100, 1.1), shadow=False)
+
+
+def botanic_strelitzia(d: Drawing):
+    d.disc("glow", 100, 100, 70, line=False)
+    d.shape("leaf", "M150 200 C160 140 176 100 196 80 C204 110 190 160 166 200Z")
+    d.shape("leaf2", "M38 200 C30 150 12 110 -4 96 C-8 130 6 170 24 200Z")
+    d.limb("leaf2", "M102 200 C100 170 100 150 104 128", 7)
+    # spathe (the beak)
+    d.shape("spathe", "M30 116 C60 112 96 112 128 120 C140 124 150 132 152 140 C130 134 104 132 70 128 C50 126 36 122 30 116Z")
+    d.shape("spathe2", "M128 120 C140 124 150 132 152 140 C140 136 128 132 112 130Z", shadow=False, line=False)
+    # orange sepals fanning up
+    for x0, x1, y1 in [(86, 70, 40), (94, 92, 30), (104, 118, 40), (112, 140, 62)]:
+        d.shape("orange", f"M{x0 - 6} 118 C{x0 - 4} 90 {x1 - 6} {y1 + 20} {x1} {y1} C{x1 + 4} {y1 + 24} {x0 + 6} 96 {x0 + 6} 118Z", spot=True)
+    # blue petals pointing forward
+    d.shape("blue", "M90 114 C78 100 64 92 48 92 C60 100 72 110 84 120Z")
+    d.shape("blue", "M100 112 C92 94 84 84 70 78 C78 92 86 104 92 118Z", shadow=False)
+
+
+# ================================================================ LAKE DAY
+LAKE = {"water": "#6FB7D6", "water2": "#DDF1F8", "wood": "#B7804C", "wood2": "#8A5A33", "pine": "#3E6E52"}
+
+
+def lake_scene(d: Drawing, shore=112, trees=True):
+    d.band("far", "M-30 96 L10 74 L40 88 L76 52 L112 86 L140 68 L176 90 L230 76")
+    d.shape("light", "M76 52 L88 64 L82 63 L76 68 L70 62 L66 64Z", shadow=False)
+    if trees:
+        for x in range(-6, 210, 12):
+            h = 22 + (x * 7) % 14
+            pine(d, x, shore + 2, h, "pine", shadow=False, line=x % 36 == 6)
+    d.band("water", f"M-30 {shore} H230")
+    d.stroke("water2", f"M30 {shore + 14} H60 M130 {shore + 10} H170 M70 {shore + 30} H100", 2, line=False)
+
+
+def chair(d: Drawing, x, y, role):
+    def draw():
+        d.shape(role, "M-18 -6 H18 V-1 H-18Z")
+        d.shape(role, "M-14 -46 C-14 -54 14 -54 14 -46 L14 0 H-14Z", spot=role == "pop")
+        d.stroke("dark", "M-7 -50 V0 M0 -51 V0 M7 -50 V0", 1.2, line=True)
+        d.shape(role, "M-20 -22 H-12 V0 H-20Z M12 -22 H20 V0 H12Z", shadow=False)
+        d.shape(role, "M-23 -24 H-10 V-20 H-23Z M10 -24 H23 V-20 H10Z", shadow=False)
+    group(d, f"translate({x} {y})", draw)
+
+
+def lakeday_dock(d: Drawing):
+    d.disc("glow", 150, 46, 18)
+    lake_scene(d, 108)
+    d.shape("wood", "M44 210 L84 120 H116 L156 210Z")
+    d.stroke("wood2", "M78 134 H122 M72 148 H128 M64 164 H136 M56 182 H144", 1.8, line=False)
+    d.stroke("wood2", "M88 118 V128 M112 118 V128", 3)
+    chair(d, 82, 168, "pop")
+    chair(d, 122, 168, "hero2")
+
+
+def lakeday_canoe(d: Drawing):
+    d.disc("glow", 52, 48, 16)
+    d.shape("light", cloud(130, 40, 0.9), shadow=False)
+    lake_scene(d, 104)
+    d.stroke("water2", "M24 168 H48 M150 172 H176", 2, line=False)
+    # reflection
+    d.raw('<g opacity=".3">', "")
+    d.shape("hero", "M20 140 C50 146 150 146 180 140 C176 152 150 160 100 160 C50 160 24 152 20 140Z", shadow=False, line=False)
+    d.raw("</g>", "")
+    # paddle
+    d.limb("wood2", "M128 92 L160 150", 3.2)
+    d.shape("wood", "M156 142 C162 140 170 150 168 160 C166 170 160 168 156 160Z", extra='transform="rotate(-28 162 155)"')
+    d.shape("hero", "M14 120 C30 128 60 132 100 132 C140 132 170 128 186 120 C184 132 170 142 150 144 L50 144 C30 142 16 132 14 120Z", spot=True)
+    d.shape("hero2", "M14 120 C30 128 60 132 100 132 C140 132 170 128 186 120 L184 126 C170 132 140 136 100 136 C60 136 30 132 16 126Z", shadow=False)
+    d.stroke("wood2", "M60 132 V138 M100 133 V140 M140 132 V138", 2.2, line=False)
+    d.limb("wood2", "M150 128 L162 104", 2.6)
+
+
+def lakeday_swan(d: Drawing):
+    d.disc("glow", 150, 44, 16)
+    lake_scene(d, 106)
+    d.stroke("water2", "M14 180 H40 M150 184 H180", 2, line=False)
+    d.raw('<g opacity=".25">', "")
+    d.shape("swan", "M30 156 C60 164 140 164 176 156 C170 170 130 176 100 176 C70 176 40 170 30 156Z", shadow=False, line=False)
+    d.raw("</g>", "")
+    # body + raised wing
+    d.shape("swan", "M30 120 C40 112 60 112 70 118 L140 118 C150 108 168 106 178 98 C176 116 170 140 156 152 "
+                    "C130 160 70 160 44 152 C34 146 28 134 30 120Z")
+    d.shape("swan2", "M70 118 C96 104 128 92 168 86 C160 104 146 122 120 128 C100 130 82 128 70 118Z", spot=True)
+    # neck
+    d.limb("swan", "M54 130 C40 110 30 84 44 66 C52 56 66 58 66 70", 14)
+    d.shape("beak", "M62 64 L82 72 L64 76Z")
+    d.shape("dark", "M60 62 C64 60 68 64 66 70 L62 72Z", shadow=False)
+    d.marks("mark", circle(56, 64, 1.8))
+    # seat + canopy hint
+    d.stroke("pop", "M70 118 V110 M90 118 V108", 0.1, line=False)
+    d.band("deep", waves(188, 3, 34), line=False)
+
+
+# ================================================================ AUTUMN LEAVES
+FALL = {"leafA": "#D9482B", "leafB": "#F08A24", "leafC": "#F2C230", "trunk": "#5A3B2A", "veins": "#9E2A1A"}
+MAPLE_R = [(100, 26), (110, 48), (119, 44), (115, 72), (131, 63), (137, 52), (145, 66), (170, 58), (161, 80), (174, 86),
+           (148, 106), (153, 116), (128, 114), (132, 128), (108, 120), (103, 144)]
+
+
+def maple(cx=100, cy=100, s=1.0):
+    pts = MAPLE_R + [(200 - x, y) for x, y in reversed(MAPLE_R[1:])]
+    return "M" + " L".join(f"{cx + (x - 100) * s:.1f} {cy + (y - 100) * s:.1f}" for x, y in pts) + "Z"
+
+
+def maple_leaf(d: Drawing, cx, cy, s, rot, role, spot=False, veins=True, shadow=True):
+    def draw():
+        d.limb("trunk", f"M{100} {140} L{100} {164}", 3.2, shadow=False)
+        d.shape(role, maple(), spot=spot, shadow=shadow)
+        if veins:
+            d.stroke("veins", "M100 138 L100 34 M100 120 L164 64 M100 120 L36 64 M100 132 L148 110 M100 132 L52 110", 1.8, line=False)
+            d.stroke("veins", "M100 138 L100 50", 2, line=True)
+    group(d, f"translate({cx} {cy}) rotate({rot}) scale({s}) translate(-100 -100)", draw)
+
+
+def autumn_maple(d: Drawing):
+    d.disc("glow", 100, 100, 66, line=False)
+    maple_leaf(d, 46, 52, 0.32, -30, "leafC", veins=False)
+    maple_leaf(d, 160, 150, 0.36, 24, "leafB", veins=False)
+    maple_leaf(d, 160, 50, 0.24, 40, "leafA", veins=False)
+    maple_leaf(d, 38, 152, 0.26, -50, "leafB", veins=False)
+    maple_leaf(d, 100, 96, 0.92, -10, "leafA", spot=True)
+
+
+def crown(d: Drawing, x, y, r, role, spot=False):
+    d.shape(role, scallop(x, y, r, 9, 0.12), spot=spot)
+
+
+def autumn_newengland(d: Drawing):
+    d.disc("glow", 152, 44, 14)
+    birds(d, [(36, 40, 1), (52, 32, 0.8)])
+    d.band("far", "M-30 88 Q30 64 90 78 T230 70")
+    d.band("mid", "M-30 116 Q50 92 120 106 T230 100")
+    for x, y, r, role in [(4, 104, 12, "leafB"), (26, 98, 13, "leafC"), (150, 98, 12, "leafA"), (172, 96, 13, "leafB"), (194, 100, 12, "leafC")]:
+        crown(d, x, y, r, role)
+    # church
+    d.shape("light", "M86 70 L92 52 L98 70Z")
+    d.shape("light", rrect(86, 70, 12, 22, 1))
+    d.shape("light", "M70 92 H116 V128 H70Z")
+    d.shape("light", "M66 94 L93 78 L120 94Z")
+    d.shape("dark", rrect(89, 74, 6, 7, 3), shadow=False)
+    d.shape("dark", rrect(88, 108, 10, 20, 4), shadow=False)
+    d.shape("dark", rrect(74, 100, 7, 10, 3) + rrect(105, 100, 7, 10, 3), shadow=False)
+    d.band("near", "M-30 130 Q60 120 120 128 T230 124")
+    for x, y, r, role in [(-4, 132, 22, "leafA"), (34, 126, 20, "leafC"), (64, 132, 18, "leafB"), (124, 130, 18, "leafC"),
+                          (156, 126, 22, "leafA"), (196, 130, 22, "leafB")]:
+        d.limb("trunk", f"M{x} {y} V{y + 30}", 4, shadow=False)
+        crown(d, x, y, r, role, spot=role == "leafA")
+    d.band("ground", hills(172, 4))
+    d.stroke("trunk", "M-10 176 H210", 2, line=False)
+    d.band("deep", hills(188, 3, 20), line=False)
+
+
+def autumn_avenue(d: Drawing):
+    d.disc("glow", 100, 84, 22)
+    d.band("far", "M-30 96 H230", line=False)
+    d.band("ground", "M-30 98 H230")
+    d.shape("light", "M96 98 H104 L150 210 H50Z", shadow=False)
+    trees = [(78, 98, 8, "leafC"), (122, 98, 8, "leafB"), (66, 106, 13, "leafB"), (134, 106, 13, "leafA"),
+             (48, 120, 20, "leafA"), (152, 120, 20, "leafC"), (16, 144, 32, "leafC"), (184, 144, 32, "leafB")]
+    for x, base, r, role in trees:
+        top = base - r * 2.6
+        d.limb("trunk", f"M{x} {base} V{top + r}", max(2, r * 0.3), shadow=False)
+        crown(d, x, top, r * 1.25, role, spot=r > 30 and role == "leafC")
+    for x, y, rot, role in [(96, 150, 20, "leafA"), (124, 176, -30, "leafB"), (70, 180, 40, "leafC"), (112, 120, 10, "leafB")]:
+        maple_leaf(d, x, y, 0.12, rot, role, veins=False, shadow=False)
+    for x, y, rot, role in [(60, 70, -20, "leafA"), (140, 60, 30, "leafC"), (100, 40, 0, "leafB")]:
+        maple_leaf(d, x, y, 0.13, rot, role, veins=False)
+
+
+# ================================================================ TULIP FIELDS
+TULIP = {"tR": "#E63946", "tY": "#F6C445", "tP": "#EE7FB0", "tO": "#F2832B", "stem": "#5E9C4A", "stem2": "#3E7A3A",
+         "mill": "#5A4636", "sail": "#F4ECDD"}
+
+
+def fan_rows(d: Drawing, vx, vy, roles, x0=-120, x1=320, bottom=210, gap=0.35):
+    n = len(roles)
+    w = (x1 - x0) / n
+    for i, role in enumerate(roles):
+        a, b = x0 + i * w, x0 + (i + 1) * w - w * gap
+        d.shape(role, f"M{vx} {vy} L{b:.1f} {bottom} L{a:.1f} {bottom}Z", shadow=False, line=role != "stem")
+
+
+def windmill(d: Drawing, x, y, s=1.0):
+    def draw():
+        d.shape("mill", "M-14 0 L-10 -44 H10 L14 0Z")
+        d.shape("mill", "M-12 -44 C-12 -54 12 -54 12 -44Z")
+        d.shape("light", rrect(-4, -14, 8, 14, 3), shadow=False)
+        d.shape("light", rrect(-3, -32, 6, 7, 2), shadow=False)
+        for a in (40, 130, 220, 310):
+            d.shape("sail", rrect(4, -3, 40, 7, 1), extra=f'transform="translate(0 -46) rotate({a})"', spot=a == 40)
+            d.stroke("mill", "M0 0 L44 0", 1.6, line=False) if False else None
+        d.shape("mill", circle(0, -46, 3.5), shadow=False)
+    group(d, f"translate({x} {y}) scale({s})", draw)
+
+
+def tulip_windmill(d: Drawing):
+    d.disc("glow", 52, 56, 16)
+    d.shape("light", cloud(128, 40, 0.9), shadow=False)
+    d.band("far", "M-30 104 H230")
+    windmill(d, 132, 104, 1.05)
+    d.band("stem", "M-30 108 H230", line=False)
+    fan_rows(d, 100, 104, ["tR", "tY", "tP", "tO", "tR", "tY", "tP", "tO"], gap=0.28)
+    d.band("stem2", "M-30 196 H230", line=False)
+
+
+def tulip_head(d: Drawing, x, y, s, role, rot=0, spot=False):
+    def draw():
+        d.shape(role, "M-16 -10 C-18 6 -10 18 0 18 C10 18 18 6 16 -10 L10 -2 L6 -20 L0 -6 L-6 -20 L-10 -2Z", spot=spot)
+        d.shape(role, "M-6 -20 C-2 -14 2 -14 6 -20 L4 2 H-4Z", shadow=False)
+        d.stroke("light", "M-9 0 Q-8 10 -2 14", 2, line=False)
+    group(d, f"translate({x} {y}) rotate({rot}) scale({s})", draw)
+
+
+def tulip_bouquet(d: Drawing):
+    d.disc("glow", 100, 100, 64, line=False)
+    d.shape("stem", "M60 196 C50 160 40 140 22 124 C44 132 62 150 70 196Z")
+    d.shape("stem", "M140 196 C150 160 162 140 180 126 C158 132 140 150 132 196Z")
+    d.limb("stem2", "M100 196 C100 160 98 120 100 92", 5)
+    d.limb("stem2", "M90 196 C86 160 72 130 56 112", 5)
+    d.limb("stem2", "M110 196 C116 160 130 132 146 116", 5)
+    d.shape("stem", "M96 196 C80 170 76 150 80 128 C90 150 100 170 104 196Z")
+    tulip_head(d, 56, 96, 1.4, "tY", -22)
+    tulip_head(d, 146, 100, 1.4, "tP", 20)
+    tulip_head(d, 100, 70, 1.65, "tR", 0, spot=True)
+
+
+def bike(d: Drawing, x, y, s=1.0):
+    def draw():
+        for cx in (-34, 34):
+            d.stroke("dark", circle(cx, 0, 22), 3.2, shadow=True)
+            d.stroke("dark", f"M{cx} -22 V22 M{cx - 22} 0 H{cx + 22} M{cx - 15} -15 L{cx + 15} 15 M{cx - 15} 15 L{cx + 15} -15", 0.8, line=False)
+        d.stroke("hero", "M-34 0 L-4 0 L-14 -30 M-4 0 L22 -26 M34 0 L22 -32 L18 -40 M-14 -30 L20 -30", 3.6, shadow=True)
+        d.stroke("hero", "M-34 0 L-14 -30", 3.6)
+        d.shape("dark", "M-22 -34 H-6 L-8 -30 H-20Z")
+        d.stroke("dark", "M14 -42 L26 -44", 3)
+        # basket of tulips
+        for i, (bx, role) in enumerate([(26, "tR"), (34, "tY"), (42, "tP"), (30, "tO"), (40, "tR")]):
+            d.stroke("stem2", f"M{bx} -30 L{bx + (bx - 34) * 0.4} -46", 2, line=False)
+        for bx, by, role in [(22, -50, "tY"), (32, -56, "tR"), (44, -52, "tP"), (28, -44, "tO"), (40, -46, "tR")]:
+            tulip_head(d, bx, by, 0.36, role)
+        d.shape("hero2", "M18 -34 H50 L46 -16 H22Z", spot=True)
+        d.stroke("mark", "M24 -28 H46 M24 -22 H44 M30 -34 L30 -16 M38 -34 L38 -16", 1.2, line=False)
+    group(d, f"translate({x} {y}) scale({s})", draw)
+
+
+def tulip_bike(d: Drawing):
+    d.disc("glow", 150, 44, 16)
+    d.band("far", "M-30 100 H230")
+    windmill(d, 40, 100, 0.5)
+    for i, role in enumerate(["tR", "tY", "tP", "tO"]):
+        y0 = 104 + i * 14
+        d.band("stem", f"M-30 {y0} H230", shadow=False, line=False)
+        d.band(role, f"M-30 {y0 + 3} H230", shadow=False, line=False)
+    d.band("ground", "M-30 158 H230")
+    bike(d, 96, 150, 1.25)
+    d.band("deep", hills(188, 3), line=False)
+
+
 # ================================================================ concepts
 NIGHT_FIX = {"sky": ["deep", "mark", "#1F2A44"]}
 
@@ -599,6 +1036,38 @@ CONCEPTS = [
             checks=[("hero", "sky"), ("hero", "water"), ("dark", "ground"), ("water", "ground")], fixes={"sky": ["sky2", "far"], "ground": ["far", "mid", "#E3C48E"]}),
     Concept("migration-wildebeest", "great-migration", "Wildebeest", migration_face, overrides=GNU,
             checks=[("hero", "glow"), ("hero", "sky"), ("hero2", "glow")], fixes={"glow": ["glow2", "light", "far"]}),
+    Concept("reef-coral-garden", "reef-exploring", "Coral garden", reef_garden, ["coastal", "dusk", "meadow"], {**REEF, "hero": "#F28C28"},
+            checks=[("fan", "near"), ("coral", "near"), ("sponge", "near"), ("hero", "mid")]),
+    Concept("reef-moorish-idol", "reef-exploring", "Moorish idol", reef_idol, ["coastal", "dusk", "meadow"],
+            {**REEF, "hero": "#F6C445", "mark": "#1C1C22", "light": "#FFFFFF"}, checks=[("light", "mid"), ("hero", "mid")]),
+    Concept("reef-glass-boat", "reef-exploring", "Glass-bottom boat", reef_glassboat, ["coastal", "dusk", "meadow", "blush"], REEF,
+            checks=[("hero", "mid"), ("hero", "sky"), ("hero", "near")], fixes={"hero": ["pop", "light", "dark"]}),
+    Concept("botanic-palm-house", "botanical-gardens", "Palm house", botanic_glasshouse, overrides=GARDEN,
+            checks=[("glass", "sky"), ("glass", "far")], fixes={"sky": ["sky2", "light"]}),
+    Concept("botanic-giant-lilies", "botanical-gardens", "Giant water lilies", botanic_lily, overrides=GARDEN,
+            checks=[("pad2", "water"), ("light", "pad")]),
+    Concept("botanic-bird-of-paradise", "botanical-gardens", "Bird of paradise", botanic_strelitzia,
+            overrides={**GARDEN, "spathe": "#4F7A5E", "spathe2": "#9E4A6A", "orange": "#F4892E", "blue": "#3C5DC8"},
+            checks=[("orange", "glow"), ("orange", "sky"), ("spathe", "glow")], fixes={"glow": ["light", "sky2", "far"]}),
+    Concept("lakeday-dock-chairs", "lake-day", "Dock chairs", lakeday_dock, ["coastal", "meadow", "blush", "dusk"], LAKE,
+            checks=[("pop", "wood"), ("hero2", "wood"), ("wood", "water")], fixes={"hero2": ["light", "hero"], "pop": ["hero", "dark"]}),
+    Concept("lakeday-canoe", "lake-day", "Red canoe", lakeday_canoe, ["coastal", "meadow", "blush", "dusk"], {**LAKE, "hero": "#D64545", "hero2": "#F4E3C1"},
+            checks=[("hero", "water"), ("hero", "pine")]),
+    Concept("lakeday-swan-pedalo", "lake-day", "Swan pedalo", lakeday_swan, ["coastal", "meadow", "blush", "dusk"],
+            {**LAKE, "swan": "#FFFFFF", "swan2": "#E8EEF2", "beak": "#F28C28", "mark": "#1F1F24"},
+            checks=[("swan", "water"), ("swan", "pine"), ("swan", "far")], fixes={"far": ["mid", "near"]}),
+    Concept("autumn-maple-leaf", "autumn-leaves", "Maple leaf", autumn_maple, overrides=FALL,
+            checks=[("leafA", "glow"), ("leafA", "sky"), ("leafC", "sky")], fixes={"glow": ["light", "sky2"], "sky": ["sky2", "far"]}),
+    Concept("autumn-new-england", "autumn-leaves", "New England fall", autumn_newengland, overrides=FALL,
+            checks=[("light", "mid"), ("light", "sky"), ("leafA", "near"), ("leafC", "near")], fixes={"mid": ["near", "deep"], "near": ["deep", "mid"]}),
+    Concept("autumn-golden-avenue", "autumn-leaves", "Golden avenue", autumn_avenue, overrides=FALL,
+            checks=[("leafC", "sky"), ("leafB", "ground"), ("light", "ground")], fixes={"sky": ["sky2", "far"], "ground": ["mid", "near"]}),
+    Concept("tulip-windmill", "tulip-fields", "Windmill & stripes", tulip_windmill, overrides=TULIP,
+            checks=[("mill", "sky"), ("sail", "sky"), ("sail", "far")], fixes={"sky": ["sky2", "far"], "far": ["mid", "near"]}),
+    Concept("tulip-bouquet", "tulip-fields", "Three tulips", tulip_bouquet, overrides=TULIP,
+            checks=[("tR", "glow"), ("tY", "glow"), ("tP", "glow")], fixes={"glow": ["light", "sky2", "far"]}),
+    Concept("tulip-bike", "tulip-fields", "Bike & tulips", tulip_bike, overrides={**TULIP, "hero": "#2F6690", "hero2": "#C9A36A"},
+            checks=[("hero", "sky"), ("dark", "ground"), ("hero", "far")], fixes={"far": ["mid", "near"]}),
 ]
 
 

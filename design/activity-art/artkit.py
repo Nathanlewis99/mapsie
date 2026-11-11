@@ -190,14 +190,14 @@ def render(concept: Concept, style: str, palette: str) -> str:
         body = (f'<g clip-path="url(#clip)"><rect width="200" height="200" fill="{c["sky"]}"/>{"".join(d.parts)}</g>'
                 f'<circle cx="100" cy="100" r="92" fill="none" stroke="#fff" stroke-width="4" opacity=".9"/>')
         defs = ('<clipPath id="clip"><circle cx="100" cy="100" r="92"/></clipPath>'
-                '<filter id="ps" x="-20%" y="-20%" width="140%" height="140%">'
+                '<filter id="ps" filterUnits="userSpaceOnUse" x="-40" y="-40" width="280" height="280">'
                 '<feDropShadow dx="0" dy="2.2" stdDeviation="2" flood-color="#2a1f14" flood-opacity=".33"/></filter>')
     else:
         c = LINE_PALETTES[palette]
         d = Drawing("line", c)
         concept.draw(d)
         body = (f'<circle cx="100" cy="100" r="84" fill="{c["wash"]}"/>'
-                f'<g clip-path="url(#clip)">{"".join(d.bands)}</g>{"".join(d.parts)}')
+                f'<g clip-path="url(#clip)">{"".join(d.bands)}{"".join(d.parts)}</g>')
         defs = '<clipPath id="clip"><circle cx="100" cy="100" r="90"/></clipPath>'
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">'
             f'<defs>{defs}</defs>{body}</svg>\n')

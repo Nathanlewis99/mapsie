@@ -897,7 +897,7 @@ def house(d: Drawing, x, y, w, h, role, shutters="hero", door=False):
     for wx in range(int(x + 6), int(x + w - 8), 16):
         for wy in range(int(y + 10), int(y + h - 24), 22):
             d.shape("dark", rrect(wx, wy, 8, 12, 1.5), shadow=False, line=False)
-            d.marks(shutters, f"M{wx - 3} {wy} h3 v12 h-3Z M{wx + 8} {wy} h3 v12 h-3Z")
+            d.shape(shutters, f"M{wx - 3} {wy} h3 v12 h-3Z M{wx + 8} {wy} h3 v12 h-3Z", shadow=False, line=False)
     if door:
         d.marks("dark", f"M{x + w / 2 - 6} {y + h} V{y + h - 16} Q{x + w / 2} {y + h - 24} {x + w / 2 + 6} {y + h - 16} V{y + h}Z")
 
@@ -924,27 +924,29 @@ def scooter_street(d: Drawing):
 @framed
 def scooter_front(d: Drawing):
     d.disc("glow", 150, 50, 16)
-    d.band("far", "M-30 120 Q10 70 50 86 Q70 94 80 120 H230")
-    for x, y, role in [(8, 92, "light"), (22, 88, "hero2"), (36, 92, "light"), (16, 102, "pop")]:
-        d.shape(role, rrect(x, y, 10, 10, 1), shadow=False, line=False)
-    d.band("mid", waves(120, 2, 24))
+    d.band("far", "M-30 124 Q0 66 44 80 Q66 88 76 124 H230")
+    for x, y, w, h, role in [(4, 88, 14, 14, "light"), (20, 84, 12, 18, "hero2"), (34, 90, 14, 14, "light"), (12, 102, 14, 12, "pop")]:
+        d.shape(role, rrect(x, y, w, h, 1.5), shadow=False, line=False)
+        d.marks("dark", rrect(x + w / 2 - 2, y + 4, 4, 5, 1))
+    d.band("mid", waves(124, 2, 24))
     d.band("near", waves(150, 3, 30), line=False)
-    # scooter head-on
-    d.shape("dark", rrect(90, 136, 20, 36, 8))
-    d.shape("hero", "M86 150 Q86 126 100 126 Q114 126 114 150 V156 H86Z")
-    d.shape("hero", "M66 156 Q62 108 76 82 H124 Q138 108 134 156 Q100 164 66 156Z")
-    d.shape("pop", "M72 140 Q100 146 128 140 L129 146 Q100 152 71 146Z", shadow=False, spot=True)
-    d.stroke("dark", "M100 80 V60", 4)
-    d.stroke("dark", "M44 62 Q72 66 100 62 Q128 66 156 62", 4)
-    d.shape("dark", rrect(36, 58, 14, 8, 4), shadow=False)
-    d.shape("dark", rrect(150, 58, 14, 8, 4), shadow=False)
-    for x, k in [(58, -1), (142, 1)]:
-        d.stroke("dark", f"M{x} 62 L{x + 8 * k} 44", 2.2)
-        d.shape("light", circle(x + 9 * k, 40, 6))
-    d.shape("hero", "M80 56 Q80 46 100 46 Q120 46 120 56 V72 Q100 80 80 72Z")
-    d.shape("dark", circle(100, 62, 10), shadow=False)
-    d.shape("glow2", circle(100, 62, 7), shadow=False)
-    d.band("ground", "M-30 172 Q100 166 230 172")
+    # scooter head-on: leg shield, then wheel and mudguard in front of it
+    d.shape("hero", "M64 150 Q58 110 76 80 H124 Q142 110 136 150 Q100 158 64 150Z")
+    d.shape("dark", "M94 86 L106 86 L102 106 H98Z", shadow=False)
+    d.shape("pop", "M66 134 Q100 140 134 134 L135 140 Q100 146 65 140Z", shadow=False, spot=True)
+    d.shape("dark", rrect(89, 140, 22, 36, 9))
+    d.shape("hero", "M82 156 Q82 128 100 128 Q118 128 118 156 V160 H82Z")
+    d.stroke("dark", "M100 80 V62", 4)
+    d.stroke("dark", "M44 64 Q72 68 100 64 Q128 68 156 64", 4)
+    d.shape("dark", rrect(34, 60, 14, 8, 4), shadow=False)
+    d.shape("dark", rrect(152, 60, 14, 8, 4), shadow=False)
+    for x, k in [(60, -1), (140, 1)]:
+        d.stroke("dark", f"M{x} 64 L{x + 8 * k} 46", 2.2)
+        d.shape("light", circle(x + 9 * k, 42, 6))
+    d.shape("hero", "M78 60 Q78 46 100 46 Q122 46 122 60 V72 Q100 80 78 72Z")
+    d.shape("dark", circle(100, 61, 10), shadow=False)
+    d.shape("glow2", circle(100, 61, 7), shadow=False)
+    d.band("ground", "M-30 174 Q100 168 230 174")
 
 
 # ================================================================ CRUISE SHIP
@@ -1047,53 +1049,49 @@ def karst(x: float, base: float, w: float, h: float) -> str:
 @framed
 def longtail_karsts(d: Drawing):
     d.disc("glow", 140, 52, 16)
-    d.shape("far", karst(150, 130, 50, 92) + " " + karst(46, 130, 40, 70))
-    d.shape("mid", karst(16, 134, 44, 96) + " " + karst(186, 134, 36, 64))
-    for x, y in [(8, 50), (22, 46), (180, 80)]:
-        d.marks("near", f"M{x} {y} q4 -6 8 0 q-4 4 -8 0Z")
-    d.band("sky2", waves(126, 2, 22))
+    d.shape("mid", karst(150, 130, 50, 92) + " " + karst(46, 130, 40, 70))
+    d.shape("near", karst(16, 134, 44, 100) + " " + karst(186, 134, 36, 66))
+    for x, y in [(8, 52), (24, 46), (14, 70), (180, 82), (190, 96), (138, 52), (154, 46), (40, 70)]:
+        d.marks("deep", f"M{x} {y} q4 -7 8 0 q-4 4 -8 0Z")
+    d.band("far", waves(126, 2, 22))
     group(d, "translate(100 100) scale(.82) translate(-100 -112)", lambda: longtail(d))
-    d.band("near", waves(150, 3, 26))
-    d.band("deep", waves(172, 3, 32), line=False)
+    d.band("mid", waves(150, 3, 26))
+    d.band("near", waves(172, 3, 32), line=False)
 
 
 @framed
 def longtail_prow(d: Drawing):
     d.disc("glow", 52, 54, 16)
-    d.shape("far", karst(56, 130, 46, 74), line=False)
-    d.band("mid", waves(124, 2, 22))
-    d.shape("hero", "M-30 150 H96 Q128 146 140 110 L150 40 L162 40 Q164 112 146 144 Q130 162 96 164 H-30Z")
-    d.shape("hero2", "M-30 156 H96 Q132 154 146 128 L150 120 Q148 152 120 160 Q104 164 96 164 H-30Z", shadow=False, spot=True)
-    d.stroke("dark", "M20 150 V164 M60 150 V164", 1.4, line=False)
+    d.shape("mid", karst(64, 128, 50, 80), line=False)
+    for x, y in [(52, 66), (70, 60), (80, 80), (48, 90)]:
+        d.marks("near", f"M{x} {y} q4 -7 8 0 q-4 4 -8 0Z")
+    d.band("far", waves(124, 2, 22))
+    d.shape("hero", "M-30 132 H88 Q124 130 138 96 L148 40 L160 40 Q160 106 144 136 Q126 166 90 168 H-30Z")
+    d.shape("hero2", "M-30 132 H88 Q124 130 138 96 L141 86 Q140 122 120 136 Q104 142 88 142 H-30Z", shadow=False, spot=True)
+    d.stroke("dark", "M-30 152 H92 Q124 150 140 124 M-30 160 H90 Q118 160 134 144", 1.4, line=False)
     for i, (role, dx) in enumerate([("pop", -14), ("glow2", -6), ("light", 2), ("pop", 10), ("glow2", 16)]):
-        d.shape(role, f"M156 46 Q{150 + dx} 80 {144 + dx} 112 L{150 + dx} 112 Q{156 + dx * 0.5} 80 160 48Z", shadow=dx == 2)
-    d.shape("light", circle(156, 50, 7))
-    d.shape("pop", circle(156, 50, 4), shadow=False)
-    for x, y, role in [(150, 70, "light"), (142, 86, "glow2"), (154, 84, "pop")]:
+        d.shape(role, f"M154 46 Q{148 + dx} 80 {142 + dx} 112 L{148 + dx} 112 Q{154 + dx * 0.5} 80 158 48Z", shadow=dx == 2)
+    d.shape("light", circle(154, 48, 7))
+    d.shape("pop", circle(154, 48, 4), shadow=False)
+    for x, y, role in [(148, 70, "light"), (140, 86, "glow2"), (152, 84, "pop")]:
         d.shape(role, circle(x, y, 3.6), shadow=False)
-    d.band("near", waves(168, 3, 26))
-    d.band("deep", waves(186, 3, 32), line=False)
+    d.band("mid", waves(166, 3, 26))
+    d.band("near", waves(184, 3, 32), line=False)
 
 
 @framed
-def longtail_engine(d: Drawing):
-    d.disc("glow", 150, 50, 16)
-    d.shape("far", karst(150, 112, 46, 60), line=False)
-    d.band("mid", waves(110, 2, 22))
-    d.shape("hero", "M-30 94 H70 Q76 94 76 100 L72 120 H-30Z")
-    d.shape("hero2", "M-30 110 H74 L73 114 H-30Z", shadow=False, spot=True)
-    d.limb("dark", "M72 82 L176 150", 5)
-    d.shape("dark", "M170 146 L190 150 L186 156 Z M176 140 L182 160 L174 160Z", shadow=False)
-    d.shape("light", "M150 140 Q170 124 190 140 Q196 150 186 158 Q170 162 150 152Z")
-    d.shape("light", "M140 132 a5 5 0 1 1 0.1 0Z M196 128 a4 4 0 1 1 0.1 0Z M160 120 a3 3 0 1 1 0.1 0Z")
-    d.shape("pop", rrect(46, 52, 48, 34, 7), spot=True)
-    d.shape("dark", rrect(50, 46, 40, 8, 3))
-    d.stroke("dark", "M56 60 V80 M64 60 V80 M72 60 V80 M80 60 V80", 2)
-    d.shape("dark", circle(94, 72, 8))
-    d.limb("dark", "M50 70 L18 52", 4)
-    d.shape("glow2", rrect(8, 46, 14, 8, 3))
-    d.band("near", waves(138, 3, 26))
-    d.band("deep", waves(170, 3, 32), line=False)
+def longtail_beach(d: Drawing):
+    d.disc("glow", 60, 56, 16)
+    d.shape("mid", karst(160, 116, 60, 84), line=False)
+    for x, y in [(150, 48), (166, 44), (178, 64), (144, 76)]:
+        d.marks("near", f"M{x} {y} q4 -7 8 0 q-4 4 -8 0Z")
+    d.band("far", waves(112, 2, 22))
+    d.band("light", "M-30 128 Q60 120 230 132", line=False)
+    d.band("ground", "M-30 134 Q60 124 230 138")
+    palm(d, 26, 140, 1.1, "dark", 10)
+    d.marks("dark", ellipse(102, 152, 64, 4))
+    group(d, "translate(100 100) scale(.9) translate(-100 -50) rotate(-3 100 150)", lambda: longtail(d))
+    d.band("deep", hills(186, 4, 20), line=False)
 
 
 # ================================================================ BACKPACKING
@@ -1250,11 +1248,11 @@ CONCEPTS = [
     Concept("cruise-anchor", "cruise-ship", "Anchor", cruise_anchor, SEA,
             checks=[("dark", "glow"), ("dark", "sky"), ("hero2", "dark"), ("hero2", "glow")], fixes={"glow": ["far", "sky2"], "hero2": ["pop", "light"]}),
     Concept("longtail-karsts", "longtail-boat", "Among the karsts", longtail_karsts, SEA,
-            checks=[("hero", "sky2"), ("hero", "near"), ("far", "sky"), ("mid", "sky")], fixes={"hero": ["pop", "hero2", "deep"]}),
+            checks=[("hero", "far"), ("hero", "mid"), ("near", "mid"), ("mid", "sky")], fixes={"hero": ["pop", "hero2", "deep"]}),
     Concept("longtail-prow", "longtail-boat", "Garlanded prow", longtail_prow, SEA,
-            checks=[("hero", "sky"), ("hero", "mid"), ("hero", "near"), ("pop", "hero")], fixes={"hero": ["deep", "dark"], "pop": ["light"]}),
-    Concept("longtail-engine", "longtail-boat", "Long-tail engine", longtail_engine, SEA,
-            checks=[("pop", "sky"), ("pop", "mid"), ("dark", "mid"), ("hero", "mid")], fixes={"pop": ["hero", "deep"], "hero": ["deep", "dark"]}),
+            checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("pop", "hero"), ("mid", "sky")], fixes={"hero": ["deep", "dark"], "pop": ["light"]}),
+    Concept("longtail-beach", "longtail-boat", "Beached longtail", longtail_beach, SEA,
+            checks=[("hero", "ground"), ("hero", "sky"), ("mid", "sky"), ("hero", "mid")], fixes={"hero": ["deep", "pop", "dark"]}),
     Concept("backpacking-pack", "backpacking", "Patched backpack", backpack,
             checks=[("hero", "glow"), ("hero2", "glow"), ("hero2", "hero"), ("pop", "glow")], fixes={"glow": ["far", "sky2", "mid"], "hero2": ["light", "glow2"]}),
     Concept("backpacking-bunk", "backpacking", "Hostel bunk", hostel_bunk,

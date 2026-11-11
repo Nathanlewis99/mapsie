@@ -967,9 +967,9 @@ def coco_palm(d: Drawing):
               "M94 62 C70 58 46 70 38 96 C52 82 66 74 80 70 C88 68 92 66 94 62Z",
               "M94 62 C100 40 120 24 144 22 C128 32 116 42 108 52 C102 58 98 62 94 62Z"]:
         d.shape("hero", a, spot=a.startswith("M94 62 C120"))
-    for x, y in [(88, 72), (102, 74), (94, 84)]:
-        d.shape("hero2", circle(x, y, 8))
-        d.marks("dark", circle(x - 2, y - 2, 1.4))
+    for x, y in [(86, 72), (104, 74), (94, 86)]:
+        d.shape("hero2", circle(x, y, 9.5))
+        d.marks("mark", circle(x - 3, y - 3, 2.2))
 
 
 def coco_halves(d: Drawing):
@@ -1133,7 +1133,7 @@ CONCEPTS = [
             overrides={"hero": "#7CB342", "mark": "#4E7D23", "light": "#FFF6E0"},
             checks=[("hero", "ground"), ("hero", "far"), ("hero", "mid"), ("hero", "sky")], fixes={"mid": ["near", "deep"], "far": ["near", "deep"]}),
     Concept("coco-palm", "coconut-on-the-beach", "Palm & coconuts", coco_palm,
-            overrides={"hero": "#4F9A5E", "hero2": "#7B5032", "dark": "#6B4A2E"},
+            overrides={"hero": "#4F9A5E", "hero2": "#8A5A34", "dark": "#6B4A2E", "mark": "#C79B6B"},
             checks=[("hero", "sky"), ("hero", "glow"), ("hero", "far")], fixes={"glow": ["#E07A5F", "glow2", "light"], "far": ["mid", "near", "deep"]}),
     Concept("coco-halves", "coconut-on-the-beach", "Cracked coconut", coco_halves,
             overrides={"hero": "#7B5032", "mark": "#4E3420", "pop": "#E84A6B", "hero2": "#F6D743", "light": "#FFFBF2"},

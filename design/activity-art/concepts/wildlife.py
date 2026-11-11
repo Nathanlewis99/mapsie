@@ -547,11 +547,11 @@ def whale_humpback(d: Drawing):
     d.band("mid", waves(90, 6, 30))
     d.raw('<g opacity=".18" fill="#fff"><path d="M40 0 L62 0 L100 200 L78 200Z"/><path d="M120 0 L132 0 L172 200 L160 200Z"/></g>', "")
     d.band("near", waves(150, 6, 34))
-    p = ((28, 96), (64, 76), (124, 72), (178, 98))
+    p = ((30, 100), (62, 80), (118, 76), (168, 100))
     prof = lambda t: (3 + 16 * math.sin(math.pi * (t * 0.8) ** 1.25), 3 + 20 * math.sin(math.pi * (t * 0.8) ** 1.25))
     d.shape("hero", flukes(p, 18, 15))
     d.shape("hero", fin(p, 0.42, 6, 6, 10))
-    d.shape("hero2", "M128 110 C120 130 102 148 76 160 C70 162 68 156 74 152 C96 138 110 122 116 106Z", spot=True)
+    d.shape("hero2", leaf(120, 108, 58, 9, 128), spot=True)
     d.shape("hero", spine(p, prof))
     d.shape("hero2", spine(p, lambda t: (-4 - 5 * t, prof(t)[1] - 1.5), t0=0.55, t1=1.0), shadow=False)
     for k in range(3):
@@ -768,8 +768,8 @@ def croc_sign(d: Drawing):
     d.limb("dark", "M100 166 L100 110", 7)
     d.shape("hero2", rrect(42, 40, 116, 88, 10), spot=True)
     d.stroke("mark", rrect(48, 46, 104, 76, 6), 2.4)
-    group(d, "translate(102 92) scale(.5) translate(-100 -130)", lambda: d.marks("mark", CROC_SIDE))
-    d.marks("mark", rrect(64, 102, 72, 5, 2.5) + rrect(74, 110, 52, 5, 2.5))
+    group(d, "translate(98 86) scale(.56) translate(-100 -130)", lambda: d.marks("mark", CROC_SIDE))
+    d.marks("mark", rrect(62, 104, 76, 6, 3) + rrect(74, 113, 52, 5, 2.5))
     d.band("deep", hills(186, 4, 30), line=False)
 
 
@@ -836,10 +836,10 @@ CONCEPTS = [
     # whale watching
     Concept("whale-tail", "whale-watching", "Whale tail", whale_tail, overrides=WHALE,
             checks=[("hero", "sky"), ("hero", "mid"), ("hero", "glow"), ("hero", "far")],
-            fixes={"far": ["mid", "sky2"]}),
+            fixes={"far": ["mid", "sky2"], "hero": ["#7FA0BD"]}),
     Concept("whale-boat", "whale-watching", "Thar she blows", whale_boat, overrides=WHALE,
             checks=[("hero", "deep"), ("hero", "mid"), ("hero", "near"), ("light", "sky"), ("hero2", "mid")],
-            fixes={"sky": ["sky2", "far"], "hero2": ["pop", "glow2", "#E4572E"]}),
+            fixes={"deep": ["far", "mid", "sky2"], "hero": ["#7FA0BD"], "sky": ["sky2", "far"], "hero2": ["pop", "glow2", "#E4572E"]}),
     Concept("whale-humpback", "whale-watching", "Humpback", whale_humpback, ["coastal", "dusk", "meadow"], WHALE_DEEP,
             checks=[("hero", "mid"), ("hero", "near"), ("hero", "far")]),
     # dolphin watching
@@ -851,7 +851,7 @@ CONCEPTS = [
             fixes={"glow": ["glow2", "#E07A5F", "light"]}),
     Concept("dolphinwatch-bow", "dolphin-watching", "Bow riding", dolphin_bow, overrides=DOLPHIN,
             checks=[("hero", "sky"), ("hero", "mid"), ("hero", "far"), ("pop", "sky"), ("pop", "near"), ("pop", "mid")],
-            fixes={"far": ["mid", "near"], "mid": ["far", "near"]}),
+            fixes={"pop": ["dark", "deep", "#E4572E"], "far": ["mid", "near"], "mid": ["far", "near"]}),
     # penguins
     Concept("penguin-emperor", "penguin-spotting", "Emperor & chick", penguin_emperor, overrides=PENGUIN_C,
             checks=[("dark", "sky"), ("dark", "far"), ("hero2", "light"), ("light", "sky")],

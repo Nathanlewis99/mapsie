@@ -1260,14 +1260,12 @@ def dn_hammock(d: Drawing):
     d.band("far", waves(108, 3, 30))
     d.band("mid", waves(122, 3, 34), line=False)
     d.band("ground", "M-30 146 Q100 138 230 146")
-    _palm(d, 32, 166, 1.05, "dark", -8)
-    _palm(d, 168, 166, 1.05, "dark", 8)
-    d.stroke("dark", "M28 108 L46 114 M172 108 L154 114", 1.6)
-    d.shape("hero", "M44 112 Q100 168 156 112 Q100 146 44 112Z", spot=True)
-    d.stroke("light", "M60 126 Q100 156 140 126", 2, line=False)
-    group(d, "translate(100 138) rotate(-4)", lambda: _laptop(d))
-    d.shape("hero2", "M140 170 C140 160 160 160 160 170Z")
-    d.stroke("pop", "M152 162 L158 150", 1.8)
+    _palm(d, 44, 168, 1.0, "dark", -6)
+    _palm(d, 156, 168, 1.0, "dark", 6)
+    d.stroke("dark", "M41 110 L54 114 M159 110 L146 114", 1.6)
+    group(d, "translate(100 136) rotate(-4) scale(.85)", lambda: _laptop(d))
+    d.shape("hero", "M52 112 Q100 180 148 112 Q100 152 52 112Z", spot=True)
+    d.stroke("light", "M62 124 Q100 166 138 124", 2, line=False)
 
 
 def dn_cafe(d: Drawing):
@@ -1370,9 +1368,11 @@ def ru_table(d: Drawing):
         p += f" L{x - 15} {y + 24} Q{x - 15} {y + 12} {x - 6} {y + 10} A8.5 8.5 0 1 1 {x + 6} {y + 10} Q{x + 15} {y + 12} {x + 15} {y + 24}"
     p += f" L230 {heads[-1][1] + 22} V230Z"
     d.shape("dark", p)
-    d.band("light", "M-30 134 H230")
-    d.shape("hero", "M60 134 H140 V230 H60Z", shadow=False, spot=True)
-    d.stroke("far", "M-30 140 H230", 1.2, line=False)
+    d.band("deep", "M-30 166 H230", line=False)
+    d.shape("hero", "M-30 140 H230 V168 H-30Z", spot=True)
+    d.stroke("light", "M-30 162 H230", 2, line=False)
+    d.limb("dark", "M30 168 V190 M170 168 V190", 5)
+    d.shape("light", "M-30 132 H230 V142 H-30Z")
     for x in (40, 160):
         d.shape("near", rrect(x - 5, 102, 10, 32, 4))
         d.shape("near", rrect(x - 2, 94, 4, 10, 1.5), shadow=False)

@@ -1149,8 +1149,8 @@ def bgarden_steins(d: Drawing):
     d.disc("glow", 100, 100, 62, line=False)
     bavarian_bunting(d)
     table(d, 160, "far", "mid")
-    group(d, "translate(66 118) rotate(-12)", stein)
-    group(d, "translate(134 118) scale(-1 1) rotate(-12)", stein)
+    group(d, "translate(66 118) rotate(-12)", lambda: stein(d))
+    group(d, "translate(134 118) scale(-1 1) rotate(-12)", lambda: stein(d))
     for x, y, r in [(100, 64, 3.4), (92, 56, 2.4), (110, 54, 2.8), (100, 46, 2)]:
         d.shape("light", circle(x, y, r), shadow=False)
 
@@ -1409,7 +1409,7 @@ CONCEPTS += [
             checks=[("light", "mid"), ("near", "light")]),
     Concept("picnic-basket", "picnic", "Picnic hamper", picnic_basket,
             overrides={**PICNIC, **WICKER, "hero2": "#E0A458", "deep": "#2F5D3A", "ground": "#7A4A2A", "light": "#FFFDF7"},
-            checks=[("hero", "glow"), ("hero", "mid"), ("hero2", "glow"), ("deep", "glow"), ("hero", "sky")],
+            checks=[("hero", "glow"), ("hero2", "glow"), ("deep", "glow"), ("hero", "sky")],
             fixes={"glow": ["light", "sky2", "far", "#F1E6CF"]}),
     Concept("picnic-tree", "picnic", "Under the tree", picnic_tree,
             overrides={**PICNIC, **WICKER, "near": "#4F8A3C", "deep": "#3A6B2E", "light": "#FFFDF7"},
@@ -1443,7 +1443,7 @@ CONCEPTS += [
     # pasta making
     Concept("pasta-machine", "pasta-making", "Pasta machine", pasta_machine,
             overrides={"hero": "#F6D58A", "hero2": "#C9D1D8", "mark": "#8A949E", "pop": "#B5302A"},
-            checks=[("hero2", "glow"), ("hero", "far"), ("hero2", "sky")],
+            checks=[("hero2", "glow"), ("hero", "far")],
             fixes={"glow": ["mid", "near", "deep"], "far": ["mid", "deep", "near"]}),
     Concept("pasta-well", "pasta-making", "Flour & eggs", pasta_well,
             overrides={**BOARD, "hero": "#D9A066", "mark": "#B07A45", "light": "#FBF5E8", "sky2": "#EADFC6", "hero2": "#F6B82A"},

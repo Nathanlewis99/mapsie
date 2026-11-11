@@ -586,7 +586,7 @@ def hippo_yawn(d: Drawing):
     head = ("M16 176 C12 136 26 104 48 88 C58 80 70 70 84 60 C104 44 124 30 142 22 C154 16 166 20 166 30 "
             "C166 38 160 44 152 48 C130 82 100 120 68 150 L62 176Z")
     jaw = "M38 176 L62 152 C100 146 140 138 172 124 C180 136 174 154 154 164 C124 174 84 178 38 180Z"
-    d.shape("mouth", "M60 156 C96 120 128 84 152 48 C160 74 168 100 174 126 C140 138 100 148 60 156Z")
+    d.shape("mouth", "M60 156 C96 120 128 84 152 48 C160 74 168 100 174 126 C140 138 100 148 60 156Z", spot=True)
     d.shape("tongue", "M78 150 C100 136 130 126 158 122 C150 136 120 146 78 150Z", shadow=False, line=False)
     d.shape("hero", jaw)
     # tusks and teeth
@@ -857,9 +857,9 @@ def wilddog_face(d: Drawing):
     # the huge round ears
     for k in (1, -1):
         def ear():
-            d.shape("hero", "M76 80 C62 74 48 62 46 40 C46 28 56 22 66 28 C80 36 88 58 86 76Z")
-            d.shape("mark", "M76 74 C66 70 56 60 54 44 C54 36 60 32 66 36 C76 44 82 58 80 72Z", shadow=False)
-            d.stroke("light", "M60 54 l8 4 M58 46 l8 2 M64 64 l8 4", 2, line=False)
+            d.shape("hero", "M80 80 C62 80 40 68 36 46 C32 26 48 18 62 22 C80 28 90 54 86 76Z")
+            d.shape("mark", "M78 74 C64 72 46 64 43 46 C41 32 51 27 61 30 C74 35 82 54 80 72Z", shadow=False, spot=True)
+            d.stroke("light", "M52 50 l10 4 M50 40 l10 2 M58 62 l10 4", 2, line=False)
         ear() if k == 1 else flip(d, ear)
     head = ("M100 64 C122 64 136 78 136 98 C136 114 128 124 122 132 C116 146 110 158 100 158 "
             "C90 158 84 146 78 132 C72 124 64 114 64 98 C64 78 78 64 100 64Z")
@@ -1185,7 +1185,7 @@ def baobab(d: Drawing, x, y, h, w, role="dark", s=1.0):
                   f"L{x + w * 0.3} {top} C{x + w * 0.32} {top + 10} {x + w * 0.6} {y - h * 0.5} {x + w / 2} {y}Z")
     d.stroke(role, f"M{x - w * 0.2} {top + 2} L{x - w * 0.9} {top - 10} M{x} {top + 2} L{x - w * 0.2} {top - 14} "
                    f"M{x + w * 0.1} {top + 2} L{x + w * 0.4} {top - 14} M{x + w * 0.2} {top + 2} L{x + w * 0.9} {top - 8}", 3 * s)
-    d.shape(role, scallop(x, top - 12, w * 0.9, 9, 0.12, ry=5 * s), shadow=False)
+    d.shape(role, scallop(x, top - 12, w * 0.9, 9, 0.12, ry=5 * s), shadow=False, line=False)
 
 
 def lemur_baobab(d: Drawing):

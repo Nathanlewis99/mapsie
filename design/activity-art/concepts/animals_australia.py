@@ -787,8 +787,8 @@ DINGO_HEAD = ("M30 84 C32 79 40 77 48 75 L54 70 L56 50 L65 61 L69 59 L75 50 L77 
 def dingo_face(d: Drawing):
     d.disc("glow", 64, 70, 40)
     d.band("far", "M-30 172 L30 166 L40 152 L70 150 L78 164 L230 170")
-    place(d, lambda: dingo_bust(d), 80, 110, 112, 128, 1.45)
-    for x, y, k in [(30, 78, 1), (24, 92, 0.8), (36, 98, 0.7)]:
+    place(d, lambda: dingo_bust(d), 80, 110, 108, 132, 1.3)
+    for x, y, k in [(70, 66, 1), (58, 74, 0.8), (78, 56, 0.7)]:
         d.stroke("mark", f"M{x} {y} q-6 -3 -8 -9", 2 * k + 0.4)
     d.band("ground", hills(190, 3), line=False)
 
@@ -805,7 +805,7 @@ def dingo_bust(d: Drawing):
         d.marks("mark", circle(31, 83, 2.8))
         d.shape("eye", ellipse(58, 76, 3.4, 2.2), shadow=False, line=False)
         d.marks("mark", circle(58, 76, 1.3))
-    group(d, "rotate(-28 80 96)", head)
+    group(d, "rotate(34 82 98)", head)
 
 
 DINGO = ("M30 84 C32 80 40 78 48 76 L54 70 L56 52 L64 62 L68 60 L74 52 L76 68 C80 72 84 78 88 86 "

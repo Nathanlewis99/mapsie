@@ -10,7 +10,7 @@ export interface TripTemplate {
   title: string;
   subtitle: string;
   preset: string;
-  stickers: string[];
+  stickers: string[]; // Mapsie Originals concept ids
   stops: T[];
 }
 
@@ -22,7 +22,7 @@ export const TEMPLATES: TripTemplate[] = [
     title: "The Big Trip",
     subtitle: "4 countries · 1 backpack",
     preset: "vintage",
-    stickers: ["elephant", "snowy-mountain", "diving-mask", "crocodile"],
+    stickers: ["elephant-bath", "trek-tent", "scuba-turtle", "croc-eyes"],
     stops: [
       ["Colombo", 79.86, 6.93],
       ["Kathmandu", 85.32, 27.72, "plane"],
@@ -38,7 +38,7 @@ export const TEMPLATES: TripTemplate[] = [
     title: "East Coast Road Trip",
     subtitle: "Sydney to Cairns",
     preset: "tropical",
-    stickers: ["surfer", "koala", "diving-mask", "crocodile", "campervan"],
+    stickers: ["surf-boards", "koala-tree", "scuba-diver", "croc-sign", "road-campervan"],
     stops: [
       ["Sydney", 151.21, -33.87],
       ["Byron Bay", 153.61, -28.64, "car"],
@@ -56,7 +56,7 @@ export const TEMPLATES: TripTemplate[] = [
     title: "Interrail Summer",
     subtitle: "8 cities · 1 pass",
     preset: "minimal",
-    stickers: ["croissant", "castle", "beer", "pizza", "classical-building"],
+    stickers: ["cafe-croissant", "castle-fairytale", "scenic-viaduct", "pizza-slice", "ruins-colosseum"],
     stops: [
       ["London", -0.13, 51.51],
       ["Paris", 2.35, 48.86, "train"],
@@ -75,7 +75,7 @@ export const TEMPLATES: TripTemplate[] = [
     title: "Westward",
     subtitle: "A Californian road trip",
     preset: "blush",
-    stickers: ["cactus", "surfer", "ferris-wheel", "desert"],
+    stickers: ["road-convertible", "surf-van", "themepark-ferris", "sunset-dunes"],
     stops: [
       ["San Francisco", -122.42, 37.77],
       ["Yosemite", -119.54, 37.75, "car"],
@@ -92,7 +92,7 @@ export const TEMPLATES: TripTemplate[] = [
     title: "Just Married",
     subtitle: "Our honeymoon",
     preset: "blush",
-    stickers: ["ring", "cheers", "island", "hibiscus", "heart"],
+    stickers: ["proposal-ring", "honeymoon-champagne", "honeymoon-bungalow", "coco-straw", "sunset-palms"],
     stops: [
       ["Bali", 115.19, -8.65],
       ["Gili Islands", 116.04, -8.35, "boat"],

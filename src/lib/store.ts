@@ -178,7 +178,7 @@ export const useEditor = create<EditorState>()(
           const stickers: Sticker[] = t.stickers.map((name, i) => {
             const at = stops[Math.round((i / Math.max(1, t.stickers.length - 1)) * (stops.length - 1))];
             const side = i % 2 ? 1 : -1;
-            return { id: nanoid(8), kind: "sticker", name, art, src: stickerSrc(name, art), lng: at.lng + side * span * 0.16, lat: at.lat + span * 0.05, size: 9, rotation: side * 8 };
+            return { id: nanoid(8), kind: "original", name, origStyle: "papercut", palette: "auto", src: "", lng: at.lng + side * span * 0.16, lat: at.lat + span * 0.05, size: 14, rotation: side * 5 };
           });
           commit(
             (d) => ({ ...d, title: t.title, subtitle: t.subtitle, theme: themeFromPreset(preset), stops, stickers, stickerStyle: art }),

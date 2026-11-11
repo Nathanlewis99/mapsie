@@ -138,33 +138,32 @@ def gamedrive_binoculars(d: Drawing):
         d.stroke("light", f"M{cx - 8} {141} A9 9 0 0 1 {cx + 1} {136}", 3)
 
 
-ZEBRA = ("M44 116 C52 106 86 106 110 108 L122 86 C126 79 133 76 140 78 L152 86 C157 90 157 95 152 97 L141 97 "
-         "L132 117 C131 124 128 128 124 130 L124 164 L117 164 L116 136 L111 136 L110 164 L103 164 L102 134 "
-         "L70 134 L68 164 L61 164 L60 136 L55 136 L54 164 L47 164 L46 128 C43 124 42 120 44 116Z")
-ZEBRA_STRIPES = ("M58 104 L52 140 L58 140 L64 104Z M72 104 L68 140 L74 140 L78 104Z M86 104 L84 140 L90 140 L92 104Z "
-                 "M100 104 L100 140 L106 140 L106 104Z M114 100 L112 140 L118 140 L120 100Z "
-                 "M118 90 L136 104 L138 99 L122 86Z M124 82 L142 92 L144 87 L128 78Z "
-                 "M40 150 H130 V154 H40Z M40 160 H130 V164 H40Z "
-                 "M138 74 L136 92 L140 92 L142 74Z M146 78 L145 92 L149 92 L150 80Z")
+ZEBRA = ("M42 118 C48 104 84 102 108 104 L122 82 C126 74 134 70 142 72 L156 84 C162 90 162 96 156 99 L144 99 "
+         "L134 116 C134 126 130 132 126 134 L126 166 L118 166 L117 140 L112 140 L111 166 L103 166 L102 138 L68 138 "
+         "L66 166 L58 166 L57 140 L52 140 L51 166 L43 166 L42 132 C40 126 40 122 42 118Z")
+ZEBRA_STRIPES = ("M54 100 L48 142 L55 142 L61 100Z M68 100 L64 142 L71 142 L75 100Z M82 100 L80 142 L87 142 L89 100Z "
+                 "M96 100 L96 142 L103 142 L103 100Z M110 98 L110 142 L117 142 L117 98Z M122 104 L126 142 L132 142 L128 104Z "
+                 "M114 92 L136 110 L139 105 L118 86Z M120 82 L144 98 L147 93 L124 77Z "
+                 "M40 148 H130 V151 H40Z M40 156 H130 V159 H40Z "
+                 "M139 70 L137 90 L141 90 L143 70Z M147 76 L146 90 L150 90 L151 78Z")
 
 
 def zebra(d: Drawing):
     d.stroke("mark", "M45 118 Q36 128 38 142", 2.5)
     d.shape("hero", ZEBRA)
     clipped(d, ZEBRA, lambda: d.marks("mark", ZEBRA_STRIPES))
-    d.shape("mark", "M120 86 C124 78 132 74 140 76 L136 72 C128 70 120 76 117 84Z", shadow=False)
-    d.shape("hero", "M138 77 L136 66 L142 74Z", shadow=False)
-    d.marks("mark", ellipse(153, 92, 4, 4.5))
-    d.marks("light", circle(140, 85, 1.8))
+    d.shape("mark", "M118 86 C122 76 130 70 140 70 L136 66 C126 66 118 74 115 84Z", shadow=False)
+    d.shape("hero", "M137 73 L134 60 L142 70Z", shadow=False)
+    d.marks("mark", ellipse(156, 93, 4.5, 5))
+    d.marks("light", circle(141, 83, 1.9))
 
 
 def gamedrive_zebra(d: Drawing):
     d.disc("glow", 132, 64, 30)
     d.band("far", hills(132, 10))
-    acacia(d, -96, 6, 0.6)
     d.band("mid", hills(150, 6, 40))
-    group(d, "translate(114 66) scale(-.6 .6)", lambda: zebra(d))
-    group(d, "translate(22 12) scale(.9)", lambda: zebra(d))
+    group(d, "translate(116 68) scale(-.6 .6)", lambda: zebra(d))
+    group(d, "translate(18 6) scale(.92)", lambda: zebra(d))
     d.band("ground", hills(178, 5))
     d.band("deep", hills(192, 4, 30), line=False)
 
@@ -367,9 +366,9 @@ def gorilla_silverback(d: Drawing):
     d.band("mid", hills(140, 8, -20))
     for x, y, a in [(164, 200, -100), (178, 196, -70), (190, 186, -120), (10, 196, -60), (24, 200, -100)]:
         d.shape("near", leaf(x, y, 70, 14, a), line=False)
-    d.shape("hero", SILVERBACK)
-    d.shape("hero2", "M84 70 C104 66 128 76 146 92 C138 102 118 106 102 102 C90 98 84 86 84 70Z", shadow=False, spot=True)
-    d.shape("hero", SB_HEAD)
+    d.shape("hero", SILVERBACK, spot=True)
+    d.shape("hero2", "M84 70 C104 66 128 76 146 92 C138 102 118 106 102 102 C90 98 84 86 84 70Z", shadow=False)
+    d.shape("hero", SB_HEAD, spot=True)
     d.shape("hero", "M40 66 Q50 52 62 66Z", shadow=False)
     d.shape("mark", "M32 90 C32 82 38 78 46 80 C52 82 56 88 54 96 C52 104 42 106 36 102 C33 99 32 95 32 90Z", shadow=False)
     d.stroke("hero", "M32 82 Q42 76 56 80", 3.4, line=False)
@@ -597,8 +596,6 @@ def dolphin_leap(d: Drawing):
 
 def dolphin_pod(d: Drawing):
     d.disc("glow", 100, 108, 34)
-    for y, w in [(100, 1.2), (110, 1.0)]:
-        pass
     d.band("far", waves(112, 2, 30))
     birds(d, [(40, 48, 1), (54, 40, 0.8), (150, 44, 0.9)])
     dolphin(d, ((24, 124), (24, 96), (56, 82), (78, 100)), 0.78)
@@ -753,7 +750,7 @@ def croc_jaws(d: Drawing):
         d.shape("hero2", ellipse(140, 119, 4.5, 3.5), shadow=False, spot=True)
         d.marks("mark", ellipse(140.5, 119, 1, 3))
         d.marks("mark", "M20 146 l4 -6 l4 6Z M36 145 l4 -7 l4 7Z M52 143 l4 -8 l4 8Z M68 139 l4 -8 l4 8Z M84 136 l4 -8 l4 8Z M100 135 l4 -8 l4 8Z M116 135 l4 -7 l4 7Z")
-    group(d, "translate(94 152) scale(.94) translate(-100 -152)", croc)
+    group(d, "translate(92 150) scale(.88 1.3) translate(-100 -150)", croc)
     d.band("deep", hills(180, 4, 30), line=False)
 
 
@@ -868,8 +865,8 @@ def kangaroo(d: Drawing, joey=False):
 def kangaroo_uluru(d: Drawing):
     d.disc("glow", 136, 70, 30)
     d.band("far", hills(132, 4))
-    d.shape("near", "M-2 136 C2 120 10 110 20 106 L66 102 C76 102 84 112 90 136Z")
-    d.stroke("deep", "M24 112 V132 M38 108 V132 M52 106 V132 M66 106 V132", 1.6, line=False)
+    d.shape("near", "M-14 140 C-8 116 8 102 32 100 L70 98 C88 98 98 116 102 140Z")
+    d.stroke("deep", "M18 108 Q14 120 16 134 M36 104 Q32 118 34 134 M54 102 Q52 118 54 134 M72 102 Q74 118 72 134", 1.8, line=False)
     d.band("mid", hills(150, 4, 30))
     for x in (156, 174):
         d.shape("deep", "M{0} 156 l3 -10 l3 8 l3 -12 l3 12 l3 -8 l3 10Z".format(x), shadow=False, line=False)
@@ -1040,6 +1037,275 @@ def np_bison(d: Drawing):
     d.band("deep", hills(188, 3, 30), line=False)
 
 
+# ================================================================ WATERFALLS
+def foam(d: Drawing, x0, x1, y, r=7, role="water2"):
+    x = x0
+    s = ""
+    i = 0
+    while x <= x1:
+        s += circle(x, y - (i % 2) * 3, r * (0.8 + 0.3 * (i % 3) / 2))
+        x += r * 1.3
+        i += 1
+    d.shape(role, s)
+
+
+def streaks(d: Drawing, xs, y0, y1, role="water2"):
+    d.stroke(role, " ".join(f"M{x} {y0 + (i * 7) % 12} V{y1 - (i * 5) % 14}" for i, x in enumerate(xs)), 2.2)
+
+
+def falls_rainbow(d: Drawing):
+    d.disc("glow", 150, 40, 14)
+    d.band("far", hills(118, 8), line=False)
+    d.shape("near", "M-10 200 L-10 60 C10 54 40 56 74 62 L80 200Z")
+    d.shape("near", "M210 200 L210 70 C190 64 156 64 126 70 L120 200Z")
+    for x, h in [(10, 34), (26, 42), (44, 30), (150, 36), (168, 44), (186, 32)]:
+        pine(d, x, 64 if x < 100 else 70, h, "deep", shadow=False)
+    d.shape("water", "M72 62 C82 58 116 60 128 70 L134 168 L66 168Z")
+    streaks(d, [80, 90, 100, 110, 120], 70, 160)
+    # a rainbow in the spray
+    for i, role in enumerate(["pop", "hero2", "hero"]):
+        r = 62 - i * 6
+        d.stroke(role, f"M{100 - r} 176 A{r} {r} 0 0 1 {100 + r} 176", 5.5, line=i == 0)
+    d.band("mid", waves(166, 3, 30))
+    foam(d, 58, 142, 166, 8)
+    d.stroke("light", "M30 182 q8 -5 16 0 M150 184 q8 -5 16 0", 2.2)
+    d.band("deep", waves(184, 3, 36), line=False)
+
+
+def falls_jungle(d: Drawing):
+    d.disc("glow", 152, 50, 16)
+    birds(d, [(126, 46, 0.9), (140, 38, 0.7)])
+    d.band("far", hills(92, 6), line=False)
+    d.shape("mid", "M-10 200 L-10 44 C20 38 60 40 84 46 L90 112 L64 112 L66 200Z")
+    d.shape("mid", "M210 200 L210 100 C180 94 150 96 134 104 L136 200Z")
+    d.shape("water", "M80 46 C92 42 112 44 120 50 L120 106 L86 106Z")
+    streaks(d, [90, 100, 110], 52, 102)
+    d.shape("near", "M60 108 C80 100 120 100 144 106 L144 120 L60 120Z")
+    foam(d, 82, 124, 106, 6)
+    d.shape("water", "M70 116 C92 112 120 112 140 118 L144 168 L62 168Z")
+    streaks(d, [76, 88, 100, 112, 124, 136], 122, 162)
+    d.band("deep", waves(166, 3, 30))
+    foam(d, 58, 148, 166, 7)
+    for x, y, a in [(-6, 120, -30), (-4, 160, -10), (10, 198, -50), (206, 130, -150), (204, 170, -170), (190, 200, -120)]:
+        d.shape("near", leaf(x, y, 60, 15, a), line=False)
+    for x, y, a in [(-8, 40, 30), (-6, 74, 10), (208, 60, 160)]:
+        d.shape("deep", leaf(x, y, 48, 12, a), line=False)
+
+
+def falls_boat(d: Drawing):
+    d.disc("glow", 160, 44, 14)
+    d.band("far", "M-30 72 C40 64 160 64 230 72")
+    d.shape("water", "M-30 74 C40 66 160 66 230 74 L230 140 L-30 140Z")
+    streaks(d, [-4, 12, 28, 44, 60, 76, 92, 108, 124, 140, 156, 172, 188, 204], 80, 132)
+    d.shape("near", "M-30 72 C10 66 30 66 50 70 L56 92 L-30 96Z")
+    d.shape("near", "M150 70 C180 66 210 68 230 72 L230 98 L146 94Z")
+    foam(d, -10, 210, 140, 10, "water2")
+    d.band("mid", waves(150, 3, 30))
+    # tour boat in the mist
+    d.shape("hero2", rrect(64, 126, 72, 16, 4))
+    d.stroke("dark", "M64 132 H136", 1.4)
+    for x in range(70, 132, 9):
+        d.marks("pop", circle(x, 132, 2.6))
+    d.shape("hero", "M50 142 H152 L144 162 H60Z", spot=True)
+    d.shape("light", "M54 148 H149 L148 151 H55Z", shadow=False)
+    d.band("near", waves(162, 3, 34))
+    d.stroke("light", "M30 172 q8 -5 16 0 M150 174 q8 -5 16 0", 2.2)
+    d.band("deep", waves(182, 3, 38), line=False)
+
+
+# ================================================================ CHERRY BLOSSOMS
+def _rot(cx, cy, x, y, a):
+    c, s = math.cos(a), math.sin(a)
+    return cx + x * c - y * s, cy + x * s + y * c
+
+
+def sakura(cx, cy, r, rot=0.0):
+    """A five-petal cherry blossom (notched petals) as one path."""
+    out = ""
+    for k in range(5):
+        a = rot + k * 2 * math.pi / 5
+        pts = [(0, 0), (-r * 0.55, -r * 0.35), (-r * 0.6, -r * 0.95), (-r * 0.22, -r * 1.05), (0, -r * 0.82),
+               (r * 0.22, -r * 1.05), (r * 0.6, -r * 0.95), (r * 0.55, -r * 0.35)]
+        p = [_rot(cx, cy, x, y, a) for x, y in pts]
+        out += (f"M{p[0][0]:.1f} {p[0][1]:.1f} C{p[1][0]:.1f} {p[1][1]:.1f} {p[2][0]:.1f} {p[2][1]:.1f} {p[3][0]:.1f} {p[3][1]:.1f} "
+                f"L{p[4][0]:.1f} {p[4][1]:.1f} L{p[5][0]:.1f} {p[5][1]:.1f} C{p[6][0]:.1f} {p[6][1]:.1f} {p[7][0]:.1f} {p[7][1]:.1f} "
+                f"{p[0][0]:.1f} {p[0][1]:.1f}Z")
+    return out
+
+
+def petal(x, y, r, a):
+    p = [_rot(x, y, px, py, math.radians(a)) for px, py in [(0, -r), (r * 0.7, 0), (0, r), (-r * 0.7, 0)]]
+    return f"M{p[0][0]:.1f} {p[0][1]:.1f} Q{p[1][0]:.1f} {p[1][1]:.1f} {p[2][0]:.1f} {p[2][1]:.1f} Q{p[3][0]:.1f} {p[3][1]:.1f} {p[0][0]:.1f} {p[0][1]:.1f}Z"
+
+
+def blossom(d: Drawing, x, y, r, rot=0.0, role="bloom", spot=False):
+    d.shape(role, sakura(x, y, r, rot), spot=spot)
+    d.marks("bloom3", circle(x, y, r * 0.22))
+    d.stroke("bloom3", "".join(f"M{x} {y} L{_rot(x, y, 0, -r * 0.45, rot + k * 1.2566 + 0.63)[0]:.1f} {_rot(x, y, 0, -r * 0.45, rot + k * 1.2566 + 0.63)[1]:.1f}" for k in range(5)), 1.1, line=False)
+
+
+def sakura_branch(d: Drawing):
+    d.disc("glow", 60, 132, 34)
+    d.limb("dark", "M210 30 C160 44 120 70 90 110 C76 128 60 140 30 150", 8)
+    d.limb("dark", "M140 56 C130 40 128 28 132 14", 4)
+    d.limb("dark", "M104 92 C116 104 126 112 146 116", 4)
+    d.limb("dark", "M64 132 C60 118 62 106 70 96", 3.5)
+    for x, y, r, a in [(158, 48, 15, 0.2), (132, 20, 12, 0.9), (120, 72, 16, 0.5), (146, 114, 14, 0.1),
+                       (92, 112, 13, 0.7), (70, 94, 11, 0.3), (50, 144, 12, 1.0), (180, 34, 10, 0.6)]:
+        blossom(d, x, y, r, a, spot=(x, y) == (120, 72))
+    for x, y in [(110, 94), (172, 52), (142, 36), (80, 120), (128, 112)]:
+        d.shape("bloom2", ellipse(x, y, 4, 5.5), shadow=False)
+    for x, y, a in [(40, 60, 30), (150, 150, -20), (176, 132, 60), (100, 160, 10), (30, 100, -40)]:
+        d.shape("bloom", petal(x, y, 4.5, a), shadow=False)
+
+
+def sakura_fuji(d: Drawing):
+    d.disc("glow", 150, 48, 16)
+    d.band("far", "M-30 140 L30 124 C50 112 74 70 90 58 L110 58 C126 70 150 112 170 124 L230 140")
+    d.shape("light", "M90 58 L110 58 C116 64 122 72 126 80 L116 76 L108 84 L100 76 L92 84 L84 76 L74 80 C78 72 84 64 90 58Z", shadow=False)
+    d.band("mid", hills(150, 6))
+    # pagoda
+    d.shape("dark", "M134 150 V96 H146 V150Z", line=False)
+    for i, (w, y) in enumerate([(20, 100), (17, 114), (14, 128), (11, 142)]):
+        d.shape("pop", f"M{140 - w} {y} Q{140} {y - 8} {140 + w} {y} L{140 + w - 4} {y + 3} H{140 - w + 4}Z", spot=i == 0)
+        d.shape("hero2", rrect(140 - w * 0.55, y + 2, w * 1.1, 10, 1), shadow=False)
+    d.stroke("dark", "M140 100 V84", 2)
+    # cherry trees in the foreground
+    for x, y, r in [(18, 146, 30), (52, 160, 26), (186, 156, 28), (160, 176, 22), (28, 186, 24)]:
+        d.shape("bloom", scallop(x, y, r, 9, 0.14))
+    for x, y in [(12, 136), (30, 150), (54, 150), (48, 168), (180, 146), (190, 162), (156, 170), (24, 176)]:
+        d.marks("bloom2", sakura(x, y, 4))
+    d.band("near", hills(186, 3), line=False)
+
+
+def sakura_bridge(d: Drawing):
+    d.band("far", hills(130, 8))
+    d.band("water", waves(150, 3, 30))
+    d.stroke("light", "M30 162 q8 -5 16 0 M120 170 q8 -5 16 0", 2.2)
+    # arched bridge
+    d.shape("pop", "M30 150 C60 110 140 110 170 150 L162 150 C136 122 64 122 38 150Z", spot=True)
+    d.stroke("pop", "M34 128 C64 96 136 96 166 128", 3)
+    d.stroke("pop", "M52 136 V112 M76 124 V102 M100 120 V98 M124 124 V102 M148 136 V112", 2.6)
+    # tree
+    d.limb("dark", "M178 190 C176 150 170 110 160 86 M166 100 C150 90 132 84 112 82", 7)
+    for x, y, r in [(144, 58, 26), (112, 64, 22), (172, 74, 22), (86, 76, 17), (154, 38, 18), (122, 40, 17)]:
+        d.shape("bloom", scallop(x, y, r, 9, 0.14))
+    for x, y in [(134, 50), (112, 58), (166, 68), (92, 72), (148, 32), (176, 82), (120, 36)]:
+        d.marks("bloom2", sakura(x, y, 4.5))
+    for x, y, a in [(60, 80, 30), (80, 100, -20), (40, 100, 60), (100, 140, 10), (70, 60, -40)]:
+        d.shape("bloom", petal(x, y, 4.5, a), shadow=False)
+    d.band("ground", hills(186, 3), line=False)
+
+
+# ================================================================ SUNRISE & SUNSET
+def rays(d: Drawing, cx, cy, n=9, r0=40, r1=120, spread=math.pi, start=math.pi):
+    paper, line = "", ""
+    for i in range(n):
+        a = start + spread * (i + 0.5) / n
+        w = spread / n * 0.28
+        p1 = (cx + r1 * math.cos(a - w), cy + r1 * math.sin(a - w))
+        p2 = (cx + r1 * math.cos(a + w), cy + r1 * math.sin(a + w))
+        paper += f"M{cx:.1f} {cy:.1f} L{p1[0]:.1f} {p1[1]:.1f} L{p2[0]:.1f} {p2[1]:.1f}Z"
+        a0 = (cx + r0 * math.cos(a), cy + r0 * math.sin(a))
+        a1 = (cx + (r0 + 12) * math.cos(a), cy + (r0 + 12) * math.sin(a))
+        line += f"M{a0[0]:.1f} {a0[1]:.1f} L{a1[0]:.1f} {a1[1]:.1f}"
+    d.raw(f'<path d="{paper}" fill="#fff" opacity=".22"/>',
+          f'<path d="{line}" stroke="{d.c.get("spot", "#000")}" stroke-width="3" stroke-linecap="round"/>')
+
+
+def sail(d: Drawing, x, y, s=1.0, role="dark"):
+    def draw():
+        d.shape(role, "M100 60 L100 112 L68 112Z")
+        d.shape(role, "M104 66 L104 112 L126 112Z")
+        d.shape(role, "M66 116 H132 L124 126 H74Z")
+    group(d, f"translate({x} {y}) scale({s}) translate(-100 -126)", draw)
+
+
+def sunrise_sea(d: Drawing):
+    rays(d, 100, 124, 9, 46, 140)
+    d.disc("glow", 100, 124, 40)
+    d.disc("glow2", 100, 124, 26, shadow=False, line=False)
+    birds(d, [(40, 52, 1), (56, 44, 0.8), (148, 56, 0.9)])
+    d.band("mid", "M-30 124 L230 124")
+    d.stroke("glow2", "M76 134 H124 M84 144 H116 M90 154 H110 M94 164 H106", 3)
+    d.band("near", waves(160, 3, 34), line=False)
+    sail(d, 150, 126, 0.62)
+    d.band("deep", waves(176, 3, 38), line=False)
+
+
+def sunrise_peaks(d: Drawing):
+    rays(d, 100, 86, 9, 32, 140)
+    d.disc("glow", 100, 86, 26)
+    d.band("far", "M-30 130 L20 96 L50 116 L80 80 L100 112 L120 80 L150 116 L180 92 L230 128")
+    mist(d, 124, 3, 40, ".65")
+    d.band("mid", "M-30 150 L30 118 L70 142 L110 116 L150 140 L190 112 L230 136")
+    mist(d, 146, 3, 46, ".55")
+    d.band("near", hills(166, 8))
+    for x, h in [(24, 40), (40, 30), (164, 36), (178, 44)]:
+        pine(d, x, 170, h, "deep", shadow=False)
+    d.band("deep", hills(184, 4, 30), line=False)
+
+
+def sunrise_coffee(d: Drawing):
+    rays(d, 100, 112, 9, 40, 140)
+    d.disc("glow", 100, 112, 36)
+    d.band("far", hills(116, 8))
+    d.band("mid", hills(134, 6, 40))
+    d.band("ground", "M-30 150 H230")
+    d.shape("near", "M-30 150 H230 V160 H-30Z", shadow=False, line=False)
+    # mug
+    d.stroke("hero", circle(136, 132, 12), 6)
+    d.shape("hero", "M72 104 H132 V146 C132 160 122 168 108 168 H96 C82 168 72 160 72 146Z", spot=True)
+    d.shape("dark", ellipse(102, 104, 30, 6), shadow=False)
+    d.shape("hero2", rrect(76, 118, 52, 10, 2), shadow=False)
+    d.stroke("light", "M92 92 C86 84 98 78 92 68 M106 92 C100 82 112 76 106 64 M120 94 C114 86 124 80 118 72", 3)
+
+
+def sunset_palms(d: Drawing):
+    d.disc("glow", 100, 112, 46)
+    d.disc("glow2", 100, 112, 30, shadow=False, line=False)
+    d.band("mid", "M-30 122 L230 122")
+    d.stroke("glow2", "M70 132 H130 M80 142 H120 M88 152 H112", 3)
+    d.band("near", waves(158, 3, 34), line=False)
+    d.band("ground", "M-30 170 Q60 160 120 168 T230 164")
+    palm(d, 36, 172, 104, 14, "dark", 1.15)
+    palm(d, 164, 172, 82, -14, "dark", 1.0)
+    birds(d, [(110, 50, 1), (126, 42, 0.8)])
+
+
+def sunset_dunes(d: Drawing):
+    d.disc("glow", 118, 96, 48)
+    d.disc("glow2", 118, 96, 32, shadow=False, line=False)
+    d.band("far", "M-30 130 C20 110 60 104 100 120 C130 132 170 112 230 118")
+    d.band("mid", "M-30 150 C30 126 80 120 120 136 C150 148 190 132 230 140")
+    # camel caravan on the ridge
+    camel = ("M84 112 C86 104 94 100 100 102 C104 92 114 92 118 100 C122 104 126 104 128 100 L133 88 "
+             "C135 84 141 84 143 88 L146 91 L142 93 L138 92 L134 104 C132 110 128 114 124 115 L124 132 L121 132 "
+             "L120 117 L115 117 L114 132 L111 132 L109 117 L96 117 L95 132 L92 132 L91 117 L89 132 L86 132 "
+             "L85 116 C83 115 83 113 84 112Z")
+    for tx, ty, s in [(-52, 4, 0.8), (-14, 2, 0.88), (26, 6, 0.96)]:
+        group(d, f"translate({tx + 100} {ty + 128}) scale({s}) translate(-100 -132)", lambda: d.shape("dark", camel))
+    d.band("near", "M-30 172 C30 150 90 150 130 166 C160 176 200 160 230 164")
+    d.band("deep", hills(190, 3, 30), line=False)
+
+
+def sunset_lighthouse(d: Drawing):
+    d.disc("glow", 64, 104, 36)
+    d.band("mid", "M-30 124 L230 124")
+    d.stroke("glow2", "M44 134 H84 M52 144 H76", 3)
+    d.shape("near", "M90 200 L100 140 C110 126 130 120 150 122 C170 124 190 132 210 150 L210 200Z")
+    # lighthouse
+    d.shape("hero", "M132 124 L136 64 H156 L160 124Z")
+    clipped(d, "M132 124 L136 64 H156 L160 124Z", lambda: d.shape("light", "M120 80 H170 V92 H120Z M120 104 H170 V116 H120Z", shadow=False, spot=True))
+    d.shape("dark", rrect(132, 58, 28, 6, 2))
+    d.shape("pop", rrect(138, 44, 16, 14, 2))
+    d.shape("dark", "M134 44 Q146 30 158 44Z")
+    d.raw('<path d="M138 50 L60 30 L60 66Z" fill="#fff" opacity=".28"/>', "")
+    d.band("near", waves(160, 3, 34), line=False)
+    birds(d, [(30, 50, 1), (46, 42, 0.8)])
+    d.band("deep", waves(178, 3, 38), line=False)
+
+
 # ================================================================ colours
 LION = {"hero": "#E0A458", "hero2": "#9C5A2B", "mark": "#3B2A20"}
 ZEBRA_C = {"hero": "#FBF7EE", "mark": "#24262E"}
@@ -1066,6 +1332,9 @@ ROO_SIGN = {"hero2": "#F6C445", "mark": "#1F1A14", "near": "#6B6B70", "light": "
 KOALA = {"hero": "#9AA3AD", "light": "#EDEFF2", "mark": "#2B2D35"}
 HAT = {"hero": "#C9A46A", "hero2": "#6B4A2B", "mark": "#7A5A34", "pop": "#5E8C4A"}
 BISON_C = {"hero": "#6B4A32", "hero2": "#8A6040", "mark": "#2B1D12", "light": "#F2E6D6"}
+WATER = {"water": "#7CC6E8", "water2": "#E6F6FD"}
+SAKURA = {"bloom": "#F7B7CB", "bloom2": "#E7859F", "bloom3": "#B8406A"}
+LIGHTHOUSE = {"hero": "#D64545", "light": "#FFFFFF", "pop": "#FFD45E"}
 
 CONCEPTS = [
     # game drive
@@ -1094,7 +1363,7 @@ CONCEPTS = [
             fixes={"sky": ["sky2", "far"], "far": ["mid", "near", "ground"], "pop": ["#2C78B8", "#1F5F99", "#BFE6F7"], "mid": ["far", "near"]}),
     Concept("elephant-mum-calf", "elephant-sanctuary", "Mother & calf", elephant_family, overrides=ELE_GREY,
             checks=[("hero", "glow"), ("hero", "sky"), ("pop", "glow")],
-            fixes={"glow": ["glow2", "far", "near", "deep"]}),
+            fixes={"glow": ["glow2", "far", "#E07A5F"]}),
     Concept("elephant-bananas", "elephant-sanctuary", "Feeding time", elephant_bananas, overrides=ELE_FEED,
             checks=[("hero", "sky"), ("hero2", "sky"), ("hero2", "near"), ("pop", "near")],
             fixes={"sky": ["sky2", "far", "glow"], "near": ["mid", "deep"]}),
@@ -1186,4 +1455,44 @@ CONCEPTS = [
     Concept("np-bison", "national-park", "Bison", np_bison, overrides=BISON_C,
             checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("hero", "ground"), ("light", "sky")],
             fixes={"sky": ["sky2", "far"], "far": ["mid", "sky2"], "mid": ["far", "ground"]}),
+    # waterfalls
+    Concept("waterfalls-rainbow", "waterfalls", "Waterfall & rainbow", falls_rainbow, overrides=WATER,
+            checks=[("water", "near"), ("water", "sky"), ("water2", "water"), ("near", "sky")],
+            fixes={"near": ["deep", "dark", "mid"]}),
+    Concept("waterfalls-jungle", "waterfalls", "Jungle falls", falls_jungle, overrides=WATER,
+            checks=[("water", "mid"), ("water", "near"), ("water", "deep"), ("near", "mid")],
+            fixes={"mid": ["near", "deep", "dark"], "near": ["deep", "dark"], "deep": ["near", "dark"]}),
+    Concept("waterfalls-boat", "waterfalls", "Falls by boat", falls_boat, overrides=WATER,
+            checks=[("water", "near"), ("water", "far"), ("hero", "water2"), ("hero", "mid"), ("hero2", "water2")],
+            fixes={"near": ["deep", "dark"], "far": ["mid", "near"], "hero": ["pop", "deep", "dark"], "hero2": ["glow2", "pop", "light"]}),
+    # cherry blossoms
+    Concept("sakura-branch", "cherry-blossoms", "Blossom branch", sakura_branch, overrides=SAKURA,
+            checks=[("bloom", "sky"), ("bloom", "glow"), ("dark", "sky")],
+            fixes={"sky": ["sky2"], "glow": ["glow2", "light", "far"]}),
+    Concept("sakura-fuji", "cherry-blossoms", "Fuji in spring", sakura_fuji, overrides=SAKURA,
+            checks=[("far", "sky"), ("light", "far"), ("bloom", "mid"), ("pop", "mid"), ("bloom", "sky")],
+            fixes={"far": ["mid", "near", "deep"], "mid": ["near", "deep", "far"], "pop": ["#D9433B", "dark"], "sky": ["sky2"]}),
+    Concept("sakura-bridge", "cherry-blossoms", "Blossom bridge", sakura_bridge, overrides={**SAKURA, **WATER, "pop": "#D9433B"},
+            checks=[("bloom", "sky"), ("pop", "water"), ("pop", "far"), ("far", "sky")],
+            fixes={"sky": ["sky2", "far"], "far": ["mid", "near"]}),
+    # sunrise
+    Concept("sunrise-sea", "sunrise", "Sunrise at sea", sunrise_sea,
+            checks=[("glow", "sky"), ("dark", "mid"), ("glow2", "mid"), ("dark", "near")],
+            fixes={"glow": ["glow2", "pop", "hero2"], "mid": ["near", "far"]}),
+    Concept("sunrise-peaks", "sunrise", "Mountain sunrise", sunrise_peaks,
+            checks=[("glow", "sky"), ("far", "glow"), ("far", "sky"), ("mid", "far")],
+            fixes={"glow": ["glow2", "pop", "hero2"], "far": ["mid", "near"]}),
+    Concept("sunrise-coffee", "sunrise", "Morning coffee", sunrise_coffee,
+            checks=[("hero", "glow"), ("hero", "far"), ("hero", "mid"), ("hero", "ground"), ("glow", "sky")],
+            fixes={"hero": ["pop", "deep", "near"], "glow": ["glow2", "pop"]}),
+    # sunset
+    Concept("sunset-palms", "sunset", "Tropical sunset", sunset_palms,
+            checks=[("dark", "glow"), ("dark", "sky"), ("glow", "sky"), ("glow2", "mid")],
+            fixes={"glow": ["glow2", "pop"], "sky": ["sky2"]}),
+    Concept("sunset-dunes", "sunset", "Desert sunset", sunset_dunes,
+            checks=[("dark", "glow"), ("dark", "far"), ("dark", "sky"), ("glow", "sky")],
+            fixes={"glow": ["glow2", "pop"], "far": ["mid", "ground"]}),
+    Concept("sunset-lighthouse", "sunset", "Lighthouse sunset", sunset_lighthouse, overrides=LIGHTHOUSE,
+            checks=[("hero", "sky"), ("hero", "near"), ("glow", "sky"), ("pop", "sky")],
+            fixes={"glow": ["glow2", "#E07A5F"], "sky": ["sky2", "far"]}),
 ]

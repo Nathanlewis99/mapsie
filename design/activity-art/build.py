@@ -20,6 +20,7 @@ ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE / "concepts"))
 from artkit import LINE_PALETTES, render, contrast, delta_e  # noqa: E402
+import polish  # noqa: E402
 
 OUT = HERE / "out"
 ACTIVITIES = {a["id"]: a for a in json.loads((HERE / "activities.json").read_text())}
@@ -33,6 +34,7 @@ def build_module(mod: str, seen: set[str]) -> list[dict]:
     m = importlib.import_module(mod)
     manifest = []
     for c in m.CONCEPTS:
+        polish.apply(c)
         problems = []
         if c.activity not in ACTIVITIES:
             problems.append(f"unknown activity '{c.activity}'")

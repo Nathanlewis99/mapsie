@@ -18,6 +18,7 @@ Open http://localhost:3000. With no keys set, checkout uses a built-in **test ch
 - **Styling:** 6 presets, 9 editable colours, terrain shading, paper texture, place names, and highlighting of visited countries.
 - **Markers:** numbers, pins, hearts or dots, with optional dates.
 - **Decorations:** 93 stickers in 10 art styles (Illustrated, Watercolour, Vintage stamp, Fine line, Gold foil, Retro print, Die-cut sticker, Neon, Flat, Cartoon), plus your own photos and handwritten text notes. Resize and rotate them with handles on the map.
+- **Mapsie Originals:** 399 original activity designs (133 activities × 3 ideas) in papercut (up to 5 palettes) and line art (4 colourways). "Match map" picks the palette that suits the map style. Drawn as code in `design/activity-art/` (see its `AUTHORING.md`); `python3 design/activity-art/build.py --export` rebuilds them into the app.
 - **Sticker search:** results show every style of each match. Each map style suggests a matching sticker style (Vintage gets Vintage stamp, Midnight gets Gold foil, and so on).
 - **Undo/redo** (Ctrl+Z / Ctrl+Shift+Z), with autosave in the browser.
 - **Products:** A4 to A1, portrait or landscape, no frame or black/white/oak frames, priced in GBP, USD or AUD.
@@ -37,6 +38,7 @@ Open http://localhost:3000. With no keys set, checkout uses a built-in **test ch
 | Payments | `/api/checkout`, `/api/webhooks/stripe` | Stripe Checkout (GBP, UK shipping). |
 | Fulfilment | `src/lib/server/fulfil.ts`, `prodigi.ts` | Prodigi v4 API (sandbox by default). |
 | Sticker art | `src/lib/stickers.ts`, `StickerFilters.tsx` | Artwork sets from `scripts/fetch-stickers.mjs` (Fluent Emoji, MIT; Twemoji, CC-BY). Finishes are SVG filters in the poster's colours, so they stay vector-sharp in print. |
+| Mapsie Originals | `design/activity-art/`, `src/lib/originals.ts` | Concepts drawn with `artkit.py`, checked for colour clashes and valid SVG, exported to `public/stickers/originals/`. The print page flattens them to full-resolution bitmaps before capture. |
 | Road routing | `/api/route` | Proxies OSRM with a cache and a queue. Set `OSRM_URL` for a self-hosted or paid router. |
 | Admin | `/admin` | Basic-auth protected with `ADMIN_PASSWORD`. Open without a password in local dev only. |
 | Storage | `src/lib/server/db.ts` | JSON files in `./data` for now. Replace before deploying. |

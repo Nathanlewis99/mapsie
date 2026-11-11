@@ -602,20 +602,20 @@ def curry_pot(d: Drawing):
 
 def sack(d: Drawing, x, y, w, spice):
     d.shape("hero", f"M{x-w} {y} C{x-w-6} {y+26} {x-w+2} {y+48} {x} {y+48} C{x+w-2} {y+48} {x+w+6} {y+26} {x+w} {y}Z")
-    d.shape(spice, f"M{x-w+2} {y+1} Q{x} {y-w*1.3} {x+w-2} {y+1}Z", spot=spice == "pop")
     d.shape("hero2", f"M{x-w-3} {y} a{w+3} 6 0 0 0 {2*w+6} 0 a{w+3} 6 0 0 0 {-2*w-6} 0Z")
+    d.shape(spice, f"M{x-w+1} {y+2} C{x-w*0.6} {y-w*0.5} {x-w*0.3} {y-w*0.95} {x} {y-w*0.95} C{x+w*0.3} {y-w*0.95} {x+w*0.6} {y-w*0.5} {x+w-1} {y+2}Z", spot=spice == "pop", shadow=False)
     d.stroke("hero2", f"M{x-w+4} {y+16} q4 2 8 0 M{x+w-14} {y+28} q4 2 8 0", 1.6, line=False)
 
 
 def curry_spices(d: Drawing):
     d.disc("glow", 100, 80, 54, line=False)
     d.band("ground", "M-30 160 L230 160")
-    sack(d, 58, 92, 26, "pop")
-    sack(d, 142, 92, 26, "mark")
+    sack(d, 54, 94, 26, "pop")
+    sack(d, 146, 94, 26, "mark")
     sack(d, 100, 112, 30, "glow2")
     # scoop in the turmeric
-    d.limb("dark", "M108 88 L128 66", 4)
-    d.shape("light", ellipse(104, 94, 8, 5), extra='transform="rotate(-30 104 94)"')
+    d.limb("dark", "M110 90 L132 64", 4)
+    d.shape("light", ellipse(106, 96, 9, 5.5), extra='transform="rotate(-30 106 96)"')
     # chillies in front
     for x, y, r in [(34, 164, -6), (138, 166, 8)]:
         def ch(x=x, y=y):
@@ -753,7 +753,7 @@ def croissant(d: Drawing, tx=0, ty=0, s=1.0, spot=True):
     def c():
         for x, y, rx, ry, r in CROISSANT:
             d.shape("hero", ellipse(x, y, rx, ry), extra=f'transform="rotate({r} {x} {y})"', spot=spot and rx == 22)
-            d.shape("hero2", ellipse(x - rx * 0.25, y - ry * 0.35, rx * 0.45, ry * 0.3), extra=f'transform="rotate({r} {x} {y})"', shadow=False, line=False)
+            d.stroke("hero2", f"M{x-rx*0.45:.1f} {y-ry*0.5:.1f} Q{x-rx*0.6:.1f} {y:.1f} {x-rx*0.4:.1f} {y+ry*0.5:.1f}", max(1.2, rx * 0.16), line=False)
     group(d, f"translate({tx} {ty}) scale({s})", c)
 
 
@@ -776,7 +776,7 @@ def cafe_cup(d: Drawing):
     d.shape("pop", "M44 106 H112 C111 112 110 116 108 120 H48 C46 116 45 112 44 106Z", shadow=False, spot=True)
     d.shape("mark", ellipse(78, 96, 38, 7), shadow=False)
     d.shape("hero2", "M78 101 C70 96 70 91 74 91 C76 91 78 93 78 95 C78 93 80 91 82 91 C86 91 86 96 78 101Z", shadow=False, line=False)
-    croissant(d, 98, 86, 0.48, spot=False)
+    croissant(d, 104, 74, 0.5, spot=False)
 
 
 def cafe_bistro(d: Drawing):
@@ -806,7 +806,8 @@ def cafe_bistro(d: Drawing):
 # ================================================================ COCKTAIL BAR
 def cocktail_martini(d: Drawing):
     d.disc("glow", 100, 92, 60, line=False)
-    d.limb("dark", "M128 42 L92 92", 2.6, shadow=False)
+    d.limb("dark", "M132 40 L96 90", 2.6, shadow=False)
+    d.marks("dark", circle(133, 39, 3))
     d.shape("light", "M44 56 H156 L100 116Z")
     d.shape("hero", "M54 64 H146 L100 108Z", shadow=False, spot=True)
     d.shape("near", ellipse(110, 76, 10, 8))
@@ -814,7 +815,6 @@ def cocktail_martini(d: Drawing):
     d.stroke("light", "M60 62 L94 100", 2.2, line=False)
     d.limb("light", "M100 114 V158", 4.5, shadow=False)
     d.shape("light", ellipse(100, 160, 26, 6))
-    d.shape("pop", "M150 56 L168 40 L172 46 Z")
 
 
 def cocktail_shaker(d: Drawing):
@@ -940,41 +940,47 @@ def coco_straw(d: Drawing):
     d.stroke("dark", "M86 96 L78 52", 2)
     d.shape("hero2", "M56 58 Q78 30 100 50 Z")
     # coconut
-    d.shape("hero", "M60 110 C56 86 74 80 100 80 C126 80 144 86 140 110 C138 140 122 160 100 160 C78 160 62 140 60 110Z", spot=False)
+    d.shape("hero", "M60 110 C56 86 74 80 100 80 C126 80 144 86 140 110 C138 140 122 160 100 160 C78 160 62 140 60 110Z", spot=True)
     d.shape("light", ellipse(100, 86, 30, 8), shadow=False)
     d.shape("mark", ellipse(100, 86, 30, 8), shadow=False, line=False, extra='opacity="0"')
     d.stroke("mark", "M70 104 Q74 132 92 152 M130 104 Q126 132 110 152", 2, line=False)
 
 
 def coco_palm(d: Drawing):
-    d.disc("glow", 128, 96, 34)
+    d.disc("glow", 132, 100, 32)
     d.band("far", waves(126, 3, 22))
     d.band("mid", waves(138, 3, 26), line=False)
     d.band("ground", "M-30 160 Q40 146 100 152 T230 160")
-    d.limb("dark", "M46 172 Q50 110 96 62", 8)
-    for x, y in [(90, 72), (102, 74), (96, 82)]:
-        d.shape("hero2", circle(x, y, 7))
-    for a in ["M96 62 Q124 40 160 56 Q128 52 100 66Z", "M96 62 Q86 34 52 34 Q84 44 92 66Z",
-              "M96 62 Q132 66 148 96 Q122 74 96 66Z", "M96 62 Q60 60 44 84 Q66 66 94 66Z", "M96 62 Q108 30 136 22 Q112 40 98 64Z"]:
-        d.shape("hero", a)
+    d.limb("dark", "M44 172 Q48 112 94 66", 8)
+    for a in ["M94 62 C112 42 146 40 168 60 C150 58 136 58 122 62 C110 64 100 66 94 62Z",
+              "M94 62 C80 44 52 38 30 52 C50 52 64 56 74 62 C82 66 90 66 94 62Z",
+              "M94 62 C120 60 148 76 156 104 C142 88 126 80 112 74 C102 70 96 66 94 62Z",
+              "M94 62 C70 58 46 70 38 96 C52 82 66 74 80 70 C88 68 92 66 94 62Z",
+              "M94 62 C100 40 120 24 144 22 C128 32 116 42 108 52 C102 58 98 62 94 62Z"]:
+        d.shape("hero", a, spot=a.startswith("M94 62 C120"))
+    for x, y in [(88, 72), (102, 74), (94, 84)]:
+        d.shape("hero2", circle(x, y, 8))
+        d.marks("dark", circle(x - 2, y - 2, 1.4))
 
 
 def coco_halves(d: Drawing):
     d.disc("glow", 100, 92, 58, line=False)
-    d.band("ground", "M-30 146 Q100 136 230 146")
-    # whole half facing us
-    d.shape("hero", ellipse(78, 112, 40, 36))
-    d.shape("light", ellipse(78, 112, 32, 28), shadow=False)
-    d.shape("sky2", ellipse(78, 112, 22, 18), shadow=False, line=False)
-    d.stroke("mark", "M42 96 l6 2 M40 116 l6 0 M48 136 l5 -3 M112 94 l-5 3", 1.6, line=False)
-    # second half, tilted
-    d.shape("hero", "M116 140 C116 110 130 96 150 96 C170 96 184 110 184 140Z", extra='transform="rotate(-8 150 140)"')
-    d.shape("light", ellipse(150, 98, 30, 7), extra='transform="rotate(-8 150 140)"', shadow=False)
+    d.band("ground", "M-30 148 Q100 138 230 148")
+    # half facing us
+    d.shape("hero", ellipse(74, 112, 38, 35))
+    d.shape("light", ellipse(74, 112, 30, 27), shadow=False)
+    d.shape("sky2", ellipse(74, 112, 21, 18), shadow=False, line=False)
+    d.stroke("mark", "M40 96 l6 2 M38 116 l6 0 M46 136 l5 -3 M106 128 l-5 -2", 1.6, line=False)
+    # half lying open like a bowl
+    d.shape("hero", "M116 122 C116 150 172 154 178 124Z")
+    d.shape("light", ellipse(147, 122, 32, 9), extra='transform="rotate(-3 147 122)"')
+    d.shape("sky2", ellipse(147, 122, 24, 5.5), extra='transform="rotate(-3 147 122)"', shadow=False, line=False)
+    d.stroke("mark", "M126 134 l5 -1 M150 144 l1 -5 M168 134 l-4 -2", 1.6, line=False)
     # hibiscus
     for a in range(0, 360, 72):
-        d.shape("pop", ellipse(146, 52, 9, 14), extra=f'transform="rotate({a} 146 64)"', spot=True, shadow=a == 0)
-    d.shape("hero2", circle(146, 64, 4), shadow=False)
-    d.stroke("hero2", "M146 64 L160 52", 1.6)
+        d.shape("pop", ellipse(148, 52, 9, 14), extra=f'transform="rotate({a} 148 64)"', spot=True, shadow=a == 0)
+    d.shape("hero2", circle(148, 64, 4), shadow=False)
+    d.stroke("hero2", "M148 64 L162 52", 1.6)
 
 
 WOOD = {"ground": "#C68B59", "near": "#9A6338"}
@@ -1066,7 +1072,7 @@ CONCEPTS = [
             checks=[("hero", "glow"), ("light", "glow"), ("glow2", "glow"), ("hero", "far")], fixes={"glow": ["mid", "deep", "#E07A5F"], "far": ["mid", "deep"]}),
     Concept("curry-spices", "curry", "Spice market", curry_spices,
             overrides={"hero": "#C9A46E", "hero2": "#A9824F", "glow2": "#F2B705", "pop": "#D7263D", "mark": "#8C5A2B", "near": "#3F8A3A", "dark": "#5A3A22"},
-            checks=[("hero", "glow"), ("hero", "ground"), ("glow2", "glow"), ("pop", "glow")], fixes={"glow": ["#E07A5F", "mid", "far", "deep"], "ground": ["near", "deep", "mid"]}),
+            checks=[("hero", "glow"), ("hero", "ground"), ("pop", "glow"), ("mark", "glow")], fixes={"glow": ["glow2", "far", "#E07A5F", "deep"], "ground": ["far", "mid", "deep"]}),
     # tacos
     Concept("taco-big", "tacos", "Loaded taco", taco_big,
             overrides={"hero": "#F2C14E", "hero2": "#D99A2B", "near": "#6FAE3A", "mark": "#8B4A2B", "pop": "#E63946"},
@@ -1090,7 +1096,7 @@ CONCEPTS = [
     # cafe & croissant
     Concept("cafe-croissant", "cafe-and-croissant", "Golden croissant", cafe_croissant,
             overrides={"hero": "#E2A04A", "hero2": "#F5C77E", "mark": "#A8642A"},
-            checks=[("hero", "glow"), ("hero", "light"), ("light", "far")], fixes={"glow": ["#E07A5F", "mid", "deep", "far"], "far": ["mid", "deep"]}),
+            checks=[("hero", "glow"), ("hero", "light"), ("light", "far")], fixes={"glow": ["#F1E6CF", "mid", "deep"], "far": ["mid", "deep"]}),
     Concept("cafe-cup", "cafe-and-croissant", "Latte & croissant", cafe_cup,
             overrides={"hero": "#E2A04A", "hero2": "#F1D9B5", "mark": "#6F4E37"},
             checks=[("light", "glow"), ("light", "far"), ("hero", "far")], fixes={"glow": ["mid", "#E07A5F", "deep"], "far": ["mid", "deep"]}),

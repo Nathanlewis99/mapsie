@@ -745,15 +745,24 @@ def gelato_counter(d: Drawing):
 
 
 # ================================================================ CAFE & CROISSANT
-CROISSANT = [(40, 132, 7, 11, -70), (160, 132, 7, 11, 70), (52, 118, 12, 18, -55), (148, 118, 12, 18, 55),
-             (74, 104, 17, 25, -30), (126, 104, 17, 25, 30), (100, 98, 22, 30, 0)]
+import math
+
+CROISSANT = []
+for _a, _th, _rx in [(-66, 18, 13), (66, 18, 13), (-36, 32, 17), (36, 32, 17), (0, 46, 21)]:
+    _r = math.radians(_a)
+    CROISSANT.append((100 + 50 * math.sin(_r), 146 - 50 * math.cos(_r), _rx, _th / 2, _a))
 
 
 def croissant(d: Drawing, tx=0, ty=0, s=1.0, spot=True):
     def c():
         for x, y, rx, ry, r in CROISSANT:
-            d.shape("hero", ellipse(x, y, rx, ry), extra=f'transform="rotate({r} {x} {y})"', spot=spot and rx == 22)
-            d.stroke("hero2", f"M{x-rx*0.45:.1f} {y-ry*0.5:.1f} Q{x-rx*0.6:.1f} {y:.1f} {x-rx*0.4:.1f} {y+ry*0.5:.1f}", max(1.2, rx * 0.16), line=False)
+            seg = ellipse(round(x, 1), round(y, 1), rx, ry)
+            d.shape("hero", seg, extra=f'transform="rotate({r} {x:.1f} {y:.1f})"', spot=spot and r == 0)
+            d.stroke("hero2", f"M{x-rx*0.5:.1f} {y-ry*0.55:.1f} Q{x:.1f} {y-ry*0.85:.1f} {x+rx*0.5:.1f} {y-ry*0.55:.1f}",
+                     max(1.4, ry * 0.18), line=False) if False else None
+            d.stroke("hero2", f"M{x-rx*0.55:.1f} {y-ry*0.45:.1f} Q{x:.1f} {y-ry*0.8:.1f} {x+rx*0.55:.1f} {y-ry*0.45:.1f}", max(1.4, ry * 0.16), line=False) \
+                if False else d.raw(f'<path d="M{x-rx*0.55:.1f} {y-ry*0.45:.1f} Q{x:.1f} {y-ry*0.85:.1f} {x+rx*0.55:.1f} {y-ry*0.45:.1f}" fill="none" stroke="{d.c.get('hero2', '#fff')}" '
+                                    f'stroke-width="{max(1.4, ry*0.16):.1f}" stroke-linecap="round" transform="rotate({r} {x:.1f} {y:.1f})"/>', "")
     group(d, f"translate({tx} {ty}) scale({s})", c)
 
 
@@ -761,9 +770,7 @@ def cafe_croissant(d: Drawing):
     d.disc("glow", 100, 100, 60, line=False)
     table(d, 146, "far", "mid")
     d.shape("light", ellipse(100, 144, 76, 12))
-    croissant(d, -8, 2, 1.08)
-    for x, y in [(70, 72), (128, 70), (96, 60), (110, 84)]:
-        d.marks("mark", ellipse(x, y, 1.6, 1))
+    croissant(d, -14, -8, 1.14)
 
 
 def cafe_cup(d: Drawing):
@@ -1072,7 +1079,7 @@ CONCEPTS = [
             checks=[("hero", "glow"), ("light", "glow"), ("glow2", "glow"), ("hero", "far")], fixes={"glow": ["mid", "deep", "#E07A5F"], "far": ["mid", "deep"]}),
     Concept("curry-spices", "curry", "Spice market", curry_spices,
             overrides={"hero": "#C9A46E", "hero2": "#A9824F", "glow2": "#F2B705", "pop": "#D7263D", "mark": "#8C5A2B", "near": "#3F8A3A", "dark": "#5A3A22"},
-            checks=[("hero", "glow"), ("hero", "ground"), ("pop", "glow"), ("mark", "glow")], fixes={"glow": ["glow2", "far", "#E07A5F", "deep"], "ground": ["far", "mid", "deep"]}),
+            checks=[("hero", "glow"), ("hero", "ground"), ("pop", "glow"), ("mark", "glow"), ("glow2", "glow")], fixes={"glow": ["far", "light", "#E07A5F", "deep"], "ground": ["far", "mid", "deep"]}),
     # tacos
     Concept("taco-big", "tacos", "Loaded taco", taco_big,
             overrides={"hero": "#F2C14E", "hero2": "#D99A2B", "near": "#6FAE3A", "mark": "#8B4A2B", "pop": "#E63946"},

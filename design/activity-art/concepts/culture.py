@@ -48,6 +48,7 @@ def person(x, feet, h=30.0) -> str:
 def flag_string(d: Drawing, x0, y0, x1, y1, sag, n, roles, size=4.0, spot_every=2, start=1):
     """Bunting / prayer flags hanging on a sagging string."""
     cx, cy = (x0 + x1) / 2, max(y0, y1) + sag
+    clip_open(d)
     d.stroke("dark", f"M{x0} {y0} Q{cx} {cy} {x1} {y1}", 1.3)
     for i in range(start, n + start):
         t = i / (n + 2 * start - 1)
@@ -55,17 +56,20 @@ def flag_string(d: Drawing, x0, y0, x1, y1, sag, n, roles, size=4.0, spot_every=
         y = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * cy + t * t * y1
         d.shape(roles[i % len(roles)], f"M{x - size:.1f} {y:.1f} L{x + size:.1f} {y:.1f} L{x:.1f} {y + size * 2.1:.1f}Z",
                 shadow=False, spot=(i % spot_every == 0))
+    clip_close(d)
 
 
 def sq_flags(d: Drawing, x0, y0, x1, y1, sag, n, roles, size=4.5):
     """Tibetan prayer flags: square cloths on a sagging string."""
     cx, cy = (x0 + x1) / 2, max(y0, y1) + sag
+    clip_open(d)
     d.stroke("dark", f"M{x0} {y0} Q{cx} {cy} {x1} {y1}", 1.2)
     for i in range(1, n + 1):
         t = i / (n + 1)
         x = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * cx + t * t * x1
         y = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * cy + t * t * y1
         d.shape(roles[i % len(roles)], rrect(x - size / 2, y, size, size * 1.25, .8), shadow=False, spot=i % 3 == 0)
+    clip_close(d)
 
 
 def clip_open(d: Drawing):
@@ -644,12 +648,14 @@ def walk_signpost(d: Drawing):
 # ================================================================ ROOFTOP VIEWS
 def bulbs(d: Drawing, x0, y0, x1, y1, sag, n, role="glow2", r=2.6):
     cx, cy = (x0 + x1) / 2, max(y0, y1) + sag
+    clip_open(d)
     d.stroke("dark", f"M{x0} {y0} Q{cx} {cy} {x1} {y1}", 1.2)
     for i in range(1, n + 1):
         t = i / (n + 1)
         x = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * cx + t * t * x1
         y = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * cy + t * t * y1
         d.disc(role, round(x, 1), round(y + r + 1, 1), r, shadow=False)
+    clip_close(d)
 
 
 def rooftop_skyline(d: Drawing):
@@ -903,6 +909,274 @@ def festival_dragon(d: Drawing):
     d.band("mid", hills(166, 4))
     d.band("near", hills(182, 3, 20), line=False)
 
+
+# ================================================================ CARNIVAL
+def confetti(d: Drawing, pts):
+    roles = ["pop", "hero2", "hero", "light"]
+    for i, (x, y, a) in enumerate(pts):
+        d.shape(roles[i % 4], rrect(x - 3, y - 1.5, 6, 3, 1), shadow=False, line=False, extra=f'transform="rotate({a} {x} {y})"')
+
+
+def carnival_mask(d: Drawing):
+    d.disc("glow", 100, 100, 62)
+    confetti(d, [(30, 70, 30), (46, 150, -20), (160, 156, 50), (174, 116, -40), (40, 112, 70), (150, 40, 10), (62, 46, -30)])
+    for ang, role in [(-50, "hero"), (-30, "pop"), (-10, "hero2"), (10, "hero")]:
+        d.shape(role, ellipse(150, 52, 8, 30), extra=f'transform="rotate({ang} 150 82)"', spot=role == "pop")
+    d.limb("wood", "M146 122 L172 176", 5)
+    mask = ("M40 92 C52 78 78 80 100 92 C122 80 148 78 160 92 C166 110 154 128 136 130 C120 132 110 122 100 114 "
+            "C90 122 80 132 64 130 C46 128 34 110 40 92Z")
+    d.shape("gold", mask)
+    d.shape("pop", "M40 92 C52 78 78 80 100 92 C122 80 148 78 160 92 C158 98 156 100 152 100 C140 92 118 90 100 100 "
+                   "C82 90 60 92 48 100 C44 100 42 98 40 92Z", shadow=False, spot=True)
+    d.marks("dark", "M60 106 Q74 94 90 106 Q74 114 60 106Z M110 106 Q126 94 140 106 Q126 114 110 106Z")
+    d.stroke("pop", "M62 120 Q70 126 80 120 M120 120 Q130 126 138 120", 2)
+    d.marks("pop", circle(100, 104, 3.5))
+    d.marks("light", circle(150, 84, 3))
+
+
+def carnival_carousel(d: Drawing):
+    d.band("far", "M-30 -10 H230", shadow=False, line=False)
+    clip_open(d)
+    d.shape("hero", "M-10 -10 H210 V38 H-10Z")
+    for i in range(8):
+        x = 0 + i * 26
+        d.shape("hero" if i % 2 else "light", f"M{x} 34 H{x + 26} V40 A13 9 0 0 1 {x} 40Z", shadow=False, spot=i % 2 == 1)
+    clip_close(d)
+    for x in range(14, 200, 26):
+        d.marks("glow2", circle(x + 13, 26, 2.6))
+    d.shape("gold", rrect(97, 40, 8, 150, 2), spot=True)
+    d.stroke("gold2", "M97 60 l8 -6 M97 76 l8 -6 M97 150 l8 -6 M97 166 l8 -6 M97 182 l8 -6", 2.2, line=False)
+    horse = ("M40 84 C44 72 56 62 66 62 L66 52 L73 61 C82 65 88 76 92 90 C106 93 126 93 140 93 C156 93 166 102 166 114 "
+             "C166 122 162 126 156 128 L172 146 L166 152 L148 134 L140 133 L148 152 L141 156 L128 135 "
+             "C116 137 106 137 96 133 L90 150 L94 160 L86 162 L80 148 L86 128 L82 124 L68 138 L62 132 L76 116 "
+             "C73 109 72 102 72 96 L60 100 C54 102 50 101 48 98 L44 98 C40 96 38 90 40 84Z")
+    d.limb("hero2", "M164 106 C178 110 184 124 178 138", 7)
+    d.shape("horse", horse)
+    d.shape("hero2", "M66 62 C80 62 92 76 96 92 L88 92 C84 80 76 70 66 66Z", shadow=False)
+    d.shape("pop", "M110 92 H136 V104 Q123 110 110 104Z", shadow=False, spot=True)
+    d.shape("hero2", rrect(106, 90, 34, 4, 2), shadow=False)
+    d.stroke("pop", "M66 70 L54 90 M60 82 L86 90", 1.8)
+    d.marks("dark", circle(56, 76, 2))
+    d.band("mid", "M-30 178 H230")
+
+
+def carnival_ferris(d: Drawing):
+    d.disc("glow", 160, 50, 14)
+    d.band("far", hills(150, 8, 20))
+    cx, cy, r = 100, 90, 56
+    d.limb("dark", f"M{cx} {cy} L68 166 M{cx} {cy} L132 166", 5)
+    d.stroke("hero", circle(cx, cy, r), 5)
+    d.stroke("hero", circle(cx, cy, r * .62), 2.2)
+    sp = " ".join(f"M{cx} {cy} L{cx + r * math.cos(a):.1f} {cy + r * math.sin(a):.1f}" for a in [i * math.pi / 5 for i in range(10)])
+    d.stroke("hero", sp, 1.6)
+    roles = ["pop", "hero2", "light", "pop", "hero2"]
+    for i in range(10):
+        a = i * math.pi / 5 + math.pi / 10
+        x, y = cx + r * math.cos(a), cy + r * math.sin(a)
+        d.stroke("dark", f"M{x:.1f} {y:.1f} V{y + 5:.1f}", 1.4)
+        d.shape(roles[i % 5], f"M{x - 7:.1f} {y + 5:.1f} H{x + 7:.1f} L{x + 6:.1f} {y + 15:.1f} H{x - 6:.1f}Z", spot=roles[i % 5] == "pop")
+    d.shape("hero2", circle(cx, cy, 7))
+    d.band("mid", hills(168, 4))
+    d.shape("pop", "M22 168 V148 L34 134 L46 148 V168Z")
+    d.shape("light", "M28 168 V156 H40 V168Z", shadow=False)
+    d.shape("hero", "M154 168 V150 L166 138 L178 150 V168Z")
+    d.band("near", hills(184, 3), line=False)
+
+
+# ================================================================ CONCERT
+def notes(d: Drawing, pts, role="dark"):
+    for x, y, k in pts:
+        d.marks(role, ellipse(x, y, 4.2 * k, 3.2 * k))
+        d.stroke(role, f"M{x + 3.8 * k:.1f} {y:.1f} V{y - 16 * k:.1f} q{4 * k:.1f} {3 * k:.1f} {7 * k:.1f} {6 * k:.1f}", 1.8)
+
+
+def concert_guitar(d: Drawing):
+    d.disc("glow", 100, 100, 60)
+    notes(d, [(36, 66, 1.2), (160, 140, 1), (48, 140, .9), (164, 64, 1.1)])
+
+    def guitar():
+        d.shape("guitar", "M100 70 C116 70 124 80 124 92 C124 102 118 106 120 112 C130 118 134 128 134 140 C134 160 120 172 100 172 "
+                          "C80 172 66 160 66 140 C66 128 70 118 80 112 C82 106 76 102 76 92 C76 80 84 70 100 70Z")
+        d.shape("guitar2", "M100 76 C112 76 118 84 118 92 C118 100 112 106 114 112 C124 118 128 128 128 140 C128 156 116 166 100 166 "
+                           "C84 166 72 156 72 140 C72 128 76 118 86 112 C88 106 82 100 82 92 C82 84 88 76 100 76Z", shadow=False, line=False)
+        d.shape("dark", circle(100, 116, 10), shadow=False, spot=True)
+        d.shape("neck", rrect(94, 12, 12, 100, 2))
+        d.shape("dark", rrect(91, -4, 18, 20, 3))
+        d.marks("light", "M89 0 h-4 v3 h4Z M89 7 h-4 v3 h4Z M111 0 h4 v3 h-4Z M111 7 h4 v3 h-4Z")
+        d.shape("dark", rrect(88, 146, 24, 6, 2), shadow=False)
+        d.stroke("light", "M97 16 V148 M100 16 V148 M103 16 V148", .8, line=False)
+        d.stroke("dark", "M94 40 H106 M94 58 H106 M94 74 H106 M94 88 H106", .9, line=False)
+    group(d, "rotate(32 100 100) translate(100 104) scale(.86) translate(-100 -92)", guitar)
+
+
+def concert_stage(d: Drawing):
+    if d.paper:
+        d.raw(f'<g opacity=".28" fill="{d.c["glow2"]}"><path d="M40 30 L54 30 L104 150 L60 150Z"/><path d="M146 30 L160 30 L140 150 L96 150Z"/>'
+              f'<path d="M96 30 L104 30 L124 150 L76 150Z"/></g>')
+    d.shape("dark", rrect(26, 22, 148, 8, 1))
+    d.stroke("dark", "M30 30 L34 22 L38 30 L42 22 L46 30 L50 22 L54 30 M146 30 L150 22 L154 30 L158 22 L162 30 L166 22 L170 30", 1.2, line=False)
+    for x in (47, 100, 153):
+        d.shape("hero", f"M{x - 6} 30 H{x + 6} L{x + 4} 40 H{x - 4}Z", shadow=False)
+        d.marks("glow2", ellipse(x, 40, 4, 2))
+    d.shape("mid", rrect(20, 128, 160, 22, 2))
+    d.shape("dark", person(100, 128, 56), spot=True)
+    d.limb("dark", "M92 96 L82 82", 5)
+    d.stroke("dark", "M120 128 L118 92 M112 92 L122 92", 2)
+    d.shape("pop", "M88 104 L118 96 L120 102 L92 112Z", shadow=False)
+    d.shape("pop", ellipse(88, 110, 9, 7), shadow=False)
+    # crowd
+    for x, y, arm in [(14, 164, 1), (38, 158, 0), (60, 166, 1), (84, 160, 0), (108, 164, 1), (132, 158, 1), (156, 166, 0), (182, 160, 1)]:
+        if arm:
+            d.limb("crowd", f"M{x + 6} {y + 4} L{x + 12} {y - 18}", 5, shadow=False)
+        d.shape("crowd", circle(x, y, 9), shadow=False)
+    d.band("crowd", "M-30 168 H230", line=False)
+
+
+def concert_violin(d: Drawing):
+    d.disc("glow", 100, 100, 60)
+    notes(d, [(40, 62, 1.1), (166, 138, 1), (34, 128, .9)])
+
+    def violin():
+        d.shape("violin", "M100 84 C112 84 124 88 124 102 C124 110 116 114 116 120 C116 126 128 132 128 146 C128 164 114 174 100 174 "
+                          "C86 174 72 164 72 146 C72 132 84 126 84 120 C84 114 76 110 76 102 C76 88 88 84 100 84Z")
+        d.shape("dark", "M96 40 H104 L106 150 H94Z", spot=True)
+        d.shape("violin2", rrect(95, 22, 10, 22, 3))
+        d.shape("violin2", circle(100, 20, 6))
+        d.marks("dark", circle(100, 20, 2.4))
+        d.stroke("dark", "M84 120 q-4 8 0 16 M116 120 q4 8 0 16", 2)
+        d.shape("light", rrect(90, 136, 20, 4, 1), shadow=False)
+        d.shape("dark", "M94 154 H106 L104 170 H96Z", shadow=False)
+        d.stroke("light", "M98 40 V156 M102 40 V156", .7, line=False)
+    group(d, "rotate(-28 100 100) translate(100 100) scale(.9) translate(-100 -98)", violin)
+    d.limb("wood", "M40 160 L166 54", 3)
+    d.stroke("light", "M46 162 L170 58", 1.2, line=False)
+    d.shape("dark", rrect(160, 50, 10, 8, 2), extra='transform="rotate(-40 165 54)"')
+
+
+# ================================================================ PHOTOGRAPHY WALK
+def photo_camera(d: Drawing):
+    d.disc("glow", 100, 100, 62)
+    d.stroke("dark", "M30 84 Q20 140 60 150 M170 84 Q180 140 140 150", 2.6, line=False)
+    d.shape("light", rrect(48, 60, 104, 26, 6))
+    d.shape("dark", rrect(58, 52, 22, 10, 2))
+    d.shape("pop", rrect(126, 54, 14, 8, 2), spot=True)
+    d.shape("hero", rrect(36, 74, 128, 72, 10))
+    d.shape("dark", rrect(36, 92, 128, 36, 0), shadow=False)
+    d.shape("light", rrect(46, 80, 22, 10, 2), shadow=False)
+    d.shape("sky2", rrect(48, 82, 18, 6, 1.5), shadow=False, line=False)
+    d.shape("light", circle(100, 110, 30))
+    d.shape("dark", circle(100, 110, 23))
+    d.shape("hero", circle(100, 110, 16), shadow=False, spot=True)
+    d.shape("dark", circle(100, 110, 10), shadow=False)
+    d.marks("light", circle(94, 104, 3.5))
+    d.marks("light", circle(106, 116, 1.6))
+    d.shape("glow2", circle(146, 84, 4), shadow=False)
+
+
+def photo_polaroids(d: Drawing):
+    d.disc("glow", 100, 100, 62)
+    clip_open(d)
+    d.stroke("dark", "M-10 52 Q100 76 210 52", 1.6)
+    clip_close(d)
+
+    def snap(x, y, ang, scene):
+        def draw():
+            d.shape("light", rrect(x - 22, y, 44, 52, 2))
+            d.shape("sky2", rrect(x - 18, y + 4, 36, 34, 1), shadow=False)
+            scene(x, y + 4)
+            d.shape("wood", rrect(x - 3, y - 6, 6, 14, 1.5), spot=True)
+        group(d, f"rotate({ang} {x} {y})", draw)
+
+    def mountains(x, y):
+        d.marks("glow", circle(x + 8, y + 10, 5))
+        d.shape("mid", f"M{x - 18} {y + 34} L{x - 6} {y + 14} L{x + 2} {y + 24} L{x + 8} {y + 18} L{x + 18} {y + 34}Z", shadow=False)
+        d.shape("light", f"M{x - 6} {y + 14} L{x - 2} {y + 20} L{x - 10} {y + 20}Z", shadow=False, line=False)
+
+    def tower(x, y):
+        d.shape("hero", f"M{x - 2} {y + 6} L{x + 2} {y + 6} L{x + 10} {y + 34} H{x + 4} Q{x} {y + 24} {x - 4} {y + 34} H{x - 10}Z", shadow=False)
+        d.stroke("light", f"M{x - 5} {y + 22} H{x + 5}", 1.4, line=False)
+
+    def sea(x, y):
+        d.marks("glow", circle(x - 6, y + 14, 6))
+        d.shape("near", f"M{x - 18} {y + 22} Q{x - 9} {y + 18} {x} {y + 22} T{x + 18} {y + 22} V{y + 34} H{x - 18}Z", shadow=False)
+        d.shape("hero2", f"M{x + 4} {y + 20} L{x + 10} {y + 8} L{x + 10} {y + 20}Z", shadow=False)
+    snap(52, 58, -8, mountains)
+    snap(100, 66, 4, tower)
+    snap(148, 58, 10, sea)
+    d.marks("dark", "M98 160 m0 0" if False else "M0 0")
+
+
+def photo_tripod(d: Drawing):
+    d.disc("glow", 140, 82, 22)
+    d.band("far", "M-30 128 L20 96 L50 112 L90 70 L124 108 L150 92 L230 120")
+    d.shape("light", "M90 70 L100 81 L94 79 L89 84 L83 78 L79 81Z", shadow=False)
+    d.band("mid", hills(146, 8, 10))
+    d.band("near", hills(168, 6, -20))
+    d.limb("dark", "M74 106 L44 174 M74 106 L76 178 M74 106 L104 172", 3.4)
+    d.shape("dark", rrect(66, 100, 16, 8, 2))
+    d.shape("hero", rrect(50, 76, 46, 28, 5), spot=True)
+    d.shape("hero", rrect(56, 70, 14, 8, 2))
+    d.shape("dark", rrect(94, 80, 16, 20, 3))
+    d.shape("light", rrect(108, 82, 5, 16, 1.5))
+    d.shape("light", rrect(56, 82, 14, 8, 1.5), shadow=False)
+    d.marks("pop", circle(84, 72, 2.6))
+    d.band("deep", hills(186, 3), line=False)
+
+
+# ================================================================ LANTERN FESTIVAL
+def sky_lantern(d: Drawing, x, y, s, role="pop", core="glow2"):
+    d.shape(role, f"M{x - 9 * s} {y - 12 * s} Q{x} {y - 15 * s} {x + 9 * s} {y - 12 * s} L{x + 6 * s} {y + 10 * s} Q{x} {y + 12 * s} {x - 6 * s} {y + 10 * s}Z",
+            spot=True, shadow=s > .6)
+    d.shape(core, ellipse(x, y + 8 * s, 4 * s, 2.4 * s), shadow=False)
+
+
+def lantern_sky(d: Drawing):
+    stars(d, [(30, 70, 2.4), (60, 36, 2), (150, 30, 2.6), (176, 74, 2), (110, 22, 1.8)], "light")
+    d.band("far", "M-30 140 Q30 118 70 132 Q110 112 150 128 Q180 118 230 134")
+    d.band("mid", waves(150, 3, 26))
+    if d.paper:
+        d.raw(f'<g opacity=".35" fill="{d.c["glow2"]}"><rect x="66" y="158" width="6" height="3" rx="1.5"/><rect x="118" y="164" width="8" height="3" rx="1.5"/>'
+              f'<rect x="96" y="156" width="10" height="3" rx="1.5"/></g>')
+    for x, y, s in [(52, 104, .5), (150, 104, .55), (128, 50, .7), (70, 52, .6), (172, 60, .45), (30, 116, .4), (40, 74, .45)]:
+        sky_lantern(d, x, y, s)
+    sky_lantern(d, 100, 94, 1.5)
+    d.band("deep", waves(172, 3, 30), line=False)
+
+
+def lantern_red(d: Drawing):
+    d.disc("glow", 100, 70, 26)
+    d.stroke("dark", "M-10 22 Q100 50 210 22", 1.6)
+    clip_open(d)
+    d.stroke("dark", "M-10 22 Q100 50 210 22", 1.6, line=True)
+    clip_close(d)
+    lantern(d, 44, 76, 1.6)
+    lantern(d, 156, 76, 1.6)
+    lantern(d, 100, 112, 2.4)
+    blossom(d, [(24, 150, 7), (36, 158, 6), (170, 150, 7), (182, 140, 6)], role="hero2")
+
+
+def lantern_river(d: Drawing):
+    d.disc("glow", 140, 52, 16)
+    stars(d, [(40, 40, 2.4), (80, 30, 2), (176, 80, 2)], "light")
+    d.band("far", "M-30 104 H20 V92 L28 80 L36 92 V100 H70 L84 78 L80 74 L90 62 L100 74 L96 78 L110 100 H150 V90 H170 V104 H230")
+    d.band("mid", "M-30 112 H230")
+    d.stroke("glow2", "M30 124 h20 M120 120 h30 M70 132 h14", 1.8)
+
+    def lotus(x, y, s):
+        def draw():
+            d.shape("glow2", ellipse(0, -14, 3, 6), shadow=False)
+            d.shape("pop", "M-6 -10 Q0 4 6 -10Z", shadow=False)
+            d.shape("lotus", "M-18 0 C-22 -10 -16 -14 -12 -14 C-10 -6 -6 -2 0 0 C6 -2 10 -6 12 -14 C16 -14 22 -10 18 0Z", spot=True)
+            d.shape("lotus2", "M-8 0 C-10 -8 -6 -14 0 -18 C6 -14 10 -8 8 0Z", shadow=False)
+            d.shape("leaf", ellipse(0, 2, 22, 4))
+        group(d, f"translate({x} {y}) scale({s})", draw)
+    if d.paper:
+        d.raw(f'<g opacity=".3" fill="{d.c["glow2"]}"><ellipse cx="100" cy="168" rx="16" ry="3"/><ellipse cx="46" cy="148" rx="8" ry="2"/><ellipse cx="156" cy="152" rx="8" ry="2"/></g>')
+    lotus(46, 136, .7)
+    lotus(156, 140, .75)
+    lotus(132, 120, .45)
+    lotus(100, 156, 1.35)
+
 GOLD = {"gold": "#E2B04A", "gold2": "#B7862C"}
 STONE = {"stone": "#D8CCB8", "stone2": "#B5A68E"}
 WOOD = {"wood": "#B07A4A", "wood2": "#8A5A33"}
@@ -986,4 +1260,28 @@ CONCEPTS = [
             checks=[("pop", "sky"), ("hero", "far"), ("hero2", "far"), ("pop", "far"), ("light", "hero2")], fixes={"far": ["mid", "near"], "hero2": ["glow", "near"]}),
     Concept("festival-dragon", "festival", "Dragon dance", festival_dragon, overrides={"pop": "#D7372B", "hero2": "#F2C14E"},
             checks=[("pop", "sky"), ("hero2", "sky"), ("pop", "far"), ("hero2", "far")], fixes={"sky": ["sky2", "far", "mid"], "far": ["mid", "near", "deep"]}),
+    Concept("carnival-mask", "carnival", "Masquerade mask", carnival_mask, overrides={**GOLD, "wood": "#8A5A33"},
+            checks=[("gold", "glow"), ("pop", "gold"), ("hero", "glow"), ("hero2", "glow")], fixes={"glow": ["mid", "near", "deep"]}),
+    Concept("carnival-carousel", "carnival", "Carousel horse", carnival_carousel, overrides={**GOLD, "horse": "#FFFFFF"},
+            checks=[("horse", "far"), ("hero", "far"), ("gold", "far"), ("hero", "sky")], fixes={"far": ["mid", "near", "deep"]}),
+    Concept("carnival-ferris", "carnival", "Ferris wheel", carnival_ferris,
+            checks=[("hero", "sky"), ("hero", "far"), ("pop", "sky"), ("hero2", "sky"), ("light", "sky")], fixes={"sky": ["sky2", "far"], "far": ["mid", "near"]}),
+    Concept("concert-guitar", "concert", "Acoustic guitar", concert_guitar, overrides={"guitar": "#D9893B", "guitar2": "#E9A65A", "neck": "#7A4A26"},
+            checks=[("guitar", "glow"), ("neck", "glow"), ("dark", "glow")], fixes={"glow": ["far", "mid", "light", "near"]}),
+    Concept("concert-stage", "concert", "Live on stage", concert_stage, palettes=["dusk", "golden", "coastal", "blush", "meadow"],
+            overrides={**NIGHT, "crowd": "#0B0F1C"}, checks=[("dark", "mid"), ("dark", "sky"), ("crowd", "mid")], fixes={"dark": ["#0B0F1C"]}),
+    Concept("concert-violin", "concert", "Violin & bow", concert_violin, overrides={"violin": "#B5562B", "violin2": "#8A3D1C", "wood": "#5A3A22"},
+            checks=[("violin", "glow"), ("violin2", "glow"), ("wood", "glow")], fixes={"glow": ["light", "far", "sky2"]}),
+    Concept("photo-camera", "photography-walk", "Vintage camera", photo_camera,
+            checks=[("hero", "glow"), ("light", "glow"), ("dark", "hero")], fixes={"glow": ["far", "mid", "near"]}),
+    Concept("photo-polaroids", "photography-walk", "Instant snaps", photo_polaroids, overrides={"wood": "#C98F52"},
+            checks=[("light", "glow"), ("mid", "sky2"), ("hero", "sky2")], fixes={"glow": ["far", "mid", "near"]}),
+    Concept("photo-tripod", "photography-walk", "Camera on tripod", photo_tripod,
+            checks=[("hero", "mid"), ("hero", "far"), ("hero", "sky"), ("dark", "near"), ("dark", "mid")], fixes={"hero": ["pop", "hero2", "light"]}),
+    Concept("lantern-sky", "lantern-festival", "Sky lanterns", lantern_sky, palettes=["dusk", "golden", "coastal", "blush", "meadow"], overrides=NIGHT,
+            checks=[("pop", "sky"), ("pop", "far")], fixes={"pop": ["hero2", "glow"]}),
+    Concept("lantern-red", "lantern-festival", "Red lanterns", lantern_red, overrides={"pop": "#D7372B", "hero2": "#F2C14E"},
+            checks=[("pop", "sky"), ("pop", "glow"), ("hero2", "sky")], fixes={"glow": ["far", "light", "mid"], "sky": ["sky2", "far"]}),
+    Concept("lantern-river", "lantern-festival", "River lanterns", lantern_river, palettes=["dusk", "golden", "coastal", "blush", "meadow"],
+            overrides={**NIGHT, "lotus": "#F4A6B8", "lotus2": "#FBD3DC", "leaf": "#4F8A5B"}, checks=[("lotus", "mid"), ("leaf", "mid"), ("far", "sky")]),
 ]

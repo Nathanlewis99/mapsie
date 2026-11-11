@@ -423,12 +423,13 @@ def _jungle(d: Drawing, y, role, amp=10, step=26, shadow=True, line=True):
 
 
 def _trolley(d: Drawing, body="hero", wheel="dark"):
-    """A zip-line trolley riding a cable at y=100 (wheels sit on the cable), hanging down to y~138."""
-    d.shape(body, "M70 98 H130 Q136 98 136 104 V116 Q136 124 126 128 L110 136 L90 136 L74 128 Q64 124 64 116 V104 Q64 98 70 98Z", spot=True)
-    for x in (84, 116):
-        d.shape(wheel, circle(x, 90, 11), shadow=False)
-        d.shape("light", circle(x, 90, 3.6), shadow=False)
-    d.marks("dark", circle(100, 126, 4))
+    """A zip-line trolley on a cable at y=100: pulley rims peep over the side plate, which hangs to y~138."""
+    for x in (82, 118):
+        d.shape(wheel, circle(x, 92, 12), shadow=False)
+        d.shape("hero2", circle(x, 92, 7), shadow=False, line=False)
+    d.shape(body, "M62 90 H138 Q144 90 142 98 L134 124 Q130 132 120 134 L80 134 Q70 132 66 124 L58 98 Q56 90 62 90Z", spot=True)
+    d.marks("dark", circle(82, 100, 2.6) + circle(118, 100, 2.6) + circle(100, 124, 4.5))
+    d.stroke("dark", "M76 114 H124", 1.6, line=False)
 
 
 def zip_jungle(d: Drawing):
@@ -514,9 +515,9 @@ def bungee_bridge(d: Drawing):
 def bungee_dive(d: Drawing):
     d.disc("glow", 100, 112, 44)
     d.band("far", hills(150, 10, 20))
-    d.shape("sky2", "M62 230 C72 196 112 186 106 166 C104 158 110 154 116 154 C122 160 120 170 130 180 C142 194 134 214 138 230Z", line=False)
-    _line_only(d, "M62 230 C72 196 112 186 106 166 C104 158 110 154 116 154 M116 154 C122 160 120 170 130 180 C142 194 134 214 138 230", 2.4)
-    d.band("near", hills(182, 6, 30), line=False)
+    d.band("mid", hills(166, 8, -20))
+    d.band("sky2", waves(180, 3, 30))
+    d.band("near", hills(190, 4, 30), line=False)
     d.stroke("pop", "M100 -10 C92 6 108 18 100 36", 3.4)
     d.shape("dark", _bar(96, 48, 95, 98, 10))
     d.shape("dark", _bar(104, 48, 105, 98, 10))
@@ -869,7 +870,7 @@ def skate_rink(d: Drawing):
         for wy in range(int(140 - h + 8), 132, 12):
             for wx in range(x + 5, x + w - 4, 8):
                 d.shape("glow2", rrect(wx, wy, 3.5, 5, 0.5), shadow=False, line=False)
-    _line_only(d, "M-10 82 H20 V58 H44 V92 H72 M128 72 H152 V50 H184 V84 H216", 2.2)
+    _line_only(d, "M-10 82 H20 V58 H44 V92 H72 M128 72 H152 V50 H184 V84 H196", 2.2)
     d.stroke("dark", "M-10 70 Q40 90 100 64 Q160 90 210 70", 1.2)
     for i, (x, y) in enumerate([(14, 76), (36, 82), (58, 80), (80, 72), (124, 72), (146, 80), (168, 82), (188, 76)]):
         d.marks("pop" if i % 2 else "glow2", circle(x, y, 2.6))
@@ -1088,8 +1089,8 @@ CONCEPTS = [
             checks=[("dark", "sky"), ("dark", "far"), ("hero", "sky")]),
     Concept("bungee-bridge", "bungee-jumping", "Gorge bridge", bungee_bridge, checks=[("dark", "sky"), ("far", "sky")],
             fixes={"far": ["mid", "near"]}),
-    Concept("bungee-dive", "bungee-jumping", "Swan dive", bungee_dive, checks=[("hero", "sky"), ("dark", "sky"), ("hero", "far"), ("pop", "sky")],
-            fixes={"hero": ["pop", "hero2"]}),
+    Concept("bungee-dive", "bungee-jumping", "Swan dive", bungee_dive, checks=[("hero", "sky"), ("dark", "sky"), ("hero", "glow"), ("pop", "sky"), ("sky2", "mid")],
+            fixes={"hero": ["pop", "hero2"], "sky2": ["near", "deep"]}),
     Concept("bungee-cliff", "bungee-jumping", "Cliff jump", bungee_cliff, checks=[("pop", "sky"), ("dark", "sky"), ("mid", "sky")]),
     Concept("ski-chairlift", "skiing", "Chairlift", ski_chairlift, checks=[("hero", "sky"), ("pop", "sky"), ("pop", "far"), ("light", "mid"), ("dark", "sky")],
             fixes={"pop": ["hero2", "deep"]}),

@@ -146,7 +146,7 @@ def foam(d: Drawing, x0, x1, y, r=7, role="water2"):
         s += circle(x, y - (i % 2) * 3, r * (0.8 + 0.3 * (i % 3) / 2))
         x += r * 1.3
         i += 1
-    d.shape(role, s)
+    d.shape(role, s, line=False)
 
 
 def is_night(d: Drawing):
@@ -269,8 +269,8 @@ def blackbear_cub_tree(d: Drawing):
 GRIZZLY = ("M44 116 C42 100 52 92 66 90 C82 88 94 86 102 80 C110 66 128 58 142 66 C150 71 154 78 157 85 "
            "C161 82 167 82 171 86 C174 90 176 93 181 95 C187 97 190 103 186 107 L173 111 C167 117 159 120 153 120 "
            "L155 152 L138 152 L136 133 C120 137 100 137 86 134 L84 152 L68 152 L64 136 C51 134 44 126 44 116Z")
-GRIZZLY_HUMP = ("M96 84 C108 66 128 58 142 66 C150 71 154 78 157 85 C156 98 152 110 150 122 C140 112 128 100 112 94 "
-                "C104 90 98 88 96 84Z")
+GRIZZLY_HUMP = ("M98 82 C108 66 128 58 142 66 C150 71 154 78 157 85 C152 92 146 96 140 94 C132 86 124 80 114 82 "
+                "C108 84 102 84 98 82Z")
 
 
 def grizzly(d: Drawing, mouth_open=False):
@@ -428,9 +428,9 @@ def moose(d: Drawing):
     """Side-on bull moose facing right; hooves at y=170. Hump, long legs, overhanging muzzle, dewlap, palm antler."""
     for x0, x1 in [(120, 122), (66, 62)]:
         d.limb("hero3", f"M{x0} 120 L{x1} 168", 8)
-    group(d, "rotate(-18 154 82)", lambda: flip(d, lambda: d.shape("antler2", MOOSE_ANTLER), cx=154))
+    group(d, "translate(4 2) rotate(-14 154 82)", lambda: flip(d, lambda: d.shape("antler2", MOOSE_ANTLER), cx=154))
     d.shape("hero", leaf(150, 82, 18, 5, -150))
-    group(d, "rotate(22 154 82)", lambda: d.shape("antler", MOOSE_ANTLER, spot=True))
+    group(d, "translate(4 2) rotate(12 154 82)", lambda: d.shape("antler", MOOSE_ANTLER, spot=True))
     for x0, x1 in [(136, 138), (80, 76)]:
         d.limb("hero2", f"M{x0} 120 C{x0 + 2} 140 {x1} 150 {x1} 168", 9)
     d.shape("hero", MOOSE)
@@ -444,7 +444,7 @@ def moose_lake(d: Drawing):
     peaks(d, "far", True, 112)
     pines(d, [(8, 40), (22, 52), (36, 38), (164, 44), (180, 56), (196, 40)], 118, "near")
     d.band("mid", "M-30 116 L230 116", line=False)
-    place(d, moose, 100, 150, 1.0, 110, 150)
+    place(d, moose, 90, 160, 0.9, 110, 150)
     d.band("water", "M-30 140 Q100 134 230 140")
     d.stroke("water2", "M30 150 H70 M120 148 H170 M60 162 H100 M140 166 H176", 2.4)
     ripples(d, [(62, 140, 1.2), (114, 140, 1.2)], "water2")
@@ -560,8 +560,8 @@ def wolf_howl(d: Drawing):
         d.shape("hero", "M56 166 C40 170 24 168 14 160 C10 156 14 152 18 154 C28 158 42 158 54 156Z")
         d.shape("hero2", "M14 160 C10 156 14 152 18 154 L26 157 L22 164Z", shadow=False, line=False)
         d.shape("hero", WOLF_SIT)
-        d.shape("hero2", "M130 76 C130 88 128 98 128 108 L122 110 C120 96 120 84 124 72Z", shadow=False)
-        d.shape("hero2", "M60 128 C70 120 84 122 90 134 C94 146 90 160 84 166 L58 166 C54 152 54 138 60 128Z", shadow=False)
+        d.shape("hero2", "M130 76 C130 88 128 98 128 108 L122 110 C120 96 120 84 124 72Z", shadow=False, line=False)
+        d.shape("hero", "M60 128 C70 120 84 122 90 134 C94 146 90 160 84 166 L58 166 C54 152 54 138 60 128Z", line=False)
         d.marks("mark", circle(125, 54, 1.6) + circle(147, 34, 1.8))
     place(d, wolf, 104, 160, 1.02, 100, 168)
     d.stroke("light", "M166 34 q6 -2 8 -8 M170 46 q8 -2 12 -8", 2)
@@ -667,8 +667,6 @@ def otter_float(d: Drawing):
     place(d, otter, 100, 112, 1.35, 96, 112)
     d.band("near", waves(122, 3, 28))
     ripples(d, [(30, 136, 1.4), (120, 138, 1.6), (70, 150, 1.2)])
-    for x, y, a in [(60, 160, -20), (100, 170, 200), (180, 160, 170)]:
-        d.shape("kelp", leaf(x, y, 28, 6, a), shadow=False, line=False)
     d.band("deep", waves(178, 4, 36), line=False)
 
 
@@ -725,7 +723,7 @@ def beaver_lodge(d: Drawing):
         d.marks("mark", circle(145, 106, 2) + ellipse(162, 121, 3, 2.4))
         d.shape("teeth", rrect(150, 130, 6, 8, 1.5), shadow=False)
         d.shape("mark", ellipse(146, 142, 6, 4.5) + ellipse(84, 162, 14, 5))
-    place(d, beaver, 120, 170, 0.78, 100, 168, mirror=True)
+    place(d, beaver, 112, 166, 0.86, 100, 168, mirror=True)
     d.band("deep", hills(190, 3, 30), line=False)
 
 
@@ -782,7 +780,7 @@ def raccoon_log(d: Drawing):
         d.marks("light", circle(152, 109, 1.6))
         d.marks("mark", ellipse(171, 117, 2.6, 2.2))
         d.shape("mark", rrect(130, 140, 12, 6, 3) + rrect(70, 140, 12, 6, 3), shadow=False, line=False)
-    place(d, coon, 96, 150, 1.05, 100, 146)
+    place(d, coon, 104, 150, 1.02, 100, 146)
     d.limb("bark", "M-20 160 L176 156", 20)
     d.shape("wood", ellipse(176, 156, 7, 10))
     d.stroke("bark", "M176 152 a3 4 0 1 1 0 8", 1.4)
@@ -882,7 +880,6 @@ def gator_swamp(d: Drawing):
     d.band("far", hills(118, 4), line=False)
     cypress(d, 26, 124, 90)
     cypress(d, 172, 124, 100)
-    cypress(d, 140, 120, 56, "near", moss=False, s=0.6)
     d.band("mid", "M-30 122 L230 122")
     d.stroke("glow2", "M84 130 H116 M90 136 H110", 2.4)
 
@@ -922,7 +919,7 @@ def manatee_spring(d: Drawing):
     underwater(d)
     for x in (20, 30, 44, 150, 164, 178):
         d.shape("mid", leaf(x, 182, 40 + (x % 3) * 6, 4, -90 + (x % 5) * 3), shadow=False, line=False)
-    p = ((26, 104), (62, 92), (130, 90), (172, 112))
+    p = ((40, 104), (74, 92), (136, 90), (176, 112))
     prof = lambda t: (4 + 18 * math.sin(math.pi * (0.12 + 0.72 * t)), 4 + 20 * math.sin(math.pi * (0.12 + 0.72 * t)))
     x, y, dx, dy = _bez(p, 0.0)
     d.shape("hero", f"M{x + 4} {y - 4} C{x - 10} {y - 22} {x - 30} {y - 14} {x - 30} {y + 2} C{x - 30} {y + 18} {x - 10} {y + 22} {x + 4} {y + 8}Z")
@@ -986,12 +983,10 @@ def orca_fin(d: Drawing, x, y, h, s=1.0, blow=False):
                     f"C{x + 4 * s} {y - h * 0.7} {x + 8 * s} {y - h * 0.4} {x + 12 * s} {y - 11 * s}Z")
     d.shape("hero2", ellipse(x - 14 * s, y - 8 * s, 8 * s, 3 * s), shadow=False, line=False)
     if blow:
-        bx, by = x + 30 * s, y - 8 * s
-        d.shape("light", f"M{bx - 2} {by} C{bx - 10} {by - 14} {bx - 22} {by - 24} {bx - 26} {by - 34} C{bx - 16} {by - 30} {bx - 6} {by - 22} "
-                         f"{bx} {by - 12} C{bx + 2} {by - 24} {bx + 8} {by - 34} {bx + 16} {by - 40} C{bx + 14} {by - 28} {bx + 8} {by - 14} {bx + 3} {by}Z",
-                spot=True)
-        for dx, dy, r in [(-28, -40, 2.4), (-18, -44, 2), (18, -46, 2.4), (6, -48, 2), (-8, -42, 1.8)]:
-            d.shape("light", drop(bx + dx * s, by + dy * s, r), shadow=False)
+        bx, by = x + 26 * s, y - 10 * s
+        d.stroke("light", f"M{bx} {by} L{bx - 8} {by - 22} M{bx + 1} {by} L{bx + 1} {by - 26} M{bx + 2} {by} L{bx + 10} {by - 22}", 2.6)
+        for dx, dy, r in [(-10, -28, 2.6), (1, -33, 2.8), (12, -28, 2.6), (-16, -20, 2), (18, -19, 2), (-4, -40, 2), (8, -40, 2)]:
+            d.shape("light", drop(bx + dx, by + dy, r), shadow=False)
 
 
 def orca_islands(d: Drawing):
@@ -1140,9 +1135,9 @@ def walrus_rock(d: Drawing):
     d.shape("ice2", "M170 70 L186 92 L192 108 L176 108 L178 90Z", shadow=False, line=False)
     d.band("far", waves(106, 2, 30))
     d.band("mid", waves(124, 3, 34))
-    d.shape("rock", "M-10 172 C-6 146 24 132 60 132 L150 130 C180 130 204 144 210 172Z")
-    place(d, walrus, 156, 136, 0.5, 100, 150, mirror=True)
-    place(d, walrus, 82, 154, 0.74, 100, 150)
+    d.shape("rock", "M-10 176 C-6 152 24 144 60 144 L150 142 C180 142 204 152 210 176Z")
+    place(d, walrus, 132, 140, 0.62, 100, 150)
+    place(d, walrus, 74, 168, 0.95, 100, 150)
     d.band("near", waves(166, 4, 34))
     ripples(d, [(30, 180, 1.6), (130, 182, 1.6)])
     d.band("deep", waves(190, 3, 38), line=False)
@@ -1211,8 +1206,8 @@ def narwhal_ice(d: Drawing):
     d.band("far", waves(104, 2, 30))
     d.shape("light", "M10 128 C10 120 30 116 50 118 C62 120 64 128 58 132 L16 134Z M150 124 C152 116 178 116 196 120 L196 132 "
                      "L154 132Z", shadow=True)
-    group(d, "translate(76 144) scale(1.5) translate(-76 -144)", lambda: narwhal_head(d, 76, 144, 22, 58))
-    group(d, "translate(124 144) scale(1.5) translate(-124 -144)", lambda: narwhal_head(d, 124, 144, -22, 58))
+    group(d, "translate(76 144) scale(1.5) translate(-76 -144)", lambda: narwhal_head(d, 76, 144, 22, 48))
+    group(d, "translate(124 144) scale(1.5) translate(-124 -144)", lambda: narwhal_head(d, 124, 144, -22, 48))
     d.band("mid", waves(140, 3, 32))
     ripples(d, [(58, 140, 1.4), (110, 140, 1.4)])
     d.band("near", waves(160, 4, 36))
@@ -1282,7 +1277,7 @@ def reindeer_lapland(d: Drawing):
     d.stroke("dark", "M32 74 L40 88 M44 74 L36 88", 2)
     d.shape("glow2", "M32 136 L38 116 L44 136Z", shadow=False, spot=True)
     d.band("snow", hills(134, 5))
-    place(d, reindeer, 108, 160, 0.92, 110, 152)
+    place(d, reindeer, 100, 164, 0.86, 110, 152)
     d.band("snow2", hills(176, 3), line=False)
 
 
@@ -1368,7 +1363,7 @@ def puffin_standing(d: Drawing, fish_=True):
     d.shape("pop", ellipse(98, 162, 9, 3) + ellipse(112, 162, 9, 3), shadow=False)
     d.shape("dark", "M84 160 C70 140 72 104 90 88 C98 80 112 80 118 88 C124 96 124 108 120 116 C128 132 128 150 118 162Z")
     d.shape("light", "M112 114 C122 128 125 148 116 161 L100 161 C106 146 108 128 112 114Z", shadow=False)
-    d.shape("dark", "M88 104 C80 120 80 140 86 154 C92 140 96 122 94 104Z", shadow=False)
+    d.shape("dark", "M88 104 C80 120 80 140 86 154 C92 140 96 122 94 104Z", shadow=False, line=False)
     d.shape("face", "M104 82 C114 78 124 84 124 94 C124 102 118 108 110 108 C104 104 102 92 104 82Z", shadow=False)
     d.shape("pop", "M122 84 C130 86 138 92 142 98 C136 102 130 104 122 104Z", spot=True)
     d.shape("beakbase", "M122 84 L126 85 L126 103 L122 104Z", shadow=False)
@@ -1394,10 +1389,9 @@ def puffin_cliff(d: Drawing):
     d.shape("cliff", "M-30 230 L-30 150 C10 144 60 150 100 152 C140 154 170 156 230 150 L230 230Z")
     d.shape("turf", "M-30 154 C10 146 60 150 100 152 C140 154 170 156 230 152 L230 162 C170 166 140 162 100 162 "
                     "C60 162 10 158 -30 164Z", shadow=False)
-    d.stroke("deep", "M30 176 L40 200 M120 172 L112 196 M160 174 L172 200", 2, line=False)
     for x, y in [(30, 150), (150, 154), (176, 152)]:
         d.shape("turf", f"M{x} {y} l3 -9 l2 8 l3 -10 l2 11Z", shadow=False, line=False)
-    place(d, puffin_standing, 92, 160, 1.5, 106, 162)
+    place(d, puffin_standing, 98, 160, 1.28, 106, 162)
 
 
 # ================================================================ BELUGA

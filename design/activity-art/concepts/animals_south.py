@@ -1013,8 +1013,509 @@ def toucan_hollow(d: Drawing):
         d.shape("near", leaf(x, y, 30, 8, a))
 
 
+# ================================================================ OCEAN HELPERS
+def snorkeller(d: Drawing, suit="hero2", fins="pop", skin="dark"):
+    """A snorkeller floating face-down, head to the left at (60, 52)."""
+    d.limb(skin, "M112 52 L140 46 M112 58 L142 60", 7)
+    d.shape(fins, ellipse(150, 42, 11, 4.5), extra='transform="rotate(-14 150 42)"', spot=True)
+    d.shape(fins, ellipse(152, 62, 11, 4.5), extra='transform="rotate(10 152 62)"', spot=True)
+    d.shape(suit, rrect(66, 46, 52, 18, 9))
+    d.limb(suit, "M74 60 Q60 70 46 66", 6)
+    d.shape(suit, circle(60, 52, 10))
+    d.shape(skin, rrect(48, 49, 12, 9, 3), shadow=False)
+    d.shape("light", rrect(50, 51, 8, 5, 2), shadow=False)
+    d.stroke(fins, "M66 46 V32", 3)
+
+
+def diver(d: Drawing, suit="dark", tank="hero2", fins="pop"):
+    """The pilot scuba diver, swimming left, centred near (100, 100)."""
+    d.stroke(fins, "M84 86 Q60 78 47 99", 2.6)
+    d.shape(tank, rrect(78, 80, 46, 15, 7.5), spot=True)
+    d.limb(suit, "M128 97 L152 87", 8)
+    d.limb(suit, "M130 107 L155 107", 8)
+    d.shape(fins, ellipse(166, 81, 14, 5.5), extra='transform="rotate(-24 166 81)"', spot=True)
+    d.shape(fins, ellipse(169, 108, 14, 5.5), extra='transform="rotate(4 169 108)"', spot=True)
+    d.shape(suit, rrect(60, 93, 74, 21, 10.5))
+    d.limb(suit, "M73 111 Q58 119 41 118", 7)
+    d.shape(suit, circle(54, 103, 12))
+    d.shape(tank, rrect(40, 97, 15, 11, 3.5), shadow=False)
+    d.shape("light", rrect(42.5, 99.5, 10, 6, 2), shadow=False)
+
+
+def deep_water(d: Drawing, bottom=False):
+    d.band("sky2", waves(30, 4, 26))
+    d.band("far", waves(58, 5, 28))
+    d.band("mid", waves(92, 6, 30))
+    d.band("near", waves(130, 6, 34))
+    d.band("deep", waves(164, 5, 36), line=False)
+    if bottom:
+        d.band("ground", "M-30 180 Q40 168 80 178 T160 174 T230 176")
+
+
+# ================================================================ MANTA RAY
+MANTA_OUT = ("M100 50 C112 50 120 56 126 64 C146 64 166 72 180 90 C168 96 146 104 128 118 C122 130 112 138 100 138 "
+             "C88 138 78 130 72 118 C54 104 32 96 20 90 C34 72 54 64 74 64 C80 56 88 50 100 50Z")
+MANTA_BELLY = ("M100 62 C110 62 118 68 122 76 C138 78 154 84 164 92 C150 96 134 104 122 114 C116 124 108 130 100 130 "
+               "C92 130 84 124 78 114 C66 104 50 96 36 92 C46 84 62 78 78 76 C82 68 90 62 100 62Z")
+MANTA_HORN = "M78 64 C70 56 68 44 74 36 C80 42 86 52 88 60Z"
+
+
+def manta_belly(d: Drawing):
+    deep_water(d)
+    d.disc("glow", 100, 8, 26)
+    rays(d, ((40, 20), (110, 14), (150, 10)))
+    for x, y, s in [(40, 150, 0.8), (54, 158, 0.7), (150, 160, 0.8), (164, 152, 0.7)]:
+        d.shape("pop", fish(x, y, s), shadow=False)
+
+    def ray():
+        d.stroke("hero", "M100 136 Q106 160 98 190", 3)
+        d.shape("hero", MANTA_HORN)
+        flip(d, lambda: d.shape("hero", MANTA_HORN))
+        d.shape("hero", MANTA_OUT)
+        d.shape("light", MANTA_BELLY, shadow=False, spot=True)
+        d.shape("mark", rrect(82, 54, 36, 7, 3.5), shadow=False)
+        gills = ""
+        for i in range(5):
+            y = 78 + i * 7
+            gills += f"M{74 - i * 0.5} {y} q7 2.5 14 0.5 M{126 + i * 0.5} {y} q-7 2.5 -14 0.5 "
+        d.stroke("mark", gills, 1.8)
+        d.marks("mark", "".join(circle(x, y, r) for x, y, r in [(100, 112, 2.6), (108, 118, 1.8), (92, 104, 2), (114, 104, 1.6),
+                                                               (96, 122, 1.6), (62, 92, 1.8)]))
+    group(d, "rotate(-8 100 100) translate(0 4)", ray)
+    bubbles(d, [(160, 70, 2.5), (166, 58, 3.4)])
+
+
+def manta_diver(d: Drawing):
+    water(d)
+    rays(d)
+    d.shape("pop", "M30 176 C28 160 36 150 46 150 C56 150 62 160 60 176Z")
+    d.stroke("mark", "M36 168 q6 -6 12 0 M40 160 q5 -5 10 0", 1.4, line=False)
+    d.limb("hero2", "M160 178 V160 M160 166 L150 154 M160 162 L170 150", 5)
+
+    def ray():
+        d.stroke("hero", "M100 136 Q96 160 104 184", 3)
+        d.shape("hero", "M74 62 C68 56 70 46 78 44 C82 50 86 56 86 60Z")
+        flip(d, lambda: d.shape("hero", "M74 62 C68 56 70 46 78 44 C82 50 86 56 86 60Z"))
+        d.shape("hero", MANTA_OUT, spot=True)
+        d.shape("light", "M90 66 C78 70 60 76 46 86 C62 84 78 82 92 78Z", shadow=False)
+        flip(d, lambda: d.shape("light", "M90 66 C78 70 60 76 46 86 C62 84 78 82 92 78Z", shadow=False))
+        d.shape("hero", "M96 126 L100 136 L104 126Z", shadow=False)
+        d.stroke("mark", "M100 58 V128", 1.2, line=False)
+    group(d, "translate(96 92) scale(.86) rotate(-14) translate(-100 -94)", ray)
+    at(d, 150, 140, 0.42, lambda: diver(d), rot=-20)
+    bubbles(d, [(116, 118, 2.2), (112, 108, 3), (118, 98, 2)])
+
+
+# ================================================================ SEA TURTLE
+def seaturtle_portrait(d: Drawing):
+    water(d, bottom=False)
+    rays(d)
+    for x, y, s in [(150, 160, 0.8), (164, 168, 0.7), (40, 44, 0.7)]:
+        d.shape("pop", fish(x, y, s), shadow=False)
+
+    def t():
+        d.shape("hero2", "M168 104 C178 108 186 116 188 128 C178 126 168 120 162 110Z")
+        d.shape("flip2", "M108 84 C118 66 134 52 156 44 C148 62 134 80 120 92Z")
+        d.shape("hero", "M66 102 C70 72 100 54 134 56 C162 58 182 76 184 98 C170 108 120 114 66 108Z", spot=True)
+        d.shape("light", "M66 104 C110 112 160 108 184 98 C182 104 176 108 168 110 C130 116 96 116 70 112Z", shadow=False)
+        d.stroke("mark", "M84 80 L104 66 M104 66 L126 61 L148 65 L166 78 M104 66 L108 92 M126 61 L128 94 M148 65 L150 92 "
+                         "M78 98 L108 92 L128 94 L150 92 L178 94", 2)
+        d.shape("hero2", "M70 92 C62 88 58 86 54 84 L58 104 C62 104 66 106 72 108Z")
+        d.shape("hero2", "M84 104 C74 120 60 140 36 156 C30 160 30 166 38 164 C64 156 86 136 100 114Z")
+        d.stroke("light", "M80 122 l8 5 M70 134 l8 5 M58 146 l7 4", 1.4, line=False)
+        d.shape("hero2", "M60 80 C52 72 38 72 30 78 C22 84 20 94 24 100 C30 106 44 108 58 106 C66 104 68 96 66 88Z")
+        d.stroke("light", "M48 77 L54 85 L48 93 M54 85 L64 88 M36 94 L48 93 L54 101", 1.4, line=False)
+        d.stroke("mark", "M24 98 Q34 102 46 100", 1.6)
+        d.marks("mark", circle(42, 86, 3.4))
+        d.marks("light", circle(43.2, 84.8, 1.1))
+    group(d, "translate(4 6)", t)
+    bubbles(d, [(26, 64, 2.5), (20, 52, 3.4)])
+
+
+def seaturtle_nesting(d: Drawing):
+    d.disc("glow", 150, 44, 16)
+    d.marks("light", "".join(circle(x, y, r) for x, y, r in [(30, 50, 1.2), (60, 30, 1), (100, 22, 1.3), (118, 48, 1), (176, 76, 1.1), (44, 76, 0.9)]))
+    d.band("far", "M-30 92 H230")
+    d.stroke("glow2", "M140 100 H160 M144 106 H156", 2, line=False)
+    d.band("mid", waves(110, 2, 26))
+    d.shape("light", "M-30 120 Q20 112 60 120 T150 118 T230 120 V128 H-30Z", shadow=False, line=False)
+    d.band("ground", "M-30 126 Q60 118 120 126 T230 124")
+    tr = ""
+    for i in range(7):
+        x, y = 30 + i * 9, 132 + i * 6
+        tr += f"M{x - 6} {y} l5 -2 M{x + 4} {y + 4} l5 -2 "
+    d.stroke("sand2", tr, 2.4)
+
+    def t():
+        d.shape("hero2", "M70 156 C58 160 50 166 46 174 C58 176 68 172 78 164Z")
+        d.shape("hero2", "M150 140 C164 132 178 134 184 142 C186 150 178 154 168 152 L152 150Z")
+        d.shape("hero", "M62 162 C64 132 90 118 118 118 C146 118 160 136 162 160 C140 166 86 168 62 162Z", spot=True)
+        d.stroke("mark", "M82 132 L100 124 L122 124 L142 134 M100 124 L102 160 M122 124 L124 160 M70 146 L102 142 L124 142 L156 146", 2)
+        d.shape("light", "M62 162 C86 168 140 166 162 160 L160 166 C140 172 86 172 64 168Z", shadow=False)
+        d.shape("hero2", "M136 154 C150 156 164 166 172 176 C158 178 144 172 132 164Z")
+        d.marks("mark", circle(170, 141, 2.2))
+        d.stroke("mark", "M184 146 Q178 150 172 148", 1.3)
+    group(d, "translate(-6 4)", t)
+    d.shape("sand2", "M30 178 Q60 170 90 178 Q60 182 30 178Z", shadow=False, line=False)
+
+
+# ================================================================ SEAHORSE
+SH_TRACK = [(106, 58), (114, 80), (114, 104), (106, 126), (100, 142), (102, 158), (112, 168), (124, 164), (126, 152),
+            (118, 147), (113, 153)]
+SH_W = [22, 28, 30, 24, 15, 11, 9, 7, 5.5, 4.5, 3.5]
+
+
+def _interp_w(ws):
+    def f(t):
+        x = t * (len(ws) - 1)
+        i = min(int(x), len(ws) - 2)
+        return ws[i] + (ws[i + 1] - ws[i]) * (x - i)
+    return f
+
+
+def seahorse(d: Drawing, spot=True):
+    """A seahorse facing left, head at (100, 46), tail curled at the bottom."""
+    wf = _interp_w(SH_W)
+    d.shape("hero2", "M120 92 C134 94 140 106 136 122 L120 118Z")
+    d.stroke("mark", "M122 98 L134 104 M121 106 L136 112 M120 114 L135 119", 1, line=False)
+    d.shape("hero", ribbon(SH_TRACK, wf), spot=spot)
+    d.shape("hero", ellipse(104, 104, 15, 20), shadow=False)
+    rings = ""
+    for x, y, nx, ny, t in track(SH_TRACK)[4:64:4]:
+        hw = wf(t) / 2
+        rings += f"M{x + nx * hw:.1f} {y + ny * hw:.1f} L{x - nx * hw:.1f} {y - ny * hw:.1f} "
+    d.stroke("mark", rings, 1.4, line=False)
+    d.shape("hero", "M86 46 C88 32 106 28 116 38 C122 44 122 56 114 62 L98 66 C90 62 86 54 86 46Z")
+    d.shape("hero", "M92 52 L60 58 C55 58 53 61 54 65 L58 67 C64 66 72 64 94 62Z")
+    d.shape("hero", "M96 34 L98 22 L102 31 L106 22 L108 32 L112 26 L112 36Z", shadow=False)
+    d.shape("hero2", "M112 60 C118 58 124 62 122 70 C118 68 114 66 112 62Z", shadow=False)
+    d.shape("light", circle(100, 46, 4.6), shadow=False)
+    d.marks("mark", circle(99.5, 46, 2.4))
+    d.marks("hero2", "".join(circle(x, y, 1.3) for x, y in [(96, 92), (100, 112), (110, 84), (92, 104), (108, 120), (74, 60)]))
+
+
+def seagrass(d: Drawing, xs, role="near", h=120):
+    for i, x in enumerate(xs):
+        k = 1 if i % 2 else -1
+        d.shape(role, ribbon([(x, 214), (x + 4 * k, 214 - h * 0.4), (x - 6 * k, 214 - h * 0.75), (x + 4 * k, 214 - h)], 9, 3), line=False)
+
+
+def seahorse_portrait(d: Drawing):
+    water(d, bottom=False)
+    rays(d)
+    seagrass(d, [20, 34, 168, 182, 194], "near", 110)
+    group(d, "translate(108 102) scale(1.04) translate(-100 -100)", lambda: seahorse(d))
+    bubbles(d, [(52, 40, 2.5), (44, 30, 3.4), (54, 22, 2)])
+
+
+def seahorse_pair(d: Drawing):
+    water(d)
+    rays(d)
+    seagrass(d, [16, 186], "near", 120)
+    d.shape("near", ribbon([(100, 214), (102, 170), (98, 130), (102, 96)], 8, 3))
+    at(d, 62, 104, 0.66, lambda: seahorse(d), flipx=True, ox=110, oy=100)
+    at(d, 138, 104, 0.66, lambda: seahorse(d, spot=False), ox=110, oy=100)
+    group(d, "translate(100 42) scale(.55)", lambda: d.shape("pop", "M0 -6 C-3 -13 -14 -12 -13 -3 C-12 4 -4 8 0 14 C4 8 12 4 13 -3 C14 -12 3 -13 0 -6Z", spot=True))
+
+
+# ================================================================ OCTOPUS
+OCTO_ARMS = [
+    [(76, 112), (52, 120), (30, 114), (22, 100), (28, 90), (36, 94), (34, 100)],
+    [(82, 118), (64, 142), (44, 154), (30, 150), (30, 140), (38, 140)],
+    [(90, 122), (84, 150), (74, 172), (60, 176), (54, 166), (62, 162)],
+    [(97, 124), (98, 152), (104, 172), (116, 174), (118, 164), (110, 162)],
+]
+
+
+def octopus(d: Drawing, arms=True):
+    """An octopus facing us, mantle on top, centred near (100, 90)."""
+    if arms:
+        for k in (1, -1):
+            for i, a in enumerate(OCTO_ARMS):
+                pts = a if k == 1 else [(200 - x, y) for x, y in a]
+                d.shape("hero", ribbon(pts, 15, 3), spot=i % 2 == 0)
+                tr = track(pts)
+                sk = ""
+                for x, y, nx, ny, t in tr[6::5]:
+                    w = (15 + (3 - 15) * t) / 2
+                    sk += circle(x, y, max(w * 0.42, 1))
+                d.shape("hero2", sk, shadow=False, line=False)
+    d.shape("hero", "M100 18 C130 18 146 40 144 66 C142 86 132 98 122 106 C128 112 126 122 116 124 L84 124 "
+                    "C74 122 72 112 78 106 C68 98 58 86 56 66 C54 40 70 18 100 18Z")
+    d.marks("hero2", "".join(circle(x, y, r) for x, y, r in [(86, 40, 2.4), (110, 32, 2), (122, 52, 2.6), (92, 58, 1.8),
+                                                            (76, 60, 2), (106, 70, 2.2), (130, 74, 1.6), (70, 80, 1.6)]))
+    for x in (80, 120):
+        d.shape("hero", circle(x, 98, 12), shadow=False)
+        d.shape("light", circle(x, 99, 8.5), shadow=False)
+        d.marks("mark", rrect(x - 6, 97, 12, 4.4, 2.2))
+        d.stroke("hero", f"M{x - 12} 92 Q{x} 82 {x + 12} 92", 3, line=False)
+
+
+def octopus_portrait(d: Drawing):
+    water(d, bottom=False)
+    rays(d)
+    bubbles(d, [(154, 30, 2.5), (162, 20, 3.4), (40, 30, 2.2)])
+    group(d, "translate(100 104) scale(.98) translate(-100 -100)", lambda: octopus(d))
+
+
+def octopus_den(d: Drawing):
+    water(d)
+    rays(d)
+    d.shape("dark", "M-30 210 L-30 120 C-10 100 20 98 40 110 C50 90 80 84 100 94 C124 82 160 90 170 110 C190 100 220 108 230 120 V210Z")
+    d.shape("deep", "M44 150 C44 120 72 104 100 104 C128 104 156 120 156 150 L156 160 H44Z", shadow=False)
+    d.shape("hole", "M54 160 C54 132 76 118 100 118 C124 118 146 132 146 160Z", shadow=False)
+    d.marks("deep", circle(20, 140, 3) + circle(176, 150, 3.4) + circle(160, 180, 2.4) + circle(40, 184, 2.6))
+
+    def oc():
+        arm_l = [(78, 150), (60, 156), (44, 150), (36, 136), (42, 128), (50, 132)]
+        arm_r = [(122, 150), (144, 160), (164, 156), (172, 140), (166, 132), (158, 138)]
+        arm_f = [(110, 156), (120, 176), (110, 190), (96, 188), (96, 180)]
+        for a in (arm_l, arm_r, arm_f):
+            d.shape("hero", ribbon(a, 13, 3), spot=True)
+            sk = "".join(circle(x, y, max((13 - 10 * t) * 0.2, 1)) for x, y, nx, ny, t in track(a)[8::5])
+            d.shape("hero2", sk, shadow=False, line=False)
+        group(d, "translate(100 112) scale(.7) translate(-100 -90)", lambda: octopus(d, arms=False))
+    oc()
+    d.shape("dark", "M30 210 C34 186 60 170 100 170 C140 170 166 186 170 210Z")
+    d.shape("pop", "M156 176 C150 160 156 146 168 144 C172 156 168 168 166 180Z M176 176 C176 160 184 150 196 150 C194 162 188 172 182 182Z")
+    d.shape("pop2", "M18 168 C10 156 12 144 22 140 C28 150 28 160 24 172Z M34 172 C32 158 38 148 48 146 C50 158 46 168 40 176Z", shadow=False)
+    for x, y, s in [(150, 46, 0.8), (164, 54, 0.7), (40, 60, 0.7)]:
+        d.shape("hero2", fish(x, y, s), shadow=False)
+
+
+# ================================================================ WHALE SHARK
+WS_HEAD = "M22 104 C24 80 58 64 100 64 C142 64 176 80 178 104 C178 126 150 142 100 142 C50 142 22 126 22 104Z"
+
+
+def whaleshark_face(d: Drawing):
+    deep_water(d)
+    rays(d, ((30, 18), (120, 14)))
+    for x, y, s in [(56, 160, 0.8), (70, 168, 0.7), (130, 166, 0.8), (144, 158, 0.7), (100, 172, 0.7)]:
+        d.shape("pop", fish(x, y, s, right=x > 100), shadow=False)
+    d.shape("hero", "M86 72 L100 26 L120 72Z")
+    d.shape("hero", "M40 118 C26 128 12 144 6 162 C22 156 40 142 54 130Z")
+    flip(d, lambda: d.shape("hero", "M40 118 C26 128 12 144 6 162 C22 156 40 142 54 130Z"))
+    d.shape("hero", WS_HEAD, spot=True)
+    clipped(d, WS_HEAD, lambda: d.shape("light", "M0 112 C40 132 160 132 200 112 V160 H0Z", shadow=False))
+    d.shape("mark", "M38 108 C62 120 138 120 162 108 C156 124 132 134 100 134 C68 134 44 124 38 108Z", shadow=False)
+    d.shape("mouth", "M50 114 C70 122 130 122 150 114 C144 124 126 129 100 129 C74 129 56 124 50 114Z", shadow=False, line=False)
+    spots = ""
+    for r, (y, xs) in enumerate([(74, range(56, 150, 10)), (82, range(42, 162, 10)), (91, range(34, 170, 10)), (100, range(30, 172, 11))]):
+        for x in xs:
+            if abs(x - 100) > 4 or r < 3:
+                spots += circle(x + (5 if r % 2 else 0), y, 2.1)
+    clipped(d, WS_HEAD, lambda: d.marks("light", spots))
+    d.stroke("hero2", "M60 70 Q100 62 140 70", 1.4, line=False)
+    for x in (30, 170):
+        d.shape("light", circle(x, 102, 4), shadow=False)
+        d.marks("mark", circle(x, 102, 2.2))
+    d.shape("remora", "M84 146 C90 142 110 142 116 146 C110 150 90 150 84 146Z", shadow=False)
+
+
+WS_BODY = "M34 116 C60 104 96 92 136 92 C160 92 178 98 184 108 C186 116 182 124 170 128 C140 136 96 136 64 128 C52 124 42 122 34 116Z"
+
+
+def whaleshark_snorkel(d: Drawing):
+    d.band("sky2", waves(22, 3, 26))
+    d.band("far", waves(44, 4, 28))
+    d.band("mid", waves(84, 6, 30))
+    d.band("near", waves(130, 6, 34))
+    d.band("deep", waves(168, 5, 36), line=False)
+    rays(d, ((40, 16), (120, 12)))
+    at(d, 96, 34, 0.34, lambda: snorkeller(d), ox=100, oy=52)
+    bubbles(d, [(70, 46, 1.6), (66, 54, 2.2)])
+
+    def shark():
+        d.shape("hero", "M40 118 L18 80 C22 98 24 110 28 120 L16 150 C28 138 36 128 44 122Z")
+        d.shape("hero", "M98 94 L112 68 L126 93Z")
+        d.shape("hero", "M62 108 L66 96 L76 104Z")
+        d.shape("hero", "M140 126 L122 154 L156 130Z")
+        d.shape("hero", WS_BODY, spot=True)
+        d.shape("light", "M60 124 C96 134 140 134 172 126 C150 134 110 138 76 132 C68 130 64 128 60 124Z", shadow=False)
+        dots = ""
+        for c, x in enumerate(range(48, 178, 9)):
+            for y in range(94, 128, 8):
+                dots += circle(x + (4 if (y // 8) % 2 else 0), y + (c % 2) * 2, 1.7)
+        lines = " ".join(f"M{x} 90 L{x - 4} 126" for x in range(70, 150, 18))
+        clipped(d, WS_BODY, lambda: (d.marks("light", dots), d.stroke("light", lines, 1.2, line=False),
+                                     d.stroke("hero2", "M60 112 C100 104 140 102 180 106", 1.4, line=False)))
+        d.stroke("mark", "M150 104 V122 M155 103 V122 M160 103 V122", 1.4)
+        d.stroke("mark", "M184 112 C178 115 172 115 166 113", 2)
+        d.marks("mark", circle(170, 104, 1.8))
+    group(d, "translate(0 18)", shark)
+    for x, y, s in [(150, 60, 0.6), (162, 66, 0.5)]:
+        d.shape("pop", fish(x, y, s, right=True), shadow=False)
+
+
+# ================================================================ HAMMERHEAD
+HAMMER = ("M28 60 C26 52 36 48 50 50 C66 52 82 50 92 46 C96 44 104 44 108 46 C118 50 134 52 150 50 C164 48 174 52 172 60 "
+          "C170 66 162 68 150 68 C134 68 118 72 112 80 L88 80 C82 72 66 68 50 68 C38 68 30 66 28 60Z")
+HH_BODY = "M88 76 C82 96 84 120 90 140 C94 152 98 162 100 174 C102 162 106 152 110 140 C116 120 118 96 112 76Z"
+HH_FIN = "M89 100 C74 110 60 124 50 140 C68 136 82 126 93 114Z"
+HH_TAIL = "M100 170 C96 180 88 192 78 198 C92 196 100 188 102 180 C106 188 110 192 116 194 C110 184 106 176 102 168Z"
+
+
+def hammerhead(d: Drawing, body="hero", under="light", eye="mark", detail=True):
+    """A hammerhead seen from below, head at the top, centred near (100, 110)."""
+    d.shape(body, HH_TAIL)
+    d.shape(body, HH_FIN)
+    flip(d, lambda: d.shape(body, HH_FIN))
+    d.shape(body, "M92 148 L84 160 L96 154Z M108 148 L116 160 L104 154Z", shadow=False)
+    d.shape(body, HH_BODY + HAMMER, spot=detail)
+    if detail:
+        d.shape(under, "M92 80 C88 98 90 120 94 138 C96 148 99 158 100 166 C101 158 104 148 106 138 C110 120 112 98 108 80Z", shadow=False)
+        d.shape(under, "M36 60 C50 58 70 60 92 54 L108 54 C130 60 150 58 164 60 C160 64 150 64 140 64 C122 66 112 70 108 76 L92 76 C88 70 78 66 60 64 C50 64 40 64 36 60Z", shadow=False)
+        d.stroke(eye, "M86 62 Q100 68 114 62", 2)
+        d.stroke(eye, "M86 84 l-4 2 M86 88 l-4 2 M86 92 l-4 2 M114 84 l4 2 M114 88 l4 2 M114 92 l4 2", 1.3, line=False)
+    d.marks(eye, circle(30, 59, 2.6) + circle(170, 59, 2.6))
+
+
+def hammerhead_portrait(d: Drawing):
+    deep_water(d)
+    rays(d, ((26, 16), (120, 12)))
+    for x, y, s in [(40, 150, 0.8), (54, 158, 0.7), (150, 40, 0.7), (164, 48, 0.6)]:
+        d.shape("pop", fish(x, y, s, right=True), shadow=False)
+    group(d, "translate(100 100) scale(.86) rotate(28) translate(-100 -112)", lambda: hammerhead(d))
+    bubbles(d, [(30, 70, 2.5), (24, 58, 3.4)])
+
+
+def hammerhead_school(d: Drawing):
+    deep_water(d)
+    rays(d, ((30, 16), (110, 12), (160, 8)))
+    for x, y, s, r, role in [(40, 50, 0.3, 30, "far2"), (150, 34, 0.26, 36, "far2"), (98, 58, 0.34, 32, "far2"),
+                             (166, 90, 0.36, 28, "school"), (30, 108, 0.38, 34, "school"), (76, 118, 0.48, 30, "school"),
+                             (134, 132, 0.52, 34, "school")]:
+        at(d, x, y, s, lambda role=role: hammerhead(d, body=role, detail=False), rot=r, ox=100, oy=110)
+    at(d, 56, 172, 0.36, lambda: diver(d), rot=-24)
+    bubbles(d, [(36, 150, 2.2), (32, 140, 3), (38, 130, 2)])
+
+
+# ================================================================ JELLYFISH
+NETTLE_BELL = ("M48 86 C48 50 72 32 100 32 C128 32 152 50 152 86 Q146 92 139 88 Q132 94 126 89 Q119 95 113 90 "
+               "Q106 96 100 90 Q94 96 87 90 Q81 95 74 89 Q68 94 61 88 Q54 92 48 86Z")
+
+
+def frill(pts, w, amp=3, n=14):
+    """A ruffled ribbon: an oral arm with wavy edges."""
+    return ribbon(pts, lambda t: w * (1 - 0.7 * t) + amp * math.sin(t * n * math.pi), n=10)
+
+
+def jelly_nettle(d: Drawing):
+    deep_water(d)
+    d.marks("light", "".join(circle(x, y, r) for x, y, r in [(30, 60, 1.2), (170, 40, 1), (160, 150, 1.3), (40, 160, 1), (180, 110, 1.1), (20, 110, 0.9)]))
+    tent = ""
+    for i, x in enumerate(range(54, 150, 10)):
+        k = 1 if i % 2 else -1
+        tent += f"M{x} 88 C{x + 10 * k} 120 {x - 10 * k} 150 {x + 6 * k} 196 "
+    d.stroke("hero", tent, 1.8)
+    d.shape("hero2", frill([(92, 84), (82, 112), (92, 142), (80, 170), (88, 194)], 14), spot=True)
+    d.shape("hero2", frill([(108, 84), (120, 114), (108, 144), (122, 172), (114, 196)], 14), spot=True)
+    d.shape("hero2", frill([(100, 86), (100, 118), (94, 150), (102, 180)], 10), shadow=False)
+    d.shape("hero", NETTLE_BELL)
+    clipped(d, NETTLE_BELL, lambda: d.stroke("mark", " ".join(f"M100 30 L{100 + 70 * math.sin(math.radians(a)):.1f} {30 + 70 * math.cos(math.radians(a)):.1f}"
+                                                              for a in range(-60, 61, 12)), 2.4, line=False))
+    d.shape("light", "M64 60 C70 46 84 38 98 38 C86 44 74 52 68 64Z", shadow=False)
+
+
+def golden_jelly(d: Drawing, x, y, s, spot=False):
+    def draw():
+        for dx in (-8, -3, 3, 8):
+            d.shape("hero2", ribbon([(dx, 8), (dx * 1.2, 18), (dx, 26)], 5, 3), shadow=False)
+            d.shape("hero2", circle(dx, 28, 3.4), shadow=False)
+        d.shape("hero", "M-18 8 C-18 -10 -8 -18 0 -18 C8 -18 18 -10 18 8 Q9 12 0 9 Q-9 12 -18 8Z", spot=spot)
+        d.marks("light", circle(-6, -6, 1.6) + circle(4, -10, 1.3) + circle(8, -2, 1.5) + circle(-2, 2, 1.2))
+    group(d, f"translate({x} {y}) scale({s})", draw)
+
+
+def jelly_lake(d: Drawing):
+    d.band("sky2", "M-30 18 H230")
+    d.band("far", waves(40, 4, 26))
+    d.band("mid", waves(84, 5, 30))
+    d.band("near", waves(130, 5, 34))
+    d.band("deep", waves(170, 5, 36), line=False)
+    rays(d, ((30, 16), (100, 12), (150, 10)))
+    at(d, 100, 26, 0.42, lambda: snorkeller(d, suit="dark", fins="dark"), ox=100, oy=52)
+    for x, y, s in [(38, 74, 0.7), (154, 70, 0.8), (64, 120, 1.25), (138, 124, 1.5), (100, 84, 0.9), (30, 150, 0.8),
+                    (172, 160, 0.7), (96, 168, 1.0), (122, 52, 0.55)]:
+        golden_jelly(d, x, y, s, spot=s > 1.2)
+
+
+# ================================================================ CLOWNFISH
+def clown_side(d: Drawing):
+    """A clownfish facing left, centred near (94, 92)."""
+    d.shape("hero", "M84 74 C90 60 108 60 116 74Z")
+    d.shape("hero", "M128 92 L148 76 C146 86 146 98 148 108 L128 96Z")
+    d.shape("hero", "M56 92 C60 76 80 70 100 72 C114 73 124 80 132 92 C124 104 114 110 100 111 C80 112 60 108 56 92Z", spot=True)
+    for st in ["M72 76 C67 86 67 98 72 108 L80 110 C76 98 76 86 80 73Z",
+               "M98 72 C93 84 93 100 98 111 L108 110 C104 100 104 84 108 73Z",
+               "M124 82 C121 88 121 96 124 102 L130 96 L130 88Z"]:
+        d.shape("light", st, shadow=False)
+        d.stroke("mark", st, 1.2, line=False)
+    d.stroke("mark", "M86 68 C92 62 106 62 114 70 M146 78 C145 86 145 98 146 106", 2, line=False)
+    d.shape("hero", "M84 100 C80 108 82 114 88 118 C90 112 92 106 92 102Z")
+    d.marks("mark", circle(64, 88, 3))
+    d.marks("light", circle(63, 87, 1))
+
+
+def clownfish_face(d: Drawing):
+    water(d, bottom=False)
+    for i in range(13):
+        a = math.radians(-180 + i * 15)
+        x0, y0 = 100 + 40 * math.cos(a) * 0.6, 196
+        x1, y1 = 100 + 92 * math.cos(a), 150 + 70 * math.sin(a) * 0.6
+        d.limb("pop", f"M{x0:.1f} {y0} Q{(x0 + x1) / 2 + 8:.1f} {(y0 + y1) / 2 + 10:.1f} {x1:.1f} {y1:.1f}", 9, shadow=i % 2 == 0)
+        d.shape("pop2", circle(x1, y1, 5), shadow=False, line=False)
+
+    def fishy():
+        d.shape("hero", "M84 46 C90 30 110 30 116 46 L110 60 H90Z")
+        d.stroke("mark", "M86 44 C92 32 108 32 114 44", 2.4, line=False)
+        for k in (1, -1):
+            def finn():
+                d.shape("hero", "M66 104 C48 94 30 98 24 112 C38 118 54 120 68 116Z")
+                d.stroke("mark", "M26 111 C30 100 44 97 54 100", 2.4, line=False)
+            finn() if k == 1 else flip(d, finn)
+        d.shape("hero", "M84 150 L76 174 L96 156Z M116 150 L124 174 L104 156Z")
+        d.shape("light", ellipse(100, 102, 44, 56), spot=True)
+        d.stroke("mark", ellipse(100, 102, 44, 56), 2.4)
+        d.shape("hero", ellipse(100, 106, 30, 44))
+        d.stroke("mark", ellipse(100, 106, 30, 44), 1.6, line=False)
+        d.shape("hero", "M88 154 C94 162 106 162 112 154 C106 158 94 158 88 154Z", shadow=False)
+        for x in (76, 124):
+            d.shape("hero2", circle(x, 88, 11), shadow=False)
+            d.marks("mark", circle(x, 88, 7))
+            d.marks("light", circle(x + 2.5, 85, 2.2))
+        d.shape("hero2", ellipse(100, 126, 9, 6), shadow=False)
+        d.marks("mark", ellipse(100, 126, 5, 3.2))
+    group(d, "translate(0 -6)", fishy)
+    bubbles(d, [(160, 40, 2.5), (166, 28, 3.4), (156, 18, 2)])
+
+
+def clownfish_family(d: Drawing):
+    water(d)
+    rays(d)
+    d.limb("coral", "M156 182 V152 M156 162 L144 148 M156 158 L170 142 M144 148 L140 136 M170 142 L176 132", 5)
+    d.shape("anem2", "M30 196 C30 172 60 164 100 164 C140 164 170 172 170 196Z")
+
+    def tentacles(front):
+        for i in range(13):
+            if (i % 2 == 0) != front:
+                continue
+            bx = 40 + i * 10
+            tx = 18 + i * 13.7 + (5 if i % 2 else -5)
+            ty = 118 + abs(i - 6) * 4.5 + (10 if i % 2 else 0)
+            d.limb("anem", f"M{bx} 176 Q{(bx + tx) / 2:.1f} {(176 + ty) / 2 + 6:.1f} {tx:.1f} {ty:.1f}", 8, shadow=False)
+            d.shape("anem", circle(tx, ty, 6.5), shadow=front, spot=front and i % 4 == 0)
+            d.shape("tip", circle(tx, ty - 1.4, 3.2), shadow=False, line=False)
+    tentacles(False)
+    at(d, 80, 112, 0.7, lambda: clown_side(d), ox=94, oy=92)
+    at(d, 132, 132, 0.5, lambda: clown_side(d), flipx=True, ox=94, oy=92)
+    tentacles(True)
+    at(d, 110, 66, 0.4, lambda: clown_side(d), ox=94, oy=92, rot=-10)
+    bubbles(d, [(40, 60, 2.5), (34, 48, 3.4)])
+
+
 # ================================================================ CONCEPTS
-SLOTH = {"hero": "#A38A6C", "hero2": "#EFE4CC", "mark": "#3B2B1F", "fur2": "#7E6850", "claw": "#2E241B", "light": "#FFFFFF"}
+SLOTH ={"hero": "#A38A6C", "hero2": "#EFE4CC", "mark": "#3B2B1F", "fur2": "#7E6850", "claw": "#2E241B", "light": "#FFFFFF"}
 JAGUAR = {"hero": "#E2A447", "hero2": "#C9B23A", "mark": "#24190F", "light": "#FBF1DC", "rose": "#C98A35", "pop": "#C8786A",
           "croc": "#6B6B3A"}
 MACAW = {"hero": "#D62D2D", "hero2": "#F6C329", "green": "#3F9A4E", "blue": "#2A6BBE", "beak": "#F1E6CF", "iris": "#F3E2A0",
@@ -1119,4 +1620,65 @@ SOUTH = [
             fixes={"mid": ["far", "near"], "near": ["mid", "far"], "sky": ["sky2", "far"]}),
 ]
 
-CONCEPTS = SOUTH
+MANTA = {"hero": "#24313F", "light": "#F1F3F5", "mark": "#121A22", "pop": "#FFC857"}
+MANTA_D = {"hero": "#24313F", "light": "#E9EEF2", "mark": "#0E151C", "pop": "#FF7A5C"}
+SEATURTLE = {"hero": "#6E6A3A", "hero2": "#A69A62", "flip2": "#857A48", "mark": "#3B361C", "light": "#EDE5C6"}
+NESTING = {"hero": "#5E5A36", "hero2": "#8C8256", "mark": "#2E2A16", "light": "#E8E0C2", "sand2": "#C9AE7C"}
+SEAHORSE = {"hero": "#F2A23A", "hero2": "#F8D27E", "mark": "#9A4B1A", "light": "#FFFFFF", "pop": "#FF6F91"}
+OCTO = {"hero": "#D8613C", "hero2": "#F6B48E", "mark": "#3A140C", "light": "#FFF6EE", "hole": "#0B1520", "pop": "#F2789A", "pop2": "#FFC857"}
+WHALESHARK = {"hero": "#3F5E78", "hero2": "#6F8DA6", "light": "#EEF3F6", "mark": "#132029", "mouth": "#24343F", "remora": "#8A99A6"}
+HAMMER_C = {"hero": "#7B8794", "light": "#D9E0E6", "mark": "#1C252E", "school": "#22323F", "far2": "#4D6272"}
+NETTLE = {"hero": "#E8893A", "hero2": "#F8D9B0", "mark": "#B4552A", "light": "#FFF3E6"}
+GOLDJELLY = {"hero": "#F2B84B", "hero2": "#E39A3A", "light": "#FFF4D6", "pop": "#FF7A5C"}
+CLOWN = {"hero": "#F26B1F", "hero2": "#F9B27A", "light": "#FFFFFF", "mark": "#151515", "pop": "#B98AE0", "pop2": "#E0C3F5"}
+CLOWN_F = {"hero": "#F26B1F", "light": "#FFFFFF", "mark": "#151515", "anem": "#E7849F", "anem2": "#B65A78", "tip": "#F9D3DE",
+           "coral": "#FFC857"}
+
+OCEANS = [
+    Concept("manta-belly", "animal-manta-ray", "Manta from below", manta_belly, UNDERWATER, MANTA,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("hero", "deep")],
+            fixes={"deep": ["near", "mid"], "near": ["mid", "far"]}),
+    Concept("manta-diver", "animal-manta-ray", "Manta & diver", manta_diver, UNDERWATER, MANTA_D,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far")], fixes={"near": ["mid", "far"]}),
+    Concept("seaturtle-portrait", "animal-sea-turtle", "Green turtle", seaturtle_portrait, UNDERWATER, SEATURTLE,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero2", "mid"), ("hero2", "near"), ("hero", "far")],
+            fixes={"near": ["deep", "far"], "mid": ["far", "sky2"]}),
+    Concept("seaturtle-nesting", "animal-sea-turtle", "Nesting night", seaturtle_nesting, NO_GOLD, NESTING,
+            checks=[("hero", "ground"), ("hero2", "ground"), ("hero", "far"), ("hero", "mid")],
+            fixes={"ground": ["light", "far"], "mid": ["far", "near"]}),
+    Concept("seahorse-portrait", "animal-seahorse", "Seahorse", seahorse_portrait, UNDERWATER, SEAHORSE,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("hero", "sky2")],
+            fixes={"far": ["mid", "near"], "sky2": ["far", "mid"]}),
+    Concept("seahorse-pair", "animal-seahorse", "Seahorse sweethearts", seahorse_pair, UNDERWATER, SEAHORSE,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far")], fixes={"far": ["mid", "near"]}),
+    Concept("octopus-portrait", "animal-octopus", "Octopus", octopus_portrait, UNDERWATER, OCTO,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("hero", "sky2")],
+            fixes={"near": ["deep", "far"], "mid": ["deep", "far"]}),
+    Concept("octopus-den", "animal-octopus", "Octopus den", octopus_den, UNDERWATER, OCTO,
+            checks=[("hero", "dark"), ("hero", "hole"), ("hero", "deep"), ("hero", "mid")], fixes={"mid": ["far", "near"]}),
+    Concept("whaleshark-face", "animal-whale-shark", "Whale shark", whaleshark_face, UNDERWATER, WHALESHARK,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("hero", "sky2")],
+            fixes={"hero": ["#6F8FAA", "#7E9DB8"], "far": ["sky2", "mid"]}),
+    Concept("whaleshark-snorkel", "animal-whale-shark", "Snorkel with a giant", whaleshark_snorkel, UNDERWATER, WHALESHARK,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far")], fixes={"hero": ["#6F8FAA", "#7E9DB8"]}),
+    Concept("hammerhead-portrait", "animal-hammerhead-shark", "Hammerhead", hammerhead_portrait, UNDERWATER, HAMMER_C,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("hero", "sky2")],
+            fixes={"hero": ["#4F5D6A", "#9AA6B2"], "far": ["mid", "sky2"]}),
+    Concept("hammerhead-school", "animal-hammerhead-shark", "Hammerhead school", hammerhead_school, UNDERWATER, HAMMER_C,
+            checks=[("school", "mid"), ("school", "near"), ("far2", "far"), ("far2", "sky2")],
+            fixes={"school": ["dark", "deep"], "far2": ["mid", "near", "deep"]}),
+    Concept("jellyfish-nettle", "animal-jellyfish", "Sea nettle", jelly_nettle, UNDERWATER, NETTLE,
+            checks=[("hero", "far"), ("hero", "mid"), ("hero", "near"), ("hero2", "near"), ("hero2", "deep")],
+            fixes={"far": ["mid", "near", "deep"], "mid": ["near", "deep"]}),
+    Concept("jellyfish-lake", "animal-jellyfish", "Jellyfish lake", jelly_lake, UNDERWATER, GOLDJELLY,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("hero", "deep")],
+            fixes={"far": ["mid", "near"], "mid": ["near", "deep"]}),
+    Concept("clownfish-face", "animal-clownfish", "Clownfish hello", clownfish_face, UNDERWATER, CLOWN,
+            checks=[("hero", "mid"), ("hero", "near"), ("light", "far"), ("light", "mid"), ("pop", "near")],
+            fixes={"far": ["mid", "near"], "pop": ["#D96BB8", "#8E5BC9"]}),
+    Concept("clownfish-anemone", "animal-clownfish", "Bubble-tip home", clownfish_family, UNDERWATER, CLOWN_F,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "anem"), ("anem", "near"), ("anem", "deep")],
+            fixes={"near": ["far", "deep"], "anem": ["#F2A7C3", "#C45C86"]}),
+]
+
+CONCEPTS = SOUTH + OCEANS

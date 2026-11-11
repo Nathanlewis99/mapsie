@@ -326,7 +326,8 @@ def reddeer_roar(d: Drawing):
 # ================================================================ HIGHLAND COW
 def coo_horn(d: Drawing):
     pts = [(74, 94), (54, 92), (36, 86), (24, 72), (22, 52)]
-    d.shape("horn", taper(pts, 9, 2))
+    d.shape("horn2", taper(pts, 10.6, 3.2))
+    d.shape("horn", taper(pts, 9, 2), shadow=False)
     clipped(d, taper(pts, 9, 2), lambda: d.shape("horntip", "M6 30 H40 V60 H6Z", shadow=False, line=False))
 
 
@@ -375,9 +376,11 @@ def coo_side(d: Drawing):
 
 def coo_head(d: Drawing):
     # horns: one swinging toward us, one behind
-    d.shape("horn", taper([(52, 98), (64, 88), (72, 74), (70, 62)], 4.5, 1.2))
+    d.shape("horn2", taper([(52, 98), (64, 88), (72, 74), (70, 62)], 5.8, 2.2))
+    d.shape("horn", taper([(52, 98), (64, 88), (72, 74), (70, 62)], 4.5, 1.2), shadow=False)
     d.shape("hero", P([(28, 108), (34, 96), (52, 94), (62, 104), (58, 124), (48, 136), (34, 138), (26, 128)]))
-    d.shape("horn", taper([(40, 98), (26, 92), (16, 80), (16, 68)], 5, 1.2))
+    d.shape("horn2", taper([(40, 98), (26, 92), (16, 80), (16, 68)], 6.3, 2.2))
+    d.shape("horn", taper([(40, 98), (26, 92), (16, 80), (16, 68)], 5, 1.2), shadow=False)
     d.shape("nose", P([(25, 122), (34, 122), (37, 131), (31, 137), (24, 134)]))
     d.marks("mark", ellipse(26.5, 129, 2, 1.5))
     d.shape("hero2", P(zig([(30, 96), (48, 92), (60, 100)], 5, 3) + [(56, 106, 1), (50, 116, 1), (46, 106, 1), (40, 118, 1), (36, 106, 1), (30, 114, 1)]),
@@ -518,7 +521,7 @@ def fox_side(d: Drawing):
 def redfox_snow(d: Drawing):
     d.disc("glow", 150, 54, 18)
     for x, h in [(10, 70), (30, 92), (178, 84), (196, 64), (160, 60)]:
-        pine(d, x, 132, h, "near", snow=True)
+        pine(d, x, 132, h, "near", snow=True, line=x in (30, 178))
     d.band("far", hills(130, 4), line=False)
     d.band("light", "M-30 146 Q40 132 100 140 T230 136")
     group(d, "translate(100 156) scale(.94) translate(-106 -150)", lambda: fox_side(d))
@@ -530,7 +533,7 @@ def redfox_snow(d: Drawing):
 def brownbear_portrait(d: Drawing):
     d.disc("glow", 100, 92, 56)
     for x, h in [(14, 96), (34, 76), (168, 80), (188, 100)]:
-        pine(d, x, 172, h, "near")
+        pine(d, x, 172, h, "near", line=False)
     d.band("far", hills(176, 4), line=False)
     d.shape("hero", P(zig([(6, 210), (16, 160), (60, 130)], 6, 7) + [(140, 130)] + zig([(140, 130), (184, 160), (194, 210)], 6, 7)[1:]))
     for x in (56, 144):
@@ -552,7 +555,7 @@ def bear_side(d: Drawing):
     d.limb("hero2", P([(140, 124), (148, 140), (144, 160)], False), 15)
     body = [(56, 106), (68, 86), (88, 76), (106, 82), (130, 88), (150, 96), (164, 108), (164, 126), (152, 134),
             (120, 136), (90, 136), (66, 130)]
-    d.shape("hero", P(body))
+    d.shape("hero", P(body), spot=True)
     d.shape("hero2", P([(70, 90), (88, 78), (104, 84), (90, 92), (74, 100)]), shadow=False, line=False)
     d.limb("hero", P([(86, 126), (84, 162)], False), 16)
     d.limb("hero", P([(152, 120), (158, 142), (154, 162)], False), 16)
@@ -574,7 +577,7 @@ def bear_head(d: Drawing):
 def brownbear_forest(d: Drawing):
     d.disc("glow", 64, 62, 24)
     for x, h in [(150, 90), (170, 112), (188, 92), (132, 70), (8, 80), (24, 64)]:
-        pine(d, x, 146, h, "near")
+        pine(d, x, 146, h, "near", line=x < 140)
     d.band("far", hills(140, 4), line=False)
     d.band("mid", hills(150, 3, 30))
     group(d, "translate(100 164) scale(1.04) translate(-90 -164)", lambda: bear_side(d))
@@ -588,7 +591,7 @@ def brownbear_forest(d: Drawing):
 def lynx_portrait(d: Drawing):
     d.disc("glow", 100, 104, 70)
     for x, h in [(12, 100), (32, 80), (170, 84), (190, 104)]:
-        pine(d, x, 190, h, "near", snow=True)
+        pine(d, x, 190, h, "near", snow=True, line=False)
     d.band("light", hills(184, 4), line=False)
     group(d, "translate(100 120) scale(.88) translate(-100 -112)", lambda: lynx_face(d))
 
@@ -658,7 +661,7 @@ def lynx_side_head(d: Drawing):
 def lynx_snow(d: Drawing):
     d.disc("glow", 46, 56, 18)
     for x, h, r in [(140, 110, "mid"), (168, 130, "near"), (192, 96, "mid"), (8, 90, "near"), (30, 70, "mid")]:
-        pine(d, x, 140, h, r, snow=True)
+        pine(d, x, 140, h, r, snow=True, line=x == 168)
     d.band("light", "M-30 144 Q60 130 120 140 T230 136")
     group(d, "translate(102 160) scale(1.04) translate(-96 -166)", lambda: lynx_side(d))
     d.stroke("far", "M20 176 q6 -3 12 0 M150 178 q6 -3 12 0", 2, line=False)
@@ -928,7 +931,7 @@ def barnowl_dusk(d: Drawing):
     d.stroke("dark", "M37 150 L178 156 M37 158 L178 164", 1.2)
     d.band("near", hills(170, 4, 20))
     grass(d, -10, 210, 172, 16, "near", 13)
-    group(d, "translate(100 94) scale(.92) translate(-100 -100)", lambda: owl_flying(d))
+    group(d, "translate(100 94) scale(.88) translate(-100 -100)", lambda: owl_flying(d))
     d.band("deep", hills(190, 3), line=False)
 
 
@@ -940,7 +943,6 @@ def albatross_portrait(d: Drawing):
     d.band("near", waves(186, 4, 38), line=False)
     d.shape("light", P([(96, 40), (124, 38), (146, 52), (152, 76), (150, 110), (156, 150), (168, 214, 1), (60, 214, 1), (72, 160),
                         (82, 128), (80, 104), (76, 84), (80, 60)]))
-    d.shape("hero2", P([(146, 58), (152, 80), (150, 108), (140, 96), (142, 74)]), shadow=False, line=False)
     d.shape("hero", P([(146, 98), (166, 104), (186, 128), (196, 214, 1), (136, 214, 1), (146, 164), (144, 126)]), spot=True)
     d.stroke("hero2", "M160 130 L172 190 M152 136 L160 200", 1.6, line=False)
     bill = P([(84, 54, 1), (68, 58), (50, 63), (36, 66), (28, 71), (26, 79), (29, 87, 1), (32, 79), (42, 76), (62, 76), (82, 77, 1)])
@@ -1053,7 +1055,7 @@ def swan_portrait(d: Drawing):
     d.disc("glow", 128, 90, 54)
     d.band("mid", "M-30 132 Q60 122 120 128 T230 124")
     d.band("near", waves(150, 3, 30))
-    group(d, "translate(102 100) scale(1.14) translate(-110 -112)", lambda: swan_busk(d))
+    group(d, "translate(108 102) scale(1.06) translate(-110 -112)", lambda: swan_busk(d))
     d.raw('<g opacity=".35">', "")
     d.stroke("light", "M40 166 H80 M110 170 H160 M60 180 H120", 2.4, line=False)
     d.raw("</g>", "")
@@ -1081,13 +1083,13 @@ def cygnet(d: Drawing, x, y, s=1.0):
 def swan_cygnets(d: Drawing):
     d.disc("glow", 152, 56, 18)
     d.band("far", hills(104, 6))
-    d.shape("mid", "M120 104 V82 h6 v-6 h4 v6 h8 v-14 l5 -8 l5 8 v14 h8 v-6 h4 v6 h6 V104Z", shadow=False)
+    d.shape("mid", "M120 104 V82 h6 v-6 h4 v6 h8 v-14 l5 -8 l5 8 v14 h8 v-6 h4 v6 h6 V104Z", shadow=False, line=False)
     d.band("mid", "M-30 112 Q60 100 120 108 T230 104")
     d.band("lake", "M-30 116 L230 116")
     d.raw('<g opacity=".5">', "")
     d.stroke("light", "M30 132 H70 M120 128 H170 M40 170 H90 M130 176 H180", 2, line=False)
     d.raw("</g>", "")
-    group(d, "translate(90 118) scale(1.12) translate(-110 -120)", lambda: swan_glide(d))
+    group(d, "translate(102 118) scale(1.08) translate(-110 -120)", lambda: swan_glide(d))
     cygnet(d, 152, 146, 1.0)
     cygnet(d, 178, 150, 0.85)
     d.stroke("lake2", "M50 150 q12 -4 24 0 M88 154 q12 -4 24 0 M138 152 q6 -2 12 0", 2)
@@ -1235,8 +1237,8 @@ def kingfisher_diving(d: Drawing):
     d.shape("pop", taper([(110, 46), (104, 76), (98, 100)], 1.5, 1.5), shadow=False)
     d.shape("hero", taper([(100, 92), (118, 70), (132, 50), (140, 34)], 1, 1, wf=lambda t: 9 * (1 - t) ** 0.6 + 1), spot=True)
     d.stroke("mark", "M122 66 L132 52 M126 70 L136 56", 1.2, line=False)
-    d.shape("hero", circle(98, 118, 11))
-    d.shape("hero2", P([(100, 116), (108, 112), (110, 122), (102, 124)]), shadow=False)
+    d.shape("hero", circle(98, 116, 13))
+    d.shape("hero2", P([(98, 112), (110, 108), (112, 120), (102, 124)]), shadow=False)
     d.shape("light", P([(104, 124), (110, 122), (108, 130)]), shadow=False, line=False)
     d.marks("mark", circle(102, 116, 2.4))
     d.shape("mark", P([(92, 124, 1), (96, 146), (98, 158, 1), (100, 146), (104, 126, 1)]))
@@ -1248,7 +1250,7 @@ def kingfisher_dive(d: Drawing):
     d.shape("near", leaf(30, 66, 22, 6, -60), shadow=False, line=False)
     d.band("far", hills(132, 5))
     d.band("water", "M-30 150 L230 150")
-    group(d, "translate(98 92) scale(1.0) translate(-100 -100)", lambda: kingfisher_diving(d))
+    group(d, "translate(98 90) scale(1.08) translate(-100 -100)", lambda: kingfisher_diving(d))
     d.band("water2", "M-30 158 Q100 152 230 158", shadow=False, line=False)
     for dx, dy, r in [(-16, -10, 3), (-8, -18, 2.6), (8, -16, 2.8), (16, -8, 2.6), (0, -22, 2)]:
         d.shape("light", f"M{97 + dx} {150 + dy - r * 1.7} Q{97 + dx + r} {150 + dy} {97 + dx} {150 + dy + r} Q{97 + dx - r} {150 + dy} {97 + dx} {150 + dy - r * 1.7}Z", shadow=False)
@@ -1316,9 +1318,9 @@ def parrot_portrait(d: Drawing):
                        (198, 150, -160, "near")]:
         d.shape(r, leaf(x, y, 64, 15, a), line=False)
     d.shape("hero", P([(98, 36), (126, 34), (150, 50), (160, 78), (156, 108), (150, 132), (160, 214, 1), (54, 214, 1), (66, 150),
-                       (80, 120), (82, 96), (84, 64)]))
+                       (80, 120), (82, 96), (84, 64)]), spot=True)
     d.shape("hero2", P([(118, 164), (150, 146), (176, 160), (190, 214, 1), (128, 214, 1)]))
-    d.shape("pop2", P([(140, 186), (170, 170), (190, 186), (196, 214, 1), (150, 214, 1)]), spot=True)
+    d.shape("pop2", P([(140, 186), (170, 170), (190, 186), (196, 214, 1), (150, 214, 1)]))
     d.stroke("hero", "M132 168 l6 6 M146 160 l6 6 M160 158 l5 6", 1.6, line=False)
     d.shape("light", P([(86, 58), (102, 52), (120, 58), (126, 74), (116, 88), (98, 92), (86, 86)]), shadow=False)
     d.stroke("hero", "M92 66 h6 M102 64 h6 M112 66 h6 M94 74 h6 M104 74 h6 M114 76 h6 M98 82 h6 M108 84 h6", 1.4, line=False)
@@ -1334,11 +1336,11 @@ def parrot_portrait(d: Drawing):
 
 def macaw_flying(d: Drawing):
     d.shape("pop2", taper([(112, 102), (124, 120), (136, 136)], 7, 2))
-    d.shape("hero", taper([(126, 96), (150, 112), (172, 130), (192, 150)], 6, 1.5))
+    d.shape("hero", taper([(126, 96), (150, 112), (172, 130), (192, 150)], 6, 1.5), spot=True)
     d.shape("pop2", taper([(132, 98), (156, 116), (178, 136), (196, 156)], 2.5, 1.2), shadow=False, line=False)
-    d.shape("hero", P([(58, 88), (70, 78), (96, 78), (120, 86), (134, 96), (120, 102), (92, 102), (70, 98)]))
+    d.shape("hero", P([(58, 88), (70, 78), (96, 78), (120, 86), (134, 96), (120, 102), (92, 102), (70, 98)]), spot=True)
     wing = [(86, 82), (94, 58), (110, 38)] + fingers(128, 34, 8, 24, 210, 330, 5)[1:-1] + [(140, 46), (122, 66), (110, 86)]
-    d.shape("pop2", P(wing), spot=True)
+    d.shape("pop2", P(wing))
     d.shape("hero2", P([(86, 82), (94, 62), (106, 46), (118, 50), (114, 70), (106, 86)]), shadow=False)
     d.shape("hero", P([(86, 82), (92, 70), (100, 64), (106, 72), (104, 86)]), shadow=False, line=False)
     d.shape("light", P([(60, 82), (68, 78), (74, 84), (68, 90), (60, 90)]), shadow=False)
@@ -1357,12 +1359,12 @@ def parrot_flight(d: Drawing):
     for x in range(-6, 220, 30):
         d.shape("near", scallop(x, 192 - (x * 3 % 8), 16, 8, 0.16), shadow=False, line=False)
     d.band("near", hills(190, 3), line=False)
-    group(d, "translate(98 104) scale(1.24) translate(-110 -90)", lambda: macaw_flying(d))
+    group(d, "translate(100 108) scale(1.12) translate(-110 -90)", lambda: macaw_flying(d))
 
 
 # ================================================================ colours
 DEER = {"hero": "#A4532C", "hero2": "#C98A5A", "mark": "#2A1A12", "light": "#F6EBDD", "mane": "#6E3A20", "horn": "#D8C29A"}
-COO = {"hero": "#C2652F", "hero2": "#DE8A4A", "mark": "#2A1812", "horn": "#F0E4C6", "horntip": "#4A3A30", "nose": "#5A3A32",
+COO = {"hero": "#C2652F", "hero2": "#DE8A4A", "mark": "#2A1812", "horn": "#F0E4C6", "horn2": "#8A6A4A", "horntip": "#4A3A30", "nose": "#5A3A32",
        "heather": "#A260A8"}
 HOG = {"hero": "#6B4A33", "hero2": "#CFA77C", "mark": "#1E1612", "light": "#EBDCC4", "leaf1": "#D9772B", "leaf2": "#B5432C",
        "leaf3": "#E8B23C", "pop": "#D23B2C"}
@@ -1385,7 +1387,7 @@ SWAN = {"light": "#FFFFFF", "hero2": "#A8ADB6", "mark": "#1C1C1E", "beak": "#F08
 HERON = {"hero": "#8E99A6", "hero2": "#DDE2E8", "light": "#FFFFFF", "mark": "#1E2228", "beak": "#F2B23A", "beak2": "#B9801F",
          "eye": "#F6D24A", "legs": "#C9A060", "reed": "#7A4E2C", "water": "#8EC5DE", "water2": "#6AAACB"}
 FALCON = {"hero": "#3E4A5C", "hero2": "#56647A", "light": "#FBF5EA", "mark": "#151A22", "beak": "#6C7C96", "pop": "#F6C33E"}
-KINGF = {"hero": "#1F8FCB", "hero2": "#F08A3C", "mark": "#151B24", "light": "#FFFFFF", "pop": "#6FE0F0", "fishc": "#C6D6DE",
+KINGF = {"hero": "#1F8FCB", "hero2": "#F08A3C", "mark": "#151B24", "light": "#FFFFFF", "pop": "#6FE0F0", "fishc": "#A9C0CC",
          "fishd": "#7E95A3", "water": "#7FC1DD", "water2": "#A7D8EC", "water3": "#5CA4C8"}
 FLAMINGO = {"hero": "#EE7591", "hero2": "#E04F72", "mark": "#1E1A1C", "beak": "#F7D7DC", "eye": "#F6D24A", "legs": "#E77F95",
             "lagoon": "#F6C2CB", "lagoon2": "#EFA8B6", "light": "#FFFFFF"}
@@ -1400,10 +1402,10 @@ CONCEPTS = [
             checks=[("hero", "sky"), ("mane", "sky"), ("horn", "sky"), ("hero", "near"), ("hero", "mid"), ("horn", "far")],
             fixes={"near": ["deep", "far", "ground"], "mid": ["far", "near"], "horn": ["#9C7E56", "#EFE3C8"], "sky": ["sky2"]}),
     Concept("highlandcow-portrait", "animal-highland-cow", "Highland coo", highlandcow_portrait, overrides=COO,
-            checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("horn", "sky"), ("horn", "far"), ("hero", "glow")],
+            checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("horn2", "sky"), ("hero", "glow")],
             fixes={"far": ["mid", "near", "deep"], "mid": ["near", "deep"], "glow": ["glow2", "light"], "horn": ["#D2BC8E", "#BFA273"]}),
     Concept("highlandcow-glen", "animal-highland-cow", "Coo in the glen", highlandcow_glen, overrides=COO,
-            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("horn", "far"), ("horn", "sky"), ("heather", "ground")],
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("horn2", "sky"), ("heather", "ground")],
             fixes={"near": ["deep", "mid"], "mid": ["far", "near"], "far": ["mid", "sky2"], "horn": ["#D2BC8E", "#BFA273"]}),
     Concept("hedgehog-portrait", "animal-hedgehog", "Hedgehog", hedgehog_portrait, overrides=HOG,
             checks=[("hero", "glow"), ("hero", "sky"), ("hero2", "glow"), ("hero2", "sky")],
@@ -1480,10 +1482,10 @@ CONCEPTS = [
             fixes={"sky": ["sky2", "far"], "far": ["mid", "near"]}),
     Concept("peregrine-portrait", "animal-peregrine-falcon", "Peregrine falcon", peregrine_portrait, overrides=FALCON,
             checks=[("light", "glow"), ("hero", "glow"), ("light", "sky"), ("hero", "far")],
-            fixes={"glow": ["mid", "far", "near"], "sky": ["sky2", "far"], "far": ["mid", "near"]}),
+            fixes={"glow": ["mid", "far", "near"], "sky": ["sky2", "far"], "far": ["mid", "near", "#8C97B8"]}),
     Concept("peregrine-stoop", "animal-peregrine-falcon", "The stoop", peregrine_stoop, ["coastal", "meadow", "blush", "dusk"], FALCON,
             checks=[("hero", "sky"), ("hero2", "sky"), ("hero", "near")],
-            fixes={"near": ["far", "mid"]}),
+            fixes={"near": ["far", "mid", "ground"]}),
     Concept("kingfisher-catch", "animal-kingfisher", "Catch of the day", kingfisher_catch, overrides=KINGF,
             checks=[("hero", "glow"), ("hero2", "glow"), ("hero", "sky"), ("fishc", "glow")],
             fixes={"glow": ["glow2", "light", "far", "sky2"], "sky": ["sky2"]}),

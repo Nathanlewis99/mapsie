@@ -262,19 +262,20 @@ def slothbear_yala(d: Drawing):
     d.stroke("pop", "M28 132 q4 2 8 0 M34 112 q3 2 6 0 M40 150 q5 2 10 0 M22 156 q4 2 8 0", 1.6, line=False)
 
     def bear():
-        d.limb("mark", "M104 134 L100 166", 12)
-        d.limb("mark", "M150 134 L154 166", 12)
-        d.shape("hero", tufty(124, 124, 44, 25, 22, 0.18))
-        d.shape("hero", tufty(98, 116, 24, 23, 12, 0.24))
-        d.limb("hero", "M90 132 L86 166", 13)
-        d.limb("hero", "M140 134 C144 146 142 156 140 166", 13)
-        d.stroke("light", "M82 170 q-6 -1 -9 3 M86 171 q-6 0 -8 5 M90 171 q-5 1 -6 6 M136 170 q-6 -1 -9 3 M140 171 q-6 0 -8 5", 1.8)
-        d.shape("hero", tufty(75, 108, 8, 8, 7, 0.35))
-        d.shape("hero", tufty(74, 124, 16, 15, 11, 0.22))
-        d.shape("hero2", "M70 118 C60 120 52 128 48 136 C46 141 50 145 55 144 C62 142 70 138 78 132Z", spot=True)
-        d.marks("mark", ellipse(49, 139, 4, 3.2))
-        d.marks("light", circle(72, 119, 1.7))
-        d.shape("light", "M84 126 L92 142 L100 126 L95 125 L92 133 L89 125Z", shadow=False)
+        d.limb("mark", "M108 132 L104 166", 13)
+        d.limb("mark", "M152 132 L156 166", 13)
+        d.shape("hero", tufty(126, 120, 42, 27, 30, 0.09))
+        d.shape("hero", tufty(98, 112, 27, 27, 18, 0.12))
+        d.limb("hero", "M92 130 L88 166", 14)
+        d.limb("hero", "M142 132 C146 146 144 156 142 166", 14)
+        d.stroke("light", "M84 170 q-6 -1 -9 3 M88 171 q-6 0 -8 5 M92 171 q-5 1 -6 6 M138 170 q-6 -1 -9 3 M142 171 q-6 0 -8 5", 1.8)
+        for ex, ey in [(64, 100), (80, 96)]:
+            d.shape("hero", tufty(ex, ey, 7.5, 7.5, 8, 0.3))
+        d.shape("hero", tufty(72, 114, 18, 17, 14, 0.13))
+        d.shape("hero2", "M66 108 C56 110 46 118 42 128 C40 133 44 137 49 136 C58 134 68 130 80 124Z", spot=True)
+        d.marks("mark", ellipse(43, 131, 4.2, 3.3))
+        d.marks("light", circle(70, 108, 1.8))
+        d.shape("light", "M86 122 L94 140 L102 122 L97 121 L94 130 L91 121Z", shadow=False)
     bear()
     d.band("ground", hills(168, 4))
     grass(d, 120, 196, 170, 10, "near")
@@ -333,7 +334,7 @@ def asianelephant_tank(d: Drawing):
     d.limb("dark", "M176 140 L175 88 M175 112 L188 96 M175 102 L164 84 M188 96 L192 86", 3)
     d.limb("dark", "M22 140 L24 100 M24 116 L14 104 M24 108 L32 94", 2.6)
     group(d, "translate(100 156) scale(.8) translate(-105 -166)", lambda: asian_side(d))
-    group(d, "translate(54 160) scale(.42) translate(-105 -166)", lambda: asian_side(d, ear_spot=False))
+    group(d, "translate(54 152) scale(.42) translate(-105 -166)", lambda: asian_side(d, ear_spot=False))
     d.band("near", waves(148, 3, 30))
     d.stroke("light", "M60 156 q8 -5 16 0 M112 158 q8 -5 16 0 M150 152 q6 -4 12 0 M30 166 q6 -4 12 0", 2.2)
     d.band("deep", waves(172, 3, 36), line=False)
@@ -348,9 +349,9 @@ LEO_HEAD = ("M100 50 C126 50 146 62 152 84 C158 98 158 114 150 128 C140 148 122 
 def srileopard_face(d: Drawing):
     foliage(d, [(10, 110, -40), (190, 106, -140), (6, 70, -10), (194, 66, -170)], "mid", 62, 14)
     foliage(d, [(16, 160, -60), (32, 176, -40), (184, 160, -120), (168, 176, -140), (100, 212, -90)], "near", 64, 15)
-    for cx in (60, 140):
-        d.shape("hero", circle(cx, 58, 14))
-        d.shape("light", circle(cx, 60, 7), shadow=False)
+    for cx in (65, 135):
+        d.shape("hero", circle(cx, 60, 11))
+        d.shape("light", circle(cx, 62, 5), shadow=False)
     d.shape("hero", LEO_HEAD)
     spots = [(100, 60, 2.4), (90, 64, 2), (110, 64, 2), (82, 70, 2.2), (118, 70, 2.2), (96, 70, 1.8), (104, 70, 1.8),
              (100, 78, 2), (90, 76, 1.6), (110, 76, 1.6), (72, 62, 2), (128, 62, 2)]
@@ -386,13 +387,15 @@ def cat_lying(d: Drawing, tail, tail_w=6, spots="rosette", ear_r=5.5):
     else:
         pat = "".join(rosette(x, y, 4.4) for x, y in [(86, 106), (104, 103), (122, 105), (140, 112), (96, 120), (116, 120)])
     clipped(d, CAT_LIE, lambda: d.marks("mark", pat))
-    for ex in (49, 69):
-        d.shape("hero", circle(ex, 79, ear_r))
-        d.shape("light", circle(ex, 80, ear_r * 0.5), shadow=False)
-    d.shape("hero", CAT_LIE_HEAD)
-    d.marks("mark", circle(52, 84, 1.2) + circle(60, 82, 1.3) + circle(68, 84, 1.2) + circle(56, 80, 1) + circle(64, 79, 1))
-    d.shape("light", ellipse(59, 102, 8.5, 6), shadow=False)
-    d.marks("mark", circle(53, 92, 1.9) + circle(66, 92, 1.9) + "M56 98 L62 98 L59 102Z")
+    def head():
+        for ex in (50, 68):
+            d.shape("hero", circle(ex, 80, ear_r))
+            d.shape("light", circle(ex, 81, ear_r * 0.5), shadow=False)
+        d.shape("hero", CAT_LIE_HEAD)
+        d.marks("mark", circle(52, 84, 1.2) + circle(60, 82, 1.3) + circle(68, 84, 1.2) + circle(56, 80, 1) + circle(64, 79, 1))
+        d.shape("light", ellipse(59, 102, 8.5, 6), shadow=False)
+        d.marks("mark", circle(53, 92, 1.9) + circle(66, 92, 1.9) + "M56 98 L62 98 L59 102Z")
+    group(d, "translate(60 104) scale(1.3) translate(-60 -104)", head)
 
 
 def srileopard_rock(d: Drawing):
@@ -404,7 +407,7 @@ def srileopard_rock(d: Drawing):
     d.shape("rock2", "M120 200 C126 166 146 152 170 152 C196 154 214 176 214 200Z")
     d.shape("rock", "M8 200 C10 160 36 128 92 126 C138 124 166 148 174 200Z")
     d.stroke("rock2", "M30 168 C40 154 54 148 68 148 M120 150 C134 156 144 166 150 180", 2.4, line=False)
-    group(d, "translate(8 -2)", lambda: cat_lying(d, "M150 116 C166 120 172 140 168 160 C166 170 170 176 176 174"))
+    group(d, "translate(102 128) scale(1.1) translate(-96 -130)", lambda: cat_lying(d, "M150 116 C164 120 168 136 164 152 C162 160 166 166 172 164"))
     d.band("deep", hills(192, 3, 30), line=False)
 
 
@@ -463,8 +466,8 @@ def bengaltiger_stride(d: Drawing):
     def pattern(p):
         clipped(d, p, lambda: d.marks("mark", tiger_stripes(p)))
         d.marks("mark", "M66 120 L78 122 L66 126Z M64 134 L76 136 L64 140Z M128 132 L142 130 L130 138Z M126 146 L140 144 L128 150Z")
-    group(d, "translate(100 164) scale(1.06) translate(-100 -160)", lambda: cat_walk(
-        d, pattern, "M160 100 C178 104 184 120 180 136 C178 146 182 152 188 150", 7,
+    group(d, "translate(104 166) scale(.96) translate(-100 -160)", lambda: cat_walk(
+        d, pattern, "M160 100 C176 106 180 124 174 140 C172 148 164 150 160 146", 7,
         head_marks="M60 74 L56 86 L63 82Z M72 80 L66 92 L75 89Z M58 104 L72 100 L62 108Z M44 78 L40 84 L47 82Z",
         tail_ring="mark"))
     d.band("ground", hills(170, 3))
@@ -474,9 +477,9 @@ def bengaltiger_stride(d: Drawing):
 
 def tiger_face_front(d: Drawing, eyes_dir=0):
     """Frontal tiger head centred (100, 100), about 116 wide."""
-    for cx in (58, 142):
-        d.shape("hero", circle(cx, 52, 15))
-        d.shape("light", circle(cx, 54, 7.5), shadow=False)
+    for cx in (60, 140):
+        d.shape("hero", circle(cx, 54, 13))
+        d.shape("light", circle(cx, 56, 6), shadow=False)
     head = ("M100 42 C128 42 148 54 154 76 C162 88 166 104 160 118 C152 140 128 156 100 156 "
             "C72 156 48 140 40 118 C34 104 38 88 46 76 C52 54 72 42 100 42Z")
     d.shape("hero", head)
@@ -495,14 +498,18 @@ def tiger_face_front(d: Drawing, eyes_dir=0):
 
 
 def bengaltiger_grass(d: Drawing):
-    d.disc("glow", 160, 46, 16)
+    d.disc("glow", 146, 48, 15)
     # Ranthambore fort on its ridge
     d.band("far", "M-30 96 L10 92 L46 74 L126 70 L166 82 L230 90")
     d.shape("deep", "M58 74 V60 H63 V56 H68 V60 H76 V56 H81 V60 H90 V54 H95 V60 H104 V56 H109 V60 H118 V72Z", shadow=False)
     d.shape("deep", "M124 60 a8 8 0 0 1 16 0Z M126 60 H138 V70 H126Z M98 54 a5 5 0 0 1 10 0Z", shadow=False)
     d.band("mid", hills(116, 6))
     blades(d, list(range(-6, 210, 9)), 140, 56, "near", 3.6, line=False)
-    group(d, "translate(100 116) scale(.72) translate(-100 -100)", lambda: tiger_face_front(d, eyes_dir=-3))
+    shoulders = "M48 210 C52 162 72 138 100 138 C128 138 148 162 152 210Z"
+    d.shape("hero", shoulders)
+    clipped(d, shoulders, lambda: d.marks("mark", "M52 150 L74 158 L54 162Z M50 170 L72 174 L50 180Z M148 150 L126 158 L146 162Z M150 170 L128 174 L150 180Z"))
+    d.shape("light", "M82 140 C88 156 112 156 118 140 C112 170 88 170 82 140Z", shadow=False)
+    group(d, "translate(100 108) scale(.72) translate(-100 -100)", lambda: tiger_face_front(d, eyes_dir=-3))
     blades(d, [8, 20, 30, 42, 52, 62, 74, 128, 140, 150, 160, 172, 182, 194], 196, 64, "deep", 4, shadow=True)
     blades(d, [86, 96, 106, 116], 200, 38, "deep", 3.6, shadow=True)
     d.band("deep", hills(186, 3, 30), line=False)
@@ -585,7 +592,9 @@ def peacock_yala(d: Drawing):
         eyespot(d, x, y, -90, s, spot=False)
     # the bird, perched facing left
     d.stroke("mark", "M86 96 L84 100 M94 96 L94 100", 2)
-    d.shape("hero2", "M76 88 C80 78 96 76 108 84 C114 88 112 96 104 98 L84 98 C78 96 74 94 76 88Z")
+    d.shape("hero", "M72 90 C70 80 80 72 94 74 C106 76 114 84 114 92 C112 98 104 100 94 100 L82 100 C76 100 72 96 72 90Z")
+    d.shape("hero2", "M88 80 C98 78 108 82 113 90 C106 95 96 95 88 90Z", shadow=False)
+    d.stroke("mark", "M94 82 L96 91 M100 81 L102 92 M106 84 L107 92", 1, line=False)
     d.shape("hero", "M74 86 C72 74 74 60 76 50 C78 44 86 44 86 50 C84 60 84 72 90 82Z")
     d.shape("hero", circle(80, 46, 7))
     d.stroke("mark", "M82 40 L86 26 M82 40 L80 26 M82 40 L91 28", 1.1)
@@ -618,9 +627,6 @@ def langur_face(d: Drawing):
         d.marks("light", circle(x + 1.3, 96.6, 1))
     d.marks("hero2", ellipse(96, 114, 2, 1.4) + ellipse(104, 114, 2, 1.4))
     d.stroke("hero2", "M91 123 Q100 127 109 123", 1.8, line=False)
-    # black hands resting on the chest
-    ink(d, "mark", ellipse(76, 166, 9, 7))
-    ink(d, "mark", ellipse(124, 166, 9, 7))
 
 
 def langur_ruins(d: Drawing):
@@ -646,7 +652,7 @@ def langur_ruins(d: Drawing):
         d.shape("hero", tufty(122, 84, 14, 13, 12, 0.18))
         ink(d, "mark", "M114 76 C107 78 104 86 106 93 C108 99 114 101 118 97 C121 91 119 81 114 76Z", shadow=False)
         d.marks("light", circle(110, 84, 1.3))
-    monkey()
+    group(d, "translate(130 142) scale(1.35) translate(-130 -142)", monkey)
 
 
 # ================================================================ INDIAN RHINO
@@ -661,7 +667,7 @@ def rhino(d: Drawing, spot=True):
     d.shape("hero", RHINO_BODY)
     d.shape("hero", "M60 92 L57 76 C58 71 65 72 66 77 L68 92Z")
     d.shape("hero", RHINO_HEAD)
-    d.shape("hero2", "M26 120 C23 110 24 100 29 93 C33 102 36 110 38 118Z", spot=spot)
+    d.shape("hero2", "M25 124 C18 112 18 98 25 86 C29 98 34 110 39 120Z", spot=spot)
     folds = ("M68 98 C72 110 72 124 66 134 M88 78 C80 98 82 124 90 148 M140 78 C132 100 132 126 140 150 "
              "M90 132 C108 137 124 137 140 132 M140 130 C150 135 160 135 170 130 M42 132 C48 128 54 126 60 120")
     d.stroke("mark", folds, 2.4)
@@ -674,7 +680,7 @@ def indianrhino_side(d: Drawing):
     d.disc("glow", 116, 94, 60)
     d.band("far", hills(150, 6))
     blades(d, [2, 10, 18, 182, 190, 198], 160, 50, "near", 3)
-    group(d, "translate(100 164) scale(1.05) translate(-100 -166)", lambda: rhino(d))
+    group(d, "translate(102 164) scale(.95) translate(-100 -166)", lambda: rhino(d))
     d.band("ground", hills(170, 3))
     grass(d, 120, 200, 172, 10, "near")
     d.band("deep", hills(188, 3, 30), line=False)
@@ -710,7 +716,7 @@ def indianrhino_kaziranga(d: Drawing):
 # ================================================================ WATER BUFFALO
 BUFFALO = {"hero": "#4A4B52", "hero2": "#6E6F78", "mark": "#1C1C21", "horn": "#8C8475", "horn2": "#6B6457", "light": "#F1EEE6",
            "pop": "#F2C14E"}
-BUF_HORN = "M90 70 C70 78 42 80 28 66 C20 58 18 46 24 34 C28 48 40 58 56 60 C70 62 82 60 92 58Z"
+BUF_HORN = "M90 78 C62 86 30 80 24 60 C20 46 28 34 42 28 C35 38 35 52 45 60 C58 68 76 66 92 64Z"
 BUF_HEAD = ("M100 56 C114 56 124 62 126 74 C128 92 122 110 118 130 C116 142 110 150 100 150 C90 150 84 142 82 130 "
             "C78 110 72 92 74 74 C76 62 86 56 100 56Z")
 
@@ -727,9 +733,9 @@ def waterbuffalo_face(d: Drawing):
     for side in (False, True):
         def horn():
             d.shape("horn", BUF_HORN, spot=True)
-            d.stroke("horn2", "M36 54 C40 60 46 62 52 64 M30 46 C32 52 36 56 40 58 M66 62 C66 66 64 70 62 72 M78 60 C78 64 77 68 75 70", 1.4)
-            d.shape("hero", ellipse(66, 86, 14, 6), extra='transform="rotate(18 66 86)"')
-            d.shape("hero2", ellipse(66, 86, 9, 3.4), extra='transform="rotate(18 66 86)"', shadow=False)
+            d.stroke("horn2", "M29 66 L37 61 M35 73 L42 65 M44 78 L48 68 M55 80 L57 70 M67 80 L67 70", 1.4)
+            d.shape("hero", ellipse(64, 92, 14, 6), extra='transform="rotate(18 64 92)"')
+            d.shape("hero2", ellipse(64, 92, 9, 3.4), extra='transform="rotate(18 64 92)"', shadow=False)
         flip(d, horn) if side else horn()
     d.shape("hero", BUF_HEAD)
     d.shape("hero", tufty(100, 62, 14, 8, 10, 0.3), shadow=False)
@@ -743,12 +749,12 @@ def waterbuffalo_face(d: Drawing):
 def buffalo_wallow(d: Drawing, egret_on=False):
     """A water buffalo up to its back in water, facing left; waterline at y=140."""
     d.shape("hero", "M60 140 C62 124 86 116 118 116 C140 116 152 126 156 140Z")
-    d.shape("horn2", "M64 116 C70 104 86 98 98 102 C101 104 99 107 96 107 C86 106 76 110 70 120Z", shadow=False)
-    d.shape("hero", "M72 120 C64 114 48 114 38 122 C32 128 32 136 38 138 C44 140 56 140 66 140 L78 136Z")
-    d.shape("horn", "M60 116 C66 100 88 92 104 98 C108 100 106 104 102 104 C88 102 76 108 68 122Z", spot=True)
-    d.shape("hero", ellipse(74, 128, 8, 3.4), extra='transform="rotate(14 74 128)"', shadow=False)
-    d.marks("light", circle(56, 124, 2))
-    d.marks("mark", circle(56, 124, 1.2) + ellipse(38, 128, 1.8, 1.2))
+    d.shape("horn2", "M80 112 C90 100 106 96 118 100 C122 102 122 106 118 108 C108 104 96 106 86 116Z", shadow=False)
+    d.shape("hero", "M82 126 C76 112 62 104 48 108 C38 111 30 118 30 127 C30 134 34 138 40 138 L80 138Z")
+    d.shape("hero", ellipse(74, 116, 8, 3.4), extra='transform="rotate(-20 74 116)"')
+    d.shape("horn", "M62 110 C68 96 86 88 104 90 C112 91 117 97 113 104 C108 98 100 97 92 99 C82 101 74 107 70 116Z", spot=True)
+    d.marks("light", circle(52, 116, 2.2))
+    d.marks("mark", circle(52, 116, 1.3) + ellipse(34, 128, 1.8, 1.2))
     if egret_on:
         egret(d, 122, 116, 1.1, face=-1)
 
@@ -759,7 +765,7 @@ def waterbuffalo_paddy(d: Drawing):
     for x, lean in [(26, 6), (176, -8), (192, 4)]:
         palm(d, x, 116, 62, lean, "dark", 0.85)
     d.band("mid", waves(118, 2, 36))
-    group(d, "translate(150 100) scale(-.62 .62) translate(-100 -140)", lambda: buffalo_wallow(d))
+    group(d, "translate(136 112) scale(-.52 .52) translate(-100 -140)", lambda: buffalo_wallow(d))
     group(d, "translate(96 140) scale(1.0) translate(-100 -140)", lambda: buffalo_wallow(d, egret_on=True))
     d.band("near", waves(140, 2, 30))
     d.stroke("light", "M30 148 q10 -5 20 0 M84 150 q10 -5 20 0 M128 150 q8 -4 16 0 M50 164 q8 -4 16 0 M150 166 q8 -4 16 0", 2.2)
@@ -806,7 +812,7 @@ def bluewhale_mirissa(d: Drawing):
     d.shape("light", cloud(110, 36, 0.8), shadow=False)
     d.band("far", "M-30 102 L150 102 L170 96 L190 98 L230 100", line=False)
     # whale-watching boat out of Mirissa
-    group(d, "translate(150 76) scale(.42)", lambda: (
+    group(d, "translate(130 76) scale(.42)", lambda: (
         d.shape("light", rrect(30, 40, 50, 18, 3)),
         d.shape("light", rrect(36, 26, 34, 14, 3)),
         d.shape("sky2", rrect(36, 44, 40, 6, 2), shadow=False),
@@ -814,9 +820,9 @@ def bluewhale_mirissa(d: Drawing):
     ))
     d.band("mid", waves(108, 3, 30))
     # the tall, straight blow of a blue whale
-    d.shape("light", "M58 134 C57 112 55 88 50 66 C38 60 36 44 48 40 C52 28 70 28 74 38 C88 40 88 58 76 64 "
-                     "C70 86 67 112 68 134Z", spot=True)
-    for x, y, r in [(40, 56, 2.6), (86, 50, 2.6), (44, 74, 2), (82, 70, 2), (62, 22, 2)]:
+    d.shape("light", "M58 134 C57 110 55 86 51 64 C44 58 42 46 49 40 C51 30 62 28 66 35 C73 32 80 42 75 50 "
+                     "C70 56 66 60 66 68 C66 92 67 114 68 134Z", spot=True)
+    for x, y, r in [(42, 54, 2.2), (82, 52, 2.4), (46, 70, 1.8), (78, 68, 1.8), (60, 22, 1.8)]:
         d.shape("light", drop(x, y, r), shadow=False)
     d.shape("hero", "M30 148 C40 136 70 126 112 125 C150 124 190 130 230 142 L230 170 L30 170Z")
     d.shape("hero", "M170 130 L180 120 L184 132Z", shadow=False)
@@ -830,11 +836,11 @@ def bluewhale_mirissa(d: Drawing):
 
 # ================================================================ KING COBRA
 COBRA = {"hero": "#4D4A27", "hero2": "#E6D488", "mark": "#1E1D10", "light": "#E9DDA8", "pop": "#D8433A"}
-HOOD = "M100 46 C118 46 132 60 134 80 C136 98 126 116 112 130 L88 130 C74 116 64 98 66 80 C68 60 82 46 100 46Z"
+HOOD = ("M100 44 C120 44 136 60 136 80 C136 100 124 116 114 128 C112 140 112 150 114 160 L86 160 "
+        "C88 150 88 140 86 128 C76 116 64 100 64 80 C64 60 80 44 100 44Z")
 
 
 def cobra_hood(d: Drawing, spot=True):
-    d.shape("hero", "M88 120 C86 136 84 148 86 160 L114 160 C116 148 114 136 112 120Z")
     d.shape("hero", HOOD)
     d.shape("light", "M68 72 L76 76 M66 88 L76 90 M68 104 L78 104 M132 72 L124 76 M134 88 L124 90 M132 104 L122 104", shadow=False, line=False)
     d.stroke("light", "M69 70 L77 75 M66 86 L76 89 M68 102 L78 103 M131 70 L123 75 M134 86 L124 89 M132 102 L122 103", 2.4, line=False)
@@ -860,14 +866,15 @@ def kingcobra_hood(d: Drawing):
 
 def kingcobra_forest(d: Drawing):
     d.band("far", hills(120, 8))
-    for x in (24, 40, 160, 178):
-        d.limb("mid", f"M{x} 200 L{x + 2} -10", 6, shadow=False)
-        d.stroke("far", f"M{x - 3} 60 H{x + 5} M{x - 3} 100 H{x + 5} M{x - 3} 140 H{x + 5} M{x - 3} 20 H{x + 5}", 1.6, line=False)
+    if d.paper:
+        for x in (24, 40, 160, 178):
+            d.limb("mid", f"M{x} 200 L{x + 2} -10", 6, shadow=False)
+            d.stroke("far", f"M{x - 3} 60 H{x + 5} M{x - 3} 100 H{x + 5} M{x - 3} 140 H{x + 5} M{x - 3} 20 H{x + 5}", 1.6)
     foliage(d, [(30, 40, -20), (40, 70, 30), (170, 40, 200), (164, 74, 150)], "mid", 34, 7)
     d.band("ground", hills(160, 4))
     foliage(d, [(4, 180, -30), (196, 180, -150), (60, 186, -10), (150, 190, -170)], "near", 40, 10)
-    body = "M14 178 C40 166 60 184 90 176 C110 170 116 158 112 144"
-    ringed(d, body, 11, "hero", "light", "2 9")
+    body = "M8 176 C36 162 60 188 90 178 C112 170 104 150 100 124"
+    ringed(d, body, 12, "hero", "light", "2 9")
     group(d, "translate(100 82) scale(.74) translate(-100 -100)", lambda: cobra_hood(d))
 
 
@@ -900,15 +907,20 @@ def orangutan_canopy(d: Drawing):
     d.limb("dark", "M-10 44 C50 38 130 42 210 34", 8)
     foliage(d, [(30, 40, -60), (60, 40, -110), (150, 38, -70), (176, 36, -120)], "mid", 26, 7)
     d.stroke("dark", "M156 38 C162 90 150 140 160 210", 3)
-    # arms reaching up, one to the branch, one to the liana
-    d.limb("hero", "M90 96 C82 74 74 56 70 42", 11)
-    d.limb("hero", "M112 98 C126 92 142 90 156 92", 11)
-    d.shape("face", ellipse(70, 40, 6, 5), shadow=False)
-    d.shape("face", ellipse(157, 92, 5, 6), shadow=False)
-    d.limb("hero", "M108 130 C122 140 140 140 157 132", 10)
-    d.limb("hero", "M92 130 C84 144 86 156 96 162", 10)
-    d.shape("face", ellipse(158, 132, 5, 6), shadow=False)
-    d.shape("hero", tufty(100, 114, 22, 26, 16, 0.16))
+    group(d, "translate(100 100) scale(1.1) translate(-100 -100)", lambda: orangutan_hanging(d))
+
+
+def orangutan_hanging(d: Drawing):
+    # hanging from the branch by both very long arms, legs tucked up
+    d.limb("hero", "M90 100 C84 78 78 60 74 40", 11)
+    d.limb("hero", "M112 100 C118 78 124 60 128 40", 11)
+    d.stroke("hero2", "M83 76 l-6 5 M79 62 l-6 5 M119 76 l6 5 M123 62 l6 5", 1.6, line=False)
+    d.shape("face", ellipse(74, 40, 6, 5), shadow=False)
+    d.shape("face", ellipse(128, 40, 6, 5), shadow=False)
+    d.limb("hero", "M90 134 C76 144 76 158 88 164", 10)
+    d.limb("hero", "M112 134 C126 144 126 158 114 164", 10)
+    d.shape("face", ellipse(91, 165, 5, 4) + ellipse(111, 165, 5, 4), shadow=False)
+    d.shape("hero", tufty(101, 116, 23, 27, 16, 0.16))
     d.shape("hero2", "M88 104 C92 96 108 96 112 104 C114 116 112 128 100 130 C88 128 86 116 88 104Z", shadow=False, line=False)
     # baby clinging on
     d.shape("hero", tufty(104, 120, 9, 9, 10, 0.2), shadow=False)
@@ -939,9 +951,9 @@ def proboscis_face(d: Drawing):
     d.stroke("mark", "M88 78 Q96 74 104 78", 1.8)
     d.marks("mark", circle(97, 84, 2.4))
     d.marks("light", circle(97.8, 83.2, 0.8))
-    d.stroke("mark", "M74 130 Q84 133 92 128", 2)
-    d.shape("nose", "M86 82 C74 78 58 84 54 98 C50 112 56 126 70 128 C80 128 88 120 90 108Z", spot=True)
-    d.marks("mark", ellipse(66, 122, 2.2, 1.4))
+    d.stroke("mark", "M84 130 Q92 132 98 127", 2)
+    d.shape("nose", "M88 80 C76 74 60 80 56 96 C52 112 54 130 64 136 C74 140 84 132 88 118 C90 106 90 94 88 80Z", spot=True)
+    d.marks("mark", ellipse(66, 132, 2.4, 1.4))
 
 
 def proboscis_river(d: Drawing):
@@ -1029,11 +1041,11 @@ def giantpanda_grove(d: Drawing):
     ink(d, "dark", ellipse(130, 168, 18, 12))
     d.shape("light", "M64 168 C56 140 66 108 100 104 C134 108 144 140 136 168Z")
     ink(d, "dark", "M64 130 C68 112 82 102 100 102 C118 102 132 112 136 130 C124 122 112 120 100 120 C88 120 76 122 64 130Z", shadow=False)
-    d.limb("dark", "M72 126 C64 144 72 154 90 150", 15)
-    d.limb("bamboo", "M88 156 L130 66", 4.5, spot=True)
-    for x, y, a in [(130, 66, -50), (130, 66, -100), (126, 74, -10)]:
+    d.limb("bamboo", "M88 164 L130 62", 4.5, spot=True)
+    for x, y, a in [(130, 62, -50), (130, 62, -100), (127, 70, -10)]:
         d.shape("bamboo", leaf(x, y, 22, 5, a), shadow=False)
-    d.limb("dark", "M128 126 C138 112 134 98 124 92", 15)
+    d.limb("dark", "M70 128 C62 146 76 152 98 142", 15)
+    d.limb("dark", "M130 128 C140 146 128 152 110 132", 15)
     panda_face(d, 100, 80, 0.46)
     d.marks("pop", ellipse(66, 166, 4, 3) + ellipse(134, 166, 4, 3)) if d.paper else None
     d.band("deep", hills(188, 3, 30), line=False)

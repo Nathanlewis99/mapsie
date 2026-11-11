@@ -1034,6 +1034,403 @@ def humming_flowers(d: Drawing):
     d.band("near", hills(180, 4))
 
 
+# ================================================================ ARCTIC FOX
+FOX_EAR = "M66 72 C60 58 62 44 70 36 C80 42 86 54 86 64Z"
+
+
+def fox_portrait(d: Drawing):
+    aurora(d, 60)
+    stars(d, [(30, 40, 1.4), (172, 46, 1.4), (150, 24, 1.1), (50, 70, 1.1)])
+    d.band("far", hills(150, 10))
+    d.band("mid", hills(170, 6, 30), line=False)
+    d.shape("hero", "M60 176 C30 176 20 150 32 132 C40 124 50 128 50 138 C52 156 72 166 100 168 C130 170 150 164 164 172 "
+                    "C150 186 100 188 60 176Z")
+    d.shape("hero", "M66 172 C58 144 68 112 86 98 L114 98 C132 112 142 144 134 172Z")
+    d.shape("hero2", "M74 168 L78 136 L86 136 L86 168Z M126 168 L122 136 L114 136 L114 168Z", shadow=False, line=False)
+    d.stroke("hero2", "M88 120 Q100 130 112 120", 1.6, line=False)
+    d.shape("hero", FOX_EAR)
+    flip(d, lambda: d.shape("hero", FOX_EAR))
+    d.shape("hero2", "M70 66 C68 56 70 48 72 44 C78 50 80 56 80 62Z", shadow=False)
+    flip(d, lambda: d.shape("hero2", "M70 66 C68 56 70 48 72 44 C78 50 80 56 80 62Z", shadow=False))
+    d.shape("hero", "M100 50 C124 50 140 64 140 82 C140 100 124 114 100 122 C76 114 60 100 60 82 C60 64 76 50 100 50Z")
+    d.shape("hero2", "M60 84 C64 96 74 104 86 108 L76 112 C68 106 62 96 60 84Z M140 84 C136 96 126 104 114 108 L124 112 "
+                     "C132 106 138 96 140 84Z", shadow=False, line=False)
+    d.marks("mark", "M78 84 Q86 76 92 84 Q86 88 78 84Z M122 84 Q114 76 108 84 Q114 88 122 84Z")
+    d.marks("mark", "M93 104 C93 100 107 100 107 104 C107 108 102 111 100 111 C98 111 93 108 93 104Z")
+    d.stroke("mark", "M100 111 V114 M95 116 Q100 118 105 116", 1.4)
+    snowflakes(d, [(24, 100, 1.8), (176, 104, 2), (160, 130, 1.5), (38, 120, 1.5)])
+
+
+def fox_curled(d: Drawing):
+    aurora(d, 56)
+    d.disc("glow", 150, 50, 14)
+    stars(d, [(30, 44, 1.4), (60, 24, 1.2), (110, 32, 1.1)])
+    d.band("far", hills(118, 8))
+    d.band("ice", hills(142, 6, 20))
+    d.shape("ice2", "M10 170 C40 152 160 150 190 170Z", shadow=False, line=False)
+    d.shape("hero", ellipse(108, 144, 46, 26))
+    d.shape("hero", "M76 128 L70 106 L86 120Z M86 124 L88 102 L98 120Z")
+    d.shape("hero2", "M77 124 L73 111 L82 120Z M89 122 L90 108 L95 119Z", shadow=False, line=False)
+    d.shape("hero", ellipse(80, 136, 20, 15))
+    d.stroke("mark", "M72 134 q4 3 8 0", 1.6)
+    d.marks("mark", circle(62, 142, 2.6))
+    d.shape("hero", "M150 132 C164 140 160 164 130 168 C100 172 70 166 56 152 C74 158 104 160 124 154 C140 150 152 142 150 132Z")
+    d.shape("hero2", "M56 152 C74 158 104 160 124 154 C110 162 80 164 56 152Z", shadow=False, line=False)
+    snowflakes(d, [(24, 80, 1.8), (176, 90, 2), (160, 116, 1.5), (40, 110, 1.6), (100, 70, 1.6), (130, 92, 1.4)])
+    d.band("ice2", hills(178, 3), line=False)
+
+
+# ================================================================ WALRUS
+def walrus_portrait(d: Drawing):
+    d.disc("glow", 152, 50, 16)
+    d.band("far", "M-30 112 L20 96 L60 108 L230 104", line=False)
+    d.band("mid", waves(116, 3, 30))
+    d.shape("hero2", "M6 210 C10 152 48 122 100 122 C152 122 190 152 194 210Z")
+    d.stroke("hero", "M30 170 Q100 150 170 170 M24 190 Q100 170 176 190", 2.4, line=False)
+    d.shape("hero", "M100 36 C138 36 162 62 162 96 C162 122 148 142 130 150 L70 150 C52 142 38 122 38 96 C38 62 62 36 100 36Z")
+    d.shape("tusk", "M82 128 C80 152 82 174 90 196 C95 174 95 152 95 130Z M118 128 C120 152 118 174 110 196 "
+                    "C105 174 105 152 105 130Z", spot=True)
+    d.shape("hero2", "M100 98 C112 88 140 90 146 108 C152 126 136 140 116 138 C108 138 102 134 100 130 C98 134 92 138 84 138 "
+                     "C64 140 48 126 54 108 C60 90 88 88 100 98Z", shadow=False)
+    d.marks("mark", "".join(circle(x, y, 1.3) for x, y in [(66, 112), (74, 118), (82, 112), (66, 124), (78, 126), (88, 122),
+                                                          (134, 112), (126, 118), (118, 112), (134, 124), (122, 126), (112, 122)]))
+    d.marks("mark", ellipse(94, 98, 2.4, 1.6) + ellipse(106, 98, 2.4, 1.6))
+    d.marks("mark", circle(74, 76, 3) + circle(126, 76, 3))
+    d.stroke("mark", "M84 62 Q100 56 116 62", 1.4, line=False)
+    d.band("near", waves(186, 4, 34), line=False)
+
+
+WALRUS_SIDE = ("M14 150 C18 124 44 108 80 106 C106 104 128 96 142 84 C152 76 170 78 176 90 C182 100 180 112 174 118 "
+               "L168 124 C158 132 150 140 146 150Z")
+
+
+def walrus(d: Drawing):
+    d.shape("hero", leaf(14, 146, 22, 7, 160) + leaf(18, 150, 22, 7, 200))
+    d.shape("hero", WALRUS_SIDE)
+    d.stroke("hero2", "M60 112 Q70 130 66 148 M90 108 Q102 128 98 148 M120 100 Q130 120 128 146", 2, line=False)
+    d.shape("hero2", leaf(130, 132, 26, 8, 120))
+    d.shape("tusk", "M164 116 C162 128 160 140 156 150 C162 142 168 130 170 118Z M170 118 C170 130 170 142 168 150 "
+                    "C174 142 176 130 176 118Z", spot=True)
+    d.shape("hero2", circle(166, 108, 9) + circle(176, 108, 8), shadow=False)
+    d.marks("mark", "".join(circle(x, y, 1) for x, y in [(162, 106), (168, 110), (172, 106), (178, 110), (164, 112)]))
+    d.marks("mark", circle(160, 90, 2))
+
+
+def walrus_rock(d: Drawing):
+    d.disc("glow", 46, 50, 16)
+    d.shape("light", "M140 108 L152 76 L170 70 L186 92 L192 108Z")
+    d.shape("ice2", "M170 70 L186 92 L192 108 L176 108 L178 90Z", shadow=False, line=False)
+    d.band("far", waves(106, 2, 30))
+    d.band("mid", waves(124, 3, 34))
+    d.shape("rock", "M10 168 C14 146 34 134 60 134 L140 132 C166 132 186 144 190 168Z")
+    place(d, walrus, 132, 142, 0.62, 100, 150, mirror=True)
+    place(d, walrus, 70, 152, 0.82, 100, 150)
+    d.band("near", waves(166, 4, 34))
+    ripples(d, [(30, 180, 1.6), (130, 182, 1.6)])
+    d.band("deep", waves(190, 3, 38), line=False)
+
+
+# ================================================================ NARWHAL
+def narwhal(d: Drawing, p, s=1.0, tusk_len=60):
+    prof = lambda t: (s * (3 + 15 * math.sin(math.pi * (t * 0.84) ** 1.15)), s * (3 + 14 * math.sin(math.pi * (t * 0.84) ** 1.15)))
+    d.shape("hero", flukes(p, 14 * s, 11 * s))
+    hx, hy, dx, dy = _bez(p, 1.0)
+    base = frame(p, 1.0, 2 * s, 6 * s)
+    tip = (base[0] + dx * tusk_len - dy * tusk_len * 0.12, base[1] + dy * tusk_len + dx * tusk_len * 0.12)
+    d.limb("tusk", f"M{base[0]:.1f} {base[1]:.1f} L{tip[0]:.1f} {tip[1]:.1f}", 3.6 * s, spot=True)
+    n = int(tusk_len / 6)
+    tw = " ".join(f"M{base[0] + (tip[0] - base[0]) * i / n - dy * 1.6:.1f} {base[1] + (tip[1] - base[1]) * i / n + dx * 1.6:.1f} "
+                  f"l{dx * 2 + dy * 3.2:.1f} {dy * 2 - dx * 3.2:.1f}" for i in range(1, n))
+    d.stroke("mark", tw, 0.9, line=False)
+    pf = frame(p, 0.74, -10 * s)
+    ang = math.degrees(math.atan2(dy, dx)) + 130
+    d.shape("hero", leaf(pf[0], pf[1], 16 * s, 5 * s, ang))
+    body = spine(p, prof)
+    d.shape("hero", body)
+    hb = prof(1.0)
+    d.shape("hero", circle(*frame(p, 0.98, (hb[0] - hb[1]) / 2), (hb[0] + hb[1]) / 2), shadow=False)
+    d.shape("hero2", spine(p, lambda t: (-3 * s, prof(t)[1] - 1.5 * s), t0=0.15, t1=0.97), shadow=False)
+    spots = []
+    for i in range(26):
+        t = 0.08 + 0.8 * ((i * 37) % 26) / 26
+        u = prof(t)[0] * (0.2 + 0.7 * ((i * 11) % 7) / 7)
+        spots.append(frame(p, t, u))
+    clipped(d, body, lambda: d.marks("mark", "".join(ellipse(x, y, 2.4 * s, 1.6 * s) for x, y in spots)))
+    e = frame(p, 0.9, 3 * s)
+    d.marks("mark", circle(e[0], e[1], 1.5 * s))
+
+
+def narwhal_portrait(d: Drawing):
+    d.band("sky2", waves(36, 5, 26))
+    d.band("far", waves(60, 5, 28))
+    d.shape("light", "M-30 30 L40 30 L50 44 L20 52 L-30 50Z M120 30 L230 30 L230 46 L160 50 L130 44Z", line=False)
+    d.band("mid", waves(92, 6, 30))
+    rays(d)
+    d.band("near", waves(132, 6, 34))
+    d.band("deep", waves(162, 5, 36), line=False)
+    narwhal(d, ((22, 132), (50, 118), (96, 112), (130, 104)), 1.35, 62)
+    bubbles(d, [(30, 92, 2.5), (24, 80, 3.5), (32, 68, 2.4)])
+
+
+def narwhal_head(d: Drawing, x, y, lean, tusk=96):
+    a = math.radians(lean)
+    ux, uy = math.sin(a), -math.cos(a)
+    tx, ty = x + ux * 26, y + uy * 26
+    d.shape("hero", f"M{x - 15} {y + 10} C{x - 16} {y - 10} {tx - 12} {ty + 4} {tx} {ty} C{tx + 12} {ty + 4} {x + 16} {y - 10} {x + 15} {y + 10}Z")
+    ex, ey = x + ux * 14 + uy * 0, y + uy * 14
+    d.shape("hero2", f"M{x - 4} {y + 10} C{x - 4} {y} {x + 2} {y - 6} {x + 8} {y - 4} C{x + 12} {y} {x + 12} {y + 6} {x + 12} {y + 10}Z",
+            shadow=False, line=False)
+    d.marks("mark", "".join(ellipse(x + dx, y + dy, 2, 1.4) for dx, dy in [(-8, -2), (-10, 6), (-4, 4), (6, -10), (-2, -12)]))
+    d.marks("mark", circle(ex + 5, ey + 4, 1.6))
+    d.limb("tusk", f"M{tx:.1f} {ty:.1f} L{tx + ux * tusk:.1f} {ty + uy * tusk:.1f}", 3.6, spot=True)
+    d.stroke("mark", " ".join(f"M{tx + ux * k - 1.8:.1f} {ty + uy * k:.1f} l3.6 {-2 if lean < 0 else 2}" for k in range(8, tusk, 7)),
+             0.9, line=False)
+
+
+def narwhal_ice(d: Drawing):
+    d.disc("glow", 100, 54, 18)
+    d.shape("light", "M-30 104 L-30 88 L10 84 L30 92 L60 94 L66 104Z M150 104 L156 90 L190 84 L230 88 L230 104Z")
+    d.band("far", waves(104, 2, 30))
+    d.shape("light", "M10 128 C10 120 30 116 50 118 C62 120 64 128 58 132 L16 134Z M150 124 C152 116 178 116 196 120 L196 132 "
+                     "L154 132Z", shadow=True)
+    narwhal_head(d, 76, 140, 22, 92)
+    narwhal_head(d, 124, 140, -22, 92)
+    d.band("mid", waves(140, 3, 32))
+    ripples(d, [(58, 140, 1.4), (110, 140, 1.4)])
+    d.band("near", waves(160, 4, 36))
+    d.band("deep", waves(182, 4, 40), line=False)
+
+
+# ================================================================ REINDEER
+def reindeer_antler(d: Drawing, mirror=False):
+    def a():
+        d.limb("antler", "M92 58 C70 52 50 40 46 14", 5.5, spot=True)
+        d.limb("antler", "M62 46 L42 40 M52 32 L36 24 M47 18 L56 6 M74 52 L74 32 M48 22 L38 12", 4, spot=True)
+        d.shape("antler", "M94 62 C86 66 84 76 86 86 L80 80 L82 90 C76 84 74 72 80 64Z", spot=True)
+    flip(d, a) if mirror else a()
+
+
+def reindeer_portrait(d: Drawing):
+    aurora(d, 60)
+    stars(d, [(24, 70, 1.4), (178, 72, 1.4), (100, 18, 1.2)])
+    d.band("far", hills(156, 6))
+    pines(d, [(14, 40), (186, 44)], 166, "mid")
+    d.shape("hero2", scallop(100, 172, 44, 14, 0.14))
+    reindeer_antler(d)
+    reindeer_antler(d, True)
+    d.shape("hero", leaf(80, 76, 26, 7, 196) + leaf(120, 76, 26, 7, -16))
+    d.shape("hero", "M100 58 C114 58 122 66 122 80 C122 98 128 112 130 126 C132 144 120 156 100 156 C80 156 68 144 70 126 "
+                    "C72 112 78 98 78 80 C78 66 86 58 100 58Z")
+    d.shape("hero2", "M100 118 C116 118 128 126 128 138 C128 150 116 156 100 156 C84 156 72 150 72 138 C72 126 84 118 100 118Z",
+            shadow=False)
+    d.marks("mark", ellipse(91, 132, 3.6, 5) + ellipse(109, 132, 3.6, 5))
+    d.marks("mark", circle(84, 90, 3.4) + circle(116, 90, 3.4))
+    d.marks("light", circle(85, 89, 1) + circle(117, 89, 1))
+    d.stroke("mark", "M92 146 Q100 150 108 146", 1.6)
+
+
+REINDEER = ("M46 104 C44 92 52 86 64 86 C86 84 108 84 122 86 C128 80 134 72 138 66 C142 60 148 56 154 56 "
+            "L170 66 C174 69 173 74 168 75 L158 75 C154 80 150 88 148 98 C146 106 144 110 142 114 "
+            "C128 120 96 120 80 118 C62 116 48 112 46 104Z")
+
+
+def reindeer(d: Drawing):
+    d.limb("hero3", "M126 112 L128 152", 6)
+    d.limb("hero3", "M64 108 L62 152", 6)
+    d.limb("antler2", "M146 58 C134 44 132 30 140 14 M136 38 L124 32 M134 26 L122 18", 3.6)
+    d.limb("hero", "M138 112 L140 152", 6.5)
+    d.limb("hero", "M76 112 C80 128 74 140 74 152", 7)
+    d.shape("hero", REINDEER)
+    d.shape("hero2", "M140 66 C150 70 152 90 146 110 L138 116 C134 108 132 100 134 90 C134 80 136 72 140 66Z", shadow=False)
+    d.shape("hero2", "M46 102 C46 94 50 90 56 90 C58 98 58 106 56 112 C50 110 47 106 46 102Z", shadow=False, line=False)
+    d.shape("hero", leaf(150, 60, 13, 4, -150), shadow=False)
+    d.limb("antler", "M152 58 C142 44 138 28 148 10 M144 40 L132 34 M142 26 L130 20 M148 10 L158 4", 3.6, spot=True)
+    d.shape("antler", "M154 58 C160 52 168 52 172 46 L170 54 C166 58 160 60 156 62Z", spot=True)
+    d.marks("mark", circle(160, 64, 1.7) + circle(171, 70, 1.6))
+    d.shape("mark", rrect(124, 150, 8, 4, 1.5) + rrect(136, 150, 8, 4, 1.5) + rrect(58, 150, 8, 4, 1.5) + rrect(70, 150, 8, 4, 1.5),
+            shadow=False, line=False)
+
+
+def reindeer_lapland(d: Drawing):
+    aurora(d, 50)
+    d.disc("glow", 160, 46, 14)
+    stars(d, [(26, 76, 1.4), (60, 30, 1.2), (130, 26, 1.1)])
+    d.band("far", hills(118, 8))
+    pines(d, [(150, 46), (166, 58), (182, 44), (196, 52)], 128, "mid")
+    for x, h in [(150, 46), (166, 58), (182, 44), (196, 52)]:
+        d.shape("light", f"M{x} {128 - h} L{x + h * 0.14} {128 - h * 0.78} L{x - h * 0.14} {128 - h * 0.78}Z", shadow=False, line=False)
+    # lavvu tent with a warm glow in the doorway
+    d.shape("tent", "M14 136 L38 82 L62 136Z")
+    d.stroke("dark", "M32 74 L40 88 M44 74 L36 88", 2)
+    d.shape("glow2", "M32 136 L38 116 L44 136Z", shadow=False, spot=True)
+    d.band("snow", hills(134, 5))
+    place(d, reindeer, 108, 160, 0.92, 110, 152)
+    d.band("snow2", hills(176, 3), line=False)
+
+
+# ================================================================ SNOWY OWL
+def owl_flecks(pts, s=1.0):
+    return "".join(f"M{x - 3 * s} {y} q{3 * s} {-2.4 * s} {6 * s} 0 q{-3 * s} {1 * s} {-6 * s} 0Z" for x, y in pts)
+
+
+def owl_portrait(d: Drawing):
+    stars(d, [(30, 40, 1.5), (170, 36, 1.4), (180, 76, 1.2)])
+    d.disc("glow", 160, 54, 18)
+    d.band("far", hills(170, 5))
+    d.shape("post", rrect(70, 168, 60, 40, 4))
+    d.shape("hero2", "M48 100 C40 130 48 160 70 176 L84 150Z M152 100 C160 130 152 160 130 176 L116 150Z")
+    d.shape("hero", "M100 40 C134 40 154 64 154 96 C154 136 136 166 100 176 C64 166 46 136 46 96 C46 64 66 40 100 40Z")
+    d.shape("hero2", circle(80, 88, 19) + circle(120, 88, 19), shadow=False, line=False)
+    d.shape("hero", "M100 82 C108 90 110 104 100 118 C90 104 92 90 100 82Z", shadow=False, line=False)
+    d.shape("eye", circle(80, 88, 10) + circle(120, 88, 10), shadow=False, spot=True)
+    d.marks("mark", circle(80, 88, 5) + circle(120, 88, 5))
+    d.marks("light", circle(82, 86, 1.6) + circle(122, 86, 1.6))
+    d.shape("mark", "M95 104 L105 104 L100 115Z", shadow=False)
+    d.marks("mark", owl_flecks([(76, 132), (92, 138), (108, 136), (124, 130), (84, 150), (100, 152), (116, 150),
+                                (92, 164), (110, 164), (70, 60), (88, 52), (112, 54), (130, 62), (60, 120), (140, 120)]))
+    d.marks("mark", owl_flecks([(54, 130), (58, 146), (146, 130), (142, 146)], 0.8))
+    d.shape("hero2", "M84 174 l4 8 l4 -8 Z M108 174 l4 8 l4 -8Z", shadow=False)
+    d.stroke("mark", "M86 180 l-1 4 M90 180 l1 4 M110 180 l-1 4 M114 180 l1 4", 1.4)
+
+
+OWL_WING = ("M92 98 C76 82 54 70 26 66 C18 66 10 70 8 76 L18 78 L6 86 L20 88 L10 96 L26 96 L20 106 L36 102 "
+            "C56 104 76 108 90 114Z")
+
+
+def owl_flight(d: Drawing):
+    d.disc("glow", 100, 70, 40)
+    stars(d, [(30, 40, 1.4), (174, 40, 1.4), (160, 100, 1.1)])
+    d.band("far", hills(146, 6))
+    d.band("snow", hills(160, 5, 30))
+
+    def wing():
+        group(d, "rotate(-6 92 100)", lambda: (
+            d.shape("hero", OWL_WING),
+            d.marks("mark", owl_flecks([(30, 78), (44, 80), (58, 84), (36, 92), (52, 94), (70, 92), (66, 102), (20, 84)], 0.9))))
+    wing()
+    flip(d, wing)
+    d.shape("hero", "M100 88 C116 88 122 104 120 120 C118 134 110 142 100 142 C90 142 82 134 80 120 C78 104 84 88 100 88Z")
+    d.marks("mark", owl_flecks([(92, 116), (108, 118), (100, 128), (90, 130), (110, 130)], 0.8))
+    d.stroke("mark", "M92 140 l-2 8 M96 141 l0 8 M104 141 l0 8 M108 140 l2 8", 1.8)
+    d.shape("hero", circle(100, 82, 18))
+    d.shape("eye", circle(93, 80, 5) + circle(107, 80, 5), shadow=False, spot=True)
+    d.marks("mark", circle(93, 80, 2.5) + circle(107, 80, 2.5) + "M97 88 L103 88 L100 94Z")
+    d.marks("mark", owl_flecks([(92, 68), (108, 68)], 0.7))
+    d.band("snow2", hills(180, 3), line=False)
+
+
+# ================================================================ PUFFIN
+def puffin_beak(d: Drawing):
+    d.shape("pop", "M136 72 C156 74 176 86 186 100 C176 108 156 116 136 118Z", spot=True)
+    d.shape("beakbase", "M136 72 C141 73 145 75 148 77 L148 114 C144 116 140 117 136 118Z", shadow=False)
+    d.shape("hero2", "M148 77 L155 80 L155 111 L148 114Z", shadow=False)
+    d.stroke("pop2", "M164 84 C160 94 160 104 164 110 M174 90 C171 96 171 102 174 106", 1.6, line=False)
+    d.stroke("mark", "M136 100 L184 100", 1.3)
+    d.shape("hero2", circle(136, 102, 4), shadow=False)
+
+
+def puffin_portrait(d: Drawing):
+    d.disc("glow", 52, 52, 18)
+    d.band("far", "M-30 130 L30 120 L40 100 L60 96 L70 120 L230 126", line=False)
+    d.band("mid", waves(140, 3, 30))
+    d.shape("dark", "M40 210 C34 170 52 134 84 126 C108 120 128 128 140 144 C152 162 158 190 156 210Z")
+    d.shape("light", "M126 150 C144 160 156 186 158 210 L110 210 C112 190 116 166 126 150Z", shadow=False)
+    d.shape("dark", "M44 150 C30 104 50 54 94 44 C120 38 140 50 146 72 L136 72 C120 64 98 66 84 78 C72 90 70 112 76 132Z")
+    d.shape("face", "M76 132 C70 104 78 80 100 68 C116 62 130 64 136 72 L136 118 C130 130 116 138 100 140 C88 140 80 138 76 132Z")
+    d.shape("hero2", "M76 132 C80 120 96 116 112 120 C120 124 128 130 132 128 C122 138 108 142 92 140 C84 140 79 137 76 132Z",
+            shadow=False, line=False)
+    puffin_beak(d)
+    d.marks("eyeliner", "M106 80 L120 74 L126 82Z M112 96 L122 92 L120 104Z")
+    d.shape("pop2", circle(118, 86, 5.5), shadow=False)
+    d.marks("mark", circle(118, 86, 3))
+    d.band("near", waves(184, 4, 36), line=False)
+
+
+def puffin_standing(d: Drawing, fish_=True):
+    d.shape("pop", ellipse(98, 162, 9, 3) + ellipse(112, 162, 9, 3), shadow=False)
+    d.shape("dark", "M84 160 C70 140 72 104 90 88 C98 80 112 80 118 88 C124 96 124 108 120 116 C128 132 128 150 118 162Z")
+    d.shape("light", "M112 114 C122 128 125 148 116 161 L100 161 C106 146 108 128 112 114Z", shadow=False)
+    d.shape("dark", "M88 104 C80 120 80 140 86 154 C92 140 96 122 94 104Z", shadow=False)
+    d.shape("face", "M104 82 C114 78 124 84 124 94 C124 102 118 108 110 108 C104 104 102 92 104 82Z", shadow=False)
+    d.shape("pop", "M122 84 C130 86 138 92 142 98 C136 102 130 104 122 104Z", spot=True)
+    d.shape("beakbase", "M122 84 L126 85 L126 103 L122 104Z", shadow=False)
+    if fish_:
+        for k, a in enumerate([70, 82, 96, 108]):
+            d.shape("fishc", leaf(128 + k * 2, 98, 20, 2.6, a), shadow=False)
+    d.marks("eyeliner", "M110 88 L117 85 L119 90Z")
+    d.marks("mark", circle(115, 91, 1.8))
+
+
+def puffin_cliff(d: Drawing):
+    d.disc("glow", 150, 48, 16)
+    d.band("far", waves(108, 2, 30))
+    d.band("mid", waves(126, 3, 34))
+    d.band("near", waves(150, 4, 38), line=False)
+
+    def flier():
+        d.shape("dark", ellipse(100, 100, 12, 6))
+        d.shape("dark", "M96 98 L84 82 L104 96Z M104 102 L96 118 L110 102Z", shadow=False)
+        d.shape("face", circle(110, 97, 4), shadow=False)
+        d.shape("pop", "M113 96 L120 99 L113 101Z", shadow=False)
+    place(d, flier, 40, 62, 0.9)
+    d.shape("cliff", "M-30 230 L-30 150 C10 144 60 150 100 152 C140 154 170 156 230 150 L230 230Z")
+    d.shape("turf", "M-30 154 C10 146 60 150 100 152 C140 154 170 156 230 152 L230 162 C170 166 140 162 100 162 "
+                    "C60 162 10 158 -30 164Z", shadow=False)
+    d.stroke("deep", "M30 176 L40 200 M120 172 L112 196 M160 174 L172 200", 2, line=False)
+    for x, y in [(30, 150), (150, 154), (176, 152)]:
+        d.shape("turf", f"M{x} {y} l3 -9 l2 8 l3 -10 l2 11Z", shadow=False, line=False)
+    place(d, puffin_standing, 96, 160, 1.15, 104, 162)
+
+
+# ================================================================ BELUGA
+def beluga(d: Drawing, p, s=1.0):
+    prof = lambda t: (s * (3 + 17 * math.sin(math.pi * (t * 0.86) ** 1.15)), s * (3 + 15 * math.sin(math.pi * (t * 0.86) ** 1.15)))
+    d.shape("hero", flukes(p, 14 * s, 11 * s))
+    x, y, dx, dy = _bez(p, 0.74)
+    pf = frame(p, 0.74, -12 * s)
+    d.shape("hero2", leaf(pf[0], pf[1], 18 * s, 6 * s, math.degrees(math.atan2(dy, dx)) + 130))
+    body = spine(p, prof)
+    d.shape("hero", body)
+    m = frame(p, 0.93, 6 * s)
+    hb = prof(1.0)
+    d.shape("hero", circle(m[0], m[1], 13 * s), shadow=False)
+    beak = frame(p, 1.0, -4 * s, 4 * s)
+    d.shape("hero", circle(beak[0], beak[1], 6 * s), shadow=False)
+    a, b = frame(p, 0.9, -8 * s), frame(p, 1.0, -6 * s, 6 * s)
+    d.stroke("mark", f"M{a[0]:.1f} {a[1]:.1f} Q{(a[0] + b[0]) / 2:.1f} {(a[1] + b[1]) / 2 + 3 * s:.1f} {b[0]:.1f} {b[1]:.1f}", 1.4 * s)
+    e = frame(p, 0.86, 2 * s)
+    d.marks("mark", circle(e[0], e[1], 1.6 * s))
+    d.stroke("hero2", " ".join(f"M{frame(p, t, prof(t)[0] - 3 * s)[0]:.1f} {frame(p, t, prof(t)[0] - 3 * s)[1]:.1f} "
+                               f"L{frame(p, t + 0.08, prof(t + 0.08)[0] - 3 * s)[0]:.1f} {frame(p, t + 0.08, prof(t + 0.08)[0] - 3 * s)[1]:.1f}"
+                               for t in (0.3, 0.42)), 2, line=False)
+
+
+def beluga_portrait(d: Drawing):
+    underwater(d, bottom=False)
+    beluga(d, ((20, 136), (56, 118), (110, 100), (150, 104)), 1.5)
+    bubbles(d, [(176, 84, 2.5), (182, 70, 3.5), (174, 58, 2.5)])
+    for x, y, sc in [(40, 56, 0.8), (54, 64, 0.7)]:
+        d.shape("pop", fish(x, y, sc), shadow=False)
+
+
+def beluga_kayak(d: Drawing):
+    d.disc("glow", 160, 34, 12)
+    d.band("far", "M-30 52 L20 44 L60 50 L100 40 L140 50 L230 46", line=False)
+    d.band("mid", "M-30 62 L230 62")
+    # kayak on the surface
+    d.limb("dark", "M66 30 L118 66", 2.6)
+    d.shape("pop2", "M64 28 l6 -4 l2 6Z M116 64 l6 4 l-6 2Z", shadow=False)
+    d.marks("dark", circle(92, 38, 5))
+    d.shape("dark", "M86 58 C86 46 98 44 100 56Z")
+    d.shape("pop", "M54 58 L132 58 C126 66 112 68 92 68 C74 68 60 66 54 58Z", spot=True)
+    d.band("near", waves(68, 3, 30))
+    rays(d)
+    d.band("deep", waves(150, 5, 36), line=False)
+    beluga(d, ((24, 118), (60, 100), (110, 90), (150, 98)), 1.15)
+    beluga(d, ((90, 156), (110, 146), (140, 140), (166, 146)), 0.62)
+    bubbles(d, [(170, 88, 2.4), (176, 78, 3.2)])
+
+
 # ================================================================ colours
 BLACK_BEAR_C = {"hero": "#2B2A2F", "hero2": "#C49A6C", "mark": "#121115", "bark": "#7A5236"}
 GRIZZLY_C = {"hero": "#7E5130", "hero2": "#B68A5C", "mark": "#2B1B10", "pop": "#E0603F", "pop2": "#F29A84",
@@ -1058,6 +1455,17 @@ MANATEE_C = {"hero": "#8C959B", "hero2": "#A9B1B6", "mark": "#3A4044", "pop": "#
 ORCA_C = {"hero": "#1D1F25", "hero2": "#8C939C", "light": "#FFFFFF", "mark": "#0B0C0F"}
 HUMMING_C = {"hero": "#3C9A63", "pop": "#D8304A", "light": "#FFFFFF", "mark": "#1E2420", "wing": "#86BCB2", "wing2": "#5F958A",
              "leafc": "#4E8A4A", "flower": "#E8503A", "flower2": "#F6A23B"}
+FOX_C = {"hero": "#F7F5EF", "hero2": "#D6D2C8", "mark": "#1E1F26", "ice": "#9DBFD6", "ice2": "#7FA6C2", "light": "#FFFFFF"}
+WALRUS_C = {"hero": "#A8735C", "hero2": "#C99A84", "mark": "#3A2219", "tusk": "#F7F0DC", "rock": "#5E5853", "ice2": "#BCD8E6"}
+NARWHAL_C = {"hero": "#7F8B95", "hero2": "#DDE3E7", "mark": "#3A444D", "tusk": "#F4EEDC", "light": "#FFFFFF"}
+REINDEER_C = {"hero": "#7B5E47", "hero2": "#EDE5D6", "hero3": "#5A4433", "mark": "#21170F", "antler": "#B79A6E", "antler2": "#8F774F",
+              "tent": "#D8C4A0", "snow": "#F4F7FA", "snow2": "#DCE6EE", "light": "#FFFFFF"}
+OWL_C = {"hero": "#FBFAF6", "hero2": "#DEDBD2", "mark": "#2A2A30", "eye": "#F4C430", "post": "#7A5A3E", "snow": "#BCD3E2",
+         "snow2": "#9DBBD0", "light": "#FFFFFF"}
+PUFFIN_C = {"dark": "#1D1F26", "light": "#FFFFFF", "face": "#F1F0EC", "hero2": "#F6C445", "pop": "#EE6B2C", "pop2": "#D8402A",
+            "beakbase": "#56677A", "eyeliner": "#6B7682", "mark": "#111216", "fishc": "#C6D2DB", "turf": "#6E9F4E",
+            "cliff": "#8C7A68"}
+BELUGA_C = {"hero": "#F6F7F7", "hero2": "#D2DCE2", "mark": "#2C3A45", "pop": "#E4572E", "pop2": "#F6C445", "dark": "#1E2A36"}
 
 SKY_DARK = ["sky2", "far", "mid", "near", "deep"]
 NO_GOLD = ["coastal", "meadow", "blush", "dusk"]
@@ -1168,4 +1576,53 @@ CONCEPTS = [
     Concept("hummingbird-flowers", "animal-hummingbird", "Sipping nectar", humming_flowers, overrides=HUMMING_C,
             checks=[("hero", "sky"), ("hero", "far"), ("flower", "sky"), ("wing", "sky"), ("hero", "glow"), ("wing", "far")],
             fixes={"sky": ["sky2", "glow2"], "far": ["mid", "near"], "glow": ["glow2", "light", "far"]}),
+    # arctic fox
+    Concept("arcticfox-portrait", "animal-arctic-fox", "Arctic fox", fox_portrait, overrides=FOX_C,
+            checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid")],
+            fixes={"sky": ["mid", "near", "deep"], "far": ["near", "deep", "mid"], "mid": ["deep", "near"]}),
+    Concept("arcticfox-curled", "animal-arctic-fox", "Curled up in the snow", fox_curled, overrides=FOX_C,
+            checks=[("hero", "ice"), ("hero", "sky"), ("hero", "far"), ("ice", "far")],
+            fixes={"sky": ["mid", "near", "deep"], "far": ["near", "deep", "mid"]}),
+    # walrus
+    Concept("walrus-portrait", "animal-walrus", "Walrus", walrus_portrait, NO_GOLD, WALRUS_C,
+            checks=[("hero", "sky"), ("hero", "mid"), ("hero2", "mid"), ("hero2", "sky"), ("tusk", "near"), ("tusk", "hero2")],
+            fixes={"mid": ["near", "far", "deep"], "sky": ["sky2", "far"], "near": ["deep"]}),
+    Concept("walrus-rock", "animal-walrus", "Walrus haul-out", walrus_rock, NO_GOLD, WALRUS_C,
+            checks=[("hero", "rock"), ("hero", "mid"), ("hero", "far"), ("tusk", "rock"), ("light", "sky")],
+            fixes={"mid": ["near", "far"], "far": ["sky2", "mid"], "sky": ["sky2", "far"]}),
+    # narwhal
+    Concept("narwhal-portrait", "animal-narwhal", "Narwhal", narwhal_portrait, ["coastal", "dusk", "meadow", "blush"], NARWHAL_C,
+            checks=[("hero", "mid"), ("hero", "near"), ("tusk", "mid"), ("tusk", "far"), ("hero2", "near")],
+            fixes={"mid": ["near", "deep"], "near": ["deep", "mid"], "far": ["mid", "near"]}),
+    Concept("narwhal-ice", "animal-narwhal", "Narwhals in the ice", narwhal_ice, NO_GOLD, NARWHAL_C,
+            checks=[("hero", "mid"), ("tusk", "sky"), ("tusk", "far"), ("light", "far"), ("hero", "near")],
+            fixes={"sky": ["sky2", "far", "mid"], "far": ["mid", "near"], "mid": ["far", "near"], "near": ["deep"]}),
+    # reindeer
+    Concept("reindeer-portrait", "animal-reindeer", "Reindeer", reindeer_portrait, overrides=REINDEER_C,
+            checks=[("hero", "sky"), ("antler", "sky"), ("hero2", "far"), ("hero2", "mid"), ("hero", "far")],
+            fixes={"sky": ["sky2", "far", "mid"], "far": ["mid", "near", "deep"], "mid": ["near", "deep"]}),
+    Concept("reindeer-lapland", "animal-reindeer", "Lapland lights", reindeer_lapland, overrides=REINDEER_C,
+            checks=[("hero", "snow"), ("hero", "far"), ("antler", "sky"), ("antler", "far"), ("tent", "far"), ("hero", "sky")],
+            fixes={"far": ["mid", "near", "deep"], "sky": ["sky2", "far", "mid"]}),
+    # snowy owl
+    Concept("snowyowl-portrait", "animal-snowy-owl", "Snowy owl", owl_portrait, overrides=OWL_C,
+            checks=[("hero", "sky"), ("hero", "far"), ("hero2", "sky"), ("hero", "glow")],
+            fixes={"sky": ["mid", "near", "deep"], "far": ["near", "deep"], "glow": ["glow2", "pop"]}),
+    Concept("snowyowl-flight", "animal-snowy-owl", "Owl in flight", owl_flight, overrides=OWL_C,
+            checks=[("hero", "sky"), ("hero", "glow"), ("hero", "far"), ("hero", "snow")],
+            fixes={"glow": ["pop", "near", "deep", "hero"], "sky": ["mid", "near", "deep"], "far": ["near", "deep"]}),
+    # puffin
+    Concept("puffin-portrait", "animal-puffin", "Puffin", puffin_portrait, NO_GOLD, PUFFIN_C,
+            checks=[("dark", "sky"), ("face", "sky"), ("pop", "sky"), ("dark", "mid"), ("dark", "near"), ("face", "glow")],
+            fixes={"sky": ["sky2", "far"], "mid": ["far", "near"], "near": ["mid", "far"], "glow": ["glow2", "pop"]}),
+    Concept("puffin-cliff", "animal-puffin", "Puffin with fish", puffin_cliff, NO_GOLD, PUFFIN_C,
+            checks=[("dark", "sky"), ("dark", "far"), ("dark", "mid"), ("face", "mid"), ("pop", "mid"), ("dark", "turf")],
+            fixes={"sky": ["sky2", "far"], "mid": ["far", "near"], "far": ["sky2", "mid"]}),
+    # beluga
+    Concept("beluga-portrait", "animal-beluga-whale", "Beluga", beluga_portrait, ["coastal", "dusk", "meadow", "blush"], BELUGA_C,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("hero", "sky2")],
+            fixes={"mid": ["near", "deep"], "far": ["near", "mid"], "sky2": ["far", "mid"], "near": ["deep"]}),
+    Concept("beluga-kayak", "animal-beluga-whale", "Kayaking with belugas", beluga_kayak, NO_GOLD, BELUGA_C,
+            checks=[("hero", "near"), ("hero", "deep"), ("pop", "near"), ("pop", "mid"), ("dark", "sky")],
+            fixes={"near": ["mid", "deep"], "deep": ["near"], "mid": ["far", "sky2"], "sky": ["sky2", "far"]}),
 ]

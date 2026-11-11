@@ -147,10 +147,10 @@ def lion_savanna(d: Drawing):
     # walking lion, side-on, facing left
     d.limb("hero", "M150 104 C166 106 170 124 168 140", 3, spot=False)
     d.shape("hero2", ellipse(168, 144, 3.6, 5.5), shadow=False, spot=True)
-    d.limb("hero", "M140 118 L144 136 L136 158", 10)
-    d.limb("hero", "M86 120 L80 158", 10)
-    d.limb("hero", "M132 118 L124 136 L128 158", 10)
-    d.limb("hero", "M100 120 L106 158", 10)
+    d.limb("hero2", "M132 116 L124 136 L128 160", 11)
+    d.limb("hero2", "M88 118 L82 160", 11)
+    d.limb("hero", "M140 116 L146 136 L138 160", 12)
+    d.limb("hero", "M100 118 L106 160", 12)
     d.shape("hero", LION_SIDE)
     d.shape("hero2", scallop(70, 92, 23, 14, 0.13, ry=25), spot=True)
     d.shape("hero", circle(70, 72, 4.5), shadow=False)
@@ -215,16 +215,18 @@ def leopard_kopje(d: Drawing):
         d.shape("hero", ellipse(99, 145, 7, 4), shadow=False)
         d.shape("hero", ellipse(132, 132, 18, 15), shadow=False)
         d.shape("hero", ellipse(124, 145, 10, 4), shadow=False)
-        d.shape("hero", circle(92, 62, 5), shadow=False)
-        d.shape("hero", "M74 70 C76 60 88 56 96 62 C102 66 104 76 98 82 C94 88 86 90 78 88 L72 86 "
-                        "C66 84 64 78 68 74 C70 72 72 71 74 70Z")
-        d.shape("light", ellipse(72, 82, 6, 4), shadow=False)
-        d.marks("mark", circle(80, 71, 1.7) + "M64.5 75 L68.5 74.5 L67 78.5Z")
+        def head():
+            d.shape("hero", circle(92, 62, 5), shadow=False)
+            d.shape("hero", "M74 70 C76 60 88 56 96 62 C102 66 104 76 98 82 C94 88 86 90 78 88 L72 86 "
+                            "C66 84 64 78 68 74 C70 72 72 71 74 70Z")
+            d.shape("light", ellipse(72, 82, 6, 4), shadow=False)
+            d.marks("mark", circle(80, 71, 1.7) + "M64.5 75 L68.5 74.5 L67 78.5Z")
+            d.marks("mark", spots([(86, 66), (90, 72), (94, 78), (84, 80)], 1.5))
+        group(d, "translate(90 84) scale(1.25) translate(-90 -84)", head)
         clipped(d, LEO_SIT, lambda: d.marks("mark", "".join(rosette(x, y, 3.1) for x, y in [
             (94, 92), (106, 98), (118, 104), (130, 108), (140, 118), (104, 112), (118, 120), (132, 126), (144, 132),
             (112, 136), (126, 140), (90, 104)])))
-        d.marks("mark", spots([(84, 122), (84, 132), (98, 124), (98, 134), (150, 150), (160, 162), (163, 172),
-                               (86, 66), (90, 72)], 1.8))
+        d.marks("mark", spots([(84, 122), (84, 132), (98, 124), (98, 134), (150, 150), (160, 162), (163, 172)], 1.8))
     group(d, "translate(100 146) scale(1.08) translate(-100 -146)", cat)
     d.band("deep", hills(192, 3, 30), line=False)
 
@@ -702,10 +704,12 @@ def buffalo_marsh(d: Drawing):
     d.band("water", "M-30 160 Q40 154 100 158 T230 158")
     ripples(d, [(30, 172, 1), (100, 172, 1.2)])
     # a cattle egret wading in front
-    d.stroke("bill", "M152 162 L153 176 M158 162 L158 176", 1.6)
-    d.shape("egret", "M144 158 C144 150 152 146 160 148 C166 150 166 158 160 162 L148 164Z")
-    d.limb("egret", "M158 150 C160 142 160 138 166 138", 3, shadow=False)
-    d.marks("bill", "M166 136 L174 139 L166 140Z")
+    def egret():
+        d.stroke("bill", "M152 162 L153 176 M158 162 L158 176", 1.6)
+        d.shape("egret", "M144 158 C144 150 152 146 160 148 C166 150 166 158 160 162 L148 164Z")
+        d.limb("egret", "M158 150 C160 142 160 138 166 138", 3, shadow=False)
+        d.marks("bill", "M166 136 L174 139 L166 140Z")
+    group(d, "translate(-106 2)", egret)
     d.band("ground", hills(184, 4, 30))
     grass(d, -10, 120, 186, 12, "near", 18)
 
@@ -838,9 +842,9 @@ def hyena_dusk(d: Drawing):
     d.disc("sky", 104, 92, 4, shadow=False, line=False)
     d.disc("sky", 124, 96, 3, shadow=False, line=False)
     d.band("far", hills(130, 8))
-    acacia(d, -82, 2, 0.66)
+    acacia(d, 66, 4, 0.62)
     d.band("mid", hills(146, 5, 30))
-    group(d, "translate(102 162) scale(1.12) translate(-90 -164)", lambda: hyena(d))
+    group(d, "translate(102 162) scale(1.04) translate(-84 -164)", lambda: hyena(d))
     d.band("ground", hills(172, 4))
     grass(d, -10, 210, 176, 12, "near", 18)
     d.band("deep", hills(190, 4, 30), line=False)
@@ -904,7 +908,7 @@ def wilddog_pack(d: Drawing):
     d.band("far", hills(108, 8))
     acacia(d, 34, -40, 0.56)
     d.band("mid", hills(124, 5, 30))
-    group(d, "translate(84 42) scale(.56)", lambda: wilddog(d, 1))
+    group(d, "translate(28 38) scale(.56)", lambda: wilddog(d, 1))
     d.band("ground", hills(150, 4))
     group(d, "translate(-4 36) scale(.98)", lambda: wilddog(d, 0))
     grass(d, -10, 210, 178, 12, "near", 20)
@@ -1011,12 +1015,14 @@ def chimp_termites(d: Drawing):
         d.limb("hero", "M86 124 C100 132 110 140 120 138", 10)
         d.shape("face", ellipse(124, 138, 5, 4.4), shadow=False)
         d.stroke("dark", "M122 140 L150 128", 1.8)
-        d.shape("hero", "M74 86 C74 74 84 66 96 66 C108 66 118 76 116 90 C114 100 104 106 94 106 C82 106 74 98 74 86Z")
-        d.shape("face", "M98 78 C106 76 116 80 120 88 C124 96 120 104 112 106 C104 108 98 102 98 96Z")
-        d.shape("face", ellipse(84, 84, 6, 8), shadow=False)
-        d.shape("face2", "M98 80 C104 76 116 78 118 84 C112 84 104 86 98 86Z", shadow=False)
-        d.marks("mark", circle(109, 88, 1.8))
-        d.stroke("mark", "M108 100 Q114 102 120 98", 1.4)
+        def head():
+            d.shape("hero", "M74 86 C74 74 84 66 96 66 C108 66 118 76 116 90 C114 100 104 106 94 106 C82 106 74 98 74 86Z")
+            d.shape("face", "M98 78 C106 76 116 80 120 88 C124 96 120 104 112 106 C104 108 98 102 98 96Z")
+            d.shape("face", ellipse(84, 84, 6, 8), shadow=False)
+            d.shape("face2", "M98 80 C104 76 116 78 118 84 C112 84 104 86 98 86Z", shadow=False)
+            d.marks("mark", circle(109, 88, 1.8))
+            d.stroke("mark", "M108 100 Q114 102 120 98", 1.4)
+        group(d, "translate(96 104) scale(1.25) translate(-96 -104)", head)
     group(d, "translate(-4 2)", chimp)
     for x, y in [(152, 126), (156, 132), (147, 122)]:
         d.marks("mark", ellipse(x, y, 1.6, 1))
@@ -1262,7 +1268,7 @@ def shoebill_swamp(d: Drawing):
         d.stroke("mark", "M102 62 C114 64 124 64 132 64", 1.4)
         d.marks("eye", circle(90, 50, 3.6))
         d.marks("mark", circle(90, 50, 1.6))
-    group(d, "translate(100 176) scale(1.18) translate(-92 -176)", bird)
+    group(d, "translate(100 184) scale(1.12) translate(-92 -176)", bird)
     d.band("water2", waves(176, 3, 34))
     ripples(d, [(40, 168, 1), (150, 166, 1.2), (110, 188, 1)])
     for x, y in [(12, 130), (196, 120)]:

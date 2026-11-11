@@ -565,7 +565,7 @@ def bear_side(d: Drawing):
 
 def bear_head(d: Drawing):
     head = [(70, 104), (62, 92), (50, 88), (38, 94), (26, 104), (16, 110, 1), (16, 116), (30, 122), (50, 126), (68, 122)]
-    d.shape("hero", P(head))
+    d.shape("hero", P(head), spot=True)
     d.shape("hero", circle(54, 86, 6.5))
     d.shape("hero2", circle(54, 87, 3.2), shadow=False)
     d.shape("hero2", P([(30, 104), (18, 110, 1), (18, 116), (30, 120), (40, 116), (38, 108)]), shadow=False, line=False)
@@ -580,7 +580,7 @@ def brownbear_forest(d: Drawing):
         pine(d, x, 146, h, "near", line=x < 140)
     d.band("far", hills(140, 4), line=False)
     d.band("mid", hills(150, 3, 30))
-    group(d, "translate(100 164) scale(1.04) translate(-90 -164)", lambda: bear_side(d))
+    group(d, "translate(104 164) scale(1.0) translate(-90 -164)", lambda: bear_side(d))
     d.band("ground", hills(170, 3, 20))
     for x, y, r in [(24, 176, 8), (150, 182, 10), (172, 176, 6)]:
         d.shape("far", ellipse(x, y, r * 1.4, r * 0.8))

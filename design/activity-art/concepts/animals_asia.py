@@ -1100,12 +1100,12 @@ def redpanda_tree(d: Drawing):
         d.shape("pop", scallop(x, y, 5, 6, 0.3), shadow=False)
 
     def rp():
-        ringed(d, "M140 104 C162 112 170 134 164 158 C162 168 154 174 146 172", 13, "hero", "ring", "6 6", spot=True)
-        d.limb("dark", "M84 104 L80 114 M96 106 L96 114 M124 106 L126 114 M134 104 L138 113", 6)
-        d.shape("hero", "M70 102 C70 90 84 82 104 82 C124 82 140 88 142 98 C144 106 136 110 128 110 L82 110 C74 110 70 106 70 102Z")
-        d.shape("dark", "M76 106 C90 110 120 110 136 106 C130 112 90 113 78 110Z", shadow=False, line=False)
-        group(d, "translate(62 88) scale(.28) translate(-100 -92)", lambda: redpanda_head(d))
-    group(d, "translate(100 112) scale(1.08) translate(-100 -112)", rp)
+        ringed(d, "M128 102 C148 110 156 130 150 154 C148 164 140 170 132 168", 13, "hero", "ring", "6 6", spot=True)
+        d.limb("dark", "M90 104 L86 114 M100 106 L100 114 M118 106 L120 114 M126 104 L130 113", 6)
+        d.shape("hero", "M78 102 C78 90 90 82 106 82 C122 82 134 88 134 100 C134 108 128 110 120 110 L88 110 C82 110 78 108 78 102Z")
+        d.shape("dark", "M82 106 C94 110 116 110 130 106 C124 112 94 113 84 110Z", shadow=False, line=False)
+        group(d, "translate(72 86) scale(.38) translate(-100 -92)", lambda: redpanda_head(d))
+    group(d, "translate(100 112) scale(1.12) translate(-100 -112)", rp)
 
 
 # ================================================================ KOMODO DRAGON
@@ -1139,21 +1139,21 @@ def komodo_island(d: Drawing):
     d.stroke("mid", "M64 74 L58 98 M64 74 L74 96 M10 90 L16 104", 1.6, line=False)
     palm(d, 176, 140, 58, -6, "dark", 0.8)
     d.band("mid", hills(130, 4, 30))
-    d.band("ground", hills(150, 3))
-    p = ((196, 148), (166, 146), (110, 126), (34, 128))
+    d.band("ground", hills(152, 3))
+    p = ((204, 146), (164, 144), (110, 112), (36, 116))
 
     def prof(t):
         w = math.sin(math.pi * min(1.0, t ** 0.65)) if t < 0.86 else math.sin(math.pi * 0.86 ** 0.65) * (1 - (t - 0.86) / 0.14 * 0.55)
-        return 1.5 + 12 * w, 1.5 + 9 * w
+        return 1.5 + 15 * w, 1.5 + 11 * w
 
-    for t, dx in [(0.42, 10), (0.78, 8)]:
+    for t, dx in [(0.44, 12), (0.76, 10)]:
         x, y = frame(p, t, -4)
-        d.limb("hero2", f"M{x:.1f} {y:.1f} L{x + dx:.1f} {y + 10:.1f} L{x + dx - 2:.1f} 150", 7)
+        d.limb("hero2", f"M{x:.1f} {y:.1f} L{x + dx:.1f} {y + 12:.1f} L{x + dx - 2:.1f} 152", 8)
     d.shape("hero", spine(p, prof))
-    for t, dx in [(0.46, -8), (0.82, -10)]:
-        x, y = frame(p, t, -6)
-        d.limb("hero", f"M{x:.1f} {y:.1f} L{x + dx:.1f} {y + 10:.1f} L{x + dx - 4:.1f} 152", 8)
-        d.stroke("light", f"M{x + dx - 4:.1f} 153 l-5 0 M{x + dx - 4:.1f} 154 l-3 3", 1.4)
+    for t, dx in [(0.48, -10), (0.8, -12)]:
+        x, y = frame(p, t, -8)
+        d.limb("hero", f"M{x:.1f} {y:.1f} L{x + dx:.1f} {y + 10:.1f} L{x + dx - 4:.1f} 154", 9)
+        d.stroke("light", f"M{x + dx - 6:.1f} 156 l-6 0 M{x + dx - 5:.1f} 157 l-4 4", 1.6)
     tip = frame(p, 1.0, -2, 2)
     d.shape("pop", f"M{tip[0]:.1f} {tip[1]:.1f} L{tip[0] - 10:.1f} {tip[1] - 1:.1f} L{tip[0] - 15:.1f} {tip[1] - 6:.1f} "
                    f"L{tip[0] - 12:.1f} {tip[1]:.1f} L{tip[0] - 15:.1f} {tip[1] + 5:.1f} L{tip[0] - 10:.1f} {tip[1] + 2:.1f} L{tip[0]:.1f} {tip[1] + 2:.1f}Z",
@@ -1177,8 +1177,8 @@ def hornbill_face(d: Drawing):
     d.shape("light", "M118 104 C132 108 144 126 148 150 C150 170 148 190 144 210 L96 210 C100 180 104 150 104 120Z")
     d.shape("dark", "M118 168 C140 154 172 160 190 182 L200 210 L108 210Z")
     d.shape("dark", "M106 76 C120 66 140 70 146 86 C150 102 140 116 124 116 C112 116 102 108 102 96Z")
-    d.shape("hero", "M108 80 C96 64 74 60 52 68 C44 72 42 80 48 82 C64 78 84 78 104 86Z", spot=True)
-    d.shape("dark", "M52 68 C46 72 44 78 48 82 L54 80 C52 76 52 72 56 67Z", shadow=False)
+    d.shape("hero", "M108 78 C96 64 74 62 54 70 C46 74 44 84 48 92 C66 86 88 86 108 92Z", spot=True)
+    d.shape("dark", "M54 70 C46 74 44 84 48 92 L54 90 C52 84 52 76 58 69Z", shadow=False)
     d.shape("hero", "M108 86 C80 82 50 90 22 118 C20 121 22 123 25 121 C52 106 80 100 108 102Z")
     d.shape("hero", "M108 102 C82 102 56 110 30 122 C56 117 84 114 108 112Z")
     d.shape("hero2", "M30 114 C26 117 22 120 22 120 C21 122 23 123 25 121 C30 118 36 116 40 114Z", shadow=False)
@@ -1200,14 +1200,14 @@ def hornbill_flight(d: Drawing):
     d.band("near", hills(184, 4, 30))
 
     def bird():
-        d.shape("dark", "M104 92 C106 116 118 136 140 146 C126 128 124 110 128 94Z")
-        d.shape("light", "M140 96 L184 88 L186 106 L140 104Z")
-        d.shape("dark", "M164 92 L172 90 L174 106 L166 106Z", shadow=False)
-        d.shape("dark", "M92 92 C98 84 128 84 142 94 C140 104 120 106 98 104 C92 102 90 96 92 92Z")
-        d.shape("dark", "M104 90 C100 64 114 36 140 24 C146 44 142 70 128 92Z")
-        d.shape("light", "M108 78 C112 60 122 44 134 36 L138 44 C126 52 118 66 116 82Z", shadow=False, spot=True)
-        d.shape("light", "M88 96 C80 92 74 94 70 98 L74 102 C80 100 86 100 92 102Z", shadow=False)
-        d.shape("dark", ellipse(66, 98, 8, 7))
+        d.shape("dark", "M108 104 C104 122 110 138 124 148 L128 140 L132 146 L134 136 C130 124 130 112 132 104Z")
+        d.shape("light", "M138 96 L180 90 L182 108 L138 106Z")
+        d.shape("dark", "M162 92 L170 91 L171 107 L163 107Z", shadow=False)
+        d.shape("dark", "M86 96 C96 88 126 88 142 96 C140 106 120 110 96 108 C88 106 84 100 86 96Z")
+        d.shape("dark", "M98 96 C92 72 100 46 118 30 L124 34 L128 28 L132 34 L138 30 L138 40 C134 58 130 78 126 96Z")
+        d.shape("light", "M104 72 C108 58 116 48 126 42 L131 47 C122 54 115 64 111 76Z", shadow=False, spot=True)
+        d.shape("light", "M74 96 C80 90 90 90 96 94 L96 106 C88 108 80 106 74 102Z")
+        d.shape("dark", ellipse(66, 98, 9, 8))
         d.shape("hero", "M62 92 C52 84 38 84 28 90 C32 92 44 92 58 96Z")
         d.shape("hero", "M60 96 C46 96 30 102 18 112 C30 108 46 104 62 104Z")
         d.marks("pop", circle(68, 96, 1.6))
@@ -1222,14 +1222,14 @@ SNOW_HEAD = ("M100 52 C126 52 146 64 150 86 C156 100 156 116 148 130 C138 148 12
 
 
 def snowleopard_face(d: Drawing):
-    d.band("far", "M-30 140 L10 104 L36 120 L70 72 L100 100 L130 66 L164 106 L190 92 L230 120")
-    for s in ["M70 72 L80 86 L74 84 L69 90 L63 84 L59 88Z", "M130 66 L141 81 L135 79 L129 85 L123 78 L119 81Z"]:
+    d.band("near", "M-30 120 L20 82 L48 98 L100 26 L152 92 L178 72 L230 100")
+    for s in ["M100 26 L114 46 L106 43 L100 50 L93 43 L86 46Z", "M20 82 L30 92 L24 91 L19 96 L13 90Z", "M178 72 L188 82 L182 81 L177 86 L171 81Z"]:
         d.shape("light", s, shadow=False)
-    d.band("mid", hills(160, 6))
+    d.band("deep", hills(160, 6))
     d.shape("hero", "M50 210 C54 168 76 148 100 148 C124 148 146 168 150 210Z")
-    for cx in (64, 136):
-        d.shape("hero", circle(cx, 62, 11))
-        d.shape("pop", circle(cx, 63, 5), shadow=False)
+    for cx in (66, 134):
+        d.shape("hero", circle(cx, 62, 9))
+        d.shape("pop", circle(cx, 63, 4), shadow=False)
     d.shape("hero", SNOW_HEAD)
     spots = [(100, 62, 2.4), (90, 66, 2), (110, 66, 2), (82, 72, 2), (118, 72, 2), (100, 74, 1.8), (92, 78, 1.6), (108, 78, 1.6)]
     d.marks("mark", "".join(circle(x, y, r) for x, y, r in spots))
@@ -1241,18 +1241,18 @@ def snowleopard_face(d: Drawing):
         eye(d, x, 93, 6, iris="hero2")
     d.shape("pop", "M91 112 H109 L100 123Z", shadow=False)
     d.stroke("mark", "M100 123 V129 M100 129 Q92 136 86 131 M100 129 Q108 136 114 131", 2)
-    tail = "M14 168 C40 196 140 202 176 176 C190 164 190 146 178 140"
-    d.limb("hero", tail, 26, spot=True)
-    d.marks("mark", "".join(rosette(x, y, 5) for x, y in [(36, 182), (62, 190), (90, 192), (118, 190), (146, 182), (170, 168)]))
+    tail = "M20 160 C44 186 140 190 172 164 C184 152 182 138 170 134"
+    d.limb("hero", tail, 24, spot=True)
+    d.marks("mark", "".join(rosette(x, y, 4.6) for x, y in [(40, 176), (66, 184), (94, 186), (122, 182), (148, 172), (172, 154)]))
 
 
 def snowleopard_ledge(d: Drawing):
     d.disc("glow", 160, 46, 14)
-    d.band("far", "M-30 124 L20 92 L44 108 L84 56 L118 96 L150 70 L186 110 L230 96")
-    for s in ["M84 56 L96 72 L89 70 L84 76 L78 70 L72 74Z", "M150 70 L160 84 L154 82 L149 88 L144 82 L140 85Z", "M20 92 L28 102 L22 100 L18 104 L13 99Z"]:
+    d.band("near", "M-30 124 L20 92 L44 108 L84 50 L118 90 L152 58 L190 84 L230 70")
+    for s in ["M84 50 L96 66 L89 64 L84 70 L78 64 L72 68Z", "M152 58 L162 72 L156 70 L151 76 L146 70 L142 73Z", "M20 92 L28 102 L22 100 L18 104 L13 99Z"]:
         d.shape("light", s, shadow=False)
-    mist(d, 128, 3, 40, ".6")
-    d.band("mid", "M-30 150 L40 136 L80 146 L130 130 L230 144")
+    mist(d, 128, 3, 40, ".5")
+    d.band("deep", "M-30 150 L40 136 L80 146 L130 130 L230 144")
     d.shape("rock", "M230 200 L230 134 L150 128 L72 130 C62 132 58 138 62 146 L70 152 L110 156 L118 200Z")
     d.shape("rock2", "M62 146 L70 152 L110 156 L118 200 L230 200 L230 168 L120 162Z", shadow=False)
     flip(d, lambda: group(d, "translate(-30 2)", lambda: cat_lying(
@@ -1262,7 +1262,7 @@ def snowleopard_ledge(d: Drawing):
 
 # ================================================================ MACAQUE
 MACAQUE = {"hero": "#B9AA94", "hero2": "#8F8170", "face": "#E0705E", "face2": "#C9524A", "mark": "#2A1E1A", "light": "#FFFFFF",
-           "water": "#7CC3CF", "water2": "#B7E2E8", "rock": "#7D7A76"}
+           "water": "#4E9AAE", "water2": "#A9DCE4", "rock": "#7D7A76"}
 
 
 def macaque_head(d: Drawing, sleepy=False, snow=True):
@@ -1339,10 +1339,10 @@ def cloudedleopard_face(d: Drawing):
     foliage(d, [(-6, 46, 20), (-4, 100, -5), (4, 150, -30), (206, 46, 160), (204, 100, 185), (196, 150, -150)], "near")
     body = "M40 210 C44 166 70 146 100 146 C130 146 156 166 160 210Z"
     d.shape("hero", body)
-    clipped(d, body, lambda: clouds_on(d, [(62, 176, 9, 0.3), (100, 188, 10, 0), (138, 176, 9, -0.3), (78, 204, 8, 0.2), (122, 204, 8, 0)]))
-    for cx in (64, 136):
-        d.shape("hero", circle(cx, 58, 11))
-        d.shape("light", circle(cx, 60, 5), shadow=False)
+    clipped(d, body, lambda: clouds_on(d, [(66, 166, 8, 0.3), (100, 174, 9, 0), (134, 166, 8, -0.3), (80, 194, 8, 0.2), (120, 194, 8, 0)]))
+    for cx in (67, 133):
+        d.shape("hero", circle(cx, 58, 9))
+        d.shape("light", circle(cx, 60, 4), shadow=False)
     head = "M100 48 C124 48 142 60 146 82 C152 96 150 116 142 130 C132 148 116 158 100 158 C84 158 68 148 58 130 C50 116 48 96 54 82 C58 60 76 48 100 48Z"
     d.shape("hero", head)
     d.marks("mark", "M94 52 L96 70 L100 52Z M104 52 L106 70 L108 54Z M84 56 L88 72 L90 56Z M116 56 L112 72 L110 56Z"
@@ -1451,13 +1451,13 @@ CONCEPTS = [
     Concept("hornbill-flight", "animal-hornbill", "Hornbill over the rainforest", hornbill_flight, overrides=HORNBILL,
             checks=[("dark", "sky"), ("hero", "sky"), ("light", "sky")], fixes={"sky": ["sky2", "far", "mid"]}),
     Concept("snowleopard-portrait", "animal-snow-leopard", "Snow leopard", snowleopard_face, overrides=SNOWLEO,
-            checks=[("hero", "far"), ("hero", "mid"), ("hero", "sky")], fixes={"far": ["mid", "near"], "mid": ["near", "deep"], "sky": ["sky2", "far"]}),
+            checks=[("hero", "near"), ("hero", "deep"), ("hero", "sky"), ("near", "sky")], fixes={"sky": ["mid", "far", "sky2"]}),
     Concept("snowleopard-ledge", "animal-snow-leopard", "Himalayan ledge", snowleopard_ledge, overrides=SNOWLEO,
-            checks=[("hero", "sky"), ("hero", "rock"), ("hero", "mid")], fixes={"sky": ["sky2", "far"], "mid": ["near", "deep"]}),
+            checks=[("hero", "sky"), ("hero", "rock"), ("hero", "near"), ("near", "sky")], fixes={"sky": ["mid", "far", "sky2"]}),
     Concept("macaque-portrait", "animal-macaque", "Snow monkey", macaque_face, overrides=MACAQUE,
             checks=[("hero", "sky"), ("light", "sky"), ("hero", "far")], fixes={"sky": ["far", "mid", "sky2"], "far": ["mid", "near"]}),
     Concept("macaque-onsen", "animal-macaque", "Hot spring bath", macaque_onsen, overrides=MACAQUE,
-            checks=[("hero", "water"), ("light", "sky"), ("hero", "light")], fixes={"sky": ["far", "mid", "sky2"]}),
+            checks=[("hero", "water"), ("hero", "light"), ("near", "light")], fixes={"near": ["deep", "mid"]}),
     Concept("cloudedleopard-portrait", "animal-clouded-leopard", "Clouded leopard", cloudedleopard_face, overrides=CLOUDED,
             checks=[("hero", "sky"), ("hero", "near")], fixes={"near": ["deep", "mid"], "sky": SKY_FIX}),
     Concept("cloudedleopard-tree", "animal-clouded-leopard", "Clouded leopard on the branch", cloudedleopard_tree, overrides=CLOUDED,

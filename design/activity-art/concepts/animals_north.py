@@ -980,7 +980,7 @@ def orca_breach(d: Drawing):
 def orca_fin(d: Drawing, x, y, h, s=1.0, blow=False):
     d.shape("hero", f"M{x - 34 * s} {y} C{x - 26 * s} {y - 12 * s} {x + 10 * s} {y - 14 * s} {x + 34 * s} {y - 2 * s} L{x + 34 * s} {y + 4}Z")
     d.shape("hero", f"M{x - 8 * s} {y - 10 * s} C{x - 6 * s} {y - h * 0.5} {x - 4 * s} {y - h * 0.8} {x - 2 * s} {y - h} "
-                    f"C{x + 4 * s} {y - h * 0.7} {x + 8 * s} {y - h * 0.4} {x + 12 * s} {y - 11 * s}Z")
+                    f"C{x + 4 * s} {y - h * 0.7} {x + 8 * s} {y - h * 0.4} {x + 12 * s} {y - 11 * s}Z", spot=True)
     d.shape("hero2", ellipse(x - 14 * s, y - 8 * s, 8 * s, 3 * s), shadow=False, line=False)
     if blow:
         bx, by = x + 26 * s, y - 10 * s

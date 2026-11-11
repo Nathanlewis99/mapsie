@@ -232,27 +232,25 @@ def sloth_hanging(d: Drawing):
 def sloth_cecropia(d: Drawing):
     d.band("far", hills(150, 12))
     d.band("mid", hills(176, 8, 30))
-    # cecropia: pale ringed trunk and big star-shaped leaves
-    d.limb("dark", "M128 214 C126 140 124 70 130 -14", 22)
-    d.stroke("far", "M118 180 h20 M117 150 h20 M117 120 h20 M118 90 h20 M119 60 h20 M121 30 h20", 1.6, line=False)
-    for cx, cy, r, rot in [(46, 24, 34, 10), (176, 40, 30, -8), (196, 120, 26, 20)]:
+    # cecropia: ringed trunk and big star-shaped leaves
+    d.limb("dark", "M146 214 C144 140 142 70 148 -14", 24)
+    d.stroke("far", "M135 180 h22 M134 150 h22 M134 120 h22 M135 90 h22 M136 60 h22 M138 30 h22", 1.6, line=False)
+    for cx, cy, r, rot in [(40, 30, 34, 10), (186, 40, 26, -8), (30, 130, 24, 20)]:
         for i in range(8):
             d.shape("near", leaf(cx, cy, r, r * 0.24, rot + i * 45), shadow=i % 2 == 0)
         d.shape("deep", circle(cx, cy, 3.5), shadow=False, line=False)
-    d.limb("dark", "M128 60 Q150 48 172 42", 4)
-    d.limb("dark", "M126 130 Q160 124 190 120", 4)
+    d.limb("dark", "M146 56 Q166 46 186 40", 4)
     # mum hugging the trunk, baby on her tummy
-    d.limb("fur2", "M110 100 L132 92", 11)
-    d.shape("hero", fluff(102, 116, 26, 36, 16, 0.06))
-    d.stroke("fur2", "M88 104 q4 6 2 12 M112 128 q4 6 2 12 M96 140 q4 6 2 10", 2, line=False)
-    d.limb("hero", "M96 86 C104 72 116 64 134 58", 12)
-    d.limb("hero", "M104 142 C112 152 124 154 136 148", 12)
-    d.stroke("claw", "M133 52 c6 -2 9 2 8 7 M135 57 c6 -1 8 3 7 8 M135 62 c5 0 7 4 5 8 "
-                     "M135 142 c6 -2 9 2 8 7 M136 147 c6 -1 8 3 7 8 M136 152 c5 0 7 4 5 8", 2.2)
-    sloth_face(d, 94, 70, 0.86)
-    # baby peeking out
-    d.limb("hero", "M108 118 Q116 112 122 114", 7)
-    sloth_face(d, 92, 122, 0.5)
+    d.limb("fur2", "M118 104 L146 96", 12)
+    d.shape("hero", fluff(106, 120, 31, 42, 16, 0.06))
+    d.stroke("fur2", "M88 108 q4 6 2 12 M118 132 q4 6 2 12 M96 146 q4 6 2 10", 2, line=False)
+    d.limb("hero", "M96 88 C108 72 124 62 146 58", 13)
+    d.limb("hero", "M108 152 C120 164 134 164 148 156", 13)
+    d.stroke("claw", "M145 51 c7 -2 10 2 9 8 M147 57 c7 -1 9 3 8 9 M147 63 c6 0 8 4 6 9 "
+                     "M147 150 c7 -2 10 2 9 8 M148 156 c7 -1 9 3 8 9 M148 162 c6 0 8 4 6 9", 2.2)
+    sloth_face(d, 98, 70, 1.0)
+    d.limb("hero", "M112 124 Q122 116 130 118", 8)
+    sloth_face(d, 98, 128, 0.58)
 
 
 # ================================================================ JAGUAR
@@ -484,7 +482,7 @@ def alpaca_portrait(d: Drawing):
 def alpaca_side(d: Drawing):
     """An alpaca standing, facing right, hooves at y = 172."""
     for x0, x1 in [(68, 66), (110, 112)]:
-        d.limb("hero2", f"M{x0 + 6} 136 L{x1 + 8} 172", 7)
+        d.limb("fur2", f"M{x0 + 6} 136 L{x1 + 8} 172", 7)
     d.shape("hero", fluff(58, 120, 8, 8, 8, 0.15))
     d.shape("hero", fluff(96, 124, 38, 22, 16, 0.07))
     for x0, x1 in [(66, 64), (118, 120)]:
@@ -500,20 +498,19 @@ def alpaca_side(d: Drawing):
 
 
 def alpaca_terraces(d: Drawing):
-    d.disc("glow", 52, 50, 16)
-    d.shape("light", cloud(14, 84, 1.0), shadow=False)
-    d.band("far", "M-30 124 L20 100 L50 112 L70 104 L100 118 L230 116")
-    d.shape("mid", "M100 132 C112 96 120 50 140 40 C158 34 164 64 170 90 C176 108 196 116 236 120 V140 H100Z")
-    d.shape("deep", "M140 40 C150 38 156 50 160 66 C150 60 144 50 140 40Z", shadow=False, line=False)
-    # stone ruins on the ridge
-    for x, w, h in [(64, 24, 16), (92, 30, 20), (126, 22, 14)]:
-        d.shape("stone", f"M{x} 128 V{128 - h} L{x + w / 2} {128 - h - 9} L{x + w} {128 - h} V128Z")
-        d.marks("stone2", f"M{x + w / 2 - 3} {128 - h + 4} L{x + w / 2 + 3} {128 - h + 4} L{x + w / 2 + 4} {128 - h + 11} L{x + w / 2 - 4} {128 - h + 11}Z")
-    for i, y in enumerate([128, 142, 156, 170, 184]):
-        role = "near" if i % 2 == 0 else "mid"
-        d.band(role, f"M-30 {y + 4} L{20 + i * 6} {y} L230 {y - 4}", line=i < 3)
-        d.stroke("stone", f"M-30 {y + 6} L{20 + i * 6} {y + 2} L230 {y - 2}", 2.2, line=False)
-    group(d, "translate(6 -14) scale(1.0)", lambda: alpaca_side(d))
+    d.disc("glow", 50, 46, 16)
+    d.band("far", "M-30 116 L16 94 L40 104 L64 90 L92 108 L230 104")
+    # Huayna Picchu
+    d.shape("mid", "M80 132 C98 118 112 74 128 52 C138 40 152 44 158 62 C164 82 172 104 196 114 C210 120 220 122 236 124 V150 H80Z")
+    d.stroke("near", "M120 72 h14 M114 84 h22 M108 96 h30", 1.6, line=False)
+    # stone ruins on the saddle
+    for x, w, h in [(28, 22, 14), (54, 28, 18), (86, 22, 12)]:
+        d.shape("stone", f"M{x} 132 V{132 - h} L{x + w / 2} {132 - h - 9} L{x + w} {132 - h} V132Z")
+        d.marks("stone2", f"M{x + w / 2 - 3} {132 - h + 4} L{x + w / 2 + 3} {132 - h + 4} L{x + w / 2 + 4} {132 - h + 11} L{x + w / 2 - 4} {132 - h + 11}Z")
+    for i, y in enumerate([134, 150, 166, 182]):
+        d.band("near", f"M-30 {y + 2} Q100 {y - 4} 230 {y + 2}", line=i < 3)
+        d.stroke("stone", f"M-30 {y + 4} Q100 {y - 2} 230 {y + 4}", 2.4, line=False)
+    at(d, 70, 170, 0.62, lambda: alpaca_side(d), ox=100, oy=172)
 
 
 # ================================================================ ANDEAN CONDOR
@@ -600,19 +597,19 @@ def tortoise_portrait(d: Drawing):
 
 
 def opuntia(d: Drawing):
-    d.limb("trunk", "M160 190 C158 160 160 130 156 100", 9)
-    d.limb("trunk", "M157 118 L138 96 M158 108 L178 84", 6)
-    for x, y, rx, ry, a in [(132, 80, 12, 16, -30), (156, 72, 12, 17, 0), (182, 70, 11, 16, 30), (144, 56, 10, 14, -15),
-                            (170, 50, 10, 14, 20), (124, 102, 10, 14, -60)]:
+    d.limb("trunk", "M164 190 C162 160 164 130 160 100", 9)
+    d.limb("trunk", "M161 112 L140 80 M161 104 L166 70 M162 96 L176 84", 6)
+    for x, y, rx, ry, a in [(118, 50, 11, 15, -40), (144, 44, 11, 16, -8), (168, 58, 11, 15, 28), (170, 90, 10, 14, 50),
+                            (100, 70, 9, 13, -60)]:
         d.shape("pad", ellipse(x, y, rx, ry), extra=f'transform="rotate({a} {x} {y})"')
         d.marks("pad2", circle(x - 3, y - 3, 1) + circle(x + 3, y + 2, 1) + circle(x - 2, y + 6, 1))
-    for x, y in [(150, 48), (178, 56), (136, 66)]:
+    for x, y in [(140, 30), (176, 48), (112, 38)]:
         d.shape("pop", scallop(x, y, 3.4, 5, 0.3), shadow=False, spot=True)
 
 
 def tortoise_cactus(d: Drawing):
-    d.disc("glow", 40, 56, 18)
-    d.band("far", "M-30 120 Q20 116 50 102 L84 72 Q100 66 116 72 L150 102 Q180 116 230 118")
+    d.disc("glow", 44, 52, 18)
+    d.band("far", "M-30 120 Q10 116 36 102 L62 76 Q76 70 90 76 L120 104 Q160 118 230 116")
     d.band("mid", hills(146, 6))
     opuntia(d)
     d.band("ground", hills(166, 4, 30))
@@ -623,12 +620,12 @@ def tortoise_cactus(d: Drawing):
         d.shape("hero", "M36 150 C34 116 54 94 82 92 C102 92 116 98 124 104 C130 96 138 98 140 106 C142 120 140 136 138 152 C110 158 60 158 36 150Z", spot=True)
         d.shape("hero2", "M36 148 C60 156 110 156 138 150 L137 157 C110 162 60 162 37 156Z", shadow=False)
         d.stroke("mark", "M52 120 L68 108 L92 106 L112 112 L122 128 M68 108 L66 150 M92 106 L94 152 M112 112 L116 150 M44 136 L136 136", 2.2)
-        d.shape("hero2", "M128 116 C134 100 140 84 146 70 L160 74 C154 90 146 106 138 120Z")
-        d.stroke("mark", "M136 104 l9 3 M140 94 l9 3", 1.3)
-        d.shape("hero2", "M144 70 C142 60 148 52 156 52 C164 52 170 58 168 66 C166 72 160 76 152 76 C148 76 145 74 144 70Z")
-        d.marks("mark", circle(156, 60, 2) + circle(166, 61, 0.9))
-        d.stroke("mark", "M168 64 Q162 68 154 66", 1.3)
-    group(d, "translate(0 6)", t)
+        d.shape("hero2", "M128 116 C132 100 136 86 140 72 L154 74 C150 90 146 106 140 120Z")
+        d.stroke("mark", "M136 104 l9 3 M139 92 l9 3", 1.3)
+        d.shape("hero2", "M136 70 C134 60 140 52 148 52 C156 52 162 58 160 66 C158 72 152 76 144 76 C140 76 137 74 136 70Z")
+        d.marks("mark", circle(148, 60, 2) + circle(158, 61, 0.9))
+        d.stroke("mark", "M160 64 Q154 68 146 66", 1.3)
+    group(d, "translate(-4 8)", t)
 
 
 # ================================================================ BLUE-FOOTED BOOBY
@@ -774,8 +771,8 @@ def iguana_lava(d: Drawing):
 
 
 # ================================================================ SEA LION
-SEALION_BODY = "M150 200 C150 160 140 128 118 104 C104 90 90 80 78 76 L66 92 C80 98 90 110 94 128 C98 150 92 176 82 200Z"
-SEALION_HEAD = "M80 70 C78 58 66 52 54 54 C44 56 36 62 32 70 C30 76 34 80 40 80 C48 82 56 86 64 92 C74 92 82 82 80 70Z"
+SEALION_BODY = "M160 200 C160 158 148 124 124 98 C110 84 94 74 82 68 L60 92 C74 100 84 114 88 132 C92 154 86 178 76 200Z"
+SEALION_HEAD = "M86 68 C84 52 70 44 56 46 C44 48 32 56 28 66 C26 74 30 80 38 80 C46 82 56 88 64 96 C80 96 88 84 86 68Z"
 
 
 def sealion_portrait(d: Drawing):
@@ -784,15 +781,16 @@ def sealion_portrait(d: Drawing):
     d.band("far", "M-30 128 H230")
     d.band("mid", waves(146, 3, 28))
     d.shape("hero", SEALION_BODY)
-    d.shape("hero2", "M70 92 C84 102 92 116 94 132 C96 152 92 176 84 200 L96 200 C102 174 104 150 100 128 C96 110 86 96 74 88Z", shadow=False)
+    d.shape("hero2", "M66 94 C80 104 88 118 90 134 C92 154 88 178 80 200 L94 200 C100 176 102 152 98 130 C94 112 84 98 72 88Z", shadow=False)
     d.shape("hero", SEALION_HEAD, spot=True)
-    d.shape("hero", "M70 60 C74 56 79 58 78 64Z", shadow=False)
-    d.marks("mark", circle(56, 65, 4.6))
-    d.marks("light", circle(57.5, 63.5, 1.5))
-    d.marks("mark", ellipse(34, 70, 2.6, 2))
-    d.stroke("mark", "M36 77 Q44 81 52 79", 1.6)
-    d.stroke("light", "M42 75 L18 72 M42 78 L20 82 M44 80 L26 90", 1.2)
-    d.shape("flipper", "M92 138 C80 150 66 166 48 178 C64 182 84 172 100 158Z")
+    d.shape("flipper", "M72 56 C76 52 82 54 80 61Z", shadow=False)
+    d.marks("mark", circle(54, 62, 5))
+    d.marks("light", circle(55.6, 60.4, 1.7))
+    d.marks("mark", ellipse(30, 67, 3, 2.2))
+    d.stroke("mark", "M32 76 Q40 81 50 79", 1.7)
+    d.marks("mark", circle(40, 74, 0.9) + circle(44, 76, 0.9) + circle(38, 78, 0.9))
+    d.stroke("light", "M40 74 L14 70 M40 77 L16 80 M42 79 L22 90", 1.2)
+    d.shape("flipper", "M88 136 C76 150 62 166 44 178 C60 184 82 174 98 158Z")
     d.band("rock", "M-30 184 C20 172 60 176 100 180 C140 182 170 172 230 176")
 
 
@@ -1146,15 +1144,17 @@ def seaturtle_nesting(d: Drawing):
     d.stroke("sand2", tr, 2.4)
 
     def t():
-        d.shape("hero2", "M70 156 C58 160 50 166 46 174 C58 176 68 172 78 164Z")
-        d.shape("hero2", "M150 140 C164 132 178 134 184 142 C186 150 178 154 168 152 L152 150Z")
-        d.shape("hero", "M62 162 C64 132 90 118 118 118 C146 118 160 136 162 160 C140 166 86 168 62 162Z", spot=True)
-        d.stroke("mark", "M82 132 L100 124 L122 124 L142 134 M100 124 L102 160 M122 124 L124 160 M70 146 L102 142 L124 142 L156 146", 2)
-        d.shape("light", "M62 162 C86 168 140 166 162 160 L160 166 C140 172 86 172 64 168Z", shadow=False)
-        d.shape("hero2", "M136 154 C150 156 164 166 172 176 C158 178 144 172 132 164Z")
-        d.marks("mark", circle(170, 141, 2.2))
-        d.stroke("mark", "M184 146 Q178 150 172 148", 1.3)
-    group(d, "translate(-6 4)", t)
+        d.shape("hero2", "M66 160 C54 162 44 168 40 176 C52 178 64 172 74 166Z")
+        d.shape("flip2", "M118 148 C130 136 146 130 160 132 C152 142 138 150 124 156Z")
+        d.shape("hero2", "M150 146 C156 134 170 128 182 134 C190 138 190 148 184 152 C176 158 164 156 156 154Z")
+        d.shape("hero", "M58 164 C60 140 86 126 116 126 C144 126 162 142 164 162 C140 168 84 170 58 164Z", spot=True)
+        d.stroke("mark", "M84 136 L104 130 L126 130 L146 140 M104 130 L106 162 M126 130 L128 162 M70 150 L106 146 L128 146 L158 150", 2)
+        d.shape("light", "M58 164 C84 170 140 168 164 162 L162 168 C140 174 84 174 60 170Z", shadow=False)
+        d.shape("hero2", "M128 160 C144 160 162 168 178 180 C162 186 142 182 124 172Z")
+        d.stroke("light", "M144 168 l6 6 M156 172 l5 6", 1.3, line=False)
+        d.marks("mark", circle(176, 140, 2.4))
+        d.stroke("mark", "M190 146 Q182 150 172 149", 1.4)
+    group(d, "translate(100 150) scale(.84) translate(-112 -152)", t)
     d.shape("sand2", "M30 178 Q60 170 90 178 Q60 182 30 178Z", shadow=False, line=False)
 
 
@@ -1260,26 +1260,24 @@ def octopus_portrait(d: Drawing):
 def octopus_den(d: Drawing):
     water(d)
     rays(d)
-    d.shape("dark", "M-30 210 L-30 120 C-10 100 20 98 40 110 C50 90 80 84 100 94 C124 82 160 90 170 110 C190 100 220 108 230 120 V210Z")
-    d.shape("deep", "M44 150 C44 120 72 104 100 104 C128 104 156 120 156 150 L156 160 H44Z", shadow=False)
-    d.shape("hole", "M54 160 C54 132 76 118 100 118 C124 118 146 132 146 160Z", shadow=False)
-    d.marks("deep", circle(20, 140, 3) + circle(176, 150, 3.4) + circle(160, 180, 2.4) + circle(40, 184, 2.6))
-
-    def oc():
-        arm_l = [(78, 150), (60, 156), (44, 150), (36, 136), (42, 128), (50, 132)]
-        arm_r = [(122, 150), (144, 160), (164, 156), (172, 140), (166, 132), (158, 138)]
-        arm_f = [(110, 156), (120, 176), (110, 190), (96, 188), (96, 180)]
-        for a in (arm_l, arm_r, arm_f):
-            d.shape("hero", ribbon(a, 13, 3), spot=True)
-            sk = "".join(circle(x, y, max((13 - 10 * t) * 0.2, 1)) for x, y, nx, ny, t in track(a)[8::5])
-            d.shape("hero2", sk, shadow=False, line=False)
-        group(d, "translate(100 112) scale(.7) translate(-100 -90)", lambda: octopus(d, arms=False))
-    oc()
-    d.shape("dark", "M30 210 C34 186 60 170 100 170 C140 170 166 186 170 210Z")
-    d.shape("pop", "M156 176 C150 160 156 146 168 144 C172 156 168 168 166 180Z M176 176 C176 160 184 150 196 150 C194 162 188 172 182 182Z")
-    d.shape("pop2", "M18 168 C10 156 12 144 22 140 C28 150 28 160 24 172Z M34 172 C32 158 38 148 48 146 C50 158 46 168 40 176Z", shadow=False)
-    for x, y, s in [(150, 46, 0.8), (164, 54, 0.7), (40, 60, 0.7)]:
-        d.shape("hero2", fish(x, y, s), shadow=False)
+    for x, y, s_ in [(150, 46, 0.8), (164, 54, 0.7), (40, 60, 0.7)]:
+        d.shape("hero2", fish(x, y, s_), shadow=False)
+    d.shape("dark", "M-30 210 L-30 130 C-10 110 20 106 40 116 C52 96 80 88 100 96 C124 86 156 94 166 114 C188 106 220 112 230 126 V210Z")
+    d.shape("hole", ellipse(100, 146, 44, 30), shadow=False)
+    group(d, "translate(100 122) scale(.72) translate(-100 -84)", lambda: octopus(d, arms=False))
+    d.shape("dark", "M40 150 C60 166 140 166 160 150 L176 210 H24Z", shadow=False)
+    d.stroke("deep", "M50 160 C70 172 130 172 150 160", 2, line=False)
+    arms = [[(84, 156), (66, 160), (50, 152), (44, 138), (52, 132), (58, 138)],
+            [(116, 156), (136, 162), (152, 156), (158, 142), (150, 136), (144, 142)],
+            [(92, 160), (86, 176), (72, 186), (60, 182), (62, 174)],
+            [(108, 160), (116, 178), (132, 186), (142, 178), (136, 172)]]
+    for i, a in enumerate(arms):
+        d.shape("hero", ribbon(a, 12, 3), spot=i < 2)
+        sk = "".join(circle(x, y, max((12 - 9 * t) * 0.2, 1)) for x, y, nx, ny, t in track(a)[8::5])
+        d.shape("hero2", sk, shadow=False, line=False)
+    d.marks("deep", circle(20, 150, 3) + circle(180, 150, 3.4) + circle(170, 190, 2.4) + circle(30, 186, 2.6))
+    d.shape("pop", "M176 132 C170 116 176 102 188 100 C192 112 188 124 186 136Z")
+    d.shape("pop2", "M16 132 C8 120 10 108 20 104 C26 114 26 124 22 136Z M30 128 C28 114 34 104 44 102 C46 114 42 124 36 132Z", shadow=False)
 
 
 # ================================================================ WHALE SHARK
@@ -1350,7 +1348,7 @@ def whaleshark_snorkel(d: Drawing):
 HAMMER = ("M28 60 C26 52 36 48 50 50 C66 52 82 50 92 46 C96 44 104 44 108 46 C118 50 134 52 150 50 C164 48 174 52 172 60 "
           "C170 66 162 68 150 68 C134 68 118 72 112 80 L88 80 C82 72 66 68 50 68 C38 68 30 66 28 60Z")
 HH_BODY = "M88 76 C82 96 84 120 90 140 C94 152 98 162 100 174 C102 162 106 152 110 140 C116 120 118 96 112 76Z"
-HH_FIN = "M89 100 C74 110 60 124 50 140 C68 136 82 126 93 114Z"
+HH_FIN = "M90 98 C80 106 70 118 64 132 C76 130 86 122 94 112Z"
 HH_TAIL = "M100 170 C96 180 88 192 78 198 C92 196 100 188 102 180 C106 188 110 192 116 194 C110 184 106 176 102 168Z"
 
 
@@ -1363,7 +1361,6 @@ def hammerhead(d: Drawing, body="hero", under="light", eye="mark", detail=True):
     d.shape(body, HH_BODY + HAMMER, spot=detail)
     if detail:
         d.shape(under, "M92 80 C88 98 90 120 94 138 C96 148 99 158 100 166 C101 158 104 148 106 138 C110 120 112 98 108 80Z", shadow=False)
-        d.shape(under, "M36 60 C50 58 70 60 92 54 L108 54 C130 60 150 58 164 60 C160 64 150 64 140 64 C122 66 112 70 108 76 L92 76 C88 70 78 66 60 64 C50 64 40 64 36 60Z", shadow=False)
         d.stroke(eye, "M86 62 Q100 68 114 62", 2)
         d.stroke(eye, "M86 84 l-4 2 M86 88 l-4 2 M86 92 l-4 2 M114 84 l4 2 M114 88 l4 2 M114 92 l4 2", 1.3, line=False)
     d.marks(eye, circle(30, 59, 2.6) + circle(170, 59, 2.6))
@@ -1523,7 +1520,7 @@ CLAY = {**MACAW, "clay": "#D99A6C", "clay2": "#B9704A"}
 CAPY = {"hero": "#A6744B", "hero2": "#7E5234", "mark": "#2E2018", "light": "#FFFFFF", "bird": "#F2C230"}
 CAPY_WET = {**CAPY, "lily": "#5E9A4A", "lily2": "#3F7A34", "pop": "#F2A7C3"}
 ALPACA = {"hero": "#C8955F", "hero2": "#F4E7D0", "mark": "#3A2A20", "pop": "#E0457B", "pop2": "#F6C445"}
-ALPACA_T = {"hero": "#F1E6D2", "hero2": "#D9C7AA", "mark": "#3A2A20", "stone": "#CFC6B4", "stone2": "#5A5048", "dark": "#3A2A20"}
+ALPACA_T = {**ALPACA, "fur2": "#A67845", "stone": "#D8CFBE", "stone2": "#5A5048", "dark": "#3A2A20"}
 CONDOR = {"dark": "#1D1D22", "hero": "#A0675A", "hero2": "#6E3A36", "light": "#FFFFFF", "beak": "#E8DCC2", "mark": "#201414",
           "wing": "#E9E9EC"}
 TORT = {"hero": "#6B6152", "hero2": "#948A77", "mark": "#3A3229", "light": "#B9AF99"}
@@ -1569,8 +1566,8 @@ SOUTH = [
             checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("hero2", "sky")],
             fixes={"far": ["mid", "near", "deep"], "mid": ["near", "deep"], "sky": ["sky2", "far"]}),
     Concept("alpaca-terraces", "animal-alpaca", "Andean terraces", alpaca_terraces, overrides=ALPACA_T,
-            checks=[("hero", "near"), ("hero", "mid"), ("hero", "far"), ("stone", "mid"), ("hero", "sky")],
-            fixes={"near": ["deep", "mid"], "mid": ["near", "deep"], "far": ["mid", "sky2"]}),
+            checks=[("hero", "near"), ("hero", "sky"), ("hero", "far"), ("stone", "mid"), ("stone", "far"), ("mid", "far")],
+            fixes={"near": ["deep", "mid", "#5E9C6A"], "mid": ["near", "deep"], "far": ["sky2", "mid"]}),
     Concept("condor-portrait", "animal-andean-condor", "Andean condor", condor_portrait, overrides=CONDOR,
             checks=[("hero", "sky"), ("hero", "far"), ("dark", "sky"), ("dark", "far")],
             fixes={"sky": ["sky2", "far", "glow2"], "far": ["mid", "sky2", "light"]}),
@@ -1622,7 +1619,7 @@ SOUTH = [
 MANTA = {"hero": "#24313F", "light": "#F1F3F5", "mark": "#121A22", "pop": "#FFC857"}
 MANTA_D = {"hero": "#24313F", "light": "#E9EEF2", "mark": "#0E151C", "pop": "#FF7A5C"}
 SEATURTLE = {"hero": "#6E6A3A", "hero2": "#A69A62", "flip2": "#857A48", "mark": "#3B361C", "light": "#EDE5C6"}
-NESTING = {"hero": "#5E5A36", "hero2": "#8C8256", "mark": "#2E2A16", "light": "#E8E0C2", "sand2": "#C9AE7C"}
+NESTING = {"hero": "#5E5A36", "hero2": "#8C8256", "flip2": "#6F6744", "mark": "#2E2A16", "light": "#E8E0C2", "sand2": "#C9AE7C"}
 SEAHORSE = {"hero": "#F2A23A", "hero2": "#F8D27E", "mark": "#9A4B1A", "light": "#FFFFFF", "pop": "#FF6F91"}
 OCTO = {"hero": "#D8613C", "hero2": "#F6B48E", "mark": "#3A140C", "light": "#FFF6EE", "hole": "#0B1520", "pop": "#F2789A", "pop2": "#FFC857"}
 WHALESHARK = {"hero": "#3F5E78", "hero2": "#6F8DA6", "light": "#EEF3F6", "mark": "#132029", "mouth": "#24343F", "remora": "#8A99A6"}

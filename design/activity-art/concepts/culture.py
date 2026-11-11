@@ -81,6 +81,16 @@ def clip_close(d: Drawing):
     d.raw("</g>", "</g>")
 
 
+def clipped(fn):
+    """Wrap a whole drawing in the circle clip (for scenes whose shapes run past the rim)."""
+    def draw(d: Drawing):
+        clip_open(d)
+        fn(d)
+        clip_close(d)
+    draw.__name__ = fn.__name__
+    return draw
+
+
 def blossom(d: Drawing, pts, role="blossom", hi="light"):
     for x, y, r in pts:
         d.shape(role, circle(x, y, r))
@@ -177,8 +187,7 @@ def temple_torii(d: Drawing):
 
 # ================================================================ CASTLE TOUR
 def castle_hilltop(d: Drawing):
-    d.shape("light", cloud(16, 60, 1.1))
-    d.shape("light", cloud(150, 44, .9))
+    d.shape("light", cloud(26, 64, 1.0))
     d.band("far", hills(140, 14, -10))
     # keep and towers
     d.shape("stone", battlement(86, 54, 28, 70, 3, 5))
@@ -230,7 +239,6 @@ def castle_fairytale(d: Drawing):
 
 
 def castle_drawbridge(d: Drawing):
-    d.shape("light", cloud(150, 30, .8))
     d.shape("stone", battlement(56, 40, 88, 110, 5, 6))
     for x in (20, 140):
         d.shape("stone", battlement(x, 24, 40, 126, 3, 7))
@@ -421,7 +429,7 @@ def ruins_colosseum(d: Drawing):
 
 
 def ruins_llama(d: Drawing):
-    d.shape("light", cloud(150, 26, .8))
+    d.shape("light", cloud(56, 40, .8))
     d.band("far", "M-30 104 L10 84 L40 96 L70 72 L96 92 L112 84 L230 104")
     d.shape("near", "M112 150 C118 112 128 72 138 52 Q146 38 154 52 C162 72 170 104 184 150Z")
     d.shape("deep", "M146 44 Q150 44 154 52 C162 72 168 100 178 132 C164 110 154 80 146 44Z", shadow=False, line=False)
@@ -438,7 +446,7 @@ def ruins_llama(d: Drawing):
     llama = ("M34 140 C34 132 44 130 54 132 L68 132 L70 110 C70 104 73 100 77 99 L77 91 L80 98 L82 90 L84 99 "
              "C88 101 93 105 93 109 C93 113 89 114 85 114 L82 114 L80 138 C82 148 78 154 76 156 L76 178 L70 178 "
              "L69 158 L64 158 L63 178 L57 178 L56 158 L46 158 L45 178 L39 178 L38 157 C34 154 31 148 34 140Z")
-    group(d, "translate(-14 -6) scale(1.15)", lambda: (
+    group(d, "translate(-8 -28) scale(1.1)", lambda: (
         d.shape("llama", llama),
         d.shape("pop", "M46 131 H68 V146 H46Z", shadow=False, spot=True),
         d.stroke("hero2", "M46 136 H68 M46 141 H68", 1.6, line=False),
@@ -545,7 +553,6 @@ def oldtown_alley(d: Drawing):
 
 
 def oldtown_canal(d: Drawing):
-    d.shape("light", cloud(150, 30, .9))
     houses = [(20, 32, 60, "hero", "step"), (52, 34, 46, "pop", "bell"), (86, 30, 54, "hero2", "step"), (116, 34, 44, "mid", "bell"),
               (150, 30, 60, "near", "step")]
     for x, w, top, role, kind in houses:
@@ -574,7 +581,7 @@ def oldtown_canal(d: Drawing):
 
 def oldtown_clocktower(d: Drawing):
     birds(d, [(140, 40, 1), (152, 32, .8)])
-    d.shape("light", cloud(16, 70, 1))
+    d.shape("light", cloud(26, 74, .9))
     d.shape("light", rrect(84, 52, 32, 112, 1))
     d.shape("hero", "M80 54 L100 18 L120 54Z", spot=True)
     d.shape("hero", rrect(80, 52, 40, 6, 1), shadow=False)
@@ -1192,9 +1199,9 @@ CONCEPTS = [
             checks=[("stone", "sky"), ("stone", "far"), ("stone", "mid")], fixes={"stone": ["#C2B194", "#B3A285", "#A69577"], "far": ["mid", "near"], "mid": ["near", "deep"]}),
     Concept("castle-fairytale", "castle-tour", "Fairytale turrets", castle_fairytale, overrides=STONE,
             checks=[("stone", "far"), ("stone", "mid"), ("hero", "far"), ("hero", "sky"), ("stone", "sky")], fixes={"stone": ["#C2B194", "#B3A285", "#A69577"], "far": ["near", "deep"], "mid": ["near", "deep"]}),
-    Concept("castle-drawbridge", "castle-tour", "Drawbridge gate", castle_drawbridge, overrides={**STONE, **WOOD},
+    Concept("castle-drawbridge", "castle-tour", "Drawbridge gate", clipped(castle_drawbridge), overrides={**STONE, **WOOD},
             checks=[("stone", "sky"), ("wood", "mid"), ("stone", "mid")], fixes={"stone": ["#C2B194", "#B3A285", "#A69577"], "mid": ["near", "deep"]}),
-    Concept("museum-facade", "museum", "Classical museum", museum_facade,
+    Concept("museum-facade", "museum", "Classical museum", clipped(museum_facade),
             checks=[("light", "glow"), ("light", "sky"), ("light", "mid"), ("light", "near")], fixes={"sky": ["far", "sky2"], "glow": ["glow2", "mid", "near"]}),
     Concept("museum-dino", "museum", "Dinosaur skeleton", museum_dino,
             checks=[("light", "far"), ("light", "mid"), ("dark", "near")], fixes={"far": ["mid", "near", "deep"], "mid": ["near", "deep"]}),
@@ -1233,7 +1240,7 @@ CONCEPTS = [
             checks=[("hero", "sky"), ("pop", "sky"), ("hero2", "sky"), ("hero", "far"), ("pop", "far"), ("hero2", "far")], fixes={"far": ["light", "mid", "near"]}),
     Concept("rooftop-skyline", "rooftop-views", "Skyline & cocktail", rooftop_skyline,
             checks=[("far", "sky"), ("mid", "far"), ("light", "mid"), ("dark", "near"), ("glow2", "sky")], fixes={"far": ["mid", "near"], "mid": ["near", "deep"], "glow2": ["pop", "glow"]}),
-    Concept("rooftop-santorini", "rooftop-views", "Blue domes", rooftop_santorini, overrides={"dome": "#2F6DB5"},
+    Concept("rooftop-santorini", "rooftop-views", "Blue domes", clipped(rooftop_santorini), overrides={"dome": "#2F6DB5"},
             checks=[("light", "far"), ("light", "sky"), ("dome", "sky"), ("dome", "light")], fixes={"sky": ["sky2", "glow2"], "far": ["mid", "near"]}),
     Concept("rooftop-cat", "rooftop-views", "Rooftop cat", rooftop_cat,
             checks=[("dark", "sky"), ("near", "far"), ("near", "sky"), ("far", "sky")], fixes={"far": ["mid", "sky2"]}),

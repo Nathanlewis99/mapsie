@@ -36,32 +36,34 @@ def sfood_cart(d: Drawing):
     d.disc("glow", 152, 52, 20)
     d.band("far", "M-30 150 V112 H14 V96 H34 V120 H52 V150 H148 V104 H170 V88 H190 V110 H230")
     d.band("ground", "M-30 160 Q100 154 230 160")
-    # back wall and poles
-    d.shape("near", rrect(54, 74, 92, 40, 2), line=False)
-    d.stroke("dark", "M54 72 V114 M146 72 V114", 3)
-    # awning: scalloped stripes
-    d.shape("pop", rrect(42, 54, 116, 10, 3), spot=True)
-    for i in range(6):
-        x = 44 + i * 112 / 6
-        role = "pop" if i % 2 == 0 else "light"
-        d.shape(role, f"M{x:.1f} 62 H{x+112/6:.1f} V76 a{56/6:.2f} 6 0 0 1 {-112/6:.1f} 0Z", spot=i % 2 == 0, shadow=i == 0)
-    # pot and steam
-    steam(d, [70, 80, 90], 96, 18)
-    d.shape("dark", rrect(64, 96, 32, 14, 4))
-    d.shape("dark", rrect(60, 94, 40, 4, 2), shadow=False)
-    # bowls stack
-    d.shape("hero2", "M108 104 H136 a14 9 0 0 1 -28 0Z", spot=True)
-    d.shape("hero2", "M110 98 H134 a12 7 0 0 1 -24 0Z", spot=True)
-    # counter and cart body
-    d.shape("hero2", rrect(46, 108, 108, 7, 2))
-    d.shape("hero", rrect(52, 114, 96, 34, 3))
-    d.shape("light", rrect(62, 122, 34, 18, 2), shadow=False)
-    d.stroke("hero", "M68 131 H90", 2.4, line=False)
-    d.stroke("dark", "M148 120 L172 110", 3.2)
-    d.stroke("dark", "M140 148 V160", 3.4)
-    d.shape("dark", circle(76, 152, 12))
-    d.shape("light", circle(76, 152, 4.5), shadow=False)
 
+    def cart():
+        # back wall and poles
+        d.shape("near", rrect(54, 74, 92, 40, 2), line=False)
+        d.stroke("dark", "M54 72 V114 M146 72 V114", 3)
+        # awning: scalloped stripes
+        d.shape("pop", rrect(42, 54, 116, 10, 3), spot=True)
+        for i in range(6):
+            x = 44 + i * 112 / 6
+            role = "pop" if i % 2 == 0 else "light"
+            d.shape(role, f"M{x:.1f} 62 H{x+112/6:.1f} V76 a{56/6:.2f} 6 0 0 1 {-112/6:.1f} 0Z", spot=i % 2 == 0, shadow=i == 0)
+        # pot and steam
+        steam(d, [70, 80, 90], 96, 18)
+        d.shape("dark", rrect(64, 96, 32, 14, 4))
+        d.shape("dark", rrect(60, 94, 40, 4, 2), shadow=False)
+        # bowls stack
+        d.shape("hero2", "M108 104 H136 a14 9 0 0 1 -28 0Z", spot=True)
+        d.shape("hero2", "M110 98 H134 a12 7 0 0 1 -24 0Z", spot=True)
+        # counter and cart body
+        d.shape("hero2", rrect(46, 108, 108, 7, 2))
+        d.shape("hero", rrect(52, 114, 96, 34, 3))
+        d.shape("light", rrect(62, 122, 34, 18, 2), shadow=False)
+        d.stroke("hero", "M68 131 H90", 2.4, line=False)
+        d.stroke("dark", "M148 120 L172 110", 3.2)
+        d.stroke("dark", "M140 148 V160", 3.4)
+        d.shape("dark", circle(76, 152, 12))
+        d.shape("light", circle(76, 152, 4.5), shadow=False)
+    group(d, "translate(100 160) scale(1.12) translate(-104 -160)", cart)
 
 def sfood_skewers(d: Drawing):
     d.disc("glow", 100, 92, 58)
@@ -74,7 +76,7 @@ def sfood_skewers(d: Drawing):
                 x = 58 + j * 20
                 yy = y + 6 - (x - 34) * 12 / 134
                 role = ["hero", "pop", "hero", "hero2", "hero"][(j + i) % 5]
-                d.shape(role, rrect(x - 8, yy - 8, 16, 16, 5), spot=role == "pop")
+                d.shape(role, rrect(x - 8, yy - 8, 16, 16, 5), spot=True)
             d.marks("mark", "")
         sk()
     d.shape("dark", "M30 132 H170 L160 172 H40Z")
@@ -177,10 +179,10 @@ def wine_vineyard(d: Drawing):
             x = -10 + k * (18 + 4 * i) + (i * 7)
             t = (x + 30) / 260
             yy = (1 - t) ** 2 * (y + 8) + 2 * (1 - t) * t * (y - 8) + t * t * (y + 10)
-            d.shape("near", circle(x, yy - r * 0.6, r), shadow=False, line=i == 2)
+            d.shape("near", circle(x, yy - r * 0.6, r), shadow=False, line=False)
     d.band("near", "M-30 172 Q100 164 230 172", line=False)
-    wine_glass(d, 76, 106, rot=7)
-    wine_glass(d, 124, 106, rot=-7)
+    wine_glass(d, 74, 106, rot=6)
+    wine_glass(d, 126, 106, rot=-6)
     d.stroke("light", "M93 62 l-6 -5 M107 62 l6 -5 M100 58 V50", 2.4)
 
 
@@ -230,11 +232,11 @@ def dine_setting(d: Drawing):
     d.band("hero", "M-30 -30 L230 -30", line=False)
     d.shape("light", circle(100, 104, 50))
     d.shape("sky", circle(100, 104, 38), shadow=False)
-    d.stroke("pop", "M80 116 C80 96 120 92 122 110", 6)
-    d.shape("mark", circle(100, 104, 9))
-    d.shape("far", "M100 92 l3 -8 l3 9Z", shadow=False)
-    d.marks("pop", circle(114, 96, 2.5))
-    d.marks("pop", circle(88, 94, 2))
+    d.stroke("pop", "M74 118 Q100 128 126 112", 5)
+    for x, y, r in [(80, 96, 3), (122, 98, 2.4), (130, 106, 1.8)]:
+        d.marks("pop", circle(x, y, r))
+    d.shape("mark", rrect(86, 96, 28, 18, 5), extra='transform="rotate(-12 100 105)"')
+    d.stroke("near", "M96 96 q4 -10 10 -12 M100 94 q-6 -6 -10 -6 M102 94 q2 -8 -2 -12", 2.2)
     # fork
     d.shape("light", "M33.5 74 H38.5 L39.5 150 a3.5 3.5 0 0 1 -7 0Z")
     d.shape("light", "M28 52 h3 v16 h3.5 v-16 h3 v16 h3.5 v-16 h3 v18 c0 6 -4 8 -8 8 c-4 0 -8 -2 -8 -8Z")
@@ -242,8 +244,8 @@ def dine_setting(d: Drawing):
     d.shape("light", "M161 104 H167 L167.5 150 a3.5 3.5 0 0 1 -7 0Z")
     d.shape("light", "M160 106 V60 C168 66 170 84 168 106Z")
     # glass
-    d.shape("light", circle(160, 42, 12))
-    d.shape("pop", circle(160, 42, 8), shadow=False, spot=True)
+    d.shape("light", circle(148, 50, 12))
+    d.shape("pop", circle(148, 50, 8), shadow=False, spot=True)
 
 
 def dine_candles(d: Drawing):
@@ -499,7 +501,7 @@ def sushi_maki(d: Drawing):
         d.shape("hero2", circle(x + 6, y + 8, 4), shadow=False)
         d.shape("near", rrect(x - 12, y + 4, 9, 6, 2), shadow=False, extra=f'transform="rotate(30 {x-7} {y+7})"')
         d.marks("mark", circle(x - 12, y - 10, 1) + circle(x + 13, y - 6, 1) + circle(x - 4, y + 15, 1) + circle(x + 15, y + 10, 1))
-    chopsticks(d, 30, 168, 150, 140, 7)
+    chopsticks(d, 46, 162, 152, 138, 7)
 
 
 def sushi_nigiri(d: Drawing):
@@ -636,13 +638,15 @@ def taco(d: Drawing, x, y, s=1.0):
         d.stroke("light", "M-20 -4 l6 -6 M0 -10 l4 -6 M12 -4 l6 -6", 2.2, line=False)
         d.shape("hero", "M-36 -2 A36 34 0 0 0 36 -2 C24 -2 -24 -2 -36 -2Z", spot=True)
         d.stroke("hero2", "M-26 10 Q0 22 26 10", 2.4, line=False)
+        for px, py in [(-22, 6), (-6, 14), (12, 8), (22, 16), (0, 24), (-16, 20)]:
+            d.marks("hero2", circle(px, py, 1.3))
     group(d, f"translate({x} {y}) scale({s})", t)
 
 
 def taco_big(d: Drawing):
     d.disc("glow", 100, 92, 60, line=False)
     table(d, 150, "far", "mid")
-    taco(d, 94, 116, 1.9)
+    group(d, "rotate(-8 94 116)", lambda: taco(d, 94, 116, 1.9))
     # lime wedge
     d.shape("near", "M140 152 a16 16 0 0 1 32 0Z")
     d.shape("light", "M144 152 a12 12 0 0 1 24 0Z", shadow=False, line=False)
@@ -681,7 +685,7 @@ def taco_fiesta(d: Drawing):
         d.shape(roles[i], f"M{x-9} {y-1} H{x+9} V{y+18} L{x+6} {y+15} L{x+3} {y+18} L{x} {y+15} L{x-3} {y+18} L{x-6} {y+15} L{x-9} {y+18}Z",
                 shadow=False, spot=i % 2 == 0)
         d.marks("sky", circle(x, y + 7, 2.6))
-    table(d, 158, "ground", "near")
+    table(d, 158, "ground", "deep")
     d.shape("light", ellipse(100, 156, 74, 12))
     taco(d, 62, 136, 0.95)
     taco(d, 138, 136, 0.95)
@@ -689,9 +693,9 @@ def taco_fiesta(d: Drawing):
 
 
 # ================================================================ GELATO
-def scoop(d: Drawing, x, y, r, role, drips=True):
+def scoop(d: Drawing, x, y, r, role, drips=True, spot=False):
     drip = f" C{x+r*0.6} {y+r*0.9} {x+r*0.3} {y+r*0.6} {x+r*0.1} {y+r*0.75} C{x-r*0.1} {y+r*1.1} {x-r*0.4} {y+r*0.6} {x-r*0.6} {y+r*0.8}" if drips else ""
-    d.shape(role, f"M{x-r} {y+r*0.55} C{x-r*1.15} {y-r*0.9} {x+r*1.15} {y-r*0.9} {x+r} {y+r*0.55}{drip} C{x-r*0.8} {y+r*0.7} {x-r*0.9} {y+r*0.6} {x-r} {y+r*0.55}Z", spot=role == "pop")
+    d.shape(role, f"M{x-r} {y+r*0.55} C{x-r*1.15} {y-r*0.9} {x+r*1.15} {y-r*0.9} {x+r} {y+r*0.55}{drip} C{x-r*0.8} {y+r*0.7} {x-r*0.9} {y+r*0.6} {x-r} {y+r*0.55}Z", spot=spot)
 
 
 def gelato_cone(d: Drawing):
@@ -699,7 +703,7 @@ def gelato_cone(d: Drawing):
     d.shape("ground", "M70 116 H130 L102 182 Q100 186 98 182Z")
     d.stroke("near", "M80 120 L112 166 M96 120 L118 150 M112 120 L124 134 M120 120 L88 166 M104 120 L82 150 M88 120 L76 134", 1.8)
     scoop(d, 100, 104, 30, "hero")
-    scoop(d, 100, 70, 26, "hero2")
+    scoop(d, 100, 70, 26, "hero2", spot=True)
     d.shape("far", "M80 54 C76 30 92 22 100 22 C108 22 124 30 120 54 C112 58 88 58 80 54Z")
     d.shape("pop", circle(104, 22, 6.5))
     d.stroke("near", "M104 16 q4 -8 10 -8", 2)
@@ -715,7 +719,7 @@ def gelato_cup(d: Drawing):
     d.limb("dark", "M70 96 L56 42", 5)
     d.shape("dark", ellipse(54, 38, 6, 9), extra='transform="rotate(-14 54 38)"')
     scoop(d, 80, 98, 27, "hero")
-    scoop(d, 120, 98, 27, "hero2")
+    scoop(d, 120, 98, 27, "hero2", spot=True)
     d.shape("light", "M48 112 H152 L138 164 H62Z")
     d.shape("pop", "M50 122 H150 L147 134 H53Z", shadow=False, spot=True)
     d.shape("pop", "M54 142 H146 L144 150 H56Z", shadow=False)
@@ -757,7 +761,7 @@ def croissant(d: Drawing, tx=0, ty=0, s=1.0, spot=True):
     def c():
         for x, y, rx, ry, r in CROISSANT:
             rot = f'transform="rotate({r} {x:.1f} {y:.1f})"'
-            d.shape("hero", ellipse(round(x, 1), round(y, 1), rx, ry), extra=rot, spot=spot and r == 0)
+            d.shape("hero", ellipse(round(x, 1), round(y, 1), rx, ry), extra=rot, spot=spot)
             if d.paper:  # a soft sheen along the top of each segment
                 d.raw(f'<path d="M{x-rx*0.55:.1f} {y-ry*0.45:.1f} Q{x:.1f} {y-ry*0.85:.1f} {x+rx*0.55:.1f} {y-ry*0.45:.1f}" fill="none" '
                       f'stroke="{d.c["hero2"]}" stroke-width="{max(1.4, ry*0.16):.1f}" stroke-linecap="round" {rot}/>')
@@ -972,12 +976,12 @@ def coco_halves(d: Drawing):
     d.disc("glow", 100, 92, 58, line=False)
     d.band("ground", "M-30 148 Q100 138 230 148")
     # half facing us
-    d.shape("hero", ellipse(74, 112, 38, 35))
+    d.shape("hero", ellipse(74, 112, 38, 35), spot=True)
     d.shape("light", ellipse(74, 112, 30, 27), shadow=False)
     d.shape("sky2", ellipse(74, 112, 21, 18), shadow=False, line=False)
     d.stroke("mark", "M40 96 l6 2 M38 116 l6 0 M46 136 l5 -3 M106 128 l-5 -2", 1.6, line=False)
     # half lying open like a bowl
-    d.shape("hero", "M116 122 C116 150 172 154 178 124Z")
+    d.shape("hero", "M116 122 C116 150 172 154 178 124Z", spot=True)
     d.shape("light", ellipse(147, 122, 32, 9), extra='transform="rotate(-3 147 122)"')
     d.shape("sky2", ellipse(147, 122, 24, 5.5), extra='transform="rotate(-3 147 122)"', shadow=False, line=False)
     d.stroke("mark", "M126 134 l5 -1 M150 144 l1 -5 M168 134 l-4 -2", 1.6, line=False)
@@ -1022,7 +1026,7 @@ CONCEPTS = [
     # fine dining
     Concept("dine-cloche", "fine-dining", "Silver cloche", dine_cloche, overrides={"hero2": "#B9C0CB"},
             checks=[("hero2", "glow"), ("light", "hero")], fixes={"glow": ["near", "mid", "deep"]}),
-    Concept("dine-setting", "fine-dining", "Place setting", dine_setting, overrides={"pop": "#8E1B3A"},
+    Concept("dine-setting", "fine-dining", "Place setting", dine_setting, overrides={"pop": "#8E1B3A", "mark": "#7A4A2A", "near": "#4C9A2A"},
             checks=[("light", "hero"), ("pop", "sky")], fixes={"hero": ["near", "deep", "mid"]}),
     Concept("dine-candles", "fine-dining", "Candlelit dinner", dine_candles, overrides={"hero2": "#D4A84B", "pop": "#FF8A3D", "mark": "#8E1B3A", "glow2": "#FFD98A"},
             checks=[("light", "far"), ("glow2", "far"), ("hero2", "light"), ("mark", "far")], fixes={"far": ["near", "deep", "dark"]}),
@@ -1091,10 +1095,10 @@ CONCEPTS = [
     # gelato
     Concept("gelato-cone", "gelato", "Triple scoop", gelato_cone,
             overrides={"hero": "#A8D08D", "hero2": "#F7A1B5", "far": "#7B4B2A", "ground": "#D9A066", "near": "#A8743F", "pop": "#D7263D"},
-            checks=[("hero", "glow"), ("hero2", "glow"), ("ground", "sky")], fixes={"glow": ["near", "deep", "mid", "dark"]}),
+            checks=[("hero", "glow"), ("hero2", "glow"), ("ground", "sky")], fixes={"glow": ["light", "sky2", "#E07A5F"]}),
     Concept("gelato-cup", "gelato", "Gelato cup", gelato_cup,
             overrides={"hero": "#F7A1B5", "hero2": "#A8D08D", "ground": "#D9A066", "near": "#A8743F"},
-            checks=[("hero", "glow"), ("hero2", "glow"), ("light", "glow")], fixes={"glow": ["near", "deep", "mid", "dark"]}),
+            checks=[("hero", "glow"), ("hero2", "glow"), ("light", "glow")], fixes={"glow": ["#7FB7BE", "mid", "deep"]}),
     Concept("gelato-counter", "gelato", "Gelateria", gelato_counter,
             overrides={"hero": "#F7A1B5", "hero2": "#A8D08D", "mark": "#7B4B2A", "near": "#F6C945", "light": "#FFF6E0"},
             checks=[("light", "far"), ("hero", "far"), ("mark", "far"), ("ground", "far")], fixes={"far": ["deep", "dark", "mid"]}),

@@ -861,6 +861,324 @@ def moto_pass(d: Drawing):
     d.stroke("dark", "M154 140 Q140 134 148 128 Q156 122 142 116", 3)
     d.band("near", hills(184, 6, 30), line=False)
 
+# ================================================================ SCOOTER
+def scooter(d: Drawing, body="hero", seat="dark"):
+    """Vintage scooter facing right, wheels on y=150."""
+    d.shape(seat, "M48 92 Q50 82 64 82 H94 Q100 82 100 88 L98 94 H50Z")
+    d.limb("dark", "M138 70 L146 134", 5)
+    d.shape(body, "M96 126 H130 L132 134 H96Z")
+    d.shape(body, "M38 128 Q32 96 70 92 H98 Q106 92 106 102 L102 132 H44Z")
+    d.shape("light", "M44 112 Q46 100 64 98 H90 Q92 106 82 110Z", shadow=False)
+    d.shape(body, "M118 134 Q128 104 130 78 L142 76 Q144 104 152 124 L154 134Z")
+    d.stroke("dark", "M130 66 L118 62 M140 66 L132 58", 2.6)
+    d.shape("dark", circle(132, 56, 3.4) + circle(116, 61, 2.4), shadow=False)
+    d.shape(body, rrect(126, 64, 26, 11, 5))
+    d.shape("glow2", circle(150, 69, 4.5), shadow=False)
+    d.shape("pop", "M40 120 Q60 116 100 118 L100 122 Q60 120 41 124Z", shadow=False, spot=True)
+    d.shape(body, "M134 142 Q134 124 150 122 Q164 122 168 136 L162 138 Q158 130 150 130 Q142 130 140 142Z")
+    wheel(d, 64, 140, 11)
+    wheel(d, 150, 140, 11)
+
+
+@framed
+def scooter_side(d: Drawing):
+    d.disc("glow", 100, 96, 62)
+    d.band("far", hills(132, 8, 20))
+    d.band("ground", "M-30 152 Q100 146 230 152")
+    for y, x0, x1 in [(104, 14, 36), (118, 6, 32), (132, 14, 34)]:
+        d.stroke("light", f"M{x0} {y} H{x1}", 3, line=False)
+    group(d, "translate(100 100) scale(1.12) translate(-100 -108)", lambda: scooter(d))
+    d.band("deep", hills(182, 4, 20), line=False)
+
+
+def house(d: Drawing, x, y, w, h, role, shutters="hero", door=False):
+    d.shape(role, f"M{x} {y + h} V{y} H{x + w} V{y + h}Z")
+    d.shape("dark", f"M{x - 2} {y} H{x + w + 2} V{y + 4} H{x - 2}Z", shadow=False, line=False)
+    for wx in range(int(x + 6), int(x + w - 8), 16):
+        for wy in range(int(y + 10), int(y + h - 24), 22):
+            d.shape("dark", rrect(wx, wy, 8, 12, 1.5), shadow=False, line=False)
+            d.marks(shutters, f"M{wx - 3} {wy} h3 v12 h-3Z M{wx + 8} {wy} h3 v12 h-3Z")
+    if door:
+        d.marks("dark", f"M{x + w / 2 - 6} {y + h} V{y + h - 16} Q{x + w / 2} {y + h - 24} {x + w / 2 + 6} {y + h - 16} V{y + h}Z")
+
+
+@framed
+def scooter_street(d: Drawing):
+    d.disc("glow", 100, 40, 22)
+    house(d, -30, 30, 62, 130, "far", "near")
+    house(d, 32, 54, 52, 106, "glow2", "near", True)
+    house(d, 84, 40, 54, 120, "mid", "near")
+    house(d, 138, 60, 54, 100, "far", "near", True)
+    house(d, 192, 36, 50, 124, "glow2", "near")
+    d.stroke("dark", "M-30 72 Q60 96 170 70", 1.2)
+    for i, x in enumerate(range(0, 170, 14)):
+        t = (x + 30) / 200
+        d.shape(["pop", "light", "hero2"][i % 3], f"M{x - 3} {80 + 8 * (1 - (2 * t - 1) ** 2):.1f} h6 l-3 6Z", shadow=False, line=False)
+    d.band("ground", "M-30 158 H230")
+    for x in range(-28, 230, 14):
+        d.stroke("near", f"M{x} 166 h8 M{x + 7} 176 h8", 1.4, line=False)
+    group(d, "translate(100 100) scale(.84) translate(-104 -78)", lambda: scooter(d))
+    d.marks("dark", ellipse(100, 160, 50, 2.4)) if False else None
+
+
+@framed
+def scooter_front(d: Drawing):
+    d.disc("glow", 150, 50, 16)
+    d.band("far", "M-30 120 Q10 70 50 86 Q70 94 80 120 H230")
+    for x, y, role in [(8, 92, "light"), (22, 88, "hero2"), (36, 92, "light"), (16, 102, "pop")]:
+        d.shape(role, rrect(x, y, 10, 10, 1), shadow=False, line=False)
+    d.band("mid", waves(120, 2, 24))
+    d.band("near", waves(150, 3, 30), line=False)
+    # scooter head-on
+    d.shape("dark", rrect(90, 136, 20, 36, 8))
+    d.shape("hero", "M86 150 Q86 126 100 126 Q114 126 114 150 V156 H86Z")
+    d.shape("hero", "M66 156 Q62 108 76 82 H124 Q138 108 134 156 Q100 164 66 156Z")
+    d.shape("pop", "M72 140 Q100 146 128 140 L129 146 Q100 152 71 146Z", shadow=False, spot=True)
+    d.stroke("dark", "M100 80 V60", 4)
+    d.stroke("dark", "M44 62 Q72 66 100 62 Q128 66 156 62", 4)
+    d.shape("dark", rrect(36, 58, 14, 8, 4), shadow=False)
+    d.shape("dark", rrect(150, 58, 14, 8, 4), shadow=False)
+    for x, k in [(58, -1), (142, 1)]:
+        d.stroke("dark", f"M{x} 62 L{x + 8 * k} 44", 2.2)
+        d.shape("light", circle(x + 9 * k, 40, 6))
+    d.shape("hero", "M80 56 Q80 46 100 46 Q120 46 120 56 V72 Q100 80 80 72Z")
+    d.shape("dark", circle(100, 62, 10), shadow=False)
+    d.shape("glow2", circle(100, 62, 7), shadow=False)
+    d.band("ground", "M-30 172 Q100 166 230 172")
+
+
+# ================================================================ CRUISE SHIP
+def liner(d: Drawing):
+    """Cruise ship facing right, waterline y=140."""
+    d.shape("pop", "M118 62 L120 40 Q120 34 128 34 H142 Q148 34 146 40 L140 62Z", spot=True)
+    d.shape("dark", "M119 44 H146 L145 48 H119Z", shadow=False)
+    d.shape("light", "M44 112 V86 Q44 80 50 80 H156 L164 112Z")
+    d.shape("light", "M58 80 V70 Q58 64 64 64 H150 L156 80Z")
+    d.shape("light", rrect(70, 54, 52, 12, 3))
+    d.shape("dark", "M150 68 H156 L158 76 H150Z", shadow=False)
+    for y, x0, x1 in [(70, 64, 148), (86, 50, 152), (98, 50, 158)]:
+        for x in range(x0, x1, 7):
+            d.marks("hero", rrect(x, y, 4.4, 5, 1))
+    for x in range(54, 150, 22):
+        d.shape("hero2", rrect(x, 104, 14, 6, 3), shadow=False)
+    d.shape("hero", "M14 110 H180 L192 108 Q186 128 172 144 H34 Q22 134 14 110Z")
+    d.shape("light", "M18 120 H186 L184 124 H20Z", shadow=False)
+    for x in range(32, 170, 9):
+        d.marks("light", circle(x, 132, 1.6))
+
+
+@framed
+def cruise_liner(d: Drawing):
+    d.disc("glow", 152, 64, 18)
+    d.shape("light", cloud(20, 54, 0.9), shadow=False)
+    d.band("far", "M-30 112 Q0 98 26 108 L230 116")
+    d.stroke("dark", "M30 28 q4 -4 8 0 q4 -4 8 0 M48 38 q3 -3 6 0 q3 -3 6 0", 1.8)
+    group(d, "translate(100 100) scale(.98) translate(-100 -96)", lambda: liner(d))
+    d.band("mid", waves(146, 3, 22))
+    d.stroke("light", "M30 154 H70 M100 160 H150 M40 168 H80", 2.4, line=False)
+    d.band("near", waves(170, 4, 30))
+    d.band("deep", waves(188, 3, 34), line=False)
+
+
+@framed
+def cruise_porthole(d: Drawing):
+    d.band("hero", "M-30 -30 H230", shadow=False, line=False)
+    for x, y in [(30, 40), (170, 40), (30, 160), (170, 160)]:
+        d.marks("dark", circle(x, y, 2.2))
+
+    def view():
+        d.shape("sky", "M40 30 H160 V170 H40Z", shadow=False, line=False)
+        d.disc("glow", 120, 76, 14)
+        d.shape("near", "M50 112 Q64 92 80 104 Q90 96 98 112Z")
+        palm(d, 72, 104, 0.4, "dark", 4)
+        d.shape("mid", waves(112, 2, 14) + " L230 230 L-30 230Z", shadow=False)
+        d.shape("near", waves(136, 3, 22) + " L230 230 L-30 230Z")
+        d.shape("light", "M110 106 h28 l-3 5 h-22Z", shadow=False)
+        d.stroke("dark", "M120 106 V98 M128 106 V96", 1.4)
+    clip(d, "port", circle(100, 100, 46), view)
+    d.shape("hero2", f"{circle(100, 100, 60)} {circle(100, 100, 46)}", extra=EVENODD, spot=True)
+    d.shape("dark", f"{circle(100, 100, 47)} {circle(100, 100, 44)}", shadow=False, extra=EVENODD, line=False)
+    import math
+    for i in range(8):
+        a = i * math.pi / 4 + math.pi / 8
+        d.marks("dark", circle(round(100 + 53 * math.cos(a), 1), round(100 + 53 * math.sin(a), 1), 2.6))
+    d.raw('<path d="M70 72 Q80 62 94 60" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/>', "")
+
+
+@framed
+def cruise_anchor(d: Drawing):
+    d.disc("glow", 100, 96, 64)
+    d.band("mid", waves(150, 3, 24))
+    d.band("near", waves(170, 4, 30), line=False)
+    a = "dark"
+    d.shape(a, f"{circle(100, 46, 12)} {circle(100, 46, 6)}", extra=EVENODD)
+    d.shape(a, rrect(94, 56, 12, 96, 4))
+    d.shape(a, rrect(74, 66, 52, 10, 5))
+    d.shape(a, "M46 116 L58 108 Q62 142 100 150 Q138 142 142 108 L154 116 L150 120 Q144 160 100 166 Q56 160 50 120Z")
+    d.shape(a, "M40 112 L58 104 L60 120Z M160 112 L142 104 L140 120Z")
+    d.stroke("hero2", "M100 34 Q140 30 146 52 Q150 72 120 80 Q90 88 96 104 Q102 120 128 118", 5)
+    d.stroke("hero2", "M100 34 Q140 30 146 52 Q150 72 120 80 Q90 88 96 104 Q102 120 128 118", 1, line=False) if False else None
+    d.raw('<path d="M100 34 Q140 30 146 52 Q150 72 120 80 Q90 88 96 104 Q102 120 128 118" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="5" stroke-dasharray="1.6 3.2"/>', "")
+
+
+# ================================================================ LONGTAIL BOAT
+LONGTAIL = "M24 126 Q36 146 70 146 H138 Q162 142 172 114 L180 72 L186 72 Q186 110 176 128 Q166 138 144 138 H28Z"
+
+
+def longtail(d: Drawing, hull="hero", trim="hero2"):
+    """Longtail boat facing right, waterline y=144; long-shaft engine at the stern."""
+    d.limb("dark", "M30 112 L-20 150", 3.2)
+    d.shape(hull, LONGTAIL)
+    d.shape(trim, "M28 134 H144 Q166 134 174 120 L176 114 Q170 138 144 140 H30Z", shadow=False, spot=True)
+    d.shape("dark", rrect(18, 102, 22, 16, 4))
+    d.stroke("dark", "M28 102 L46 90", 2.6)
+    d.shape("light", rrect(70, 118, 50, 4, 2), shadow=False, line=False)
+    for i, (role, dx) in enumerate([("pop", -6), ("glow2", 0), ("light", 6), ("pop", 10)]):
+        d.shape(role, f"M182 76 Q{176 + dx} 90 {172 + dx} 104 L{175 + dx} 104 Q{180 + dx * 0.5} 90 184 78Z", shadow=False)
+    d.shape("pop", circle(183, 74, 4))
+
+
+def karst(x: float, base: float, w: float, h: float) -> str:
+    return (f"M{x - w / 2} {base} Q{x - w / 2 - 4} {base - h * 0.6} {x - w / 3} {base - h * 0.85} "
+            f"Q{x - w / 4} {base - h} {x} {base - h} Q{x + w / 3} {base - h} {x + w / 2.6} {base - h * 0.75} "
+            f"Q{x + w / 2 + 4} {base - h * 0.4} {x + w / 2} {base}Z")
+
+
+@framed
+def longtail_karsts(d: Drawing):
+    d.disc("glow", 140, 52, 16)
+    d.shape("far", karst(150, 130, 50, 92) + " " + karst(46, 130, 40, 70))
+    d.shape("mid", karst(16, 134, 44, 96) + " " + karst(186, 134, 36, 64))
+    for x, y in [(8, 50), (22, 46), (180, 80)]:
+        d.marks("near", f"M{x} {y} q4 -6 8 0 q-4 4 -8 0Z")
+    d.band("sky2", waves(126, 2, 22))
+    group(d, "translate(100 100) scale(.82) translate(-100 -112)", lambda: longtail(d))
+    d.band("near", waves(150, 3, 26))
+    d.band("deep", waves(172, 3, 32), line=False)
+
+
+@framed
+def longtail_prow(d: Drawing):
+    d.disc("glow", 52, 54, 16)
+    d.shape("far", karst(56, 130, 46, 74), line=False)
+    d.band("mid", waves(124, 2, 22))
+    d.shape("hero", "M-30 150 H96 Q128 146 140 110 L150 40 L162 40 Q164 112 146 144 Q130 162 96 164 H-30Z")
+    d.shape("hero2", "M-30 156 H96 Q132 154 146 128 L150 120 Q148 152 120 160 Q104 164 96 164 H-30Z", shadow=False, spot=True)
+    d.stroke("dark", "M20 150 V164 M60 150 V164", 1.4, line=False)
+    for i, (role, dx) in enumerate([("pop", -14), ("glow2", -6), ("light", 2), ("pop", 10), ("glow2", 16)]):
+        d.shape(role, f"M156 46 Q{150 + dx} 80 {144 + dx} 112 L{150 + dx} 112 Q{156 + dx * 0.5} 80 160 48Z", shadow=dx == 2)
+    d.shape("light", circle(156, 50, 7))
+    d.shape("pop", circle(156, 50, 4), shadow=False)
+    for x, y, role in [(150, 70, "light"), (142, 86, "glow2"), (154, 84, "pop")]:
+        d.shape(role, circle(x, y, 3.6), shadow=False)
+    d.band("near", waves(168, 3, 26))
+    d.band("deep", waves(186, 3, 32), line=False)
+
+
+@framed
+def longtail_engine(d: Drawing):
+    d.disc("glow", 150, 50, 16)
+    d.shape("far", karst(150, 112, 46, 60), line=False)
+    d.band("mid", waves(110, 2, 22))
+    d.shape("hero", "M-30 94 H70 Q76 94 76 100 L72 120 H-30Z")
+    d.shape("hero2", "M-30 110 H74 L73 114 H-30Z", shadow=False, spot=True)
+    d.limb("dark", "M72 82 L176 150", 5)
+    d.shape("dark", "M170 146 L190 150 L186 156 Z M176 140 L182 160 L174 160Z", shadow=False)
+    d.shape("light", "M150 140 Q170 124 190 140 Q196 150 186 158 Q170 162 150 152Z")
+    d.shape("light", "M140 132 a5 5 0 1 1 0.1 0Z M196 128 a4 4 0 1 1 0.1 0Z M160 120 a3 3 0 1 1 0.1 0Z")
+    d.shape("pop", rrect(46, 52, 48, 34, 7), spot=True)
+    d.shape("dark", rrect(50, 46, 40, 8, 3))
+    d.stroke("dark", "M56 60 V80 M64 60 V80 M72 60 V80 M80 60 V80", 2)
+    d.shape("dark", circle(94, 72, 8))
+    d.limb("dark", "M50 70 L18 52", 4)
+    d.shape("glow2", rrect(8, 46, 14, 8, 3))
+    d.band("near", waves(138, 3, 26))
+    d.band("deep", waves(170, 3, 32), line=False)
+
+
+# ================================================================ BACKPACKING
+@framed
+def backpack(d: Drawing):
+    d.disc("glow", 100, 100, 72)
+    d.shape("pop", rrect(56, 30, 88, 20, 10), spot=True)
+    d.stroke("dark", "M72 30 V50 M128 30 V50", 2.4)
+    d.shape("hero", "M52 64 Q52 48 72 46 H128 Q148 48 148 64 V160 Q148 168 140 168 H60 Q52 168 52 160Z")
+    d.shape("hero2", "M50 60 Q50 44 72 42 H128 Q150 44 150 60 L148 84 Q100 92 52 84Z")
+    d.stroke("dark", "M78 84 V102 M122 84 V102", 3)
+    d.shape("dark", rrect(73, 98, 10, 7, 2), shadow=False)
+    d.shape("dark", rrect(117, 98, 10, 7, 2), shadow=False)
+    d.shape("hero", rrect(64, 118, 72, 42, 8))
+    d.stroke("dark", "M64 128 H136", 1.6)
+    d.shape("light", circle(84, 142, 9), shadow=False)
+    d.marks("pop", circle(84, 142, 5))
+    d.shape("glow2", "M110 134 L122 132 L124 144 L112 146Z", shadow=False)
+    d.shape("light", rrect(118, 98, 0.1, 0.1, 0), shadow=False, line=False)
+    d.shape("pop", "M100 60 L104 68 L113 69 L106 75 L108 84 L100 79 L92 84 L94 75 L87 69 L96 68Z", shadow=False, spot=True) if False else None
+    d.shape("light", rrect(88, 104, 24, 8, 2), shadow=False)
+    d.shape("pop", rrect(88, 104, 8, 8, 1), shadow=False, spot=True)
+    d.shape("pop", rrect(104, 104, 8, 8, 1), shadow=False, spot=True)
+    d.shape("light", rrect(150, 104, 12, 46, 5))
+    d.shape("near", rrect(152, 98, 8, 8, 2))
+    d.stroke("dark", "M40 70 Q36 120 52 150", 3) if False else None
+    d.band("far", hills(178, 4), line=False)
+
+
+@framed
+def hostel_bunk(d: Drawing):
+    d.band("far", "M-30 -30 H230", shadow=False, line=False)
+    d.shape("sky2", rrect(122, 34, 46, 46, 4))
+    d.stroke("far", "M145 34 V80 M122 57 H168", 3)
+    d.disc("glow", 136, 47, 6, line=False)
+    d.band("mid", "M-30 168 H230")
+    for x in (40, 160):
+        d.shape("dark", rrect(x - 4, 36, 8, 140, 3))
+    for y in (82, 140):
+        d.shape("light", rrect(42, y - 8, 116, 12, 4))
+        d.shape("dark", rrect(40, y + 4, 120, 6, 2))
+    d.shape("light", rrect(50, 64, 28, 12, 6), shadow=False)
+    d.shape("hero", "M80 74 Q110 60 154 74 V80 H80Z", spot=True)
+    d.shape("light", rrect(50, 122, 28, 12, 6), shadow=False)
+    d.shape("hero2", "M80 132 Q116 120 154 132 V138 H80Z")
+    d.stroke("dark", "M146 90 V160 M162 90 V160", 2.2) if False else None
+    for y in (100, 116, 132, 150):
+        d.shape("dark", rrect(130, y, 20, 3, 1.5), shadow=False)
+    d.shape("dark", rrect(128, 88, 3, 80, 1.5), shadow=False)
+    d.shape("dark", rrect(149, 88, 3, 80, 1.5), shadow=False)
+    # backpack on the floor
+    d.shape("pop", "M82 172 Q80 148 98 146 Q116 148 114 172Z")
+    d.shape("hero2", "M80 156 Q98 140 116 156 L114 160 Q98 150 82 160Z", shadow=False)
+    d.shape("dark", rrect(90, 162, 16, 3, 1.5), shadow=False)
+
+
+@framed
+def map_compass(d: Drawing):
+    d.disc("glow", 100, 100, 70)
+
+    def mapsheet():
+        panels = [("light", "M36 56 L72 46 V146 L36 156Z"), ("sky2", "M72 46 L108 56 V156 L72 146Z"),
+                  ("light", "M108 56 L144 46 V146 L108 156Z"), ("sky2", "M144 46 L172 54 V154 L144 146Z")]
+        d.shape("light", "M36 56 L72 46 L108 56 L144 46 L172 54 V154 L144 146 L108 156 L72 146 L36 156Z")
+        for role, p in panels:
+            d.shape(role, p, shadow=False, line=False)
+        d.stroke("dark", "M72 46 V146 M108 56 V156 M144 46 V146", 1.4)
+        d.shape("mid", "M40 104 Q56 92 68 104 Q82 116 96 100 L104 108 Q92 124 70 112 Q56 104 40 116Z", shadow=False, line=False)
+        d.raw('<path d="M46 140 Q70 120 90 128 Q120 140 130 110 Q138 86 160 76" fill="none" stroke="#E4572E" stroke-width="2.4" stroke-dasharray="4 4" stroke-linecap="round"/>',
+              '<path d="M46 140 Q70 120 90 128 Q120 140 130 110 Q138 86 160 76" fill="none" stroke="#1D2D44" stroke-width="2.2" stroke-dasharray="4 4" stroke-linecap="round"/>')
+        d.shape("pop", "M160 78 C150 66 152 56 160 56 C168 56 170 66 160 78Z", spot=True)
+        d.marks("light", circle(160, 62, 2.4))
+    group(d, "rotate(-6 100 100)", mapsheet)
+    # compass
+    d.shape("hero2", f"{circle(76, 128, 30)}")
+    d.shape("dark", rrect(70, 92, 12, 8, 3))
+    d.shape("light", circle(76, 128, 24), shadow=False)
+    for a, l in [(0, 4), (90, 3), (180, 3), (270, 3)]:
+        d.stroke("dark", f"M76 {104 + 1} V{104 + l + 1}", 2, line=True) if False else None
+    d.stroke("dark", "M76 106 V110 M76 146 V150 M54 128 H58 M94 128 H98", 2)
+    d.shape("pop", "M76 128 L71 126 L82 108Z", shadow=False, spot=True)
+    d.shape("pop", "M76 128 L81 130 L82 108Z", shadow=False, spot=True)
+    d.shape("dark", "M76 128 L81 130 L70 148Z M76 128 L71 126 L70 148Z", shadow=False)
+    d.marks("hero2", circle(76, 128, 2.6))
+
 
 CONCEPTS = [
     Concept("flight-window-seat", "flight", "Window seat", flight_window,
@@ -919,4 +1237,28 @@ CONCEPTS = [
             checks=[("hero", "glow"), ("hero", "sky"), ("hero2", "hero")], fixes={"glow": ["far", "mid", "sky2"], "hero2": ["light", "glow2"]}),
     Concept("moto-mountain-pass", "motorbike-tour", "Mountain pass", moto_pass,
             checks=[("ground", "mid"), ("pop", "mid"), ("light", "mid")], fixes={"ground": ["light", "far"], "mid": ["near", "deep"]}),
+    Concept("scooter-classic", "scooter-ride", "Vintage scooter", scooter_side,
+            checks=[("hero", "glow"), ("hero", "far"), ("hero", "sky"), ("hero", "ground")], fixes={"glow": ["far", "sky2", "mid"], "hero": ["pop", "deep"]}),
+    Concept("scooter-street", "scooter-ride", "Scooter on a side street", scooter_street,
+            checks=[("hero", "glow2"), ("hero", "far"), ("hero", "mid"), ("hero", "ground")], fixes={"hero": ["deep", "pop", "dark"]}),
+    Concept("scooter-front", "scooter-ride", "Scooter head-on", scooter_front,
+            checks=[("hero", "mid"), ("hero", "near"), ("hero", "sky"), ("hero", "ground")], fixes={"hero": ["pop", "deep", "hero2"]}),
+    Concept("cruise-liner", "cruise-ship", "Cruise liner", cruise_liner, SEA,
+            checks=[("light", "far"), ("hero", "mid"), ("pop", "light")], fixes={"far": ["mid", "near"], "hero": ["deep", "dark"]}),
+    Concept("cruise-porthole", "cruise-ship", "Porthole view", cruise_porthole, SEA,
+            checks=[("hero2", "hero"), ("near", "mid"), ("hero2", "near")], fixes={"hero2": ["light", "glow2", "glow"]}),
+    Concept("cruise-anchor", "cruise-ship", "Anchor", cruise_anchor, SEA,
+            checks=[("dark", "glow"), ("dark", "sky"), ("hero2", "dark"), ("hero2", "glow")], fixes={"glow": ["far", "sky2"], "hero2": ["pop", "light"]}),
+    Concept("longtail-karsts", "longtail-boat", "Among the karsts", longtail_karsts, SEA,
+            checks=[("hero", "sky2"), ("hero", "near"), ("far", "sky"), ("mid", "sky")], fixes={"hero": ["pop", "hero2", "deep"]}),
+    Concept("longtail-prow", "longtail-boat", "Garlanded prow", longtail_prow, SEA,
+            checks=[("hero", "sky"), ("hero", "mid"), ("hero", "near"), ("pop", "hero")], fixes={"hero": ["deep", "dark"], "pop": ["light"]}),
+    Concept("longtail-engine", "longtail-boat", "Long-tail engine", longtail_engine, SEA,
+            checks=[("pop", "sky"), ("pop", "mid"), ("dark", "mid"), ("hero", "mid")], fixes={"pop": ["hero", "deep"], "hero": ["deep", "dark"]}),
+    Concept("backpacking-pack", "backpacking", "Patched backpack", backpack,
+            checks=[("hero", "glow"), ("hero2", "glow"), ("hero2", "hero"), ("pop", "glow")], fixes={"glow": ["far", "sky2", "mid"], "hero2": ["light", "glow2"]}),
+    Concept("backpacking-bunk", "backpacking", "Hostel bunk", hostel_bunk,
+            checks=[("dark", "far"), ("light", "far"), ("hero", "far"), ("pop", "mid")], fixes={"far": ["mid", "near"], "pop": ["hero"]}),
+    Concept("backpacking-map", "backpacking", "Map & compass", map_compass,
+            checks=[("light", "glow"), ("hero2", "light"), ("hero2", "sky2")], fixes={"glow": ["far", "mid", "near"], "hero2": ["hero", "glow"]}),
 ]

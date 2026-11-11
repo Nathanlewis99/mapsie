@@ -515,60 +515,59 @@ def whale_tail(d: Drawing):
 
 
 def whale_boat(d: Drawing):
-    d.disc("glow", 48, 56, 18)
-    d.shape("light", cloud(124, 46, 1.1), shadow=False)
-    d.band("far", "M-30 108 L20 92 L44 100 L80 84 L110 104 L230 104", line=False)
-    d.band("mid", waves(108, 3, 30))
-    # spout and back
-    d.shape("light", "M150 112 C146 94 134 84 122 82 C134 80 144 88 149 98 C150 82 156 70 168 64 C160 78 156 94 155 112Z", spot=True)
-    for x, y, r in [(120, 92, 2.6), (128, 74, 2.2), (166, 76, 2.2), (174, 90, 2.6), (146, 66, 2)]:
+    d.disc("glow", 160, 50, 16)
+    d.shape("light", cloud(24, 44, 1.0), shadow=False)
+    d.band("far", "M-30 104 L20 88 L44 96 L80 80 L110 100 L230 100", line=False)
+    d.band("mid", waves(106, 3, 30))
+    group(d, "translate(2 22) scale(.68)", lambda: (
+        d.stroke("dark", "M56 82 V110", 2.4),
+        d.shape("pop", "M57 82 L72 87 L57 92Z", shadow=False, spot=True),
+        d.shape("light", rrect(36, 104, 40, 22, 4)),
+        d.shape("sky2", rrect(42, 108, 9, 7, 2), shadow=False),
+        d.shape("sky2", rrect(55, 108, 9, 7, 2), shadow=False),
+        d.marks("dark", circle(84, 116, 4) + circle(94, 116, 4) + "M80 124 a4 5 0 0 1 8 0Z M90 124 a4 5 0 0 1 8 0Z"),
+        d.shape("hero2", "M18 124 H112 C110 140 100 150 86 150 H36 C26 146 20 136 18 124Z", spot=True),
+        d.shape("light", "M22 132 H110 V136 H22Z", shadow=False),
+    ))
+    d.band("near", waves(124, 3, 32), line=False)
+    # spout from the blowhole, then the whale's broad back
+    d.shape("light", "M114 124 C108 98 90 80 72 76 C92 72 108 84 113 98 C114 76 124 58 142 50 C130 70 122 94 121 124Z", spot=True)
+    for x, y, r in [(70, 88, 3), (82, 70, 2.6), (142, 64, 2.6), (150, 82, 3), (104, 60, 2.2), (124, 44, 2.2)]:
         d.shape("light", drop(x, y, r), shadow=False)
-    d.shape("hero", "M104 142 C116 120 150 110 180 116 C196 120 206 130 210 142Z")
-    d.shape("hero", "M134 118 L146 104 L150 118Z", shadow=False)
-    d.band("near", waves(138, 4, 30))
-    # boat
-    d.stroke("dark", "M56 82 V110", 2)
-    d.shape("pop", "M57 82 L72 87 L57 92Z", shadow=False, spot=True)
-    d.shape("light", rrect(36, 104, 40, 22, 4))
-    d.shape("sky2", rrect(42, 108, 9, 7, 2), shadow=False)
-    d.shape("sky2", rrect(55, 108, 9, 7, 2), shadow=False)
-    d.marks("dark", circle(84, 116, 4) + circle(94, 116, 4) + "M80 124 a4 5 0 0 1 8 0Z M90 124 a4 5 0 0 1 8 0Z")
-    d.shape("hero2", "M18 124 H112 C110 140 100 150 86 150 H36 C26 146 20 136 18 124Z", spot=True)
-    d.shape("light", "M22 132 H110 V136 H22Z", shadow=False)
-    d.band("deep", waves(160, 4, 38), line=False)
+    d.shape("hero", "M84 152 C96 124 140 112 180 118 C200 122 212 134 218 152Z")
+    d.shape("hero", "M156 118 L170 102 L174 120Z", shadow=False)
+    d.shape("mark", ellipse(116, 126, 3, 1.6), shadow=False)
+    d.band("deep", waves(146, 4, 36))
+    d.stroke("light", "M30 160 q8 -6 16 0 M140 166 q8 -6 16 0 M86 172 q6 -4 12 0", 2.2)
 
 
 def whale_humpback(d: Drawing):
-    from _common import water
     d.band("sky2", waves(40, 5, 26))
     d.band("far", waves(64, 5, 28))
     d.band("mid", waves(90, 6, 30))
     d.raw('<g opacity=".18" fill="#fff"><path d="M40 0 L62 0 L100 200 L78 200Z"/><path d="M120 0 L132 0 L172 200 L160 200Z"/></g>', "")
     d.band("near", waves(150, 6, 34))
-    p = ((26, 92), (62, 70), (130, 72), (182, 104))
-    prof = lambda t: (2 + 17 * math.sin(math.pi * min(t, 0.999) ** 1.3), 2 + 21 * math.sin(math.pi * min(t, 0.999) ** 1.3))
-    d.shape("hero", flukes(p, 18, 14))
-    d.shape("hero", fin(p, 0.4, 7, 6, 10))
-    d.shape("hero2", "M128 108 C120 128 104 146 82 156 C78 158 76 154 80 151 C98 138 112 122 118 104Z", spot=True)
+    p = ((28, 96), (64, 76), (124, 72), (178, 98))
+    prof = lambda t: (3 + 16 * math.sin(math.pi * (t * 0.8) ** 1.25), 3 + 20 * math.sin(math.pi * (t * 0.8) ** 1.25))
+    d.shape("hero", flukes(p, 18, 15))
+    d.shape("hero", fin(p, 0.42, 6, 6, 10))
+    d.shape("hero2", "M128 110 C120 130 102 148 76 160 C70 162 68 156 74 152 C96 138 110 122 116 106Z", spot=True)
     d.shape("hero", spine(p, prof))
-    d.shape("hero2", spine(p, lambda t: (-2 - 6 * t, prof(t)[1] - 1.5), t0=0.55, t1=0.97), shadow=False)
-    grooves = " ".join(f"M{frame(p, t, -10)[0]:.1f} {frame(p, t, -10)[1]:.1f} L{frame(p, t, -19)[0]:.1f} {frame(p, t, -19)[1]:.1f}" for t in [])
-    d.stroke("hero", " ".join(f"M{frame(p, t0, -4 - 8 * t0)[0]:.1f} {frame(p, t0, -4 - 8 * t0)[1]:.1f} L{frame(p, 0.97, -6)[0]:.1f} {frame(p, 0.97, -6)[1]:.1f}"
-                              for t0 in []), 1.4)
+    d.shape("hero2", spine(p, lambda t: (-4 - 5 * t, prof(t)[1] - 1.5), t0=0.55, t1=1.0), shadow=False)
     for k in range(3):
-        a = frame(p, 0.66, -8 - 4 * k)
-        b = frame(p, 0.95, -5 - 3 * k)
-        d.stroke("mark", f"M{a[0]:.1f} {a[1]:.1f} L{b[0]:.1f} {b[1]:.1f}", 1.4)
-    e = frame(p, 0.84, 1)
-    d.marks("light", circle(e[0], e[1], 2.2))
-    d.marks("mark", circle(e[0], e[1], 1.2))
-    for t, u in [(0.9, 10), (0.94, 6), (0.86, 14)]:
+        a = frame(p, 0.62, -9 - 4 * k)
+        b = frame(p, 0.98, -6 - 4 * k)
+        d.stroke("hero", f"M{a[0]:.1f} {a[1]:.1f} L{b[0]:.1f} {b[1]:.1f}", 1.5)
+    e = frame(p, 0.86, 0)
+    d.marks("light", circle(e[0], e[1], 2.4))
+    d.marks("mark", circle(e[0], e[1], 1.3))
+    for t, u in [(0.92, 9), (0.96, 5), (0.88, 13), (0.97, 11)]:
         q = frame(p, t, u)
         d.marks("mark", circle(q[0], q[1], 1.4))
     for x, y, s in [(44, 136, 0.8), (58, 144, 0.7), (150, 46, 0.8), (164, 54, 0.7)]:
         d.shape("pop", fish(x, y, s, right=True), shadow=False)
     d.band("deep", waves(174, 5, 36), line=False)
-    for x, y, r in [(170, 82, 2.5), (176, 70, 3.5), (170, 58, 2.5)]:
+    for x, y, r in [(176, 76, 2.5), (182, 64, 3.5), (176, 52, 2.5)]:
         d.stroke("light", circle(x, y, r), 2)
 
 
@@ -612,18 +611,19 @@ def dolphin_pod(d: Drawing):
 
 
 def dolphin_bow(d: Drawing):
-    d.disc("glow", 150, 54, 18)
-    d.shape("light", cloud(30, 50, 1.0), shadow=False)
+    d.disc("glow", 152, 50, 18)
+    d.shape("light", cloud(96, 40, 0.9), shadow=False)
     d.band("far", waves(100, 2, 30))
     d.band("mid", waves(118, 3, 30))
-    dolphin(d, ((70, 140), (76, 96), (120, 74), (156, 98)), 1.15, spot=True)
-    splash(d, 72, 138, 18)
-    d.band("near", waves(140, 4, 34))
-    # the boat's bow cutting in from the left
-    d.shape("hero", "M-10 96 L56 104 C50 130 40 150 20 172 L-10 172Z")
-    d.shape("light", "M-10 104 L52 110 L50 116 L-10 112Z", shadow=False)
-    d.stroke("dark", "M-10 88 L44 96 M10 88 V98 M30 92 V100", 2.2)
-    d.stroke("light", "M54 132 q10 -4 18 4 M44 152 q10 -4 18 4", 2.4)
+    dolphin(d, ((84, 142), (88, 96), (130, 72), (168, 96)), 1.15, spot=True)
+    splash(d, 84, 140, 18)
+    d.band("near", waves(142, 4, 34))
+    # the bow of the tour boat, cutting in from the left
+    d.stroke("dark", "M-30 78 L60 86 M0 79 V90 M20 81 V92 M40 83 V94 M58 86 V96", 2.2)
+    d.shape("pop", "M-30 88 L70 96 C62 114 50 132 30 150 L-30 150Z", spot=True)
+    d.shape("light", "M-30 100 L64 106 L60 112 L-30 106Z", shadow=False)
+    d.marks("dark", circle(20, 126, 3.5))
+    d.stroke("light", "M48 148 q10 -6 20 2 M34 160 q10 -6 20 2", 2.4)
     d.band("deep", waves(170, 4, 38), line=False)
 
 
@@ -730,8 +730,8 @@ def croc_eyes(d: Drawing):
     d.band("deep", waves(170, 3, 38), line=False)
 
 
-CROC_SIDE = ("M6 150 C30 152 56 146 76 140 C96 136 112 136 126 136 L134 128 C142 122 152 118 160 116 L188 96 "
-             "C192 94 195 98 192 102 L166 124 C176 126 186 128 192 130 C196 132 195 137 190 137 L150 140 "
+CROC_SIDE = ("M6 150 C30 152 56 146 76 140 C96 136 112 136 126 136 L134 128 C142 122 152 118 160 114 L184 88 "
+             "C188 85 192 89 189 93 L166 124 C176 126 186 128 192 130 C196 132 195 137 190 137 L150 140 "
              "C142 148 130 152 118 152 L80 154 C56 156 30 156 6 150Z")
 
 
@@ -742,44 +742,35 @@ def croc_jaws(d: Drawing):
         d.stroke("near", f"M{x} 140 Q{x + 2} 110 {x - 4} {86 + (x % 5) * 3}", 3, line=False)
     d.band("mid", waves(134, 3, 30))
     d.band("ground", "M-30 156 Q60 140 120 148 T230 150")
-    d.limb("hero", "M70 148 L62 160 L54 162", 7)
-    d.limb("hero", "M122 148 L130 160 L140 161", 7)
-    d.shape("pop", "M140 128 L186 100 L170 122 L188 132 L150 136Z", shadow=False)
-    d.shape("hero", CROC_SIDE)
-    d.shape("light", "M168 106 l3 6 l2 -8 l3 6 l2 -8 l3 6 l2 -7Z M162 128 l3 -6 l2 6 l3 -6 l2 6 l3 -6 l2 6Z", shadow=False)
-    d.shape("hero2", "M30 152 C60 152 100 148 120 148 L150 140 C142 148 130 152 118 152 L80 154 C60 155 40 155 30 152Z", shadow=False)
-    d.shape("hero", ellipse(140, 120, 8, 6), shadow=False)
-    d.shape("hero2", ellipse(140, 119, 4.5, 3.5), shadow=False, spot=True)
-    d.marks("mark", ellipse(140.5, 119, 1, 3))
-    d.marks("mark", "M20 146 l4 -6 l4 6Z M36 145 l4 -7 l4 7Z M52 143 l4 -8 l4 8Z M68 139 l4 -8 l4 8Z M84 136 l4 -8 l4 8Z M100 135 l4 -8 l4 8Z M116 135 l4 -7 l4 7Z")
-    d.limb("hero", "M50 150 L44 164 L36 166", 7, shadow=False) if False else None
+    def croc():
+        d.limb("hero", "M70 148 L62 160 L54 162", 7)
+        d.limb("hero", "M122 148 L130 160 L140 161", 7)
+        d.shape("pop", "M140 128 L184 92 L170 122 L188 132 L150 136Z", shadow=False)
+        d.shape("hero", CROC_SIDE)
+        d.shape("light", "M166 110 l4 4 l1 -6 l4 3 l1 -6 l4 3 l1 -6Z M164 128 l3 -6 l2 6 l3 -6 l2 6 l3 -6 l2 6Z", shadow=False)
+        d.shape("hero2", "M30 152 C60 152 100 148 120 148 L150 140 C142 148 130 152 118 152 L80 154 C60 155 40 155 30 152Z", shadow=False)
+        d.shape("hero", ellipse(140, 120, 8, 6), shadow=False)
+        d.shape("hero2", ellipse(140, 119, 4.5, 3.5), shadow=False, spot=True)
+        d.marks("mark", ellipse(140.5, 119, 1, 3))
+        d.marks("mark", "M20 146 l4 -6 l4 6Z M36 145 l4 -7 l4 7Z M52 143 l4 -8 l4 8Z M68 139 l4 -8 l4 8Z M84 136 l4 -8 l4 8Z M100 135 l4 -8 l4 8Z M116 135 l4 -7 l4 7Z")
+    group(d, "translate(94 152) scale(.94) translate(-100 -152)", croc)
     d.band("deep", hills(180, 4, 30), line=False)
 
 
-def croc_above(d: Drawing):
-    d.band("mid", "M-30 -10 H230")
-    d.band("near", waves(150, 3, 40), line=False)
-    for x, y, r in [(36, 54, 12), (160, 150, 14), (150, 40, 9)]:
-        d.shape("far", f"M{x} {y} L{x + r} {y - 3} A{r} {r} 0 1 1 {x + r * 0.7} {y + r * 0.7}Z")
-    d.shape("pop", circle(158, 44, 4), shadow=False)
-    p = ((60, 190), (40, 130), (130, 110), (128, 30))
-    prof = lambda t: (1 + 15 * math.sin(math.pi * min(1, 0.1 + t * 0.95)) * (0.55 if t > 0.78 else 1) + (2 if 0.82 < t < 0.88 else 0),) * 2
-    d.stroke("light", f"M128 32 Q112 50 96 54 M128 32 Q144 50 160 54", 2.4)
-    d.stroke("light", f"M128 44 Q108 66 88 72 M128 44 Q150 64 172 70", 2)
-    for t, side, ang in [(0.48, 1, 0), (0.48, -1, 0), (0.7, 1, 0), (0.7, -1, 0)]:
-        x, y, dx, dy = _bez(p, t)
-        nx, ny = dy * side, -dx * side
-        a = (x + nx * 12, y + ny * 12)
-        b = (x + nx * 24 + dx * 8, y + ny * 24 + dy * 8)
-        d.limb("hero", f"M{x:.1f} {y:.1f} L{a[0]:.1f} {a[1]:.1f} L{b[0]:.1f} {b[1]:.1f}", 6)
-    d.shape("hero", spine(p, prof, 48))
-    for t in [i / 22 for i in range(3, 18)]:
-        q = frame(p, t)
-        d.marks("mark", rrect(q[0] - 2, q[1] - 2, 4, 4, 1))
-    for side in (1, -1):
-        q = frame(p, 0.86, 5 * side)
-        d.shape("hero2", circle(q[0], q[1], 3.2), shadow=False, spot=True)
-        d.marks("mark", circle(q[0], q[1], 1.2))
+def croc_sign(d: Drawing):
+    d.disc("glow", 40, 56, 18)
+    d.band("far", hills(118, 8))
+    for x in (150, 162, 174, 22, 34):
+        d.stroke("near", f"M{x} 150 Q{x + 2} 118 {x - 4} {92 + (x % 5) * 3}", 3, line=False)
+    d.band("mid", waves(132, 3, 30))
+    d.band("near", waves(150, 3, 34))
+    d.band("ground", "M-30 168 Q60 156 120 162 T230 164")
+    d.limb("dark", "M100 166 L100 110", 7)
+    d.shape("hero2", rrect(42, 40, 116, 88, 10), spot=True)
+    d.stroke("mark", rrect(48, 46, 104, 76, 6), 2.4)
+    group(d, "translate(102 92) scale(.5) translate(-100 -130)", lambda: d.marks("mark", CROC_SIDE))
+    d.marks("mark", rrect(64, 102, 72, 5, 2.5) + rrect(74, 110, 52, 5, 2.5))
+    d.band("deep", hills(186, 4, 30), line=False)
 
 
 # ================================================================ colours
@@ -798,6 +789,7 @@ WHALE_DEEP = {"hero": "#3D5A73", "hero2": "#B9CAD8", "mark": "#1E2F3D"}
 DOLPHIN = {"hero": "#6E8FAE", "hero2": "#D5E1EC", "mark": "#1F2F40"}
 DOLPHIN_DARK = {"hero": "#3F5F7F", "hero2": "#A9BDD1", "mark": "#16222F"}
 PENGUIN_C = {"dark": "#1F2633", "light": "#FFFFFF", "pop": "#F28C28", "hero2": "#F6C445"}
+CROC_SIGN = {"hero2": "#F6C445", "mark": "#1F1A14"}
 CROC = {"hero": "#5E7A3A", "hero2": "#C8C26A", "mark": "#2E3D1C", "pop": "#E8838F", "light": "#FFFDF4"}
 
 CONCEPTS = [
@@ -846,7 +838,7 @@ CONCEPTS = [
             checks=[("hero", "sky"), ("hero", "mid"), ("hero", "glow"), ("hero", "far")],
             fixes={"far": ["mid", "sky2"]}),
     Concept("whale-boat", "whale-watching", "Thar she blows", whale_boat, overrides=WHALE,
-            checks=[("hero", "near"), ("hero", "mid"), ("light", "sky"), ("hero2", "mid"), ("hero2", "near")],
+            checks=[("hero", "deep"), ("hero", "mid"), ("hero", "near"), ("light", "sky"), ("hero2", "mid")],
             fixes={"sky": ["sky2", "far"], "hero2": ["pop", "glow2", "#E4572E"]}),
     Concept("whale-humpback", "whale-watching", "Humpback", whale_humpback, ["coastal", "dusk", "meadow"], WHALE_DEEP,
             checks=[("hero", "mid"), ("hero", "near"), ("hero", "far")]),
@@ -858,7 +850,7 @@ CONCEPTS = [
             checks=[("hero", "glow"), ("hero", "sky"), ("hero", "far")],
             fixes={"glow": ["glow2", "#E07A5F", "light"]}),
     Concept("dolphinwatch-bow", "dolphin-watching", "Bow riding", dolphin_bow, overrides=DOLPHIN,
-            checks=[("hero", "sky"), ("hero", "mid"), ("hero", "far")],
+            checks=[("hero", "sky"), ("hero", "mid"), ("hero", "far"), ("pop", "sky"), ("pop", "near"), ("pop", "mid")],
             fixes={"far": ["mid", "near"], "mid": ["far", "near"]}),
     # penguins
     Concept("penguin-emperor", "penguin-spotting", "Emperor & chick", penguin_emperor, overrides=PENGUIN_C,
@@ -876,7 +868,7 @@ CONCEPTS = [
     Concept("croc-jaws", "crocodile-spotting", "Snap!", croc_jaws, overrides=CROC,
             checks=[("hero", "ground"), ("hero", "mid"), ("hero", "sky"), ("pop", "hero")],
             fixes={"ground": ["near", "far"], "mid": ["far", "sky2"]}),
-    Concept("croc-above", "crocodile-spotting", "River croc", croc_above, overrides=CROC,
-            checks=[("hero", "mid"), ("hero", "near"), ("far", "mid")],
-            fixes={"mid": ["far", "sky2", "near"]}),
+    Concept("croc-sign", "crocodile-spotting", "Croc warning", croc_sign, overrides=CROC_SIGN,
+            checks=[("hero2", "sky"), ("hero2", "far"), ("hero2", "glow"), ("mark", "hero2")],
+            fixes={"glow": ["near", "deep", "#E07A5F"], "sky": ["sky2", "far"], "far": ["mid", "near"]}),
 ]

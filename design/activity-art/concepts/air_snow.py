@@ -260,15 +260,15 @@ def parasail_chute(d: Drawing):
 
 def _palm(d: Drawing, x, y, s=1.0):
     def p():
-        d.limb("dark", "M0 0 C2 -30 10 -60 24 -84", 7)
-        fronds = ["M24 -84 C10 -92 -6 -88 -16 -74 C-2 -84 12 -84 24 -84Z",
-                  "M24 -84 C14 -100 -2 -104 -12 -100 C2 -98 14 -92 24 -84Z",
-                  "M24 -84 C34 -100 52 -102 62 -94 C48 -96 36 -92 24 -84Z",
-                  "M24 -84 C40 -86 56 -78 62 -64 C50 -76 38 -80 24 -84Z",
-                  "M24 -84 C26 -96 36 -108 46 -110 C36 -102 30 -94 24 -84Z"]
+        d.limb("dark", "M 0 120 C 2 90 10 60 24 36", 7)
+        fronds = ["M 24 36 C 10 28 -6 32 -16 46 C -2 36 12 36 24 36 Z",
+                  "M 24 36 C 14 20 -2 16 -12 20 C 2 22 14 28 24 36 Z",
+                  "M 24 36 C 34 20 52 18 62 26 C 48 24 36 28 24 36 Z",
+                  "M 24 36 C 40 34 56 42 62 56 C 50 44 38 40 24 36 Z",
+                  "M 24 36 C 26 24 36 12 46 10 C 36 18 30 26 24 36 Z"]
         for f in fronds:
             d.shape("dark", f)
-    group(d, f"translate({x} {y}) scale({s})", p)
+    group(d, f"translate({x} {y}) scale({s}) translate(0 -120)", p)
 
 
 def parasail_beach(d: Drawing):
@@ -332,10 +332,9 @@ def heli_island(d: Drawing):
     cliffs = "M64 230 L70 150 L84 122 L94 134 L106 98 L118 114 L130 84 L142 102 L156 76 L172 92 L230 70"
     _land(d, "mid", cliffs + " V230Z", cliffs)
     d.shape("near", "M86 230 L92 164 L104 140 L110 152 L122 122 L130 138 L142 114 L152 132 L166 108 L230 100 V230Z", shadow=False, line=False)
-    d.shape("light", "M148 106 C150 104 152 104 154 106 L156 166 L146 166Z", shadow=False, line=False)
-    d.stroke("near", "M150.5 112 L150.5 160", 1, line=False)
-    _line_only(d, "M148 108 L146 166 M154 108 L156 166", 2)
-    d.shape("light", ellipse(151, 168, 12, 3.5), shadow=False, line=False)
+    d.shape("light", "M149 110 Q151 108 153 110 L155 164 L147 164Z", shadow=False, line=False)
+    _line_only(d, "M149 110 L147 164 M153 110 L155 164", 2)
+    d.shape("light", cloud(136, 172, 0.7), shadow=False, line=False)
     d.band("ground", "M-30 184 Q40 174 90 180 T230 178", line=False)
     d.shape("light", cloud(150, 44, 0.7))
     group(d, "translate(70 94) scale(.5) rotate(-8) translate(-104 -98)", lambda: _heli(d))
@@ -452,17 +451,28 @@ def zip_jungle(d: Drawing):
 
 
 def zip_trolley(d: Drawing):
-    d.disc("glow", 46, 54, 16)
-    _jungle(d, 150, "mid", 10, 30)
-    _jungle(d, 176, "near", 10, 34, line=False)
-    d.shape("light", cloud(136, 46, 0.9))
+    d.disc("glow", 150, 60, 18)
+    _jungle(d, 140, "mid", 10, 30)
+    _jungle(d, 170, "near", 10, 34, line=False)
+    d.shape("light", cloud(20, 70, 0.9))
+    d.stroke("dark", "M-30 40 L230 84", 2.6)
 
     def kit():
-        d.stroke("dark", "M-30 101 L230 101", 3.4)
         _trolley(d)
-        d.stroke("hero2", "M100 128 C88 134 88 152 100 156 C112 152 112 134 100 128Z", 4.5)
-        d.limb("pop", "M100 156 Q98 172 104 200", 6, spot=True)
-    group(d, "rotate(12 100 100) translate(0 -8)", kit)
+    group(d, "translate(84 59) rotate(9.6) scale(.5) translate(-100 -100)", kit)
+    d.stroke("hero2", "M84 72 L81 88 M84 72 L92 88", 2.2)
+
+    def rider():
+        d.limb("dark", "M-6 44 L-14 70 L-10 92 M6 44 L18 66 L20 90", 9)
+        d.shape("dark", rrect(-18, 88, 14, 8, 3))
+        d.shape("dark", rrect(14, 86, 14, 8, 3))
+        d.shape("hero", rrect(-13, 6, 26, 42, 11))
+        d.shape("pop", rrect(-14, 34, 28, 9, 3), shadow=False, spot=True)
+        d.limb("hero", "M-8 14 L-6 -4 L-2 -18 M8 14 L8 -4 L4 -18", 7)
+        d.shape("hero2", circle(0, -6, 11))
+        d.shape("dark", rrect(-2, -9, 14, 7, 3.5), shadow=False)
+        d.shape("light", rrect(1, -7.5, 9, 4, 2), shadow=False)
+    group(d, "translate(86 102) scale(.76)", rider)
 
 
 TOUCAN = ("M70 120 C64 102 74 82 92 78 C100 77 106 80 110 86 L114 100 C118 116 116 132 108 146 L96 172 L88 170 L92 146 C80 142 72 132 70 120Z")
@@ -1083,7 +1093,7 @@ CONCEPTS = [
     Concept("seaplane-dock", "seaplane-flight", "Lake dock", seaplane_dock, checks=[("hero", "mid"), ("hero", "near"), ("dark", "near")],
             fixes={"hero": ["pop", "hero2"]}),
     Concept("zip-jungle", "zip-lining", "Jungle zip line", zip_jungle, checks=[("hero", "sky"), ("hero", "mid"), ("dark", "sky")]),
-    Concept("zip-trolley", "zip-lining", "Trolley close-up", zip_trolley, checks=[("hero", "sky"), ("pop", "mid"), ("pop", "near")],
+    Concept("zip-trolley", "zip-lining", "Riding the line", zip_trolley, checks=[("hero", "sky"), ("pop", "mid"), ("pop", "near")],
             fixes={"pop": ["hero2", "dark"]}),
     Concept("zip-toucan", "zip-lining", "Toucan on the line", zip_toucan, overrides={"hero": "#F28F3B", "hero2": "#FFE8A3", "dark": "#1C1B22"},
             checks=[("dark", "sky"), ("dark", "far"), ("hero", "sky")]),

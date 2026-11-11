@@ -1092,9 +1092,9 @@ def longtail_beach(d: Drawing):
     d.band("far", waves(112, 2, 22))
     d.band("light", "M-30 128 Q60 120 230 132", line=False)
     d.band("ground", "M-30 134 Q60 124 230 138")
-    palm(d, 180, 142, 1.1, "dark", -10)
+    palm(d, 186, 144, 1.0, "dark", -4)
     d.marks("dark", ellipse(102, 152, 66, 3.5)) if False else None
-    group(d, "translate(100 100) scale(.9) translate(-100 -92) rotate(-3 100 146)", lambda: longtail(d))
+    group(d, "translate(88 100) scale(.88) translate(-100 -92) rotate(-3 100 146)", lambda: longtail(d))
     d.band("deep", hills(186, 4, 20), line=False)
 
 

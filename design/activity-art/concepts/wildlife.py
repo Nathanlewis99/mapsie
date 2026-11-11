@@ -775,28 +775,28 @@ def croc_sign(d: Drawing):
 
 # ================================================================ BIRDS
 def bird_kingfisher(d: Drawing):
-    d.disc("glow", 140, 62, 26)
-    for x in (20, 30, 168, 178, 188):
+    d.disc("glow", 146, 60, 26)
+    for x in (16, 26, 170, 180, 190):
         d.stroke("near", f"M{x} 160 Q{x + 2} 124 {x - 4} {98 + (x % 5) * 3}", 3, line=False)
     d.band("mid", waves(150, 3, 30))
     d.band("near", waves(166, 3, 34))
-    d.limb("dark", "M-10 132 C40 126 100 124 196 108", 7)
-    d.limb("dark", "M150 116 L176 92", 4)
-    d.shape("near", leaf(176, 92, 22, 6, -40), shadow=False)
-    d.shape("near", leaf(164, 104, 18, 5, -110), shadow=False)
+    d.limb("dark", "M-10 136 C40 130 100 128 196 112", 7)
+    d.limb("dark", "M150 120 L174 96", 4)
+    d.shape("near", leaf(174, 96, 22, 6, -40), shadow=False)
+    d.shape("near", leaf(162, 108, 18, 5, -110), shadow=False)
     # kingfisher perched, facing left
-    d.shape("pop", "M96 124 L94 132 M104 124 L104 132", line=False)
-    d.stroke("pop", "M95 120 L93 128 M104 120 L104 128", 2.6)
-    d.shape("hero", "M128 96 L150 112 L146 116 L124 104Z")
-    d.shape("hero2", "M78 88 C76 104 86 122 104 124 C118 124 128 112 128 98 C128 86 118 78 104 78 C92 78 80 80 78 88Z", spot=True)
-    d.shape("hero", "M84 80 C92 70 112 70 124 82 C132 92 132 104 126 110 C120 98 108 90 96 88 C90 88 86 86 84 80Z")
-    d.shape("hero", "M66 72 C66 56 78 48 90 50 C102 52 108 62 106 74 C104 84 94 90 84 90 C74 90 66 82 66 72Z")
-    d.shape("dark", "M68 66 L30 74 L68 76Z", shadow=False)
-    d.shape("hero2", "M70 74 C76 72 86 74 92 78 C86 84 76 84 70 80Z", shadow=False)
-    d.shape("light", "M72 82 C78 84 86 86 90 88 C84 92 76 90 72 86Z", shadow=False)
-    d.marks("light", circle(82, 66, 3.6))
-    d.marks("mark", circle(82, 66, 2.1))
-    d.marks("light", "M100 96 l3 1 l-3 1Z M108 92 l3 1 l-3 1Z M112 100 l3 1 l-3 1Z")
+    d.stroke("pop", "M96 124 L94 132 M106 124 L105 132", 2.8)
+    d.shape("hero", "M112 112 L134 150 L126 154 L104 120Z")
+    d.shape("hero", ellipse(104, 102, 22, 30), extra='transform="rotate(-28 104 102)"')
+    d.shape("hero2", ellipse(94, 108, 14, 22), extra='transform="rotate(-24 94 108)"', shadow=False, spot=True)
+    d.shape("mark", "M112 82 C124 90 128 108 120 126 C116 112 110 96 104 86Z", shadow=False, line=False)
+    d.marks("light", circle(114, 96, 1.6) + circle(118, 106, 1.6) + circle(112, 110, 1.4))
+    d.shape("hero", circle(84, 70, 19))
+    d.shape("dark", "M68 64 L28 74 L68 78Z", shadow=False)
+    d.shape("hero2", "M70 72 C78 70 90 72 98 76 C90 82 78 82 70 78Z", shadow=False)
+    d.shape("light", "M70 80 C76 84 84 86 88 88 C82 92 74 90 70 84Z", shadow=False)
+    d.marks("light", circle(80, 66, 3.8))
+    d.marks("mark", circle(80, 66, 2.2))
     d.band("deep", waves(184, 3, 38), line=False)
 
 
@@ -819,8 +819,8 @@ def bird_flamingo(d: Drawing):
     d.band("far", "M-30 120 L10 104 L40 112 L70 92 L100 112 L140 98 L230 116")
     d.band("mid", hills(130, 4))
     d.band("near", waves(150, 3, 30))
-    group(d, "translate(136 96) scale(-.72 .72) translate(-100 -100)", lambda: flamingo(d))
-    group(d, "translate(96 92) scale(1.06) translate(-100 -100)", lambda: flamingo(d))
+    group(d, "translate(150 112) scale(-.66 .66) translate(-100 -100)", lambda: flamingo(d))
+    group(d, "translate(80 94) scale(1.04) translate(-100 -100)", lambda: flamingo(d))
     d.stroke("light", "M76 160 q10 -5 20 0 M104 162 q10 -5 20 0 M150 164 q8 -4 16 0", 2.2)
     d.band("deep", waves(178, 3, 36), line=False)
 
@@ -882,13 +882,13 @@ def kangaroo_joey(d: Drawing):
     d.disc("glow", 64, 74, 34)
     d.band("far", hills(136, 6))
     acacia(d, -68, 12, 0.6)
-    group(d, "translate(108 172) scale(1.2) translate(-100 -172)", lambda: kangaroo(d, joey=True))
+    group(d, "translate(110 172) scale(1.12) translate(-100 -172)", lambda: kangaroo(d, joey=True))
     d.band("ground", hills(172, 3))
     d.band("deep", hills(188, 3, 30), line=False)
 
 
 def kangaroo_sign(d: Drawing):
-    d.disc("glow", 150, 52, 18)
+    d.disc("glow", 42, 50, 16)
     d.band("far", hills(126, 4))
     d.band("ground", "M-30 136 L230 136")
     d.shape("near", "M86 136 L114 136 L170 200 L30 200Z", shadow=False)
@@ -910,8 +910,8 @@ def koala(d: Drawing, cx, cy, s=1.0, leaf_=False, sleepy=False):
             d.shape("hero", scallop(ex, 62, 22, 10, 0.12))
             d.shape("light", circle(ex, 64, 12), shadow=False)
         d.shape("hero", "M100 46 C134 46 150 68 150 94 C150 122 128 140 100 140 C72 140 50 122 50 94 C50 68 66 46 100 46Z")
-        d.shape("mark", "M100 82 C110 82 114 92 114 104 C114 116 108 122 100 122 C92 122 86 116 86 104 C86 92 90 82 100 82Z",
-                shadow=False, spot=True)
+        d.marks("mark", "M100 82 C110 82 114 92 114 104 C114 116 108 122 100 122 C92 122 86 116 86 104 C86 92 90 82 100 82Z")
+        d.marks("light", ellipse(95, 92, 2.5, 4))
         if sleepy:
             d.stroke("mark", "M68 94 Q74 100 80 94 M120 94 Q126 100 132 94", 2.4)
         else:
@@ -925,16 +925,18 @@ GUM = lambda x, y, a: leaf(x, y, 30, 7, a)
 
 
 def koala_tree(d: Drawing):
-    d.disc("glow", 150, 56, 22)
+    d.disc("glow", 46, 56, 20)
     d.band("far", hills(150, 6))
-    d.limb("dark", "M98 210 C96 160 104 110 100 -10", 22)
-    d.limb("dark", "M102 70 C120 56 140 48 170 46", 7)
-    for x, y, a in [(150, 50, -30), (164, 46, 20), (138, 54, 70), (176, 48, -60)]:
-        d.shape("mid", GUM(x, y, a), shadow=False)
-    d.shape("hero", "M70 110 C66 90 76 76 100 76 C124 76 136 92 132 116 C130 140 118 156 100 158 C80 158 72 136 70 110Z")
-    d.limb("hero", "M78 108 C84 126 100 132 116 128", 11)
-    d.limb("hero", "M84 146 C92 150 104 150 112 146", 11)
-    koala(d, 100, 84, 0.62)
+    d.limb("dark", "M120 210 C118 160 126 110 122 -10", 22)
+    d.limb("dark", "M124 64 C140 52 158 44 184 42", 7)
+    for x, y, a in [(166, 46, -30), (178, 42, 20), (152, 52, 70), (188, 44, -60)]:
+        d.shape("mid", GUM(x, y, a), shadow=False, spot=True)
+    # koala clinging to the left side of the trunk, arms and legs wrapped around it
+    d.shape("hero", "M66 112 C62 92 72 78 94 78 C114 78 122 94 120 116 C118 140 108 156 92 158 C74 158 68 136 66 112Z")
+    d.limb("hero", "M96 100 C110 104 124 104 132 100", 11)
+    d.limb("hero", "M92 144 C106 148 122 148 130 142", 11)
+    d.marks("mark", circle(134, 100, 1.4) + circle(134, 104, 1.4) + circle(132, 142, 1.4) + circle(132, 146, 1.4))
+    koala(d, 90, 82, 0.6)
     d.band("ground", hills(178, 4))
 
 
@@ -944,7 +946,7 @@ def koala_face(d: Drawing):
     koala(d, 100, 96, 0.98)
     d.limb("dark", "M112 138 C132 144 150 140 166 128", 3)
     for x, y, a in [(130, 142, 70), (146, 140, -40), (156, 134, 60), (164, 128, -20)]:
-        d.shape("mid", GUM(x, y, a), shadow=False)
+        d.shape("mid", GUM(x, y, a), shadow=False, spot=True)
 
 
 def koala_cuddle(d: Drawing):
@@ -980,10 +982,10 @@ def np_hat(d: Drawing):
         pine(d, x, 150, h, "mid")
     d.band("mid", hills(146, 4))
     # campaign hat
-    d.shape("hero", ellipse(100, 128, 76, 16))
-    d.shape("hero", "M66 126 C66 100 74 74 84 66 C90 62 96 70 100 66 C104 70 110 62 116 66 C126 74 134 100 134 126Z")
+    d.shape("hero", "M20 130 C20 118 60 112 100 112 C140 112 180 118 180 130 C180 140 140 144 100 144 C60 144 20 140 20 130Z")
+    d.shape("hero", "M66 126 C66 104 70 84 78 72 L100 58 L122 72 C130 84 134 104 134 126Z")
     d.shape("hero2", "M66 112 H134 V126 H66Z", shadow=False, spot=True)
-    d.stroke("mark", "M100 68 V96 M88 70 L92 96 M112 70 L108 96", 1.6, line=False)
+    d.stroke("mark", "M100 60 V98 M78 74 L88 96 M122 74 L112 96", 1.8, line=False)
     d.shape("pop", "M100 104 L110 112 L104 128 L96 128 L90 112Z", shadow=False)
     pine_ = "M100 107 L104 114 L102 114 L105 120 L95 120 L98 114 L96 114Z"
     d.marks("mark", pine_)
@@ -1142,8 +1144,8 @@ CONCEPTS = [
             checks=[("hero", "ground"), ("hero", "mid"), ("hero", "sky"), ("pop", "hero")],
             fixes={"ground": ["near", "far"], "mid": ["far", "sky2"]}),
     Concept("croc-sign", "crocodile-spotting", "Croc warning", croc_sign, overrides=CROC_SIGN,
-            checks=[("hero2", "sky"), ("hero2", "far"), ("hero2", "glow"), ("mark", "hero2")],
-            fixes={"glow": ["near", "deep", "#E07A5F"], "sky": ["sky2", "far"], "far": ["mid", "near"]}),
+            checks=[("hero2", "sky"), ("hero2", "far"), ("mark", "hero2")],
+            fixes={"sky": ["sky2", "far"], "far": ["mid", "near"]}),
     # birdwatching
     Concept("bird-kingfisher", "birdwatching", "Kingfisher", bird_kingfisher, overrides=KINGFISHER,
             checks=[("hero", "sky"), ("hero", "glow"), ("hero2", "glow"), ("hero", "near"), ("hero2", "sky")],
@@ -1162,12 +1164,12 @@ CONCEPTS = [
             checks=[("hero", "glow"), ("hero", "sky"), ("hero", "far"), ("hero", "ground")],
             fixes={"glow": ["glow2", "light", "#E07A5F"], "far": ["mid", "near"], "ground": ["far", "mid"]}),
     Concept("kangaroo-sign", "kangaroo-spotting", "Roo crossing", kangaroo_sign, overrides=ROO_SIGN,
-            checks=[("hero2", "sky"), ("hero2", "far"), ("hero2", "glow"), ("hero2", "ground")],
-            fixes={"glow": ["near", "#E07A5F"], "sky": ["sky2", "far"], "ground": ["mid", "near"], "far": ["mid", "near"]}),
+            checks=[("hero2", "sky"), ("hero2", "far"), ("hero2", "ground")],
+            fixes={"sky": ["sky2", "far"], "ground": ["mid", "near"], "far": ["mid", "near"]}),
     # koalas
     Concept("koala-tree", "koala-cuddle", "Tree hug", koala_tree, overrides=KOALA,
-            checks=[("hero", "dark"), ("hero", "sky"), ("mid", "sky")],
-            fixes={"mid": ["near", "deep"]}),
+            checks=[("hero", "dark"), ("hero", "sky"), ("mid", "sky"), ("hero", "far")],
+            fixes={"mid": ["near", "deep"], "far": ["mid", "near"]}),
     Concept("koala-face", "koala-cuddle", "Koala", koala_face, overrides=KOALA,
             checks=[("hero", "sky"), ("hero", "near"), ("mid", "hero")],
             fixes={"sky": ["sky2", "far"], "near": ["deep", "mid"], "mid": ["near", "deep"]}),

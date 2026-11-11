@@ -88,12 +88,12 @@ def _night(d: Drawing):
     d.band("deep", "M-30 -30 H230", shadow=False, line=False)
 
 
-def _leaf(d: Drawing, x, y, length, width, angle, role="near", rib="deep", spot=False, shadow=True):
+def _leaf(d: Drawing, x, y, length, width, angle, role="near", rib="deep", spot=False, shadow=True, line=True):
     """A pointed tropical leaf from (x, y), pointing along `angle` degrees, with a midrib."""
     L, w = length, width
 
     def draw():
-        d.shape(role, f"M0 0 C{L * .3:.1f} {-w} {L * .7:.1f} {-w} {L} 0 C{L * .7:.1f} {w} {L * .3:.1f} {w} 0 0Z", spot=spot, shadow=shadow)
+        d.shape(role, f"M0 0 C{L * .3:.1f} {-w} {L * .7:.1f} {-w} {L} 0 C{L * .7:.1f} {w} {L * .3:.1f} {w} 0 0Z", spot=spot, shadow=shadow, line=line)
         d.stroke(rib, f"M2 0 L{L * .9:.1f} 0", 1.4, line=False)
     group(d, f"translate({x} {y}) rotate({angle})", draw)
 
@@ -569,12 +569,12 @@ def yoga_deck(d: Drawing):
     d.shape("light", "M150 150 L172 146 L174 151 L152 155Z", shadow=False, line=False)
     def leaves():
         _leaf(d, -6, 66, 64, 15, 18, "near", "deep")
-        _leaf(d, -10, 108, 60, 13, -12, "deep", "near")
-        _leaf(d, -2, 150, 48, 12, -40, "near", "deep")
+        _leaf(d, -10, 108, 60, 13, -12, "deep", "near", line=False)
+        _leaf(d, -2, 150, 48, 12, -40, "near", "deep", line=False)
         _leaf(d, 206, 58, 64, 15, 162, "deep", "near")
-        _leaf(d, 210, 104, 62, 14, 192, "near", "deep")
-        _leaf(d, 40, -6, 50, 12, 70, "near", "deep")
-        _leaf(d, 160, -6, 50, 12, 110, "near", "deep")
+        _leaf(d, 210, 104, 62, 14, 192, "near", "deep", line=False)
+        _leaf(d, 40, -6, 50, 12, 70, "near", "deep", line=False)
+        _leaf(d, 160, -6, 50, 12, 110, "near", "deep", line=False)
     _clip(d, leaves)
 
 
@@ -1012,15 +1012,15 @@ def solo_backpack(d: Drawing):
 def solo_window(d: Drawing):
     d.band("ground", "M-30 -30 H230", shadow=False, line=False)
     d.stroke("far", "M-30 22 H230 M-30 178 H230", 2, line=False)
-    d.shape("light", rrect(44, 22, 112, 156, 52))
-    d.shape("sky2", rrect(58, 36, 84, 128, 40), shadow=False)
+    d.shape("light", rrect(46, 28, 108, 146, 50))
+    d.shape("sky2", rrect(58, 40, 84, 122, 40), shadow=False)
     d.disc("glow", 118, 92, 13, shadow=False)
     d.shape("far", "M58 134 C80 128 110 132 142 126 V124 A40 40 0 0 1 102 164 H98 A40 40 0 0 1 58 124Z", shadow=False, line=False)
     d.shape("light", "M64 112 C68 102 82 102 86 108 C92 100 106 102 108 110 C116 108 124 114 122 120 H70 C62 120 60 116 64 112Z", line=False)
     d.shape("dark", "M70 150 L128 110 C132 108 136 110 136 114 L138 120 L78 160 Z", spot=True)
     d.shape("pop", "M124 116 L134 104 L139 119Z", shadow=False)
-    d.shape("light", "M58 74 C58 52 76 36 100 36 C124 36 142 52 142 74Z")
-    d.shape("far", rrect(90, 66, 20, 5, 2.5), shadow=False)
+    d.shape("light", "M58 78 C58 56 76 40 100 40 C124 40 142 56 142 78Z")
+    d.shape("far", rrect(90, 70, 20, 5, 2.5), shadow=False)
 
 
 def solo_compass(d: Drawing):
@@ -1189,7 +1189,7 @@ CONCEPTS = [
             checks=[("light", "ground"), ("dark", "sky2"), ("dark", "far")], fixes={"ground": ["far", "mid"], "dark": ["hero", "mark"]}),
     Concept("solo-compass", "solo-travel", "Compass & map", solo_compass,
             checks=[("ground", "sky"), ("dark", "ground"), ("pop", "light")], fixes={"ground": ["far", "light", "glow2"]}),
-    Concept("gapyear-globe", "gap-year", "Round the world", gapyear_globe,
+    Concept("gapyear-globe", "gap-year", "Round the world", gapyear_globe, overrides={"hero": "#4A90C2", "near": "#8CC084"},
             checks=[("hero", "glow"), ("near", "hero"), ("pop", "glow")], fixes={"glow": ["far", "light", "sky2"], "near": ["ground", "hero2", "light"]}),
     Concept("gapyear-rucksack", "gap-year", "Big rucksack", gapyear_rucksack,
             checks=[("hero", "glow"), ("pop", "glow"), ("hero2", "hero")], fixes={"glow": ["far", "light", "sky2"], "hero2": ["light", "glow2"]}),

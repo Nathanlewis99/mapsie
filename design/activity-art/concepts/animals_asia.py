@@ -1140,11 +1140,14 @@ def komodo_island(d: Drawing):
     palm(d, 176, 140, 58, -6, "dark", 0.8)
     d.band("mid", hills(130, 4, 30))
     d.band("ground", hills(152, 3))
-    p = ((204, 146), (164, 144), (110, 112), (36, 116))
+    p = ((206, 148), (150, 150), (116, 110), (44, 106))
 
     def prof(t):
-        w = math.sin(math.pi * min(1.0, t ** 0.65)) if t < 0.86 else math.sin(math.pi * 0.86 ** 0.65) * (1 - (t - 0.86) / 0.14 * 0.55)
-        return 1.5 + 15 * w, 1.5 + 11 * w
+        if t < 0.72:
+            w = math.sin(math.pi * t ** 0.65)
+        else:
+            w = math.sin(math.pi * 0.72 ** 0.65) * (1 - ((t - 0.72) / 0.28) ** 3) * (1 - 0.25 * math.sin(math.pi * (t - 0.72) / 0.14) if t < 0.86 else 1)
+        return 1.5 + 17 * w, 1.5 + 12 * w
 
     for t, dx in [(0.44, 12), (0.76, 10)]:
         x, y = frame(p, t, -4)

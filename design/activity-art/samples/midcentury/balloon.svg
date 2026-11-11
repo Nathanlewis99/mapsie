@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<defs><clipPath id="arch"><path d="M28 194 V96 A72 72 0 0 1 172 96 V194 Z"/></clipPath>
+<filter id="grain" x="0" y="0" width="100%" height="100%">
+  <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" result="n"/>
+  <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.12  0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 -2.4 1.05" result="dots"/>
+  <feComposite in="dots" in2="SourceGraphic" operator="in"/>
+</filter></defs>
+<g clip-path="url(#arch)">
+  <rect width="200" height="200" fill="#F6D7A7"/>
+  <rect y="0" width="200" height="60" fill="#F3C98B"/>
+  <circle cx="138" cy="72" r="30" fill="#E4572E" opacity="0.9"/>
+  <path d="M40 118 a8.8 8.8 0 0 1 13.200000000000001 -6.6000000000000005 a12.100000000000001 12.100000000000001 0 0 1 22.0 2.2 a8.8 8.8 0 0 1 6.6000000000000005 15.400000000000002 H42.2 a6.6000000000000005 6.6000000000000005 0 0 1 -2.2 -11.0Z" fill="#F4E9D4"/>
+  <path d="M132 104 a6.4 6.4 0 0 1 9.600000000000001 -4.800000000000001 a8.8 8.8 0 0 1 16.0 1.6 a6.4 6.4 0 0 1 4.800000000000001 11.200000000000001 H133.6 a4.800000000000001 4.800000000000001 0 0 1 -1.6 -8.0Z" fill="#F4E9D4"/>
+  <g transform="translate(36 52) scale(.3)"><path d="M100 34 C132 34 148 58 148 82 C148 106 124 120 112 132 L88 132 C76 120 52 106 52 82 C52 58 68 34 100 34Z" fill="#1F6F78"/><path d="M100 34 C86 56 84 104 92 132 L108 132 C116 104 114 56 100 34Z" fill="#F4E9D4"/><rect x="91" y="146" width="18" height="14" rx="2" fill="#1D2D44"/></g>
+  <path d="M0 166 Q50 140 100 158 T200 150 V200 H0Z" fill="#7FB7B0"/>
+  <path d="M138 178 L144 148 Q149 138 154 148 L160 178Z M160 178 L164 156 Q168 149 172 156 L176 178Z" fill="#E8C88E"/>
+  <path d="M0 184 Q60 164 120 180 T200 176 V200 H0Z" fill="#1F6F78"/>
+  <path d="M100 34 C132 34 148 58 148 82 C148 106 124 120 112 132 L88 132 C76 120 52 106 52 82 C52 58 68 34 100 34Z" fill="#E4572E"/>
+  <path d="M100 34 C74 44 64 94 80 125 L86 130 C76 104 80 58 100 34Z" fill="#E9A23B"/><path d="M100 34 C126 44 136 94 120 125 L114 130 C124 104 120 58 100 34Z" fill="#E9A23B"/>
+  <path d="M100 34 C86 56 84 104 92 132 L108 132 C116 104 114 56 100 34Z" fill="#F4E9D4"/>
+  <rect x="88" y="131" width="24" height="6" rx="2" fill="#1D2D44"/>
+  <path d="M90 137 L93 148 M110 137 L107 148" stroke="#1D2D44" stroke-width="1.8"/>
+  <rect x="91" y="147" width="18" height="13" rx="2" fill="#8B5A2B"/>
+  <path d="M60 48 q5 -5 10 0 q5 -5 10 0" fill="none" stroke="#1D2D44" stroke-width="2" stroke-linecap="round"/>
+  <rect width="200" height="200" filter="url(#grain)" fill="#000"/>
+</g>
+<path d="M28 194 V96 A72 72 0 0 1 172 96 V194 Z" fill="none" stroke="#1D2D44" stroke-width="5"/>
+</svg>

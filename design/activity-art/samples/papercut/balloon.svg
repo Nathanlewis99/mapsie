@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<defs><clipPath id="round"><circle cx="100" cy="100" r="92"/></clipPath><filter id="paper" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2.2" stdDeviation="2" flood-color="#3a2a1a" flood-opacity=".35"/></filter></defs>
+<g clip-path="url(#round)">
+  <rect width="200" height="200" fill="#FFE8D1"/>
+  <circle filter="url(#paper)" cx="146" cy="64" r="26" fill="#FFB86B"/>
+  <path filter="url(#paper)" d="M24 98 a10.4 10.4 0 0 1 15.600000000000001 -7.800000000000001 a14.3 14.3 0 0 1 26.0 2.6 a10.4 10.4 0 0 1 7.800000000000001 18.2 H26.6 a7.800000000000001 7.800000000000001 0 0 1 -2.6 -13.0Z" fill="#fff"/>
+  <path filter="url(#paper)" d="M138 112 a7.2 7.2 0 0 1 10.8 -5.4 a9.9 9.9 0 0 1 18.0 1.8 a7.2 7.2 0 0 1 5.4 12.6 H139.8 a5.4 5.4 0 0 1 -1.8 -9.0Z" fill="#fff"/>
+  <path filter="url(#paper)" d="M0 150 Q50 120 100 142 T200 132 V220 H0Z" fill="#F6B89A"/>
+  <path filter="url(#paper)" d="M0 166 Q60 144 120 160 T200 154 V220 H0Z" fill="#E98A6C"/>
+  <path filter="url(#paper)" d="M0 182 Q70 164 130 178 T200 172 V220 H0Z" fill="#B85C4A"/>
+  <g filter="url(#paper)"><path d="M100 34 C132 34 148 58 148 82 C148 106 124 120 112 132 L88 132 C76 120 52 106 52 82 C52 58 68 34 100 34Z" fill="#3E7CB1"/><path d="M100 34 C74 44 64 94 80 125 L86 130 C76 104 80 58 100 34Z" fill="#FFD166"/><path d="M100 34 C126 44 136 94 120 125 L114 130 C124 104 120 58 100 34Z" fill="#FFD166"/><path d="M100 34 C86 56 84 104 92 132 L108 132 C116 104 114 56 100 34Z" fill="#EF476F"/></g>
+  <path d="M90 136 L93 148 M110 136 L107 148" stroke="#5A3E36" stroke-width="1.8"/>
+  <rect filter="url(#paper)" x="91" y="147" width="18" height="13" rx="2" fill="#8B5A2B"/>
+</g><circle cx="100" cy="100" r="92" fill="none" stroke="#fff" stroke-width="4" opacity=".9"/>
+</svg>

@@ -1,0 +1,1616 @@
+[
+ {
+  "id": "scuba-diving",
+  "label": "Scuba diving",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "snorkelling",
+  "label": "Snorkelling",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "surfing",
+  "label": "Surfing",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "bodyboarding",
+  "label": "Bodyboarding",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "stand-up-paddleboarding",
+  "label": "Stand-up paddleboarding",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "kayaking",
+  "label": "Kayaking",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "sea-kayaking",
+  "label": "Sea kayaking",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "canoeing",
+  "label": "Canoeing",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "white-water-rafting",
+  "label": "White-water rafting",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "sailing",
+  "label": "Sailing",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "yacht-charter",
+  "label": "Yacht charter",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "boat-trip",
+  "label": "Boat trip",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "island-hopping",
+  "label": "Island hopping",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "catamaran-cruise",
+  "label": "Catamaran cruise",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "sunset-cruise",
+  "label": "Sunset cruise",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "river-cruise",
+  "label": "River cruise",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "jet-skiing",
+  "label": "Jet skiing",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "waterskiing",
+  "label": "Waterskiing",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "wakeboarding",
+  "label": "Wakeboarding",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "kitesurfing",
+  "label": "Kitesurfing",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "windsurfing",
+  "label": "Windsurfing",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "swimming-with-dolphins",
+  "label": "Swimming with dolphins",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "swimming-with-turtles",
+  "label": "Swimming with turtles",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "whale-shark-swim",
+  "label": "Whale shark swim",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "shark-cage-diving",
+  "label": "Shark cage diving",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "freediving",
+  "label": "Freediving",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "cliff-jumping",
+  "label": "Cliff jumping",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "canyoning",
+  "label": "Canyoning",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "wild-swimming",
+  "label": "Wild swimming",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "hot-springs",
+  "label": "Hot springs",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "waterfall-swim",
+  "label": "Waterfall swim",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "fishing",
+  "label": "Fishing",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "deep-sea-fishing",
+  "label": "Deep-sea fishing",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "glass-bottom-boat",
+  "label": "Glass-bottom boat",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "banana-boat",
+  "label": "Banana boat",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "beach-day",
+  "label": "Beach day",
+  "category": "Water",
+  "tier": 1
+ },
+ {
+  "id": "sunbathing",
+  "label": "Sunbathing",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "river-tubing",
+  "label": "River tubing",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "pool-day",
+  "label": "Pool day",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "lagoon-swim",
+  "label": "Lagoon swim",
+  "category": "Water",
+  "tier": 2
+ },
+ {
+  "id": "skydiving",
+  "label": "Skydiving",
+  "category": "Air",
+  "tier": 1
+ },
+ {
+  "id": "paragliding",
+  "label": "Paragliding",
+  "category": "Air",
+  "tier": 1
+ },
+ {
+  "id": "parasailing",
+  "label": "Parasailing",
+  "category": "Air",
+  "tier": 1
+ },
+ {
+  "id": "hang-gliding",
+  "label": "Hang gliding",
+  "category": "Air",
+  "tier": 2
+ },
+ {
+  "id": "hot-air-balloon",
+  "label": "Hot air balloon",
+  "category": "Air",
+  "tier": 1
+ },
+ {
+  "id": "helicopter-tour",
+  "label": "Helicopter tour",
+  "category": "Air",
+  "tier": 1
+ },
+ {
+  "id": "scenic-flight",
+  "label": "Scenic flight",
+  "category": "Air",
+  "tier": 2
+ },
+ {
+  "id": "seaplane-flight",
+  "label": "Seaplane flight",
+  "category": "Air",
+  "tier": 1
+ },
+ {
+  "id": "zip-lining",
+  "label": "Zip-lining",
+  "category": "Air",
+  "tier": 1
+ },
+ {
+  "id": "bungee-jumping",
+  "label": "Bungee jumping",
+  "category": "Air",
+  "tier": 1
+ },
+ {
+  "id": "gliding",
+  "label": "Gliding",
+  "category": "Air",
+  "tier": 2
+ },
+ {
+  "id": "microlight-flight",
+  "label": "Microlight flight",
+  "category": "Air",
+  "tier": 2
+ },
+ {
+  "id": "skywalk",
+  "label": "Skywalk",
+  "category": "Air",
+  "tier": 2
+ },
+ {
+  "id": "giant-swing",
+  "label": "Giant swing",
+  "category": "Air",
+  "tier": 2
+ },
+ {
+  "id": "drone-photography",
+  "label": "Drone photography",
+  "category": "Air",
+  "tier": 2
+ },
+ {
+  "id": "hiking",
+  "label": "Hiking",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "trekking",
+  "label": "Trekking",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "multi-day-trek",
+  "label": "Multi-day trek",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "summit-climb",
+  "label": "Summit climb",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "rock-climbing",
+  "label": "Rock climbing",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "bouldering",
+  "label": "Bouldering",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "via-ferrata",
+  "label": "Via ferrata",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "abseiling",
+  "label": "Abseiling",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "caving",
+  "label": "Caving",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "sandboarding",
+  "label": "Sandboarding",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "dune-bashing",
+  "label": "Dune bashing",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "quad-biking",
+  "label": "Quad biking",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "dirt-biking",
+  "label": "Dirt biking",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "mountain-biking",
+  "label": "Mountain biking",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "cycling-tour",
+  "label": "Cycling tour",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "e-bike-tour",
+  "label": "E-bike tour",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "horse-riding",
+  "label": "Horse riding",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "camel-trek",
+  "label": "Camel trek",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "off-road-4x4",
+  "label": "Off-road 4x4",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "road-trip",
+  "label": "Road trip",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "camping",
+  "label": "Camping",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "glamping",
+  "label": "Glamping",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "wild-camping",
+  "label": "Wild camping",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "stargazing",
+  "label": "Stargazing",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "volcano-hike",
+  "label": "Volcano hike",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "glacier-hike",
+  "label": "Glacier hike",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "canyon-hike",
+  "label": "Canyon hike",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "rainforest-trek",
+  "label": "Rainforest trek",
+  "category": "Mountains & trails",
+  "tier": 1
+ },
+ {
+  "id": "jungle-trek",
+  "label": "Jungle trek",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "trail-running",
+  "label": "Trail running",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "marathon",
+  "label": "Marathon",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "cave-tubing",
+  "label": "Cave tubing",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "hammock-camping",
+  "label": "Hammock camping",
+  "category": "Mountains & trails",
+  "tier": 2
+ },
+ {
+  "id": "skiing",
+  "label": "Skiing",
+  "category": "Snow & ice",
+  "tier": 1
+ },
+ {
+  "id": "snowboarding",
+  "label": "Snowboarding",
+  "category": "Snow & ice",
+  "tier": 1
+ },
+ {
+  "id": "cross-country-skiing",
+  "label": "Cross-country skiing",
+  "category": "Snow & ice",
+  "tier": 2
+ },
+ {
+  "id": "ski-touring",
+  "label": "Ski touring",
+  "category": "Snow & ice",
+  "tier": 2
+ },
+ {
+  "id": "heli-skiing",
+  "label": "Heli-skiing",
+  "category": "Snow & ice",
+  "tier": 2
+ },
+ {
+  "id": "dog-sledding",
+  "label": "Dog sledding",
+  "category": "Snow & ice",
+  "tier": 1
+ },
+ {
+  "id": "snowmobiling",
+  "label": "Snowmobiling",
+  "category": "Snow & ice",
+  "tier": 1
+ },
+ {
+  "id": "snowshoeing",
+  "label": "Snowshoeing",
+  "category": "Snow & ice",
+  "tier": 2
+ },
+ {
+  "id": "ice-climbing",
+  "label": "Ice climbing",
+  "category": "Snow & ice",
+  "tier": 2
+ },
+ {
+  "id": "ice-skating",
+  "label": "Ice skating",
+  "category": "Snow & ice",
+  "tier": 1
+ },
+ {
+  "id": "ice-fishing",
+  "label": "Ice fishing",
+  "category": "Snow & ice",
+  "tier": 2
+ },
+ {
+  "id": "northern-lights",
+  "label": "Northern lights",
+  "category": "Snow & ice",
+  "tier": 1
+ },
+ {
+  "id": "ice-hotel",
+  "label": "Ice hotel",
+  "category": "Snow & ice",
+  "tier": 2
+ },
+ {
+  "id": "igloo-stay",
+  "label": "Igloo stay",
+  "category": "Snow & ice",
+  "tier": 2
+ },
+ {
+  "id": "sledging",
+  "label": "Sledging",
+  "category": "Snow & ice",
+  "tier": 2
+ },
+ {
+  "id": "apr-s-ski",
+  "label": "Apr\u00e8s-ski",
+  "category": "Snow & ice",
+  "tier": 1
+ },
+ {
+  "id": "safari",
+  "label": "Safari",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "game-drive",
+  "label": "Game drive",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "walking-safari",
+  "label": "Walking safari",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "gorilla-trekking",
+  "label": "Gorilla trekking",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "orangutan-spotting",
+  "label": "Orangutan spotting",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "whale-watching",
+  "label": "Whale watching",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "dolphin-watching",
+  "label": "Dolphin watching",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "birdwatching",
+  "label": "Birdwatching",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "penguin-spotting",
+  "label": "Penguin spotting",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "turtle-hatching",
+  "label": "Turtle hatching",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "kangaroo-spotting",
+  "label": "Kangaroo spotting",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "koala-cuddle",
+  "label": "Koala cuddle",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "elephant-sanctuary",
+  "label": "Elephant sanctuary",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "big-cat-spotting",
+  "label": "Big cat spotting",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "bear-watching",
+  "label": "Bear watching",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "great-migration",
+  "label": "Great migration",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "crocodile-spotting",
+  "label": "Crocodile spotting",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "reef-exploring",
+  "label": "Reef exploring",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "botanical-gardens",
+  "label": "Botanical gardens",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "national-park",
+  "label": "National park",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "waterfalls",
+  "label": "Waterfalls",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "lake-day",
+  "label": "Lake day",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "cherry-blossoms",
+  "label": "Cherry blossoms",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "autumn-leaves",
+  "label": "Autumn leaves",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "tulip-fields",
+  "label": "Tulip fields",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "lavender-fields",
+  "label": "Lavender fields",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "sunrise",
+  "label": "Sunrise",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "sunset",
+  "label": "Sunset",
+  "category": "Wildlife & nature",
+  "tier": 1
+ },
+ {
+  "id": "rainbow-chasing",
+  "label": "Rainbow chasing",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "fireflies",
+  "label": "Fireflies",
+  "category": "Wildlife & nature",
+  "tier": 2
+ },
+ {
+  "id": "temple-visit",
+  "label": "Temple visit",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "castle-tour",
+  "label": "Castle tour",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "museum",
+  "label": "Museum",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "art-gallery",
+  "label": "Art gallery",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "ancient-ruins",
+  "label": "Ancient ruins",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "pyramids",
+  "label": "Pyramids",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "cathedral-visit",
+  "label": "Cathedral visit",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "mosque-visit",
+  "label": "Mosque visit",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "palace-tour",
+  "label": "Palace tour",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "old-town-stroll",
+  "label": "Old town stroll",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "walking-tour",
+  "label": "Walking tour",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "street-art-tour",
+  "label": "Street art tour",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "city-bike-tour",
+  "label": "City bike tour",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "hop-on-bus",
+  "label": "Hop-on bus",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "rooftop-views",
+  "label": "Rooftop views",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "observation-deck",
+  "label": "Observation deck",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "famous-bridge",
+  "label": "Famous bridge",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "lighthouse",
+  "label": "Lighthouse",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "monastery-stay",
+  "label": "Monastery stay",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "pilgrimage-walk",
+  "label": "Pilgrimage walk",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "local-market",
+  "label": "Local market",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "night-market",
+  "label": "Night market",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "souk-shopping",
+  "label": "Souk shopping",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "festival",
+  "label": "Festival",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "carnival",
+  "label": "Carnival",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "parade",
+  "label": "Parade",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "theatre-show",
+  "label": "Theatre show",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "opera",
+  "label": "Opera",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "concert",
+  "label": "Concert",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "live-music",
+  "label": "Live music",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "cultural-dance-show",
+  "label": "Cultural dance show",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "tea-ceremony",
+  "label": "Tea ceremony",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "calligraphy-class",
+  "label": "Calligraphy class",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "pottery-class",
+  "label": "Pottery class",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "photography-walk",
+  "label": "Photography walk",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "language-class",
+  "label": "Language class",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "volunteering",
+  "label": "Volunteering",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "homestay",
+  "label": "Homestay",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "lantern-festival",
+  "label": "Lantern festival",
+  "category": "Culture & sightseeing",
+  "tier": 1
+ },
+ {
+  "id": "holi-festival",
+  "label": "Holi festival",
+  "category": "Culture & sightseeing",
+  "tier": 2
+ },
+ {
+  "id": "street-food-tour",
+  "label": "Street food tour",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "cooking-class",
+  "label": "Cooking class",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "wine-tasting",
+  "label": "Wine tasting",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "vineyard-tour",
+  "label": "Vineyard tour",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "brewery-tour",
+  "label": "Brewery tour",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "whisky-distillery",
+  "label": "Whisky distillery",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "sake-tasting",
+  "label": "Sake tasting",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "coffee-plantation",
+  "label": "Coffee plantation",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "tea-plantation",
+  "label": "Tea plantation",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "chocolate-tasting",
+  "label": "Chocolate tasting",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "cheese-tasting",
+  "label": "Cheese tasting",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "fine-dining",
+  "label": "Fine dining",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "seafood-feast",
+  "label": "Seafood feast",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "beach-bbq",
+  "label": "Beach BBQ",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "picnic",
+  "label": "Picnic",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "fruit-market",
+  "label": "Fruit market",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "ramen",
+  "label": "Ramen",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "sushi",
+  "label": "Sushi",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "tapas-crawl",
+  "label": "Tapas crawl",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "pizza",
+  "label": "Pizza",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "pasta-making",
+  "label": "Pasta making",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "curry",
+  "label": "Curry",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "tacos",
+  "label": "Tacos",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "dim-sum",
+  "label": "Dim sum",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "gelato",
+  "label": "Gelato",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "caf-and-croissant",
+  "label": "Caf\u00e9 & croissant",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "cocktail-bar",
+  "label": "Cocktail bar",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "rooftop-bar",
+  "label": "Rooftop bar",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "pub-crawl",
+  "label": "Pub crawl",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "beer-garden",
+  "label": "Beer garden",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "coconut-on-the-beach",
+  "label": "Coconut on the beach",
+  "category": "Food & drink",
+  "tier": 1
+ },
+ {
+  "id": "food-truck",
+  "label": "Food truck",
+  "category": "Food & drink",
+  "tier": 2
+ },
+ {
+  "id": "yoga-retreat",
+  "label": "Yoga retreat",
+  "category": "Wellness",
+  "tier": 1
+ },
+ {
+  "id": "meditation",
+  "label": "Meditation",
+  "category": "Wellness",
+  "tier": 2
+ },
+ {
+  "id": "spa-day",
+  "label": "Spa day",
+  "category": "Wellness",
+  "tier": 1
+ },
+ {
+  "id": "massage",
+  "label": "Massage",
+  "category": "Wellness",
+  "tier": 1
+ },
+ {
+  "id": "thermal-baths",
+  "label": "Thermal baths",
+  "category": "Wellness",
+  "tier": 2
+ },
+ {
+  "id": "onsen",
+  "label": "Onsen",
+  "category": "Wellness",
+  "tier": 2
+ },
+ {
+  "id": "hammam",
+  "label": "Hammam",
+  "category": "Wellness",
+  "tier": 2
+ },
+ {
+  "id": "sauna",
+  "label": "Sauna",
+  "category": "Wellness",
+  "tier": 2
+ },
+ {
+  "id": "sound-bath",
+  "label": "Sound bath",
+  "category": "Wellness",
+  "tier": 2
+ },
+ {
+  "id": "surf-and-yoga-camp",
+  "label": "Surf & yoga camp",
+  "category": "Wellness",
+  "tier": 2
+ },
+ {
+  "id": "digital-detox",
+  "label": "Digital detox",
+  "category": "Wellness",
+  "tier": 2
+ },
+ {
+  "id": "beach-hammock",
+  "label": "Beach hammock",
+  "category": "Wellness",
+  "tier": 1
+ },
+ {
+  "id": "nightclub",
+  "label": "Nightclub",
+  "category": "Nightlife & fun",
+  "tier": 2
+ },
+ {
+  "id": "beach-party",
+  "label": "Beach party",
+  "category": "Nightlife & fun",
+  "tier": 1
+ },
+ {
+  "id": "full-moon-party",
+  "label": "Full moon party",
+  "category": "Nightlife & fun",
+  "tier": 2
+ },
+ {
+  "id": "karaoke",
+  "label": "Karaoke",
+  "category": "Nightlife & fun",
+  "tier": 2
+ },
+ {
+  "id": "casino",
+  "label": "Casino",
+  "category": "Nightlife & fun",
+  "tier": 2
+ },
+ {
+  "id": "rooftop-party",
+  "label": "Rooftop party",
+  "category": "Nightlife & fun",
+  "tier": 2
+ },
+ {
+  "id": "bar-hopping",
+  "label": "Bar hopping",
+  "category": "Nightlife & fun",
+  "tier": 2
+ },
+ {
+  "id": "music-festival",
+  "label": "Music festival",
+  "category": "Nightlife & fun",
+  "tier": 1
+ },
+ {
+  "id": "theme-park",
+  "label": "Theme park",
+  "category": "Nightlife & fun",
+  "tier": 1
+ },
+ {
+  "id": "water-park",
+  "label": "Water park",
+  "category": "Nightlife & fun",
+  "tier": 1
+ },
+ {
+  "id": "aquarium",
+  "label": "Aquarium",
+  "category": "Nightlife & fun",
+  "tier": 1
+ },
+ {
+  "id": "zoo",
+  "label": "Zoo",
+  "category": "Nightlife & fun",
+  "tier": 2
+ },
+ {
+  "id": "escape-room",
+  "label": "Escape room",
+  "category": "Nightlife & fun",
+  "tier": 2
+ },
+ {
+  "id": "go-karting",
+  "label": "Go-karting",
+  "category": "Nightlife & fun",
+  "tier": 2
+ },
+ {
+  "id": "open-air-cinema",
+  "label": "Open-air cinema",
+  "category": "Nightlife & fun",
+  "tier": 2
+ },
+ {
+  "id": "fireworks",
+  "label": "Fireworks",
+  "category": "Nightlife & fun",
+  "tier": 1
+ },
+ {
+  "id": "flight",
+  "label": "Flight",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "first-class",
+  "label": "First class",
+  "category": "Getting around",
+  "tier": 2
+ },
+ {
+  "id": "long-haul-flight",
+  "label": "Long-haul flight",
+  "category": "Getting around",
+  "tier": 2
+ },
+ {
+  "id": "train-journey",
+  "label": "Train journey",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "sleeper-train",
+  "label": "Sleeper train",
+  "category": "Getting around",
+  "tier": 2
+ },
+ {
+  "id": "scenic-railway",
+  "label": "Scenic railway",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "bullet-train",
+  "label": "Bullet train",
+  "category": "Getting around",
+  "tier": 2
+ },
+ {
+  "id": "tuk-tuk-ride",
+  "label": "Tuk-tuk ride",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "gondola-ride",
+  "label": "Gondola ride",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "ferry-crossing",
+  "label": "Ferry crossing",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "cable-car",
+  "label": "Cable car",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "funicular",
+  "label": "Funicular",
+  "category": "Getting around",
+  "tier": 2
+ },
+ {
+  "id": "campervan",
+  "label": "Campervan",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "motorbike-tour",
+  "label": "Motorbike tour",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "scooter-ride",
+  "label": "Scooter ride",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "rickshaw",
+  "label": "Rickshaw",
+  "category": "Getting around",
+  "tier": 2
+ },
+ {
+  "id": "cruise-ship",
+  "label": "Cruise ship",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "canal-boat",
+  "label": "Canal boat",
+  "category": "Getting around",
+  "tier": 2
+ },
+ {
+  "id": "longtail-boat",
+  "label": "Longtail boat",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "backpacking",
+  "label": "Backpacking",
+  "category": "Getting around",
+  "tier": 1
+ },
+ {
+  "id": "hitchhiking",
+  "label": "Hitchhiking",
+  "category": "Getting around",
+  "tier": 2
+ },
+ {
+  "id": "bus-journey",
+  "label": "Bus journey",
+  "category": "Getting around",
+  "tier": 2
+ },
+ {
+  "id": "honeymoon",
+  "label": "Honeymoon",
+  "category": "Moments",
+  "tier": 1
+ },
+ {
+  "id": "proposal",
+  "label": "Proposal",
+  "category": "Moments",
+  "tier": 1
+ },
+ {
+  "id": "wedding",
+  "label": "Wedding",
+  "category": "Moments",
+  "tier": 1
+ },
+ {
+  "id": "birthday-trip",
+  "label": "Birthday trip",
+  "category": "Moments",
+  "tier": 2
+ },
+ {
+  "id": "anniversary",
+  "label": "Anniversary",
+  "category": "Moments",
+  "tier": 2
+ },
+ {
+  "id": "family-holiday",
+  "label": "Family holiday",
+  "category": "Moments",
+  "tier": 1
+ },
+ {
+  "id": "girls-trip",
+  "label": "Girls' trip",
+  "category": "Moments",
+  "tier": 2
+ },
+ {
+  "id": "lads-trip",
+  "label": "Lads' trip",
+  "category": "Moments",
+  "tier": 2
+ },
+ {
+  "id": "solo-travel",
+  "label": "Solo travel",
+  "category": "Moments",
+  "tier": 1
+ },
+ {
+  "id": "graduation-trip",
+  "label": "Graduation trip",
+  "category": "Moments",
+  "tier": 2
+ },
+ {
+  "id": "gap-year",
+  "label": "Gap year",
+  "category": "Moments",
+  "tier": 1
+ },
+ {
+  "id": "digital-nomad",
+  "label": "Digital nomad",
+  "category": "Moments",
+  "tier": 2
+ },
+ {
+  "id": "reunion",
+  "label": "Reunion",
+  "category": "Moments",
+  "tier": 2
+ }
+]

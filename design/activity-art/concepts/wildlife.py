@@ -1,6 +1,5 @@
 """Wildlife & nature: three concepts each for sixteen wildlife, landscape and sky activities."""
 import math
-import re
 
 from _common import Concept, Drawing, cloud, fish, circle, ellipse, waves, hills, rrect, group, acacia  # noqa: F401
 from _common import GIRAFFE
@@ -21,19 +20,6 @@ def clipped(d: Drawing, path: str, fn):
     d.raw(tag, tag)
     fn()
     d.raw("</g>", "</g>")
-
-
-def limb(d: Drawing, role, path, w, shadow=True, spot=False):
-    """d.limb, but the papercut shadow filter gets a padded box so straight limbs aren't clipped thin."""
-    if not (d.paper and shadow):
-        d.limb(role, path, w, shadow=shadow, spot=spot)
-        return
-    nums = [float(n) for n in re.findall(r"-?\d+\.?\d*", path)]
-    xs, ys = nums[0::2], nums[1::2]
-    x0, y0, x1, y1 = min(xs) - w, min(ys) - w, max(xs) + w, max(ys) + w
-    d.raw(f'<g filter="url(#ps)"><rect x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" fill="none"/>')
-    d.limb(role, path, w, shadow=False)
-    d.raw("</g>")
 
 
 def flip(d: Drawing, fn, cx=100):
@@ -69,7 +55,7 @@ def leaf(x, y, length, width, angle):
 def palm(d: Drawing, x, y, h=70, lean=8, role="dark", s=1.0):
     """Palm tree silhouette with its foot at (x, y)."""
     tx, ty = x + lean, y - h
-    limb(d, role, f"M{x} {y} Q{x + lean * 0.1} {y - h * 0.55} {tx} {ty}", 5 * s)
+    d.limb(role, f"M{x} {y} Q{x + lean * 0.1} {y - h * 0.55} {tx} {ty}", 5 * s)
     for ang, ln in [(-160, 34), (-125, 30), (-60, 30), (-20, 34), (15, 28), (165, 28)]:
         a = math.radians(ang)
         ex, ey = tx + math.cos(a) * ln * s, ty + math.sin(a) * ln * s
@@ -194,14 +180,14 @@ def bigcat_leopard(d: Drawing):
     d.band("far", hills(150, 8))
     d.band("mid", hills(166, 6, 30))
     # tree
-    limb(d, "dark", "M152 200 C150 160 148 134 136 114 M144 130 L178 104", 10)
-    limb(d, "dark", "M156 114 L14 118", 9)
+    d.limb("dark", "M152 200 C150 160 148 134 136 114 M144 130 L178 104", 10)
+    d.limb("dark", "M156 114 L14 118", 9)
     d.shape("dark", "M8 124 Q40 104 86 112 Q56 128 8 124Z", shadow=False)
     d.shape("dark", "M150 108 Q178 86 204 92 Q188 108 150 108Z", shadow=False)
     # leopard draped on the branch: one front and one back leg dangling
-    limb(d, "hero", "M140 100 C158 104 162 126 154 146 C151 154 156 160 162 156", 5.5, spot=True)
-    limb(d, "hero", "M70 104 Q71 116 69 126", 12)
-    limb(d, "hero", "M124 104 Q126 114 124 122", 12)
+    d.limb("hero", "M140 100 C158 104 162 126 154 146 C151 154 156 160 162 156", 5.5, spot=True)
+    d.limb("hero", "M70 104 Q71 116 69 126", 12)
+    d.limb("hero", "M124 104 Q126 114 124 122", 12)
     d.shape("hero", ellipse(68, 130, 7.5, 5.5), shadow=False)
     d.shape("hero", ellipse(123, 126, 7.5, 5.5), shadow=False)
     d.shape("hero", LEOPARD)
@@ -257,7 +243,7 @@ def bigcat_cheetah(d: Drawing):
     d.band("mid", hills(150, 5, 30))
 
     def cat():
-        limb(d, "hero", "M150 92 C164 100 168 120 160 134 C156 140 160 146 166 142", 4.5, spot=True)
+        d.limb("hero", "M150 92 C164 100 168 120 160 134 C156 140 160 146 166 142", 4.5, spot=True)
         d.stroke("mark", "M162 128 L168 131 M160 136 L165 141", 2.2)
         d.shape("hero", circle(51, 67, 3.6), shadow=False)
         d.shape("hero", circle(58, 70, 3.2), shadow=False)
@@ -291,7 +277,7 @@ def elephant_bath(d: Drawing):
     d.band("far", hills(124, 8))
 
     def calf():
-        limb(d, "hero", "M146 104 C162 98 166 76 158 60 C154 54 150 54 148 60", 11)
+        d.limb("hero", "M146 104 C162 98 166 76 158 60 C154 54 150 54 148 60", 11)
         d.stroke("hero", "M50 118 Q42 124 44 134", 2.5)
         d.shape("hero", BABY_ELE)
         d.shape("hero2", BABY_EAR, shadow=False)
@@ -330,7 +316,7 @@ def elephant_family(d: Drawing):
 
     def calf():
         d.stroke("hero", "M50 118 Q42 124 44 134", 2.5)
-        limb(d, "hero", "M150 112 C156 124 158 134 166 136", 8)
+        d.limb("hero", "M150 112 C156 124 158 134 166 136", 8)
         d.shape("hero", BABY_ELE)
         d.shape("hero2", BABY_EAR, shadow=False)
         d.marks("mark", circle(144, 102, 2.2))
@@ -424,8 +410,8 @@ def gorilla_volcano(d: Drawing):
     d.band("near", hills(158, 6, 30))
     # gorilla sitting, facing us
     d.shape("hero", "M62 176 C58 146 70 124 100 122 C130 124 142 146 138 176Z")
-    limb(d, "hero", "M72 134 C62 148 62 162 66 174", 15)
-    limb(d, "hero", "M128 134 C138 148 138 162 134 174", 15)
+    d.limb("hero", "M72 134 C62 148 62 162 66 174", 15)
+    d.limb("hero", "M128 134 C138 148 138 162 134 174", 15)
     d.shape("hero", "M88 92 Q100 70 112 92Z")
     d.shape("hero", "M100 82 C114 82 124 92 124 106 C124 120 112 128 100 128 C88 128 76 120 76 106 C76 92 86 82 100 82Z")
     d.shape("hero2", "M100 98 C110 98 117 104 117 112 C117 120 108 126 100 126 C92 126 83 120 83 112 C83 104 90 98 100 98Z",
@@ -642,25 +628,26 @@ def dolphin_bow(d: Drawing):
 
 
 # ---------------------------------------------------------------- penguins
-PENGUIN = ("M-17 0 C-30 -26 -28 -66 -12 -86 C-6 -94 8 -97 15 -88 C20 -82 21 -72 17 -62 C27 -46 28 -18 19 0Z")
-PENGUIN_BELLY = "M7 -62 C19 -48 22 -20 14 -2 L-9 -2 C-6 -22 -4 -46 7 -62Z"
+PENGUIN = "M83 100 C70 74 72 34 88 14 C94 6 108 3 115 12 C120 18 121 28 117 38 C127 54 128 82 119 100Z"
+PENGUIN_BELLY = "M107 38 C119 52 122 80 114 98 L91 98 C94 78 96 54 107 38Z"
 
 
 def penguin(d: Drawing, x, y, s=1.0, flipx=False, crest=False, patch=True):
+    """A penguin standing with its feet at (x, y), facing right (drawn around (100, 100) so shadows aren't clipped)."""
     def draw():
-        d.shape("dark", "M-14 -50 C-24 -36 -26 -20 -22 -8 C-14 -22 -10 -36 -10 -50Z", shadow=False)
-        d.shape("pop", ellipse(-6, 0, 7, 3) + ellipse(9, 0, 7, 3), shadow=False)
+        d.shape("dark", "M86 50 C76 64 74 80 78 92 C86 78 90 64 90 50Z", shadow=False)
+        d.shape("pop", ellipse(94, 100, 7, 3) + ellipse(109, 100, 7, 3), shadow=False)
         d.shape("dark", PENGUIN)
         d.shape("light", PENGUIN_BELLY, shadow=False)
         if patch:
-            d.shape("hero2", "M8 -74 C14 -70 16 -64 14 -58 C10 -62 6 -66 6 -72Z", shadow=False, spot=True)
-        d.shape("pop", "M15 -84 L32 -79 L15 -77Z", shadow=False, spot=not patch)
+            d.shape("hero2", "M108 26 C114 30 116 36 114 42 C110 38 106 34 106 28Z", shadow=False, spot=True)
+        d.shape("pop", "M115 16 L132 21 L115 23Z", shadow=False, spot=not patch)
         if crest:
-            d.stroke("hero2", "M10 -88 Q20 -92 26 -98 M8 -88 Q18 -90 24 -92", 2)
-        d.marks("light", circle(9, -84, 2))
-        d.shape("dark", "M-8 -50 C-2 -38 -2 -20 -8 -8 C-12 -20 -12 -38 -8 -50Z", shadow=False)
+            d.stroke("hero2", "M110 12 Q120 8 126 2 M108 12 Q118 10 124 8", 2)
+        d.marks("light", circle(109, 16, 2))
+        d.shape("dark", "M92 50 C98 62 98 80 92 92 C88 80 88 62 92 50Z", shadow=False)
     sx = -s if flipx else s
-    group(d, f"translate({x} {y}) scale({sx} {s})", draw)
+    group(d, f"translate({x} {y}) scale({sx} {s}) translate(-100 -100)", draw)
 
 
 def penguin_emperor(d: Drawing):
@@ -755,8 +742,8 @@ def croc_jaws(d: Drawing):
         d.stroke("near", f"M{x} 140 Q{x + 2} 110 {x - 4} {86 + (x % 5) * 3}", 3, line=False)
     d.band("mid", waves(134, 3, 30))
     d.band("ground", "M-30 156 Q60 140 120 148 T230 150")
-    limb(d, "hero", "M70 148 L62 160 L54 162", 7)
-    limb(d, "hero", "M122 148 L130 160 L140 161", 7)
+    d.limb("hero", "M70 148 L62 160 L54 162", 7)
+    d.limb("hero", "M122 148 L130 160 L140 161", 7)
     d.shape("pop", "M140 128 L186 100 L170 122 L188 132 L150 136Z", shadow=False)
     d.shape("hero", CROC_SIDE)
     d.shape("light", "M168 106 l3 6 l2 -8 l3 6 l2 -8 l3 6 l2 -7Z M162 128 l3 -6 l2 6 l3 -6 l2 6 l3 -6 l2 6Z", shadow=False)
@@ -784,7 +771,7 @@ def croc_above(d: Drawing):
         nx, ny = dy * side, -dx * side
         a = (x + nx * 12, y + ny * 12)
         b = (x + nx * 24 + dx * 8, y + ny * 24 + dy * 8)
-        limb(d, "hero", f"M{x:.1f} {y:.1f} L{a[0]:.1f} {a[1]:.1f} L{b[0]:.1f} {b[1]:.1f}", 6)
+        d.limb("hero", f"M{x:.1f} {y:.1f} L{a[0]:.1f} {a[1]:.1f} L{b[0]:.1f} {b[1]:.1f}", 6)
     d.shape("hero", spine(p, prof, 48))
     for t in [i / 22 for i in range(3, 18)]:
         q = frame(p, t)

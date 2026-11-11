@@ -756,13 +756,11 @@ for _a, _th, _rx in [(-66, 18, 13), (66, 18, 13), (-36, 32, 17), (36, 32, 17), (
 def croissant(d: Drawing, tx=0, ty=0, s=1.0, spot=True):
     def c():
         for x, y, rx, ry, r in CROISSANT:
-            seg = ellipse(round(x, 1), round(y, 1), rx, ry)
-            d.shape("hero", seg, extra=f'transform="rotate({r} {x:.1f} {y:.1f})"', spot=spot and r == 0)
-            d.stroke("hero2", f"M{x-rx*0.5:.1f} {y-ry*0.55:.1f} Q{x:.1f} {y-ry*0.85:.1f} {x+rx*0.5:.1f} {y-ry*0.55:.1f}",
-                     max(1.4, ry * 0.18), line=False) if False else None
-            d.stroke("hero2", f"M{x-rx*0.55:.1f} {y-ry*0.45:.1f} Q{x:.1f} {y-ry*0.8:.1f} {x+rx*0.55:.1f} {y-ry*0.45:.1f}", max(1.4, ry * 0.16), line=False) \
-                if False else d.raw(f'<path d="M{x-rx*0.55:.1f} {y-ry*0.45:.1f} Q{x:.1f} {y-ry*0.85:.1f} {x+rx*0.55:.1f} {y-ry*0.45:.1f}" fill="none" stroke="{d.c.get('hero2', '#fff')}" '
-                                    f'stroke-width="{max(1.4, ry*0.16):.1f}" stroke-linecap="round" transform="rotate({r} {x:.1f} {y:.1f})"/>', "")
+            rot = f'transform="rotate({r} {x:.1f} {y:.1f})"'
+            d.shape("hero", ellipse(round(x, 1), round(y, 1), rx, ry), extra=rot, spot=spot and r == 0)
+            if d.paper:  # a soft sheen along the top of each segment
+                d.raw(f'<path d="M{x-rx*0.55:.1f} {y-ry*0.45:.1f} Q{x:.1f} {y-ry*0.85:.1f} {x+rx*0.55:.1f} {y-ry*0.45:.1f}" fill="none" '
+                      f'stroke="{d.c["hero2"]}" stroke-width="{max(1.4, ry*0.16):.1f}" stroke-linecap="round" {rot}/>')
     group(d, f"translate({tx} {ty}) scale({s})", c)
 
 
@@ -799,7 +797,7 @@ def cafe_bistro(d: Drawing):
     for k in (-1, 1):
         x = 100 + k * 50
         d.stroke("dark", f"M{x} 172 V140 M{x-k*16} 172 L{x-k*14} 140 M{x+k*2} 112 C{x+k*6} 96 {x-k*12} 96 {x-k*12} 112 V140", 3.4)
-        d.shape("dark", rrect(x - 14 if k > 0 else x - 4, 136, 18, 6, 3) if False else f"M{x-k*20} 138 H{x+k*4} V143 H{x-k*20}Z")
+        d.shape("dark", f"M{x-k*20} 138 H{x+k*4} V143 H{x-k*20}Z")
     # table
     d.stroke("dark", "M100 120 V168 M86 172 Q100 164 114 172", 3.6)
     d.shape("hero", ellipse(100, 118, 34, 7), spot=False)

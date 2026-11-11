@@ -977,9 +977,9 @@ def carnival_ferris(d: Drawing):
         d.shape(roles[i % 5], f"M{x - 7:.1f} {y + 5:.1f} H{x + 7:.1f} L{x + 6:.1f} {y + 15:.1f} H{x - 6:.1f}Z", spot=roles[i % 5] == "pop")
     d.shape("hero2", circle(cx, cy, 7))
     d.band("mid", hills(168, 4))
-    d.shape("pop", "M22 168 V148 L34 134 L46 148 V168Z")
-    d.shape("light", "M28 168 V156 H40 V168Z", shadow=False)
-    d.shape("hero", "M154 168 V150 L166 138 L178 150 V168Z")
+    d.shape("pop", "M30 168 V150 L42 137 L54 150 V168Z")
+    d.shape("light", "M36 168 V157 H48 V168Z", shadow=False)
+    d.shape("hero", "M148 168 V152 L159 140 L170 152 V168Z")
     d.band("near", hills(184, 3), line=False)
 
 
@@ -1018,12 +1018,12 @@ def concert_stage(d: Drawing):
     for x in (47, 100, 153):
         d.shape("hero", f"M{x - 6} 30 H{x + 6} L{x + 4} 40 H{x - 4}Z", shadow=False)
         d.marks("glow2", ellipse(x, 40, 4, 2))
+    d.disc("glow", 100, 94, 30)
     d.shape("mid", rrect(20, 128, 160, 22, 2))
-    d.shape("dark", person(100, 128, 56), spot=True)
-    d.limb("dark", "M92 96 L82 82", 5)
-    d.stroke("dark", "M120 128 L118 92 M112 92 L122 92", 2)
-    d.shape("pop", "M88 104 L118 96 L120 102 L92 112Z", shadow=False)
-    d.shape("pop", ellipse(88, 110, 9, 7), shadow=False)
+    d.limb("dark", "M108 96 L118 68", 5)
+    d.shape("dark", person(100, 128, 60), spot=True)
+    d.stroke("dark", "M86 128 L88 90", 2)
+    d.shape("dark", rrect(85, 84, 7, 9, 3), extra='transform="rotate(10 88 88)"')
     # crowd
     for x, y, arm in [(14, 164, 1), (38, 158, 0), (60, 166, 1), (84, 160, 0), (108, 164, 1), (132, 158, 1), (156, 166, 0), (182, 160, 1)]:
         if arm:
@@ -1145,14 +1145,12 @@ def lantern_sky(d: Drawing):
 
 def lantern_red(d: Drawing):
     d.disc("glow", 100, 70, 26)
-    d.stroke("dark", "M-10 22 Q100 50 210 22", 1.6)
     clip_open(d)
-    d.stroke("dark", "M-10 22 Q100 50 210 22", 1.6, line=True)
+    d.stroke("dark", "M-10 22 Q100 50 210 22", 1.6)
     clip_close(d)
     lantern(d, 44, 76, 1.6)
     lantern(d, 156, 76, 1.6)
     lantern(d, 100, 112, 2.4)
-    blossom(d, [(24, 150, 7), (36, 158, 6), (170, 150, 7), (182, 140, 6)], role="hero2")
 
 
 def lantern_river(d: Drawing):
@@ -1269,7 +1267,7 @@ CONCEPTS = [
     Concept("concert-guitar", "concert", "Acoustic guitar", concert_guitar, overrides={"guitar": "#D9893B", "guitar2": "#E9A65A", "neck": "#7A4A26"},
             checks=[("guitar", "glow"), ("neck", "glow"), ("dark", "glow")], fixes={"glow": ["far", "mid", "light", "near"]}),
     Concept("concert-stage", "concert", "Live on stage", concert_stage, palettes=["dusk", "golden", "coastal", "blush", "meadow"],
-            overrides={**NIGHT, "crowd": "#0B0F1C"}, checks=[("dark", "mid"), ("dark", "sky"), ("crowd", "mid")], fixes={"dark": ["#0B0F1C"]}),
+            overrides={**NIGHT, "crowd": "#0B0F1C"}, checks=[("dark", "mid"), ("dark", "glow"), ("crowd", "mid"), ("glow", "sky")], fixes={"glow": ["glow2", "pop"]}),
     Concept("concert-violin", "concert", "Violin & bow", concert_violin, overrides={"violin": "#B5562B", "violin2": "#8A3D1C", "wood": "#5A3A22"},
             checks=[("violin", "glow"), ("violin2", "glow"), ("wood", "glow")], fixes={"glow": ["light", "far", "sky2"]}),
     Concept("photo-camera", "photography-walk", "Vintage camera", photo_camera,

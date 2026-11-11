@@ -514,7 +514,7 @@ def citybike_ride(d: Drawing):
         d.limb("dark", "M106 58 L120 80", 6)
         d.shape("dark", circle(114, 44, 9))
         d.shape("pop", "M104 40 Q112 28 124 38 L124 42 H104Z", spot=True)
-    group(d, "translate(100 112) scale(.5) translate(-100 -112) translate(0 -14)", rider)
+    group(d, "translate(100 112) scale(.56) translate(-100 -112) translate(0 -18)", rider)
 
 
 def citybike_sign(d: Drawing):
@@ -981,9 +981,11 @@ def pilgrim_shell(d: Drawing):
 def pilgrim_waymarker(d: Drawing):
     d.disc("glow", 150, 54, 14)
     d.band("far", "M-30 118 Q20 96 60 104 Q100 84 140 98 Q180 88 230 108")
-    d.shape("far", "M140 98 V80 L144 70 L148 80 V98Z M134 98 V88 H156 V98Z")
+    d.shape("light", "M142 100 V82 L146 70 L150 82 V100Z M134 100 V90 H158 V100Z")
+    d.shape("pop", "M132 91 L140 84 H158 V91Z", shadow=False)
+    d.marks("dark", arch(144, 90, 4, 7))
     d.band("mid", hills(134, 6, 10))
-    d.shape("ground", "M150 126 Q132 140 116 150 Q90 166 100 200 H168 Q146 176 152 156 Q158 140 156 126Z", shadow=False)
+    d.shape("ground", "M112 200 C104 180 150 170 140 154 C134 144 150 138 146 132 L152 132 C158 138 144 146 150 156 C164 174 126 182 152 200Z", shadow=False)
     # waymarker post
     d.shape("stone", "M44 176 V82 Q44 74 52 74 H84 Q92 74 92 82 V176Z")
     d.shape("tile", rrect(51, 82, 34, 34, 3), spot=True)
@@ -1010,7 +1012,7 @@ def pilgrim_walker(d: Drawing):
     d.limb("coat2", "M98 72 L88 96 L96 108", 6)
     d.shape("pack", rrect(70, 64, 24, 40, 7))
     d.shape("pack2", rrect(72, 84, 20, 14, 4), shadow=False)
-    d.marks("light", "M82 70 l-5 7 h10Z")
+    d.marks("light", "M82 80 L76 72 A8 8 0 0 1 88 72Z")
     d.shape("coat", "M90 64 Q102 60 108 66 L112 112 H90Z", spot=True)
     d.limb("dark", "M104 110 L116 136 L120 162", 9)
     d.shape("dark", "M114 158 H128 Q132 160 132 166 H114Z")

@@ -996,6 +996,214 @@ def tulip_bike(d: Drawing):
     d.band("deep", hills(188, 3), line=False)
 
 
+
+# ================================================================ LAVENDER FIELDS
+LAV = {"lav": "#8E6CC0", "lav2": "#B79AE0", "lavdeep": "#5E4592", "stem": "#6E9A5A", "stem2": "#4F7A44",
+       "stone": "#E8D6B5", "roof": "#C8673E", "tree": "#3F6B3A", "ribbon": "#E9C46A"}
+
+
+def lav_spike(d: Drawing, x, y, h, rot=0, role="lav", role2="lav2", stem=True, spot=False):
+    def draw():
+        if stem:
+            d.stroke("stem2", f"M0 0 L0 {-h}", 2, line=True)
+        for i in range(6):
+            yy = -h + i * h * 0.075
+            w = 3.2 + i * 0.3
+            d.shape(role if i % 2 == 0 else role2, f"M{-w} {yy} a{w} {w * 1.25} 0 1 0 {2 * w} 0 a{w} {w * 1.25} 0 1 0 {-2 * w} 0Z",
+                    shadow=False, spot=spot and i % 2 == 0)
+    group(d, f"translate({x} {y}) rotate({rot})", draw)
+
+
+def lavender_rows(d: Drawing):
+    d.disc("glow", 64, 82, 26)
+    d.band("far", "M-30 94 Q60 84 120 90 T230 88")
+    # lone tree and farmhouse on the horizon
+    d.limb("trunk", "M144 96 V74", 3.4)
+    d.shape("tree", scallop(144, 66, 14, 9, 0.12))
+    d.shape("stone", "M32 96 V82 H56 V96Z")
+    d.shape("roof", "M29 83 L44 74 L59 83Z")
+    d.marks("dark", rrect(40, 86, 5, 6, 1))
+    d.band("stone", "M-30 96 H230", line=False)
+    vx, vy = 120, 94
+    x0, n = -200, 13
+    w = 600 / n
+    for i in range(n):
+        a, b = x0 + i * w, x0 + (i + 1) * w - w * 0.38
+        d.shape("lav", f"M{vx} {vy} L{b:.1f} 210 L{a:.1f} 210Z", shadow=True, line=i % 2 == 0)
+        d.shape("lav2", f"M{vx} {vy} L{a + (b - a) * 0.7:.1f} 210 L{a + (b - a) * 0.55:.1f} 210Z", shadow=False, line=False)
+
+
+def lavender_bundle(d: Drawing):
+    d.disc("glow", 100, 100, 64, line=False)
+    stems = [(-26, 70), (-16, 80), (-6, 88), (4, 90), (14, 84), (24, 74), (-20, 60), (20, 62)]
+    for ang, h in stems:
+        lav_spike(d, 100, 160, h + 30, ang * 0.9, stem=False)
+    for ang, h in stems:
+        d.stroke("stem2", f"M100 160 L{100 + math.sin(math.radians(ang * 0.9)) * (h - 14):.1f} {160 - math.cos(math.radians(ang * 0.9)) * (h - 14):.1f}", 2.2, line=False)
+    d.limb("stem", "M92 150 L88 192 M100 150 L100 194 M108 150 L112 192", 4)
+    # ribbon bow
+    d.shape("ribbon", rrect(86, 150, 28, 10, 3), spot=True)
+    d.shape("ribbon", "M100 155 C90 140 74 142 76 152 C78 162 92 160 100 155Z", spot=True)
+    d.shape("ribbon", "M100 155 C110 140 126 142 124 152 C122 162 108 160 100 155Z", spot=True)
+    d.shape("ribbon", "M98 156 L86 178 L92 176 L94 182 L102 158Z M102 156 L114 178 L108 176 L106 182 L98 158Z", shadow=False)
+    d.shape("ribbon", circle(100, 155, 5))
+
+
+def bee(d: Drawing, x, y, s=1.0, rot=0):
+    def draw():
+        d.raw('<g opacity=".8">', "")
+        d.shape("wing", ellipse(-6, -20, 10, 16), extra='transform="rotate(-24 -6 -20)"')
+        d.shape("wing", ellipse(8, -18, 8, 13), extra='transform="rotate(20 8 -18)"')
+        d.raw("</g>", "")
+        d.limb("beeD", "M-6 8 L-10 20 M2 10 L0 22 M10 8 L14 18", 2.4, shadow=False)
+        d.shape("beeY", ellipse(0, 0, 22, 13), spot=True)
+        clipped(d, ellipse(0, 0, 22, 13), lambda: d.marks("beeD", "M-8 -14 h7 v28 h-7Z M6 -14 h6 v28 h-6Z M18 -14 h8 v28 h-8Z"))
+        d.shape("beeD", circle(-26, -2, 9))
+        d.marks("light", circle(-29, -4, 2.4))
+        d.stroke("beeD", "M-30 -9 Q-36 -18 -42 -18 M-26 -10 Q-28 -20 -34 -24", 1.6)
+    group(d, f"translate({x} {y}) rotate({rot}) scale({s})", draw)
+
+
+def lavender_bee(d: Drawing):
+    d.disc("glow", 150, 50, 20)
+    d.band("far", hills(150, 6))
+    for x, h, r in [(20, 90, -10), (44, 70, 6), (168, 80, 8), (186, 100, -4), (150, 60, -12)]:
+        lav_spike(d, x, 200, h, r, "lavdeep", "lav")
+    lav_spike(d, 92, 200, 150, -4, spot=True)
+    lav_spike(d, 120, 200, 120, 8)
+    lav_spike(d, 66, 200, 112, -12)
+    bee(d, 116, 74, 1.25, -10)
+    d.stroke("beeD", "M150 104 q8 -6 14 2 q6 8 14 0", 1.4, line=False)
+
+
+# ================================================================ RAINBOW CHASING
+BOW = {"r1": "#E8504A", "r2": "#F28C28", "r3": "#F6C445", "r4": "#6CBF5A", "r5": "#4A9BD6", "r6": "#7A5BB5"}
+
+
+def rainbow(d: Drawing, cx, cy, r, w=6, line_bands=(0, 5), shadow=True):
+    for i, role in enumerate(["r1", "r2", "r3", "r4", "r5", "r6"]):
+        rr = r - i * w
+        d.stroke(role, f"M{cx - rr} {cy} A{rr} {rr} 0 0 1 {cx + rr} {cy}", w + 0.6, shadow=shadow and i == 0, line=i in line_bands)
+
+
+def rainbow_hills(d: Drawing):
+    d.shape("light", cloud(-6, 48, 1.4))
+    rainbow(d, 100, 150, 86, 6)
+    d.raw('<g opacity=".45">', "")
+    rainbow(d, 100, 150, 104, 3, line_bands=(), shadow=False)
+    d.raw("</g>", "")
+    d.band("far", hills(118, 10))
+    d.band("mid", hills(140, 12, 30))
+    d.stroke("ground", "M-10 150 L40 142 L80 148 L120 140 L170 146 L214 140", 1.6, line=False)
+    d.band("near", hills(162, 10, -20))
+    # sheep
+    for x, y, s in [(60, 154, 1.0), (140, 150, 0.8)]:
+        def sheep(x=x, y=y, s=s):
+            d.shape("light", scallop(0, 0, 9, 8, 0.18))
+            d.shape("dark", ellipse(-10, 1, 3.6, 4.4), shadow=False)
+            d.stroke("dark", "M-4 7 V13 M4 7 V13", 2)
+        group(d, f"translate({x} {y}) scale({s})", sheep)
+    d.band("deep", hills(184, 6, 30))
+
+
+def rainbow_cloud(d: Drawing):
+    d.disc("glow", 150, 66, 20)
+    d.shape("pop", "M150 32 L150 24 M174 42 L180 36 M184 66 L192 66", line=False)
+    d.stroke("glow", "M150 40 V30 M174 50 L181 43 M180 70 H190", 3)
+    rainbow(d, 100, 140, 74, 9, line_bands=(0, 2, 4))
+    for x0, y0 in [(18, 132), (130, 132)]:
+        d.shape("light", f"M{x0} {y0 + 12} a12 12 0 0 1 8 -22 a16 16 0 0 1 28 -6 a13 13 0 0 1 16 14 a10 10 0 0 1 0 14Z")
+    d.stroke("r5", "M34 158 l-3 8 M46 162 l-3 8 M58 158 l-3 8 M146 158 l-3 8 M158 162 l-3 8 M170 158 l-3 8", 2.4)
+
+
+def rainbow_road(d: Drawing):
+    rainbow(d, 100, 112, 70, 6)
+    d.band("far", "M-30 112 Q40 100 100 110 T230 106")
+    d.band("mid", hills(130, 6, 20))
+    d.shape("dark", "M96 110 H104 L170 210 H30Z")
+    d.stroke("light", "M100 116 V124 M100 134 V146 M100 158 V176 M100 188 V210", 2.6)
+    # car from behind
+    def car():
+        d.shape("hero", "M-30 -4 C-30 -10 -26 -14 -20 -14 L-16 -28 C-14 -34 14 -34 16 -28 L20 -14 C26 -14 30 -10 30 -4 L30 10 H-30Z")
+        d.shape("light", "M-14 -15 L-11 -27 H11 L14 -15Z", shadow=False)
+        d.shape("pop", rrect(-27, -8, 10, 5, 2) + rrect(17, -8, 10, 5, 2), shadow=False)
+        d.shape("light", rrect(-8, 0, 16, 5, 1), shadow=False)
+        d.shape("dark", rrect(-28, 8, 10, 8, 2) + rrect(18, 8, 10, 8, 2), shadow=False)
+        d.shape("hero2", rrect(-18, -40, 36, 6, 2), spot=True)
+    group(d, "translate(100 162) scale(1.25)", car)
+
+
+# ================================================================ FIREFLIES
+FLY = {"bug": "#F7F06B", "bug2": "#FFFBC9", "fly": "#3B3530", "flyR": "#E0584A", "wing": "#EEF2F4", "jar": "#CFE5E8",
+       "lid": "#B9A27A", "trunkN": "#2A2F3A", "grassN": "#2F4A3A"}
+NIGHT_PAL = ["dusk", "coastal", "meadow", "blush"]
+
+
+def glows(d: Drawing, pts, r=2.2):
+    paper = "".join(f'<circle cx="{x}" cy="{y}" r="{r * k * 3.2}" fill="{d.c.get("bug", "#fff")}" opacity=".22"/>'
+                    f'<circle cx="{x}" cy="{y}" r="{r * k}" fill="{d.c.get("bug2", "#fff")}"/>' for x, y, k in pts)
+    line = "".join(f'<circle cx="{x}" cy="{y}" r="{r * k * 1.1}" fill="{d.c.get("spot", "#000")}"/>' for x, y, k in pts)
+    d.raw(paper, line)
+
+
+def firefly_jar(d: Drawing):
+    stars(d, [(30, 50, 1.2), (160, 40, 1.4), (140, 24, 1), (60, 28, 1)])
+    d.disc("glow", 46, 50, 12)
+    d.band("far", hills(150, 8))
+    grass(d, -10, 210, 156, 16, "grassN", 12)
+    glows(d, [(30, 110, 1), (172, 96, 0.9), (156, 132, 1.1), (20, 140, 0.8)])
+    # jar glow
+    d.raw('<circle cx="100" cy="124" r="56" fill="#FFF6A8" opacity=".18"/>', "")
+    d.raw('<g opacity=".88">', "")
+    d.shape("jar", "M70 76 C66 82 62 90 62 100 V160 C62 170 70 176 80 176 H120 C130 176 138 170 138 160 V100 C138 90 134 82 130 76Z")
+    d.raw("</g>", "")
+    glows(d, [(84, 110, 1.2), (110, 98, 1), (118, 132, 1.3), (90, 150, 1.1), (104, 120, 0.9), (78, 134, 0.9), (122, 158, 1)], 2.6)
+    d.stroke("light", "M72 104 V150", 3, line=False)
+    d.shape("lid", rrect(66, 62, 68, 16, 4), spot=True)
+    d.stroke("dark", "M70 68 H130 M70 73 H130", 1.2, line=False)
+    d.stroke("lid", "M76 62 C70 40 130 40 124 62", 2.4)
+    d.band("deep", hills(186, 4, 20), line=False)
+
+
+def firefly_forest(d: Drawing):
+    d.disc("glow", 140, 42, 14)
+    stars(d, [(40, 30, 1.2), (70, 18, 1), (176, 70, 1.1), (110, 26, 1)])
+    for x in range(-10, 220, 24):
+        pine(d, x, 130, 50 + (x * 7) % 20, "far", shadow=False, line=False)
+    d.band("mid", hills(132, 4))
+    for x, w in [(24, 14), (66, 10), (150, 12), (184, 16)]:
+        d.shape("trunkN", f"M{x - w / 2} 200 L{x - w / 2 + 1} -10 L{x + w / 2 - 1} -10 L{x + w / 2} 200Z")
+    d.band("grassN", hills(170, 6))
+    grass(d, -10, 210, 172, 14, "grassN", 10)
+    pts = [(40, 90, 1), (52, 120, 0.8), (88, 100, 1.2), (104, 70, 0.9), (118, 116, 1), (132, 90, 0.8), (96, 140, 1.1),
+           (168, 110, 0.9), (82, 60, 0.7), (126, 150, 0.9), (60, 150, 1), (172, 150, 0.8), (110, 92, 0.7), (40, 132, 0.7)]
+    glows(d, pts, 2.4)
+
+
+def firefly_bug(d: Drawing):
+    stars(d, [(30, 60, 1.2), (170, 40, 1.4), (150, 160, 1), (60, 30, 1)])
+    d.band("far", hills(170, 6))
+    d.shape("grassN", "M40 210 C60 160 110 120 186 104 C130 128 84 160 62 210Z")
+    glows(d, [(40, 110, 1), (170, 140, 0.9), (30, 150, 0.8), (150, 70, 0.8)], 2.4)
+
+    def bug():
+        # glowing tail
+        d.raw('<circle cx="64" cy="114" r="42" fill="#FFF6A8" opacity=".25"/><circle cx="64" cy="114" r="24" fill="#FFF6A8" opacity=".35"/>', "")
+        d.limb("fly", "M110 108 L118 128 M126 104 L138 122 M96 110 L98 130", 2.6, shadow=False)
+        d.shape("bug", "M50 100 C42 106 42 124 52 130 C64 136 80 128 88 118 C90 110 80 100 70 98Z", spot=True)
+        d.shape("bug2", "M54 108 C50 114 52 122 58 124 C66 126 74 120 76 114Z", shadow=False, line=False)
+        d.shape("fly", "M76 96 C96 88 128 88 146 96 C150 104 140 112 128 114 C108 118 88 118 80 112Z")
+        d.shape("flyR", "M140 88 C150 84 160 88 162 96 C162 104 154 108 146 106Z")
+        d.shape("fly", circle(164, 102, 8))
+        d.marks("light", circle(166, 100, 2))
+        d.stroke("fly", "M168 96 Q180 80 176 66 M164 94 Q168 76 160 64", 1.8)
+        d.raw('<g opacity=".7">', "")
+        d.shape("wing", "M120 92 C100 70 70 64 52 70 C66 84 92 94 118 98Z")
+        d.raw("</g>", "")
+        d.shape("fly", "M78 96 C100 82 130 82 144 92 L140 100 C120 96 96 98 80 104Z", shadow=False)
+    group(d, "translate(-8 4)", bug)
+
+
 # ================================================================ concepts
 NIGHT_FIX = {"sky": ["deep", "mark", "#1F2A44"]}
 
@@ -1068,6 +1276,26 @@ CONCEPTS = [
             checks=[("tR", "glow"), ("tY", "glow"), ("tP", "glow")], fixes={"glow": ["light", "sky2", "far"]}),
     Concept("tulip-bike", "tulip-fields", "Bike & tulips", tulip_bike, overrides={**TULIP, "hero": "#2F6690", "hero2": "#C9A36A"},
             checks=[("hero", "sky"), ("dark", "ground"), ("hero", "far")], fixes={"far": ["mid", "near"]}),
+    Concept("lavender-provence-rows", "lavender-fields", "Provence rows", lavender_rows, overrides={**LAV, "trunk": "#4A3A2A"},
+            checks=[("lav", "stone"), ("tree", "sky"), ("tree", "glow"), ("lav", "glow")], fixes={"glow": ["glow2", "pop", "hero2"]}),
+    Concept("lavender-bundle", "lavender-fields", "Lavender bunch", lavender_bundle, overrides=LAV,
+            checks=[("lav", "glow"), ("lav", "sky"), ("ribbon", "lav")], fixes={"glow": ["light", "sky2", "far"]}),
+    Concept("lavender-bee", "lavender-fields", "Bee on lavender", lavender_bee,
+            overrides={**LAV, "beeY": "#F6C445", "beeD": "#2A2420", "wing": "#FFFFFF"},
+            checks=[("beeY", "sky"), ("lav", "far"), ("beeY", "lav"), ("lav", "sky")], fixes={"far": ["mid", "near"], "sky": ["sky2"]}),
+    Concept("rainbow-over-hills", "rainbow-chasing", "Rainbow over the hills", rainbow_hills, overrides=BOW,
+            checks=[("r1", "sky"), ("r6", "sky"), ("light", "mid"), ("r3", "sky")], fixes={"sky": ["sky2", "#DCE9F2"]}),
+    Concept("rainbow-sun-cloud", "rainbow-chasing", "Sun, cloud & rainbow", rainbow_cloud, overrides=BOW,
+            checks=[("r1", "sky"), ("r6", "sky"), ("light", "sky"), ("r3", "sky")], fixes={"sky": ["far", "sky2", "#BFD8E6"]}),
+    Concept("rainbow-road-trip", "rainbow-chasing", "Chasing the rainbow", rainbow_road, overrides=BOW,
+            checks=[("r1", "sky"), ("r6", "sky"), ("hero", "dark"), ("dark", "mid"), ("r3", "sky")],
+            fixes={"sky": ["sky2", "#DCE9F2"], "hero": ["pop", "hero2", "light"]}),
+    Concept("firefly-jar", "fireflies", "Jar of fireflies", firefly_jar, NIGHT_PAL, overrides=FLY,
+            checks=[("sky", "light"), ("jar", "sky"), ("lid", "sky")], fixes=NIGHT_FIX),
+    Concept("firefly-forest", "fireflies", "Glowing forest", firefly_forest, NIGHT_PAL, overrides=FLY,
+            checks=[("sky", "light"), ("far", "sky"), ("trunkN", "mid")], fixes={**NIGHT_FIX, "far": ["near", "deep"]}),
+    Concept("firefly-closeup", "fireflies", "Firefly", firefly_bug, NIGHT_PAL, overrides=FLY,
+            checks=[("sky", "light"), ("fly", "sky"), ("bug", "sky")], fixes={"sky": ["deep", "mark", "#1F2A44"], "fly": ["#5A4E44"]}),
 ]
 
 

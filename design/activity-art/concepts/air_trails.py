@@ -122,12 +122,12 @@ def hang_ramp(d: Drawing):
 
 
 def hang_rio(d: Drawing):
-    d.disc("glow", 52, 58, 16)
+    d.disc("glow", 60, 50, 15)
     d.shape("light", cloud(112, 34, 0.7))
     d.band("far", "M-30 130 L230 130", line=False)
     # Corcovado with the statue, then Sugarloaf and Urca
-    d.shape("far", "M-30 132 L4 84 L14 76 L24 86 L40 132Z", line=True)
-    d.shape("dark", "M13 68 h2 v9 h-2Z M9 70.5 h10 v1.6 h-10Z")
+    d.shape("near", "M-30 134 L4 98 L20 80 L34 96 L58 134Z")
+    d.shape("dark", "M18.8 66 h2.4 v14 h-2.4Z M14 69.5 h12 v2.2 h-12Z")
     d.stroke("dark", "M126 112 L158 74", 0.9)
     d.shape("deep", "M106 134 C108 118 116 110 126 110 C136 110 142 120 144 134Z")
     d.shape("mid", "M136 134 C138 98 146 72 160 70 C174 70 182 100 186 134Z")
@@ -136,7 +136,7 @@ def hang_rio(d: Drawing):
     d.band("near", waves(150, 3, 34), line=False)
     d.band("ground", "M-30 172 Q60 158 120 168 T230 164")
     d.band("deep", hills(188, 4, 20), line=False)
-    group(d, "translate(76 82) rotate(8) scale(.5)", lambda: _delta(d, sail="pop", alt="light"))
+    group(d, "translate(82 80) rotate(8) scale(.5)", lambda: _delta(d, sail="pop", alt="light"))
 
 
 # ================================================================ SCENIC FLIGHT
@@ -185,16 +185,15 @@ def scenic_nazca(d: Drawing):
     d.disc("glow", 150, 30, 12)
     d.band("far", "M-30 52 L10 40 L36 48 L70 34 L104 46 L140 38 L176 50 L230 42")
     d.band("ground", "M-30 56 Q100 50 230 56")
-    d.shape("mid", "M-30 120 Q30 100 70 130 T150 190 L-30 230Z", shadow=False, line=False)
-    d.stroke("dark", "M150 230 L190 58", 1.6, line=False)
-    bird = ("M100 104 L100 162 "
+    d.shape("mid", "M-30 130 Q30 110 60 140 T120 230 L-30 230Z", shadow=False, line=False)
+    bird = ("M100 104 L100 166 "
             "M96 104 a4 4 0 1 1 8 0 "
             "M93 100 C90 90 92 78 100 74 C108 78 110 90 107 100 "
-            "M93 92 L52 76 L50 82 L58 84 L48 88 L58 91 L50 96 L94 98 "
-            "M107 92 L148 76 L150 82 L142 84 L152 88 L142 91 L150 96 L106 98 "
+            "M93 92 L50 74 L48 81 L57 84 L46 88 L57 91 L48 96 L94 99 "
+            "M107 92 L150 74 L152 81 L143 84 L154 88 L143 91 L152 96 L106 99 "
             "M96 76 L88 58 L93 56 L98 70 L100 54 L104 54 L102 70 L107 56 L112 58 L104 76")
-    group(d, "translate(98 112) scale(1 .78) translate(-100 -108)", lambda: d.stroke("light", bird, 2.6))
-    group(d, "translate(150 116) rotate(-28) scale(.62)", lambda: _plane_top(d))
+    group(d, "translate(96 116) scale(1.18 .92) translate(-100 -110)", lambda: d.stroke("light", bird, 2.6))
+    group(d, "translate(158 72) rotate(-60) scale(.56)", lambda: _plane_top(d))
 
 
 def scenic_heart(d: Drawing):
@@ -223,25 +222,27 @@ def _sailplane_top(d: Drawing, body="light", trim="pop"):
 
 
 def glide_airfield(d: Drawing):
-    d.disc("glow", 46, 56, 16)
-    d.shape("light", cloud(126, 36, 0.9))
-    d.band("far", hills(120, 8, 20))
-    d.shape("near", rrect(150, 96, 44, 26, 2))
-    d.shape("deep", "M146 98 Q172 80 198 98Z")
-    d.band("mid", "M-30 140 Q100 132 230 140")
-    d.stroke("ground", "M-30 168 Q100 156 230 168", 7, line=False)
-    _windsock(d, 28, 136, 40)
+    d.disc("glow", 46, 54, 16)
+    d.shape("light", cloud(130, 30, 0.8))
+    d.band("far", hills(140, 10, 20))
+    d.band("mid", "M-30 162 Q60 148 120 156 T230 150")
+    d.stroke("ground", "M-30 176 Q60 164 120 170 T230 166", 4, line=False)
+    d.band("near", hills(186, 5, 10), line=False)
+    d.shape("light", cloud(-4, 140, 1.0))
 
     def glider():
-        d.shape("hero", "M-3 -12 L-2 -50 L2 -50 L3 -12Z")
-        d.shape("hero", rrect(-20, -54, 40, 5, 2.5))
-        d.shape("hero2", rrect(-2.5, -52, 5, 14, 1.5), shadow=False, spot=True)
-        d.shape("hero", "M0 -6 L-86 -22 L-87 -16 L0 4 L86 22 L87 16Z")
-        d.shape("hero2", "M-76 -20 L-86 -22 L-87 -16 L-77 -14Z M76 20 L86 22 L87 16 L77 14Z", shadow=False, spot=True)
-        d.marks("dark", circle(0, 20, 5))
-        d.shape("hero", ellipse(0, 4, 9, 13))
-        d.shape("light", "M-7 -1 Q0 -12 7 -1 Q0 2 -7 -1Z", shadow=False)
-    group(d, "translate(100 128) rotate(10)", glider)
+        # far wing rising up and away, near wing sweeping down towards us
+        d.shape("hero", "M116 95 L130 95 L170 26 L165 25Z")
+        d.shape("hero2", "M170 26 L165 25 L159 36 L165 37Z", shadow=False, spot=True)
+        d.shape("hero", "M34 101 L38 62 L48 62 L54 99Z")
+        d.shape("hero", "M26 62 L60 60 L60 65 L26 66Z")
+        d.shape("hero2", "M40 63 L48 63 L46 72 L39 72Z", shadow=False, spot=True)
+        d.shape("hero", "M162 102 Q160 91 142 89 L122 91 Q96 95 50 97 L34 99 L34 104 L50 104 Q96 106 122 110 Q152 112 162 102Z")
+        d.shape("dark", "M124 91 Q132 82 146 86 Q154 89 156 95 Q140 92 124 91Z")
+        d.shape("light", "M134 86 Q142 85 148 89 L136 89Z", shadow=False, line=False)
+        d.shape("hero", "M112 104 L132 104 L82 182 L70 182Z")
+        d.shape("hero2", "M82 182 L70 182 L76 172 L88 172Z", shadow=False, spot=True)
+    group(d, "translate(100 100) rotate(-8) scale(.98) translate(-100 -104)", glider)
 
 
 def glide_tow(d: Drawing):
@@ -316,17 +317,22 @@ def micro_falls(d: Drawing):
     d.band("far", "M-30 96 Q100 90 230 96")
     d.band("sky2", "M-30 104 Q100 100 230 104")
     d.stroke("light", "M10 101 h18 M70 100 h22 M140 101 h20", 1.6, line=False)
-    # the curtain of water dropping into the gorge
-    d.shape("light", "M-30 110 Q100 106 230 110 L230 156 L-30 156Z", line=False)
+    # the curtain of water dropping into the gorge, broken by rocky buttresses
+    d.band("deep", "M-30 110 Q100 106 230 110", line=False)
+    for x0, x1 in [(-30, 30), (40, 112), (124, 230)]:
+        d.shape("light", f"M{x0} 110 L{x1} 109 L{x1} 160 L{x0} 160Z", shadow=False, line=False)
+    d.shape("near", "M30 109 L40 109 L42 160 L28 160Z M112 109 L124 109 L126 160 L110 160Z", shadow=False, line=False)
     _line_only(d, "M-30 110 Q100 106 230 110", 3)
-    d.stroke("sky2", "M6 114 V150 M24 112 V152 M44 112 V150 M62 112 V152 M84 111 V150 M104 111 V152 M124 111 V150 "
-                     "M144 112 V152 M164 112 V150 M184 113 V152", 2, line=False)
+    _line_only(d, "M30 110 L28 150 M40 110 L42 150 M112 110 L110 150 M124 110 L126 150", 2)
+    d.stroke("sky2", "M6 114 V150 M20 112 V152 M52 112 V150 M66 112 V152 M82 111 V150 M98 111 V152 "
+                     "M136 112 V152 M152 112 V150 M168 112 V152 M184 113 V150", 2.4, line=False)
     d.band("deep", "M-30 150 Q100 146 230 150", line=False)
     for x, y, s in [(-10, 150, 1.5), (40, 142, 1.3), (96, 150, 1.6), (150, 144, 1.3)]:
         d.shape("light", cloud(x, y, s), shadow=False, line=False)
     d.stroke("pop", "M52 150 A54 46 0 0 1 160 150", 3, line=False)
     d.stroke("hero2", "M57 150 A49 41 0 0 1 155 150", 3, line=False)
     d.stroke("far", "M62 150 A44 36 0 0 1 150 150", 3, line=False)
+    _line_only(d, "M56 150 A50 42 0 0 1 156 150", 2)
     d.band("near", "M-30 172 Q40 160 100 168 T230 162")
     for x, y, h in [(26, 172, 18), (40, 170, 14), (166, 166, 18), (180, 168, 14)]:
         d.shape("deep", _pine(x, y, h), line=False)
@@ -354,19 +360,22 @@ def skywalk_horseshoe(d: Drawing):
     d.band("near", "M-30 142 H80 L88 152 H140 L150 138 H230")
     d.band("deep", "M-30 174 Q60 168 100 172 T230 170")
     d.stroke("sky2", "M80 230 Q90 196 120 186 T150 172", 4, line=False)
-    _land(d, "ground", "M-30 92 H44 L48 230 H-30Z", "M-30 92 H44 L48 230")
-    d.shape("near", "M30 92 H44 L48 230 H36Z", shadow=False, line=False)
-    d.stroke("dark", "M-30 104 H40 M-30 124 H42 M-30 150 H43", 1.2, line=False)
-    # the horseshoe: glass floor with a steel rim
-    floor = "M40 88 H140 A22 18 0 0 1 140 124 H40 V112 H136 A8 6 0 0 0 136 100 H40Z"
-    d.shape("dark", "M40 124 H140 A22 18 0 0 0 162 108 L162 112 A22 18 0 0 1 140 128 H40Z", shadow=False)
-    d.shape("light", floor)
-    d.shape("sky2", "M40 92 H140 A18 14 0 0 1 140 120 H40 V114 H136 A12 8 0 0 0 136 98 H40Z", shadow=False, spot=True)
-    d.stroke("dark", "M40 80 H140 A22 18 0 0 1 162 98", 1.6)
-    d.stroke("dark", "M60 80 V88 M84 80 V88 M108 80 V88 M132 80 V88 M154 84 V94", 1.2)
-    for x, role in [(70, "pop"), (120, "hero")]:
-        d.shape(role, rrect(x - 2.5, 72, 5, 14, 2.5), shadow=False)
-        d.marks("dark", circle(x, 69, 3))
+    _land(d, "ground", "M-30 92 H46 L50 230 H-30Z", "M-30 92 H46 L50 230")
+    d.shape("near", "M32 92 H46 L50 230 H38Z", shadow=False, line=False)
+    d.stroke("dark", "M-30 108 H42 M-30 132 H44 M-30 160 H45", 1.2, line=False)
+    # the horseshoe seen from above: a glass-walled U over the void
+    d.shape("dark", "M44 128 H138 A20 16 0 0 0 158 112 L158 117 A20 16 0 0 1 138 133 H44Z", shadow=False)
+    d.shape("light", "M44 96 H138 A20 16 0 0 1 138 128 H44Z M44 104 H136 A10 8 0 0 1 136 120 H44Z", extra='fill-rule="evenodd"')
+    d.stroke("dark", "M44 104 H136 A10 8 0 0 1 136 120 H44", 1.2, line=False)
+    # people on the far arm and at the tip
+    for x, y, role in [(70, 101, "pop"), (100, 101, "hero"), (146, 112, "hero2")]:
+        d.limb("dark", f"M{x} {y} V{y - 6}", 2.6, shadow=False)
+        d.shape(role, rrect(x - 3, y - 15, 6, 10, 3), shadow=False)
+        d.marks("dark", circle(x, y - 18, 2.8))
+    d.raw('<path d="M44 96 H138 A20 16 0 0 1 158 112 L158 103 A20 16 0 0 0 138 87 H44Z M44 128 H138 A20 16 0 0 0 158 112 '
+          'L158 103 A20 16 0 0 1 138 119 H44Z" fill="#fff" opacity=".45"/>', "")
+    d.stroke("dark", "M44 87 H138 A20 16 0 0 1 138 119 H44", 1.6)
+    d.stroke("dark", "M64 87 V96 M88 87 V96 M112 87 V96 M136 87 V96 M64 119 V128 M88 119 V128 M112 119 V128 M136 119 V128 M157 103 V112", 1)
 
 
 def skywalk_glass(d: Drawing):
@@ -426,11 +435,10 @@ def swing_canyon(d: Drawing):
     d.shape("deep", "M30 30 L36 60 L30 96 L40 140 L34 180 L44 230 L34 230 L26 180 L30 140 L22 96 L28 60Z", shadow=False, line=False)
     d.shape("deep", "M170 30 L164 64 L172 100 L160 140 L168 180 L156 230 L166 230 L176 180 L170 140 L180 100 L174 64Z", shadow=False, line=False)
     d.stroke("dark", "M28 30 Q100 44 172 30", 2.2)
-    d.stroke("light", "M64 118 A80 80 0 0 0 136 118", 2, line=False)
-    _line_only(d, "M60 116 A80 80 0 0 0 72 124", 1.6)
-    d.stroke("dark", "M100 38 L146 112", 1.8)
-    d.stroke("light", "M160 128 l10 4 M156 136 l9 6 M164 120 l10 2", 2)
-    group(d, "translate(146 112) rotate(-32)", lambda: _hanging_rider(d, 0, 0, 1.4, body="hero", helmet="pop"))
+    d.raw('<path d="M60 112 A84 84 0 0 0 132 120" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 5" opacity=".9"/>', "")
+    d.stroke("dark", "M100 38 L136 104", 1.8)
+    d.stroke("light", "M152 124 l10 4 M146 134 l9 6 M156 114 l10 2", 2)
+    group(d, "translate(136 104) rotate(-28)", lambda: _hanging_rider(d, 0, 0, 1.7, body="hero", helmet="pop"))
 
 
 def swing_bali(d: Drawing):
@@ -469,20 +477,21 @@ def swing_bali(d: Drawing):
 
 
 def swing_treehouse(d: Drawing):
-    d.disc("glow", 160, 50, 14)
-    d.shape("far", "M120 128 L156 66 L166 66 L204 128Z")
-    d.shape("light", "M156 66 L166 66 L174 80 L166 76 L160 82 L154 76 L148 80Z", shadow=False)
-    d.shape("light", cloud(150, 50, 0.6), shadow=False)
-    d.band("light", "M-30 132 Q0 120 30 130 Q60 120 90 130 Q120 118 150 128 Q180 120 230 128")
-    d.band("sky2", "M-30 160 Q20 150 60 158 Q100 148 140 158 Q180 150 230 156", line=False)
-    _land(d, "near", "M-30 150 Q10 136 40 140 Q64 146 70 230 L-30 230Z", "M-30 150 Q10 136 40 140 Q64 146 70 230")
-    d.limb("dark", "M30 150 L32 40 M32 66 Q60 50 104 52", 8)
-    d.shape("deep", "M-10 50 Q-14 20 20 14 Q40 -4 64 16 Q90 18 86 40 Q80 54 50 50 Q20 62 -10 50Z")
-    d.shape("ground", rrect(10, 76, 46, 28, 2))
-    d.shape("dark", rrect(26, 86, 12, 18, 1.5), shadow=False)
-    d.shape("pop", "M4 78 L33 62 L62 78Z")
-    d.stroke("dark", "M6 104 H58", 2.4)
-    d.stroke("dark", "M94 52 L124 128 M100 52 L132 126", 1.6)
+    d.disc("glow", 176, 70, 11)
+    d.band("far", "M-30 136 L40 126 L90 132 L140 124 L230 130")
+    d.shape("mid", "M110 134 L148 76 L160 76 L198 134Z")
+    d.shape("light", "M148 76 L160 76 L168 88 L161 85 L155 91 L149 85 L141 88Z", shadow=False)
+    d.raw('<g fill="#fff" opacity=".8"><circle cx="154" cy="66" r="6"/><circle cx="160" cy="56" r="7"/><circle cx="152" cy="46" r="5"/></g>', "")
+    d.band("light", "M-30 144 Q0 132 30 142 Q60 132 90 142 Q120 130 150 140 Q180 132 230 140")
+    d.band("sky2", "M-30 168 Q20 158 60 166 Q100 156 140 166 Q180 158 230 164", line=False)
+    _land(d, "near", "M-30 160 Q20 140 50 144 Q74 150 80 230 L-30 230Z", "M-30 160 Q20 140 50 144 Q74 150 80 230")
+    d.limb("dark", "M46 150 L48 62 M48 82 Q80 66 126 68", 7)
+    d.shape("deep", "M14 66 Q8 40 40 34 Q56 20 78 34 Q102 34 100 54 Q94 68 66 64 Q40 76 14 66Z")
+    d.shape("ground", rrect(26, 100, 44, 26, 2))
+    d.shape("dark", rrect(42, 110, 11, 16, 1.5), shadow=False)
+    d.shape("pop", "M20 102 L48 84 L76 102Z")
+    d.stroke("dark", "M18 126 H78", 2.6)
+    d.stroke("dark", "M116 68 L140 136 M122 68 L150 134", 1.6)
 
     def rider():
         d.shape("dark", rrect(-12, -2, 24, 4, 2))
@@ -490,7 +499,7 @@ def swing_treehouse(d: Drawing):
         d.limb("hero2", "M-2 -4 L-6 -22", 7)
         d.limb("hero2", "M-5 -18 L-2 -30", 3, shadow=False)
         d.shape("dark", circle(-8, -30, 5))
-    group(d, "translate(128 128) rotate(-22)", rider)
+    group(d, "translate(146 136) rotate(-20)", rider)
 
 
 # ================================================================ DRONE PHOTOGRAPHY
@@ -557,13 +566,14 @@ def drone_beach(d: Drawing):
     brolly(40, 160, 12, "hero2", "pop")
     d.shape("hero2", rrect(110, 150, 13, 24, 2), shadow=False)
     # viewfinder frame
-    d.stroke("light", "M30 52 V36 H46 M154 36 H170 V52 M170 150 V166 H154 M46 166 H30 V150", 3.2)
-    d.marks("pop", circle(40, 44, 3.6) if d.paper else "")
+    d.stroke("light", "M46 62 V46 H62 M138 46 H154 V62 M154 138 V154 H138 M62 154 H46 V138", 3.2)
+    d.marks("pop", circle(56, 56, 3.4) if d.paper else "")
     d.stroke("light", "M94 101 H106 M100 95 V107", 1.8)
 
 
 def drone_controller(d: Drawing):
-    d.disc("glow", 160, 40, 13)
+    d.shape("light", cloud(150, 130, 0.8))
+    d.shape("light", cloud(4, 136, 0.7))
     d.band("far", hills(150, 10, 20))
     d.band("near", hills(176, 6, -10))
     # phone on the clamp, showing the live view
@@ -613,8 +623,8 @@ def trek_hut(d: Drawing):
         d.shape("pop", rrect(x - 5, 107, 4.5, 12, 1), shadow=False)
         d.shape("pop", rrect(x + 12.5, 107, 4.5, 12, 1), shadow=False)
     d.shape("dark", rrect(130, 112, 10, 18, 1.5), shadow=False)
-    d.stroke("dark", "M184 130 V90", 1.8)
-    d.shape("hero", "M185 90 L200 94 L185 99Z", spot=True)
+    d.stroke("dark", "M82 130 V88", 1.8)
+    d.shape("hero", "M83 88 L97 92 L83 97Z", spot=True)
     d.stroke("dark", "M104 116 H110 M160 122 H168 M116 124 H124", 1.2, line=False)
     d.band("deep", hills(188, 4, 30), line=False)
 
@@ -651,59 +661,66 @@ def trek_torres(d: Drawing):
     d.band("sky2", "M-30 144 Q100 138 230 144")
     d.stroke("light", "M30 152 h22 M96 150 h26 M150 154 h20", 1.6, line=False)
     d.band("ground", "M-30 168 Q60 156 120 164 T230 160")
-    d.shape("hero", "M150 166 L162 146 L174 166Z", spot=True)
-    d.shape("dark", "M160 166 L162 156 L164 166Z", shadow=False)
+    d.shape("hero", "M136 166 L148 146 L160 166Z", spot=True)
+    d.shape("dark", "M146 166 L148 156 L150 166Z", shadow=False)
     d.band("deep", hills(186, 5, 20), line=False)
 
 
 # ================================================================ BOULDERING
 def boulder_pad(d: Drawing):
-    d.disc("glow", 150, 44, 14)
+    d.disc("glow", 152, 42, 13)
     for x, y, h in [(10, 120, 50), (30, 126, 64), (52, 118, 42), (150, 122, 56), (172, 120, 46), (190, 126, 60)]:
         d.shape("deep", _pine(x, y, h), line=False)
     d.band("far", "M-30 124 Q100 118 230 124", line=False)
     d.band("mid", hills(146, 6, 20))
-    rock = "M30 160 C24 120 40 84 80 70 C110 60 150 70 166 100 C176 120 174 146 168 160Z"
+    rock = "M26 164 L30 126 L50 94 L88 74 L130 72 L158 90 L172 124 L170 164Z"
     d.shape("far", rock)
-    d.shape("near", "M120 66 C150 72 168 90 172 120 C174 140 170 152 168 160 L132 160 C150 130 146 96 120 66Z", shadow=False, line=False)
-    d.stroke("near", "M60 110 Q72 120 70 136 M100 82 Q110 96 104 108", 2, line=False)
-    for x, y, role in [(62, 132, "pop"), (82, 108, "hero2"), (100, 92, "pop"), (124, 82, "hero2"), (140, 104, "pop")]:
-        d.shape(role, ellipse(x, y, 4.5, 3.2), shadow=False, spot=role == "pop")
-        d.raw(f'<ellipse cx="{x}" cy="{y + 4}" rx="6" ry="3" fill="#fff" opacity=".6"/>', "")
-    d.marks("light", "M72 132 l4 0 l0 2 l-4 0Z M92 108 l4 0 l0 2 l-4 0Z")
+    d.shape("near", "M130 72 L158 90 L172 124 L170 164 L136 164 L146 120Z", shadow=False, line=False)
+    d.shape("light", "M50 94 L88 74 L130 72 L112 84 L74 90Z", shadow=False, line=False)
+    _line_only(d, "M130 72 L146 120 L136 164", 1.8)
+    d.stroke("near", "M60 114 L70 126 L66 144 M96 86 L104 100", 2, line=False)
+    holds = [(58, 140, "pop"), (74, 116, "hero2"), (94, 104, "pop"), (114, 90, "hero2"), (130, 110, "pop"), (100, 132, "hero2")]
+    for x, y, role in holds:
+        d.raw(f'<ellipse cx="{x}" cy="{y + 1}" rx="8" ry="6" fill="#fff" opacity=".55"/>', "")
+        d.shape(role, f"M{x - 6} {y + 1} Q{x - 6} {y - 5} {x} {y - 5} Q{x + 7} {y - 5} {x + 6} {y + 2} Q{x} {y + 5} {x - 6} {y + 1}Z", spot=role == "pop")
     d.band("ground", "M-30 168 Q100 160 230 168")
     # crash pad
-    d.shape("hero", "M54 160 L146 156 L152 176 L48 182Z")
-    d.shape("dark", "M48 182 L152 176 L152 182 L48 188Z", shadow=False)
-    d.stroke("hero2", "M78 159 L76 182 M118 157 L120 179", 3.2)
+    d.shape("hero", "M50 160 L150 156 L156 176 L44 182Z")
+    d.shape("dark", "M44 182 L156 176 L156 182 L44 188Z", shadow=False)
+    d.stroke("hero2", "M78 159 L76 182 M120 157 L122 179", 3.2)
 
 
 def boulder_chalk(d: Drawing):
-    d.disc("glow", 148, 48, 16)
+    d.disc("glow", 152, 50, 15)
     d.band("far", "M-30 140 C10 100 40 96 70 120 C90 104 120 100 140 116 C170 96 200 110 230 130")
     d.band("near", hills(178, 6, 20))
-    d.raw('<g fill="#fff" opacity=".8">' + "".join(f'<circle cx="{x}" cy="{y}" r="{r}"/>' for x, y, r in
-          [(80, 54, 10), (96, 46, 12), (114, 52, 9), (126, 40, 6), (70, 40, 6), (104, 32, 5)]) + "</g>",
-          '<g fill="none" stroke-dasharray="3 4">' + "".join(f'<circle cx="{x}" cy="{y}" r="{r}" stroke="#888" stroke-width="1.4"/>' for x, y, r in
-          [(80, 54, 10), (96, 46, 12), (114, 52, 9)]) + "</g>")
-    d.limb("dark", "M48 150 H152", 5)
-    d.shape("hero", "M62 82 L138 82 L136 150 Q136 166 120 166 H80 Q64 166 64 150Z")
-    d.shape("hero2", "M64 128 L136 128 L136 140 L64 140Z", shadow=False, spot=True)
+    if d.paper:
+        d.raw('<g fill="#fff" opacity=".85">' + "".join(f'<circle cx="{x}" cy="{y}" r="{r}"/>' for x, y, r in
+              [(82, 56, 10), (98, 46, 12), (116, 54, 9), (128, 40, 6), (70, 42, 6), (106, 30, 5)]) + "</g>")
+    else:
+        d.raw("", '<g fill="none" stroke-dasharray="3 4">' + "".join(
+            f'<circle cx="{x}" cy="{y}" r="{r}" stroke="{d.c["ink"]}" stroke-width="1.4"/>' for x, y, r in
+            [(82, 56, 10), (98, 46, 12), (116, 54, 9)]) + "</g>")
+    d.limb("dark", "M44 150 H156", 5)
+    d.shape("hero", "M62 82 L138 82 L134 152 Q133 166 118 166 H82 Q67 166 66 152Z")
+    d.shape("hero2", "M64 130 L136 130 L135 142 L65 142Z", shadow=False, spot=True)
+    d.raw('<g fill="#fff" opacity=".5"><ellipse cx="80" cy="104" rx="6" ry="3"/><ellipse cx="118" cy="114" rx="5" ry="2.5"/></g>', "")
     d.shape("light", "M58 76 Q100 64 142 76 Q144 88 136 90 Q100 82 64 90 Q56 88 58 76Z")
-    d.stroke("dark", "M88 86 Q84 100 90 104 M112 86 Q116 100 110 104", 1.6)
-    d.marks("dark", circle(90, 106, 3) + circle(110, 106, 3))
+    d.stroke("dark", "M68 86 Q56 98 60 112", 1.6)
+    d.shape("dark", rrect(56, 110, 8, 10, 3))
     # brush in its holder
-    d.shape("dark", rrect(138, 100, 10, 30, 3))
-    d.shape("pop", rrect(140, 74, 6, 30, 2), spot=True)
-    d.shape("light", rrect(138, 66, 10, 10, 2))
+    d.shape("dark", rrect(136, 100, 10, 30, 3))
+    d.shape("pop", rrect(138.5, 80, 5, 26, 2), spot=True)
+    d.shape("dark", rrect(136, 66, 10, 16, 2.5))
+    d.stroke("light", "M139 69 V79 M143 69 V79", 1, line=False)
 
 
 def boulder_shoe(d: Drawing):
     d.disc("glow", 52, 52, 16)
-    d.band("far", "M-30 120 C20 100 60 104 100 116 C140 104 180 100 230 112")
-    for x, y, role in [(150, 60, "pop"), (176, 88, "hero2"), (30, 92, "hero2")]:
-        d.shape(role, ellipse(x, y, 7, 5), spot=False)
-    d.band("mid", hills(168, 6, 20))
+    d.band("far", "M-30 112 C20 92 60 96 100 108 C140 96 180 92 230 104")
+    for x, y, role in [(22, 128, "pop"), (180, 120, "hero2"), (160, 160, "pop")]:
+        d.shape(role, f"M{x - 7} {y + 1} Q{x - 7} {y - 6} {x} {y - 6} Q{x + 8} {y - 6} {x + 7} {y + 2} Q{x} {y + 6} {x - 7} {y + 1}Z")
+    d.band("mid", hills(172, 6, 20))
     shoe = ("M30 112 C30 92 46 82 64 82 L92 82 C106 82 118 90 130 98 C148 108 166 118 172 132 C174 140 166 146 156 144 "
             "C134 140 112 138 92 140 C70 144 52 148 40 142 C32 136 30 124 30 112Z")
     sole = ("M30 120 C30 132 32 140 40 144 C52 150 70 146 92 142 C112 140 134 142 156 146 C166 148 176 142 172 130 "
@@ -716,7 +733,7 @@ def boulder_shoe(d: Drawing):
     for x in (82, 102, 120):
         d.shape("hero2", f"M{x} 82 L{x + 14} 86 L{x + 8} 128 L{x - 6} 126Z", shadow=False, spot=True)
         d.stroke("dark", f"M{x + 1} 104 H{x + 9}", 1, line=False)
-    d.band("deep", hills(186, 4, 20), line=False)
+    d.band("deep", hills(188, 4, 20), line=False)
 
 
 # ================================================================ VIA FERRATA
@@ -772,9 +789,12 @@ def vf_bridge(d: Drawing):
 
 def vf_dolomites(d: Drawing):
     d.disc("glow", 160, 44, 14)
-    d.shape("far", "M20 132 L36 70 L44 64 L50 132Z M48 132 L62 48 L74 40 L86 132Z M84 132 L96 74 L106 70 L114 132Z")
-    d.shape("light", "M36 70 L44 64 L42 74Z M62 48 L74 40 L70 54Z", shadow=False)
-    d.band("mid", "M-30 138 Q20 126 60 132 T140 128 T230 132")
+    d.shape("mid", "M18 136 L34 70 L44 64 L52 136Z M46 136 L62 46 L74 38 L88 136Z M84 136 L96 72 L106 68 L116 136Z")
+    d.shape("near", "M44 64 L52 136 L46 136 L40 90Z M74 38 L88 136 L80 136 L72 70Z M106 68 L116 136 L110 136 L104 96Z", shadow=False, line=False)
+    d.shape("light", "M34 70 L44 64 L41 76Z M62 46 L74 38 L69 54Z M96 72 L106 68 L102 80Z", shadow=False)
+    d.band("far", "M-30 138 Q20 126 60 132 T140 128 T230 132")
+    for x, y, h in [(4, 146, 18), (18, 148, 22), (34, 146, 16), (70, 148, 20), (86, 146, 16)]:
+        d.shape("deep", _pine(x, y, h), line=False)
     cliff = "M108 230 L118 140 L126 100 L120 60 L132 20 L130 -30 L230 -30 L230 230Z"
     _land(d, "near", cliff, "M108 230 L118 140 L126 100 L120 60 L132 20 L130 -30")
     d.stroke("deep", "M150 40 L160 90 L150 140 M180 20 L176 70 M190 120 L200 170", 2, line=False)
@@ -831,7 +851,7 @@ def abseil_cliff(d: Drawing):
         d.shape("dark", rrect(106, 112, 14, 7, 3), shadow=False)
         d.shape("light", circle(100, 76, 7.5))
         d.shape("pop", "M92 75 a8 8 0 0 1 16 -2 Q100 70 92 75Z", spot=True)
-    group(d, "translate(0 2)", person)
+    group(d, "translate(130 110) scale(1.3) translate(-126 -104)", person)
 
 
 def abseil_falls(d: Drawing):
@@ -874,10 +894,10 @@ def _dirtbike(d: Drawing, body="hero", trim="hero2", rider=False, suit="hero2", 
     d.shape("dark", rrect(84, 108, 30, 22, 5))
     d.stroke("light", "M90 114 h18 M90 120 h18", 1.4, line=False)
     d.stroke("dark", "M112 126 Q120 134 104 136 Q80 130 70 104 L52 98", 3)
-    d.shape(body, "M20 88 L80 90 L84 98 L60 102 Z", spot=True)
-    d.shape(body, "M76 92 L112 90 Q126 86 132 80 L134 96 Q118 104 94 106 L80 104Z", spot=True)
-    d.shape("dark", "M44 86 Q76 82 106 84 L106 89 Q76 88 46 91Z")
-    d.shape("light", "M72 94 L92 94 L90 104 L78 104Z", shadow=False)
+    d.shape("dark", rrect(36, 92, 26, 6, 3))
+    d.shape(body, "M18 82 L60 92 L76 90 L110 88 Q122 86 130 80 L134 84 L128 104 L110 108 L92 106 L80 100 L62 100Z", spot=True)
+    d.shape("dark", "M40 85 Q70 86 108 84 L110 89 L76 91 L60 93 L40 88Z", shadow=False)
+    d.shape("light", "M64 93 L84 92 L82 100 L67 100Z", shadow=False)
     d.shape(body, "M132 92 L172 96 L168 102 L134 100Z", spot=True)
     d.shape("light", "M128 76 Q138 76 140 84 L138 92 Q130 88 128 76Z")
     d.limb("dark", "M124 72 L134 74 L142 70", 3)
@@ -991,17 +1011,16 @@ def ebike_vineyard(d: Drawing):
 def ebike_charge(d: Drawing):
     d.disc("glow", 50, 50, 16)
     d.band("far", hills(118, 10, 20))
-    d.shape("ground", rrect(136, 70, 64, 80, 2))
-    d.shape("hero2", "M130 72 L168 54 L206 72Z", spot=False)
-    d.shape("dark", rrect(150, 96, 16, 24, 2), shadow=False)
-    d.shape("light", rrect(178, 96, 14, 14, 1.5), shadow=False)
+    d.shape("ground", rrect(140, 70, 64, 80, 2))
+    d.shape("hero2", "M134 72 L172 54 L210 72Z")
+    d.shape("dark", rrect(156, 96, 14, 24, 2), shadow=False)
     d.band("mid", "M-30 150 Q100 144 230 150")
     # charging post with its cable to the battery
-    d.shape("dark", rrect(118, 60, 26, 94, 6))
-    d.shape("light", rrect(123, 68, 16, 20, 3), shadow=False)
-    d.marks("pop", "M133 70 L126 79 L131 79 L128 86 L137 76 L132 76Z")
-    d.stroke("dark", "M131 104 Q130 132 112 130 Q92 128 86 122", 2.4)
-    group(d, "translate(76 130) scale(.86) translate(-100 -118)", lambda: _ebike(d))
+    d.shape("dark", rrect(124, 62, 24, 92, 6))
+    d.shape("light", rrect(128, 70, 16, 20, 3), shadow=False)
+    d.marks("pop", "M138 72 L131 81 L136 81 L133 88 L142 78 L137 78Z")
+    d.stroke("dark", "M136 106 Q136 136 112 134 Q92 132 80 124", 2.4)
+    group(d, "translate(64 130) scale(.86) translate(-100 -118)", lambda: _ebike(d))
     d.band("near", "M-30 176 Q100 168 230 176", line=False)
 
 
@@ -1014,14 +1033,14 @@ CONCEPTS = [
     Concept("hang-launch-ramp", "hang-gliding", "Launch ramp", hang_ramp,
             checks=[("hero", "sky"), ("hero2", "near"), ("near", "mid")], fixes={"hero": ["pop", "deep"], "hero2": ["light", "pop"]}),
     Concept("hang-rio-bay", "hang-gliding", "Over the bay", hang_rio, SEA,
-            checks=[("pop", "sky"), ("mid", "sky"), ("deep", "mid")], fixes={"pop": ["hero", "deep"]}),
+            checks=[("pop", "sky"), ("mid", "sky"), ("near", "sky"), ("deep", "mid")], fixes={"pop": ["hero", "deep"]}),
     Concept("scenic-bush-plane", "scenic-flight", "Bush plane", scenic_cessna,
             checks=[("hero", "sky"), ("hero", "far"), ("hero2", "hero")], fixes={"hero": ["pop", "deep"]}),
     Concept("scenic-nazca-lines", "scenic-flight", "Nazca lines", scenic_nazca, overrides={"ground": "#C98B5B", "mid": "#B97A4E", "light": "#FBEBD0"},
             checks=[("hero", "ground"), ("far", "sky")], fixes={"hero": ["hero2", "pop"]}),
     Concept("scenic-heart-reef", "scenic-flight", "Heart Reef", scenic_heart, SEA,
             checks=[("pop", "light"), ("pop", "mid"), ("light", "mid")], fixes={"pop": ["hero", "deep"]}),
-    Concept("glide-airfield", "gliding", "Glider on the airfield", glide_airfield,
+    Concept("glide-sailplane", "gliding", "Sailplane over the hills", glide_airfield,
             checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid")], fixes={"hero": ["pop", "deep"]}),
     Concept("glide-aerotow", "gliding", "Aerotow", glide_tow,
             checks=[("light", "far"), ("light", "ground"), ("light", "mid")], fixes={"far": ["near"]}),
@@ -1044,7 +1063,7 @@ CONCEPTS = [
     Concept("swing-bali", "giant-swing", "Jungle swing", swing_bali,
             checks=[("pop", "sky"), ("pop", "far"), ("deep", "sky")], fixes={"pop": ["hero", "deep"]}),
     Concept("swing-treehouse", "giant-swing", "Swing at the end of the world", swing_treehouse,
-            checks=[("hero2", "sky"), ("pop", "deep"), ("far", "sky"), ("light", "sky")], fixes={"hero2": ["pop", "hero"], "light": ["sky2"]}),
+            checks=[("hero2", "sky"), ("hero2", "mid"), ("pop", "deep"), ("light", "far"), ("mid", "sky")], fixes={"hero2": ["pop", "hero"], "mid": ["near", "deep"]}),
     Concept("drone-quad", "drone-photography", "Quadcopter", drone_quad,
             checks=[("hero", "sky"), ("hero", "far"), ("dark", "sky")], fixes={"hero": ["pop", "deep"]}),
     Concept("drone-beach-shot", "drone-photography", "Beach from above", drone_beach, SEA,
@@ -1068,7 +1087,7 @@ CONCEPTS = [
     Concept("ferrata-bridge", "via-ferrata", "Cable bridge", vf_bridge,
             checks=[("near", "sky"), ("hero2", "sky"), ("dark", "sky")], fixes={"hero2": ["pop", "hero"]}),
     Concept("ferrata-dolomites", "via-ferrata", "Dolomites ladder", vf_dolomites,
-            checks=[("far", "sky"), ("hero2", "near"), ("dark", "near")], fixes={"hero2": ["light", "pop"]}),
+            checks=[("mid", "sky"), ("hero2", "near"), ("dark", "near")], fixes={"hero2": ["light", "pop"]}),
     Concept("abseil-figure-eight", "abseiling", "Figure-8 descender", abseil_eight,
             checks=[("light", "sky"), ("pop", "sky"), ("pop", "light")], fixes={"light": ["mid", "far", "near"]}),
     Concept("abseil-cliff", "abseiling", "Over the edge", abseil_cliff,

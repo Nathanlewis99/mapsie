@@ -373,8 +373,8 @@ def giraffe_head(d: Drawing):
 def _giraffe_head(d: Drawing):
     # acacia branch for it to browse
     d.limb("dark", "M230 70 C206 56 190 58 168 48", 4)
-    for x, y in [(174, 58), (192, 62), (208, 70)]:
-        d.shape("near", scallop(x, y, 11, 9, 0.18, ry=8), shadow=False)
+    for x, y in [(174, 58), (194, 62)]:
+        d.shape("leaf", scallop(x, y, 11, 9, 0.18, ry=8), shadow=False)
     d.stroke("dark", "M176 52 l-3 -5 M190 56 l2 -6 M204 62 l-2 -6", 1.4)
     d.shape("hero", GIRAFFE_NECK)
     # short brown mane along the back of the neck
@@ -683,7 +683,8 @@ def buffalo(d: Drawing):
     d.shape("hero", BUF_BODY)
     # head held low, facing left, horns sweeping down and up
     d.shape("hero", "M68 86 C58 84 46 92 40 104 C36 112 36 120 40 124 C46 128 54 124 58 118 C64 112 70 106 72 98Z")
-    d.shape("horn", "M70 84 C60 76 46 78 40 86 C36 90 32 88 30 82 C28 94 36 100 46 96 C54 92 62 92 70 94Z", spot=True)
+    d.shape("horn", "M74 82 C62 72 44 74 36 86 C32 92 26 90 22 78 C18 94 28 104 42 100 C52 96 62 94 74 96Z", spot=True)
+    d.shape("horn2", "M58 78 C66 76 72 80 74 86 L70 92 C66 86 62 82 58 80Z", shadow=False, line=False)
     d.shape("hero", leaf(70, 96, 16, 5, 160), shadow=False)
     d.marks("mark", circle(54, 100, 1.8))
     d.marks("hero2", ellipse(42, 120, 5, 4))
@@ -759,23 +760,31 @@ def gnu_head(d: Drawing):
 
 
 def gnu_crossing(d: Drawing):
-    d.disc("glow", 150, 46, 18)
-    d.band("far", hills(88, 6))
-    for i, x in enumerate(range(-10, 210, 26)):
-        group(d, f"translate({x} {58 + (i % 2) * 3}) scale(.24)", lambda: d.shape("dark", GNU_BODY + " " + GNU_HEAD))
-    # dusty bank on the right, the river below
-    d.shape("ground", "M120 110 C140 98 180 96 230 98 L230 230 L150 230 C150 180 140 140 120 110Z")
-    d.stroke("near", "M150 120 L170 140 M180 112 L196 130", 2, line=False)
-    d.band("water", waves(140, 4, 30))
-    group(d, "translate(140 37) scale(.42)", lambda: gnu(d))
-    # the leap: off the bank and into the river
-    for x, y, s in [(46, 150, 1), (72, 146, 0.6)]:
+    d.disc("glow", 46, 50, 20)
+    d.band("far", hills(84, 6))
+    for i, x in enumerate(range(-6, 210, 24)):
+        group(d, f"translate({x} {56 + (i % 2) * 3}) scale(.22)", lambda: (
+            d.shape("dark", GNU_BODY + " " + GNU_HEAD, shadow=False),
+            d.stroke("dark", "M80 120 L78 150 M94 120 L96 150 M134 120 L132 150 M144 116 L148 150", 6)))
+    d.band("water", waves(100, 3, 30))
+    # steep dusty bank on the right, with the next one about to jump
+    d.shape("bank", "M132 230 C132 180 130 140 142 112 C150 100 176 96 230 96 L230 230Z")
+    d.stroke("deep", "M150 130 l10 12 M164 116 l10 10 M146 160 l8 10", 2, line=False)
+    group(d, "translate(146 30) scale(.42)", lambda: gnu(d))
+    # the leap: mid-air, front legs tucked, back legs trailing
+    group(d, "translate(88 92) rotate(-16) scale(.74) translate(-100 -100)", lambda: gnu(d, leap=True))
+    for x, y, s in [(46, 148, 1.1), (30, 144, 0.6)]:
         d.shape("light", f"M{x - 18 * s} {y} L{x - 14 * s} {y - 16 * s} L{x - 6 * s} {y - 6 * s} L{x} {y - 22 * s} "
                          f"L{x + 6 * s} {y - 6 * s} L{x + 14 * s} {y - 16 * s} L{x + 18 * s} {y}Z", shadow=False)
-    group(d, "translate(96 106) rotate(-14) scale(.84) translate(-100 -100)", lambda: gnu(d, leap=True))
-    d.band("water2", waves(166, 3, 34), line=False)
-    ripples(d, [(30, 176, 1.4), (120, 164, 1.2), (100, 182, 1)])
-    d.band("deep", waves(188, 3, 38), line=False)
+    # swimmers: heads and horns above the water
+    for x, y in [(70, 158), (104, 170)]:
+        group(d, f"translate({x} {y}) scale(.5)", lambda: (
+            d.shape("hero", "M-14 0 C-14 -12 -6 -18 4 -16 C12 -14 14 -6 12 0Z"),
+            d.shape("horn", "M-4 -14 C-12 -16 -16 -22 -14 -28 C-10 -24 -6 -20 2 -18Z M4 -16 C8 -22 8 -26 6 -30 C12 -26 12 -20 8 -14Z", shadow=False),
+            d.marks("mark", circle(-6, -8, 2))))
+    d.band("water2", waves(152, 3, 34), line=False)
+    ripples(d, [(30, 176, 1.4), (120, 160, 1.2), (60, 186, 1)])
+    d.band("deep", waves(190, 3, 38), line=False)
 
 
 # ================================================================ HYENA
@@ -868,13 +877,13 @@ def wilddog_face(d: Drawing):
     d.marks("light", ellipse(96, 131, 2.5, 1.5))
 
 
-WDOG_BODY = ("M50 96 C58 88 80 86 104 88 C120 88 134 90 140 96 C144 102 140 110 132 112 C112 116 86 114 66 112 "
+WDOG_BODY = ("M50 96 C58 86 80 84 104 86 C122 86 136 88 142 96 C146 106 140 116 130 118 C112 120 86 114 66 112 "
              "C56 110 50 104 50 96Z")
 
 
 def wilddog(d: Drawing, phase=0):
-    legs = [["M132 104 L150 116 L164 116", "M126 106 L134 126 L144 132", "M62 104 L44 114 L30 110", "M70 106 L60 126 L50 132"],
-            ["M132 104 L140 124 L150 132", "M126 106 L146 112 L160 108", "M62 104 L54 124 L44 132", "M70 106 L50 110 L36 104"]][phase]
+    legs = [["M132 106 L150 122 L166 122", "M126 108 L132 130 L144 140", "M62 104 L46 120 L30 118", "M70 106 L62 130 L50 138"],
+            ["M132 106 L138 130 L150 140", "M126 108 L146 116 L162 112", "M62 104 L54 128 L42 138", "M70 106 L50 114 L34 108"]][phase]
     for p in legs[1::2]:
         d.limb("hero2", p, 5)
     d.limb("hero", "M54 94 C40 96 32 102 26 100", 6)
@@ -899,10 +908,9 @@ def wilddog_pack(d: Drawing):
     d.band("far", hills(108, 8))
     acacia(d, 34, -40, 0.56)
     d.band("mid", hills(124, 5, 30))
-    group(d, "translate(86 50) scale(.62)", lambda: wilddog(d, 1))
-    group(d, "translate(-14 78) scale(.7)", lambda: wilddog(d, 0))
+    group(d, "translate(66 46) scale(.62)", lambda: wilddog(d, 1))
     d.band("ground", hills(150, 4))
-    group(d, "translate(54 82) scale(.78)", lambda: wilddog(d, 1))
+    group(d, "translate(-10 34) scale(1.0)", lambda: wilddog(d, 0))
     grass(d, -10, 210, 178, 12, "near", 20)
     d.band("deep", hills(188, 4, 30), line=False)
 
@@ -1093,7 +1101,7 @@ CHEETAH_C = {"hero": "#E8BA62", "hero2": "#CF9C48", "mark": "#2D2219", "light": 
              "nose": "#3A2A20"}
 AFELE = {"hero": "#858079", "hero2": "#BDB6AC", "mark": "#3A3532", "light": "#F4EAD2", "pop": "#C9787A"}
 AFELE_KILI = {"hero": "#8D99AE", "hero2": "#A9B3C3", "mark": "#2B2D42", "light": "#FFFFFF"}
-GIRAFFE_C = {"hero": "#F2C46A", "hero2": "#E8D5A8", "mark": "#9A5530", "tongue": "#5B4A78"}
+GIRAFFE_C = {"leaf": "#7FA650", "hero": "#F2C46A", "hero2": "#E8D5A8", "mark": "#9A5530", "tongue": "#5B4A78"}
 GIRAFFE_D = {"hero": "#F2C46A", "mark": "#9A5530", "water": "#7CC6E8"}
 
 ZEBRA_C = {"hero": "#FBF7EE", "mark": "#24262E", "muzzle": "#3A3A40", "foal": "#6E4E3A", "light": "#FFFFFF"}
@@ -1107,7 +1115,7 @@ BUFFALO_C = {"hero": "#3E3836", "hero2": "#6A625D", "horn": "#8C8178", "horn2": 
              "light": "#F4EAD8", "bird": "#7A5A3A", "pop": "#E0402E", "eye": "#F2C14E"}
 BUFFALO_M = {**BUFFALO_C, "egret": "#FFFFFF", "bill": "#F2B33D", "water": "#7CB8D0"}
 GNU_C = {"hero": "#6F6C74", "mark": "#2A2628", "horn": "#3A3436", "light": "#FFFFFF"}
-GNU_X = {**GNU_C, "water": "#C9A878", "water2": "#B39064", "light": "#FBF6EC"}
+GNU_X = {**GNU_C, "water": "#A8916A", "water2": "#93795A", "light": "#FBF6EC", "bank": "#E6CC9C", "horn": "#2A2426"}
 
 HYENA_C = {"hero": "#B89A72", "mark": "#3A2C22", "muzzle": "#4A3A30", "mouth": "#7A2E2E", "light": "#FBF3E4"}
 WDOG_C = {"hero": "#C99A55", "hero2": "#A87C40", "mark": "#2A221C", "light": "#F4E8CF", "eye": "#C98A3A"}
@@ -1169,7 +1177,7 @@ CONCEPTS = [
     Concept("wildebeest-head", "animal-wildebeest-migration", "Wildebeest", gnu_head, overrides=GNU_C,
             checks=[("hero", "sky"), ("hero", "glow"), ("hero", "far")], fixes={"glow": ["glow2", "far", "#E07A5F"], "far": ["ground", "mid"], "sky": ["sky2", "glow2"]}),
     Concept("wildebeest-crossing", "animal-wildebeest-migration", "River crossing", gnu_crossing, overrides=GNU_X,
-            checks=[("hero", "sky"), ("hero", "water"), ("hero", "ground"), ("dark", "far")],
+            checks=[("hero", "sky"), ("hero", "water"), ("hero", "bank"), ("dark", "far"), ("bank", "water")],
             fixes={"sky": ["sky2", "glow2"], "far": ["mid", "ground"]}),
     Concept("hyena-grin", "animal-hyena", "Laughing hyena", hyena_face, overrides=HYENA_C,
             checks=[("hero", "glow"), ("hero", "sky"), ("hero", "mid")], fixes={"glow": ["glow2", "far", "light", "#E07A5F"], "mid": ["near", "deep"]}),

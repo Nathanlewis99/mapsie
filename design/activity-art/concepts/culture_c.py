@@ -223,14 +223,14 @@ def theatre_curtains(d: Drawing):
     d.stroke("wood2", "M-10 168 H210 M-10 182 H210", 1.4, line=False)
     d.shape("glow2", ellipse(100, 157, 44, 7), shadow=False)
     # actor in the spotlight, arm out
-    d.limb("dark", "M106 118 Q118 112 126 100", 4.4)
+    d.limb("dark", "M106 131 Q118 126 124 108", 5)
     d.shape("dark", person(100, 157, 46), spot=False)
     # footlights
     for x in range(10, 200, 22):
         d.shape("gold", f"M{x - 5} 160 A5 4 0 0 1 {x + 5} 160Z", shadow=False)
     for side in (1, -1):
         def curtain():
-            d.shape("curtain", "M-14 10 H66 C64 50 56 82 42 100 C50 118 56 140 58 172 H-14Z", spot=True)
+            d.shape("curtain", "M-14 10 H66 C64 50 56 82 42 100 C50 118 56 140 58 172 H-14Z")
             d.stroke("curtain2", "M10 14 C12 50 14 80 18 100 M30 14 C32 50 30 80 32 98 M48 14 C48 50 44 80 38 98 "
                                  "M20 108 C20 130 18 150 18 172 M38 108 C40 130 40 150 42 172", 2.2, line=False)
             d.shape("gold", rrect(30, 96, 18, 8, 3), extra='transform="rotate(-12 39 100)"')
@@ -273,8 +273,9 @@ def theatre_globe(d: Drawing):
     d.disc("glow", 150, 50, 15)
     d.shape("light", cloud(22, 52, 1.0))
     d.band("far", hills(132, 10))
-    d.shape("dark", ellipse(28, 118, 12, 18))
-    d.shape("dark", ellipse(176, 116, 12, 20))
+    for x, y in [(26, 116), (176, 112)]:
+        d.limb("dark", f"M{x} {y} V150", 3)
+        blob(d, "tree", [(x, y, 13), (x - 6, y + 8, 9), (x + 7, y + 7, 9)])
     # thatched drum of timber-framed walls
     d.shape("light", "M30 102 L56 94 H144 L170 102 V160 H30Z")
     d.stroke("wood2", "M30 102 V160 M56 94 V160 M78 94 V160 M100 94 V160 M122 94 V160 M144 94 V160 M170 102 V160 "
@@ -282,7 +283,7 @@ def theatre_globe(d: Drawing):
                       "M56 94 L78 118 M100 94 L78 118 M100 94 L122 118 M144 94 L122 118 "
                       "M30 122 L56 140 M144 140 L170 122", 2.4)
     d.shape("wood2", "M90 160 V146 Q100 136 110 146 V160Z", shadow=False)
-    d.shape("thatch", "M22 104 L52 84 H148 L178 104 L168 106 L146 94 H54 L32 106Z")
+    d.shape("thatch", "M20 106 L50 80 H150 L180 106 L170 110 L146 94 H54 L30 110Z")
     d.stroke("thatch2", "M40 98 L46 92 M62 90 L66 86 M86 90 L88 86 M112 90 L114 86 M136 90 L138 86 M156 96 L160 92", 1.6, line=False)
     d.stroke("dark", "M100 84 V44", 2)
     d.shape("pop", "M100 44 L122 49 L100 56Z", spot=True)
@@ -341,7 +342,7 @@ def opera_diva(d: Drawing):
     d.disc("glow", 100, 84, 50)
     d.band("wood", "M-30 156 H230")
     for side in ("translate(0 0)", "translate(200 0) scale(-1 1)"):
-        group(d, side, lambda: d.shape("curtain", "M-14 -10 H44 C40 40 30 70 22 92 C28 110 30 140 32 172 H-14Z", spot=True))
+        group(d, side, lambda: d.shape("curtain", "M-14 -10 H44 C40 40 30 70 22 92 C28 110 30 140 32 172 H-14Z"))
     # diva, arms open
     d.limb("dark", "M90 82 Q74 70 64 52", 5)
     d.limb("dark", "M110 82 Q126 70 136 52", 5)
@@ -530,10 +531,10 @@ def tea_house(d: Drawing):
     d.disc("glow", 152, 50, 14)
     d.band("far", hills(120, 10))
     # maple
-    d.limb("dark", "M40 150 Q38 120 46 100 M44 112 L30 98", 5)
-    d.shape("maple", ellipse(38, 88, 26, 18))
-    d.shape("maple", ellipse(56, 100, 14, 10))
-    d.shape("maple2", ellipse(30, 82, 12, 8), shadow=False, line=False)
+    d.limb("dark", "M40 154 Q36 126 44 104 M42 120 L28 104 M44 110 L58 98", 5)
+    blob(d, "maple", [(38, 86, 15), (56, 84, 12), (24, 98, 11), (48, 100, 12), (64, 98, 9), (30, 76, 9)], spot=True)
+    for x, y in [(32, 80), (52, 80), (28, 96)]:
+        d.shape("maple2", circle(x, y, 4), shadow=False, line=False)
     # tea house
     d.shape("wood", rrect(66, 96, 82, 58, 1))
     d.shape("light", rrect(72, 102, 34, 46, 1), shadow=False)
@@ -555,44 +556,60 @@ def tea_house(d: Drawing):
 
 def tea_mint(d: Drawing):
     d.disc("glow", 104, 104, 60)
-    # arm holding the pot high
-    d.limb("hero", "M-10 2 L36 52", 14, spot=True)
-    d.shape("dark", ellipse(40, 58, 7, 6))
-    # teapot
-    d.limb("pot2", "M44 58 Q30 72 46 92", 4)
-    d.limb("pot", "M86 82 Q100 76 108 58", 5)
+    # teapot, held high by its handle
+    d.limb("pot2", "M48 62 Q30 74 48 92", 5)
+    d.limb("pot", "M86 82 Q100 76 108 58", 6)
     d.shape("pot", "M50 62 C40 74 44 98 70 100 C96 98 100 74 90 62Z", spot=True)
     d.shape("pot2", "M52 68 C50 76 52 84 58 90 Q70 84 82 90 C88 84 90 76 88 68Z", shadow=False, line=False)
     d.shape("pot", "M54 62 Q56 48 70 46 Q84 48 86 62Z")
     d.shape("pot2", rrect(52, 60, 36, 4, 2), shadow=False)
     d.shape("pot2", circle(70, 42, 3.5))
+    d.limb("hero", "M-14 78 L28 76", 16, spot=True)
+    d.shape("dark", "M26 70 C32 64 42 66 42 74 C42 82 34 86 26 82Z")
     # tea stream
-    d.stroke("tea", "M109 57 Q124 60 128 124", 2.6)
+    d.stroke("tea", "M109 57 Q126 60 129 124", 3.4)
     # glass on a tray
     d.shape("brass", ellipse(110, 160, 58, 10))
     d.shape("brass2", ellipse(110, 158, 50, 7), shadow=False, line=False)
-    d.shape("light", "M114 122 H144 L140 156 H118Z")
-    d.shape("tea", "M116 136 H142 L140 156 H118Z", shadow=False)
-    d.stroke("brass", "M115 130 H143", 2.4)
-    leaf(d, 134, 128, 12, 4, -60, "leaf", shadow=False)
-    leaf(d, 136, 128, 10, 3.5, -20, "leaf", shadow=False)
+    d.shape("light", "M110 116 H148 L143 158 H115Z")
+    d.shape("tea", "M112 132 H146 L143 158 H115Z", shadow=False)
+    d.stroke("brass", "M111 125 H147", 2.8)
+    leaf(d, 140, 122, 14, 4.5, -60, "leaf", shadow=False)
+    leaf(d, 142, 122, 12, 4, -20, "leaf", shadow=False)
     d.shape("light", "M72 140 H92 L90 156 H74Z")
     d.shape("tea", "M73 146 H91 L90 156 H74Z", shadow=False)
     d.stroke("brass", "M73 144 H91", 2)
 
 
 # ================================================================ CALLIGRAPHY CLASS
+def leaf_path(x, y, L, w, ang):
+    c, s_ = math.cos(math.radians(ang)), math.sin(math.radians(ang))
+    P = lambda u, v: f"{x + u * c - v * s_:.1f} {y + u * s_ + v * c:.1f}"
+    return f"M{P(0, 0)} C{P(L * .3, -w)} {P(L * .7, -w * .6)} {P(L, 0)} C{P(L * .7, w * .4)} {P(L * .3, w)} {P(0, 0)}Z"
+
+
+def bamboo_painting(d: Drawing):
+    """Sumi-e bamboo: ink stalks with nodes and slender leaves."""
+    p = ""
+    for x0, segs, w in [(96, [(140, 118), (115, 94), (91, 70), (67, 46)], 7), (122, [(140, 122), (119, 100), (97, 80)], 5)]:
+        for i, (y1, y0) in enumerate(segs):
+            x = x0 + i * 1.5
+            p += f" M{x - w / 2:.1f} {y1} L{x - w / 2 + .8:.1f} {y0 + 1} Q{x:.1f} {y0 - 1} {x + w / 2 + .8:.1f} {y0 + 1} L{x + w / 2:.1f} {y1}Z"
+    for x, y, L, w, a in [(100, 70, 30, 5, -35), (100, 70, 26, 4.5, -10), (101, 47, 24, 4, -60), (98, 94, 28, 5, 200), (98, 94, 24, 4, 170),
+                          (124, 98, 26, 4.5, -30), (124, 98, 22, 4, 5), (95, 118, 22, 4, 210)]:
+        p += " " + leaf_path(x, y, L, w, a)
+    d.marks("ink", p)
+
+
 def calligraphy_inkstone(d: Drawing):
     d.band("wood", "M-30 -30 H230", shadow=False, line=False)
     d.stroke("wood2", "M-10 40 Q60 34 210 46 M-10 100 Q90 94 210 104 M-10 170 Q100 164 210 176", 1.4, line=False)
     # paper with a bold stroke and seal
     def paper():
         d.shape("light", rrect(64, 26, 92, 122, 2))
-        d.marks("ink", "M84 60 C100 46 130 44 140 58 C142 64 136 64 132 60 C120 52 104 56 92 68 C88 72 82 66 84 60Z "
-                       "M110 70 C116 86 116 110 106 128 C102 134 96 130 99 124 C106 108 106 88 102 74 C100 66 108 64 110 70Z "
-                       "M80 98 C86 94 92 98 90 104 C86 110 78 106 80 98Z M126 92 C134 90 140 96 136 102 C130 106 122 100 126 92Z")
+        bamboo_painting(d)
         d.shape("pop", rrect(136, 124, 11, 11, 1.5), shadow=False, spot=True)
-        d.marks("light", rrect(139, 127, 2, 5, .3) + rrect(143, 127, 2, 5, .3))
+        d.shape("light", rrect(139, 127, 2, 5, .3) + rrect(143, 127, 2, 5, .3), shadow=False, line=False)
     group(d, "rotate(6 110 86)", paper)
     # ink stone with ink stick
     d.shape("ink2", rrect(20, 106, 42, 64, 8))
@@ -875,15 +892,14 @@ def homestay_door(d: Drawing):
     d.shape("wood", "M120 60 L140 52 V160 L120 156Z")
     d.marks("dark", circle(125, 108, 2))
     # step and shoes
-    d.shape("stone", rrect(48, 156, 104, 12, 2))
+    d.shape("stone", rrect(52, 156, 96, 8, 2))
     d.band("ground", "M-30 168 H230")
 
-    def shoe(x, y, role, flip=False):
-        k = -1 if flip else 1
-        d.shape(role, f"M{x} {y} V{y - 6} Q{x + 4 * k} {y - 9} {x + 8 * k} {y - 6} Q{x + 14 * k} {y - 5} {x + 16 * k} {y}Z", spot=role == "pop")
-    shoe(56, 165, "hero"), shoe(66, 165, "hero")
-    shoe(84, 165, "pop"), shoe(94, 165, "pop")
-    shoe(114, 165, "dark"), shoe(124, 165, "dark")
+    def shoe(x, y, role):
+        d.shape(role, f"M{x} {y} V{y - 9} Q{x + 6} {y - 13} {x + 11} {y - 9} Q{x + 19} {y - 7} {x + 22} {y}Z", spot=role == "pop")
+        d.shape("light", rrect(x, y - 2, 22, 2.5, 1), shadow=False, line=False)
+    for x, role in [(34, "hero"), (46, "hero"), (80, "pop"), (92, "pop"), (126, "dark"), (138, "dark")]:
+        shoe(x, 167, role)
     # plant and lantern
     d.shape("pot", "M24 136 H50 L46 166 H28Z")
     for a, L in [(-100, 26), (-130, 22), (-60, 22), (-150, 16), (-30, 16)]:
@@ -1032,15 +1048,15 @@ CONCEPTS = [
     Concept("theatre-curtains", "theatre-show", "Curtain up", theatre_curtains, overrides={**CURTAIN, **GOLD, **WOOD},
             checks=[("curtain", "deep"), ("dark", "glow2")], fixes={"deep": ["dark", "mark"]}),
     Concept("theatre-masks", "theatre-show", "Comedy & tragedy masks", theatre_masks, overrides=GOLD,
-            checks=[("gold", "glow"), ("hero", "glow"), ("gold", "hero"), ("pop", "glow")], fixes={"glow": ["far", "mid", "near", "sky2"], "hero": ["pop", "mark", "deep"]}),
+            checks=[("gold", "glow"), ("hero", "glow"), ("gold", "hero"), ("pop", "glow")], fixes={"glow": ["far", "mid", "near", "sky2", "light", "deep"], "hero": ["pop", "mark", "deep"]}),
     Concept("theatre-globe", "theatre-show", "Round timber playhouse", theatre_globe,
-            overrides={"wood2": "#5A3A22", "thatch": "#C9A25E", "thatch2": "#9C7A3A"},
-            checks=[("light", "far"), ("light", "sky"), ("thatch", "sky"), ("thatch", "far")], fixes={"sky": ["sky2", "far", "glow"], "far": ["mid", "near"]}),
+            overrides={"wood2": "#5A3A22", "thatch": "#C9A25E", "thatch2": "#9C7A3A", "tree": "#4F8A3F"},
+            checks=[("light", "far"), ("light", "sky"), ("thatch", "sky"), ("thatch", "far"), ("tree", "far")], fixes={"sky": ["sky2", "far", "glow", "mid"], "far": ["mid", "near", "sky2", "light"]}),
     # opera
     Concept("opera-house", "opera", "Harbour opera house", opera_house, SEA, overrides={"stone": "#D8CCB8", "stone2": "#B5A68E"},
-            checks=[("light", "sky"), ("light", "mid"), ("far", "sky")], fixes={"sky": ["sky2", "far", "mid"], "far": ["mid", "near"]}),
+            checks=[("light", "sky"), ("light", "mid")], fixes={"sky": ["sky2", "far", "mid", "near"]}),
     Concept("opera-glasses", "opera", "Opera glasses & rose", opera_glasses, overrides={**GOLD, **LEAF, "pop": "#D7372B"},
-            checks=[("gold", "glow"), ("pop", "glow")], fixes={"glow": ["far", "mid", "near", "sky2"]}),
+            checks=[("gold", "glow"), ("pop", "glow")], fixes={"glow": ["far", "mid", "near", "sky2", "light", "deep"]}),
     Concept("opera-diva", "opera", "Diva on stage", opera_diva, overrides={**CURTAIN, **WOOD},
             checks=[("dark", "glow"), ("hero", "glow"), ("hero", "deep"), ("curtain", "deep")], fixes={"hero": ["pop", "light"], "deep": ["dark", "mark"]}),
     # live music
@@ -1069,7 +1085,7 @@ CONCEPTS = [
             overrides={"pot": "#C9CED6", "pot2": "#9AA3AE", "tea": "#C77A2A", "brass": "#D4A64A", "brass2": "#B98A30", **LEAF},
             checks=[("pot", "glow"), ("light", "glow"), ("brass", "glow"), ("hero", "glow")], fixes={"glow": ["far", "mid", "near", "deep"]}),
     # calligraphy class
-    Concept("calligraphy-inkstone", "calligraphy-class", "Brush & ink stone", calligraphy_inkstone,
+    Concept("calligraphy-inkstone", "calligraphy-class", "Ink painting & brush", calligraphy_inkstone,
             overrides={"wood": "#9C6A40", "wood2": "#7E5230", "ink": "#22242B", "ink2": "#3E414C", "ink3": "#15161A", "pop": "#C8282E",
                        "bamboo": "#E3CC94", "bamboo2": "#B89A5A", **GOLD}),
     Concept("calligraphy-scroll", "calligraphy-class", "Ensō scroll", calligraphy_scroll,

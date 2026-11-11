@@ -71,6 +71,23 @@ def ripples(d: Drawing, x, y, rx, ry, role="light", n=2, w=1.8):
         d.stroke(role, f"M{x - rx * k} {y} A{rx * k} {ry * k} 0 0 0 {x + rx * k} {y}", w)
 
 
+def leaf(tx, ty, ex, ey, bulge=0.36, droop=8):
+    """A pointed, slightly drooping leaf from (tx, ty) to (ex, ey)."""
+    dx, dy = ex - tx, ey - ty
+    n = math.hypot(dx, dy)
+    px, py = -dy / n * n * bulge / 2, dx / n * n * bulge / 2
+    mx, my = (tx + ex) / 2, (ty + ey) / 2 - droop
+    return f"M{tx} {ty} Q{mx+px:.1f} {my+py:.1f} {ex} {ey} Q{mx-px:.1f} {my-py:.1f} {tx} {ty}Z"
+
+
+def palm(d: Drawing, x, y, h, lean, role="dark", trunk_w=6):
+    """A palm tree with its base at (x, y), top at (x + lean, y - h)."""
+    tx, ty = x + lean, y - h
+    d.limb(role, f"M{x} {y} Q{x + lean*0.1} {y - h*0.6} {tx} {ty}", trunk_w)
+    for ex, ey, dr in [(-34, 10, 6), (-28, -12, 6), (-6, -24, 4), (20, -18, 6), (34, 4, 6), (-16, 22, 2), (18, 20, 2)]:
+        d.shape(role, leaf(tx, ty, tx + ex, ty + ey, 0.34, dr), shadow=False)
+
+
 def freediver(d: Drawing, suit="dark", fin="hero", mask="hero2", stripe=None):
     """A freediver side-on, head to the left and face down, arms stretched ahead, long blade fins; spans x 28-194 around y 100."""
     d.shape(fin, "M142 94 L190 82 Q196 84 193 89 L144 101Z", spot=True)
@@ -658,12 +675,8 @@ def pool_ladder(d: Drawing):
 
 
 def pool_flamingo(d: Drawing):
-    d.disc("glow", 46, 44, 13)
-    d.shape("dark", "M150 100 Q156 60 170 34", line=False)
-    d.limb("dark", "M152 102 Q156 66 168 36", 4)
-    for f in ["M168 36 C178 26 194 28 202 40 C190 34 178 34 168 36Z", "M168 36 C160 24 144 22 134 30 C146 30 158 32 168 36Z",
-              "M168 36 C172 22 182 16 190 18 C182 24 176 30 168 36Z", "M168 36 C162 42 154 54 152 62 C160 52 166 44 168 36Z"]:
-        d.shape("dark", f, shadow=False)
+    d.disc("glow", 100, 36, 12)
+    group(d, "translate(44 104) scale(.8)", lambda: palm(d, 0, 0, 86, 10))
     d.band("ground", "M-30 100 H230")
     d.band("light", "M-30 106 H230")
     d.band("pool", "M-30 112 H230")
@@ -758,7 +771,6 @@ def lagoon_float(d: Drawing):
         person_top(dd, "pop")
         d.parts.append("".join(p.replace(' filter="url(#ps)"', "").replace(' filter="url(#psl)"', "") for p in dd.parts))
     d.raw("</g>", "")
-    ripples(d, 92, 96, 36, 12, n=1, w=2)
     group(d, "translate(92 92) rotate(-20) scale(1.1)", lambda: person_top(d, "pop"))
     d.shape("hero2", fish(150, 150, 0.9, right=True), shadow=False)
     d.shape("hero2", fish(140, 166, 0.7, right=True), shadow=False)

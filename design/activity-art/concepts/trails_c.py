@@ -22,11 +22,8 @@ def _snowy_pine(d: Drawing, x, base, h, w, role="deep", snow="light", line=True)
     """A pine with snow resting on each tier."""
     d.shape(role, _pine(x, base, h, w), line=line)
     t = base - h
-    caps = [(t, .55, .38, .3, .36), (t + h * .36, .8, .7, .4, .68)]
     d.shape(snow, f"M{x} {t} L{x + w * .55:.1f} {t + h * .38:.1f} L{x + w * .2:.1f} {t + h * .3:.1f} L{x} {t + h * .36:.1f} "
                   f"L{x - w * .2:.1f} {t + h * .3:.1f} L{x - w * .55:.1f} {t + h * .38:.1f}Z", shadow=False, line=False)
-    for y0, k in [(t + h * .36, .8), (t + h * .68, 1.0)]:
-        yb = t + h * (.7 if k == .8 else 1.0) - (0 if k == .8 else h * 0)
     d.shape(snow, f"M{x - w * .3:.1f} {t + h * .36:.1f} L{x + w * .3:.1f} {t + h * .36:.1f} L{x + w * .8:.1f} {t + h * .7:.1f} "
                   f"L{x + w * .4:.1f} {t + h * .6:.1f} L{x:.1f} {t + h * .66:.1f} L{x - w * .4:.1f} {t + h * .6:.1f} L{x - w * .8:.1f} {t + h * .7:.1f}Z",
             shadow=False, line=False)
@@ -243,7 +240,7 @@ def canyon_arch(d: Drawing):
     d.band("ground", "M-30 158 Q40 146 100 152 T230 150")
     arch = ("M52 166 C50 132 44 96 58 70 C70 48 96 38 118 46 C142 56 152 86 148 118 C146 136 146 152 148 166 H128 "
             "C128 150 130 130 128 110 C126 88 116 76 102 76 C86 76 78 90 76 112 C74 130 76 150 76 166Z")
-    d.shape("near", arch, spot=True)
+    d.shape("near", arch)
     d.stroke("deep", "M60 92 C70 88 80 86 88 80 M132 82 C140 90 142 100 146 102 M56 130 H74 M130 132 H148", 2, line=False)
     d.shape("deep", "M118 46 C142 56 152 86 148 118 C146 136 146 152 148 166 H140 C140 140 144 100 136 74 C132 62 126 52 118 46Z", shadow=False, line=False)
     # tiny hiker under the arch
@@ -415,7 +412,7 @@ def marathon_finish(d: Drawing):
     d.stroke("light", "M30 120 V96 C30 52 170 52 170 96 V120", 8, line=False)
     d.raw(f'<path d="M30 120 V96 C30 52 170 52 170 96 V120" fill="none" stroke="{d.c.get("mark", "")}" stroke-width="8" stroke-dasharray="6 6"/>', "")
     # finish tape stretched across
-    d.limb("pop", "M38 134 Q100 146 162 134", 5, spot=True)
+    d.limb("pop", "M38 134 Q100 146 162 134", 6.5, spot=True)
     d.shape("dark", rrect(20, 164, 20, 8, 3))
     d.shape("dark", rrect(160, 164, 20, 8, 3))
 
@@ -487,7 +484,10 @@ def cavetube_mouth(d: Drawing):
     d.band("far", "M-30 100 L230 100", shadow=False, line=False)
     # limestone hill with the cave mouth
     d.shape("mid", "M-30 230 V112 C10 86 50 60 100 58 C150 60 190 86 230 104 V230Z")
-    d.shape("dark", "M50 132 C52 98 76 82 100 82 C124 82 148 98 150 132Z", shadow=False)
+    if d.paper:
+        d.shape("dark", "M50 132 C52 98 76 82 100 82 C124 82 148 98 150 132Z", shadow=False)
+    else:
+        d.raw("", f'<path d="M50 132 C52 98 76 82 100 82 C124 82 148 98 150 132Z" fill="{d.c["ink"]}"/>')
     d.shape("near", "M50 132 C52 98 76 82 100 82 C108 82 112 86 108 88 L104 100 L98 92 L92 106 L86 92 L78 104 L72 96 L66 112 L60 104Z", shadow=False, line=False)
     d.shape("near", "M150 132 C148 104 136 92 122 86 L120 96 L126 92 L128 104 L134 96 L140 110Z", shadow=False, line=False)
     _leaves(d, [("near", -10, 110, 60, 10, 14), ("near", 210, 110, 60, 170, 14)], line=False)
@@ -873,12 +873,12 @@ def snowshoe_tracks(d: Drawing):
     for x, b, h in [(22, 168, 84), (184, 176, 76)]:
         _snowy_pine(d, x, b, h, h * .3)
     # a line of snowshoe prints running away into the forest
-    for x, y, s in [(84, 182, 1.25), (116, 158, .95), (90, 142, .72), (110, 132, .55), (96, 126, .42)]:
+    for x, y, s in [(76, 178, 1.1), (122, 160, .88), (86, 146, .68), (112, 136, .52), (96, 129, .4)]:
         def g():
             d.shape("mid", SNOWSHOE, shadow=False)
             d.stroke("light", "M-14 -18 H14 M-14 14 H14", 4, line=False)
             d.shape("near", "M-9 -6 L-11 6 L-4 3 L0 10 L4 3 L11 6 L9 -6Z", shadow=False, line=False)
-        group(d, f"translate({x} {y}) scale({s * .55:.2f} {s * .32:.2f})", g)
+        group(d, f"translate({x} {y}) rotate({(x - 100) * .3:.0f}) scale({s * .5:.2f} {s * .36:.2f})", g)
 
 
 
@@ -888,14 +888,14 @@ NIGHT = ["dusk", "coastal", "blush", "meadow"]
 JUNGLE = ["meadow", "coastal", "dusk", "golden", "blush"]
 MONKEY_C = {"hero": "#6B4226", "hero2": "#E3B98A", "mark": "#2A1A10"}
 GREEN = {"far": "#A8D5A2", "mid": "#6DB37A", "near": "#3E8E5A", "deep": "#245C3C"}
-SKIN = {"ground": "#EDB98F", "glow2": "#C98E68"}
+SKIN = {"ground": "#E9AD80", "glow2": "#C08058"}
 CANYON = {"far": "#F0B27A", "mid": "#D9784A", "near": "#B04F2E", "deep": "#6E2E22"}
 WATER = ["coastal", "meadow", "dusk", "blush"]
 
 CONCEPTS = [
     Concept("wildcamp-lakeside", "wild-camping", "Lakeside pitch", wild_lake, WATER,
             checks=[("hero", "near"), ("hero2", "near"), ("hero", "sky2"), ("hero2", "sky2"), ("deep", "near"), ("hero", "hero2")],
-            fixes={"hero2": ["light", "glow2", "pop"], "hero": ["pop", "hero2"]}),
+            fixes={"hero": ["pop", "#E56B6F"], "hero2": ["light", "glow2", "pop"], "deep": ["dark", "mark"]}),
     Concept("wildcamp-stove", "wild-camping", "Camp stove brew", wild_stove,
             checks=[("hero", "glow"), ("hero2", "ground"), ("dark", "glow"), ("pop", "hero"), ("light", "glow")],
             fixes={"glow": ["glow2", "far", "sky2"], "pop": ["hero2", "light"], "ground": ["mid", "near"]}),
@@ -908,14 +908,14 @@ CONCEPTS = [
     Concept("canyon-switchbacks", "canyon-hike", "Canyon switchbacks", canyon_switchback, overrides={**CANYON, "sky2": "#7CC6D9"},
             checks=[("ground", "deep"), ("hero", "deep"), ("near", "mid"), ("far", "sky"), ("deep", "near"), ("sky2", "far")],
             fixes={"hero": ["pop", "light"]}),
-    Concept("canyon-arch", "canyon-hike", "Sandstone arch", canyon_arch,
+    Concept("canyon-arch", "canyon-hike", "Sandstone arch", canyon_arch, overrides=CANYON,
             checks=[("near", "glow"), ("near", "sky"), ("near", "far"), ("near", "ground")],
             fixes={"glow": ["glow2", "light", "sky2"]}),
     Concept("jungle-temple", "jungle-trek", "Temple in the jungle", jungle_temple, JUNGLE, overrides={**GREEN, "ground": "#D8C9A3"},
             checks=[("ground", "sky"), ("ground", "far"), ("near", "ground"), ("mid", "ground")],
             fixes={"ground": ["light", "glow2"]}),
     Concept("jungle-monkey", "jungle-trek", "Spider monkey", jungle_monkey, JUNGLE, overrides=MONKEY_C,
-            checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("hero", "glow"), ("deep", "sky")]),
+            checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("hero", "glow"), ("deep", "sky")], fixes={"deep": ["mid"]}),
     Concept("jungle-boots", "jungle-trek", "Muddy boots", jungle_boots, JUNGLE, overrides={**GREEN, "ground": "#8A5A3B", "deep": "#5A3A26"},
             checks=[("hero", "mid"), ("hero2", "mid"), ("hero", "far"), ("hero2", "far"), ("hero", "hero2"), ("hero", "deep"), ("hero2", "deep")],
             fixes={"hero2": ["light", "glow2"], "hero": ["pop", "dark"]}),
@@ -929,8 +929,8 @@ CONCEPTS = [
             checks=[("hero", "far"), ("hero", "sky"), ("dark", "far"), ("glow", "deep"), ("hero", "mid")],
             fixes={"hero": ["pop", "hero2"]}),
     Concept("marathon-finish", "marathon", "Finish line", marathon_finish,
-            checks=[("hero", "sky"), ("hero", "far"), ("pop", "sky"), ("pop", "hero"), ("dark", "mid")],
-            fixes={"pop": ["hero2", "deep"]}),
+            checks=[("hero", "sky"), ("hero", "far"), ("pop", "glow"), ("pop", "far"), ("pop", "hero"), ("dark", "mid")],
+            fixes={"pop": ["hero2", "deep", "mark"], "glow": ["glow2", "light"]}),
     Concept("marathon-medal", "marathon", "Finisher medal", marathon_medal, overrides={"hero2": "#E9B52F", "glow": "#F7D774", "mark": "#3A2E1A"},
             checks=[("hero2", "sky2"), ("hero", "sky2"), ("pop", "sky2"), ("hero", "pop"), ("hero2", "glow2")],
             fixes={"pop": ["deep", "mark"], "glow2": ["light", "far"]}),
@@ -942,16 +942,16 @@ CONCEPTS = [
             fixes={"hero": ["pop", "hero2"], "far": ["near", "deep"]}),
     Concept("cavetube-dark", "cave-tubing", "Headlamps underground", cavetube_dark, WATER,
             checks=[("hero", "mid"), ("near", "deep"), ("mid", "deep"), ("hero2", "mid")],
-            fixes={"hero": ["pop", "hero2"], "hero2": ["light", "glow2"]}),
+            fixes={"hero": ["pop", "hero2"], "hero2": ["light", "glow2"], "near": ["far"]}),
     Concept("cavetube-ring", "cave-tubing", "Tube & headlamp", cavetube_ring, WATER,
             checks=[("hero", "mid"), ("hero", "far"), ("near", "deep"), ("mid", "deep")],
-            fixes={"hero": ["pop", "hero2"]}),
+            fixes={"hero": ["pop", "hero2"], "near": ["far"]}),
     Concept("hammock-forest", "hammock-camping", "Hammock in the woods", hammock_forest,
             checks=[("hero", "mid"), ("hero", "ground"), ("hero", "far"), ("deep", "sky"), ("hero2", "hero"), ("pop", "hero")],
-            fixes={"hero": ["pop", "deep"], "hero2": ["light", "glow2"], "pop": ["hero2", "light"]}),
+            fixes={"hero": ["pop", "deep"], "hero2": ["light", "glow2"], "pop": ["hero2", "light"], "deep": ["mid"]}),
     Concept("hammock-view", "hammock-camping", "Feet up with a view", hammock_feet, WATER, overrides=SKIN,
             checks=[("hero", "sky2"), ("ground", "sky2"), ("ground", "mid"), ("ground", "hero"), ("hero", "mid"), ("ground", "far")],
-            fixes={"hero": ["deep", "near", "pop"]}),
+            fixes={"hero": ["deep", "near", "pop"], "ground": ["#D8956A", "#C98458"]}),
     Concept("hammock-stars", "hammock-camping", "Hammock under the stars", hammock_stars, NIGHT,
             checks=[("hero", "deep"), ("hero2", "deep"), ("hero", "far"), ("dark", "far"), ("far", "deep")],
             fixes={"far": ["mid", "near"], "hero2": ["light", "glow2"]}),

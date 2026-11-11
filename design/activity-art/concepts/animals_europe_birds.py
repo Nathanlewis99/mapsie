@@ -840,7 +840,7 @@ def goldeneagle_highlands(d: Drawing):
     d.band("mid", hills(156, 8, 30))
     d.band("near", hills(178, 5, -10))
     birds(d, [(30, 56, 0.7), (40, 50, 0.5)])
-    group(d, "translate(100 88) scale(1.12) translate(-100 -100)", lambda: eagle_spread(d))
+    group(d, "translate(100 92) scale(1.0) translate(-100 -100)", lambda: eagle_spread(d))
     d.band("deep", hills(194, 3, 30), line=False)
 
 
@@ -928,7 +928,7 @@ def barnowl_dusk(d: Drawing):
     d.stroke("dark", "M37 150 L178 156 M37 158 L178 164", 1.2)
     d.band("near", hills(170, 4, 20))
     grass(d, -10, 210, 172, 16, "near", 13)
-    group(d, "translate(98 92) scale(1.0) translate(-100 -100)", lambda: owl_flying(d))
+    group(d, "translate(100 94) scale(.92) translate(-100 -100)", lambda: owl_flying(d))
     d.band("deep", hills(190, 3), line=False)
 
 
@@ -1002,9 +1002,9 @@ def pelican_post(d: Drawing):
     d.shape("light", taper([(84, 96), (76, 82), (74, 66), (80, 56)], 9, 7))
     d.shape("light", circle(82, 54, 11))
     d.shape("light", P(zig([(86, 44), (94, 42), (98, 50)], 2, 3) + [(92, 52)]), shadow=False, line=False)
-    pouch = P([(72, 58), (66, 74), (64, 92), (66, 108, 1), (74, 104), (80, 88), (82, 72)])
-    d.shape("pouch", pouch)
-    d.shape("beak", P([(70, 52, 1), (64, 70), (62, 90), (64, 110), (67, 112, 1), (68, 100), (70, 80), (76, 60, 1)]), spot=True)
+    d.shape("pouch", P([(76, 56), (68, 100), (66, 108, 1), (78, 102), (86, 84), (86, 64)]))
+    d.shape("beak", P([(73, 47, 1), (62, 104), (61, 111, 1), (66, 108), (79, 52, 1)]), spot=True)
+    d.marks("pop", "M61 104 L61 111 L66 108Z")
     d.shape("skin", ellipse(84, 52, 4.5, 3.6), shadow=False)
     d.marks("mark", circle(84, 52, 1.6))
 
@@ -1071,8 +1071,8 @@ def swan_glide(d: Drawing):
 
 def cygnet(d: Drawing, x, y, s=1.0):
     def draw():
-        d.shape("hero2", P([(-12, 0), (-8, -8), (6, -8), (12, -2), (8, 4), (-8, 4)]))
-        d.shape("hero2", circle(-10, -12, 5))
+        d.shape("cyg", P([(-12, 0), (-8, -8), (6, -8), (12, -2), (8, 4), (-8, 4)]))
+        d.shape("cyg", circle(-10, -12, 5))
         d.shape("mark", "M-14 -12 L-19 -10 L-14 -9Z", shadow=False)
         d.marks("mark", circle(-11, -13, 1))
     group(d, f"translate({x} {y}) scale({s})", draw)
@@ -1134,7 +1134,7 @@ def heron_reeds(d: Drawing):
     d.disc("glow", 52, 64, 24)
     d.band("far", hills(128, 5))
     d.band("water", "M-30 146 L230 146")
-    group(d, "translate(104 152) scale(1.28) translate(-120 -152)", lambda: heron_stand(d))
+    group(d, "translate(104 160) scale(1.06) translate(-120 -152)", lambda: heron_stand(d))
     d.raw('<g opacity=".45">', "")
     d.stroke("light", "M74 156 H116 M86 164 H128 M40 176 H80 M136 172 H170", 2, line=False)
     d.raw("</g>", "")
@@ -1214,7 +1214,7 @@ def kingfisher_bust(d: Drawing):
     d.shape("light", P([(70, 100), (84, 106), (86, 118), (72, 114)]), shadow=False)
     d.marks("mark", circle(92, 82, 4.6))
     d.marks("light", circle(90.6, 80.6, 1.4))
-    group(d, "rotate(-10 40 92)", lambda: [d.shape("fishc", fish(40, 92, 2.2, right=False), extra='transform="rotate(90 40 92)"'),
+    group(d, "rotate(-10 40 92)", lambda: [d.shape("fishc", fish(40, 92, 3.0, right=False), extra='transform="rotate(90 40 92)"'),
                                            d.marks("mark", circle(40, 78, 1.6)),
                                            d.stroke("fishd", "M36 84 V100", 1.4, line=False)])
     d.shape("mark", P([(76, 78, 1), (48, 86), (16, 94, 1), (48, 92), (76, 90, 1)]))
@@ -1302,10 +1302,10 @@ def flamingo_lagoon(d: Drawing):
     for x in (20, 34, 48, 160, 176):
         d.shape("hero", f"M{x} 130 q4 -6 8 0 l-3 0 l-1 -8 l-1 0 Z M{x + 3.5} 122 l0 -4 l-2 0Z", shadow=False, line=False)
     d.raw('<g opacity=".35" transform="translate(0 300) scale(1 -1)">', "")
-    group(d, "translate(98 150) scale(1.3) translate(-100 -150)", lambda: flamingo_oneleg(d))
+    group(d, "translate(98 150) scale(.98) translate(-100 -150)", lambda: flamingo_oneleg(d))
     d.raw("</g>", "")
     d.raw("", "")
-    group(d, "translate(98 150) scale(1.3) translate(-100 -150)", lambda: flamingo_oneleg(d))
+    group(d, "translate(98 150) scale(.98) translate(-100 -150)", lambda: flamingo_oneleg(d))
     d.stroke("light", "M74 152 q10 -4 20 0 M110 152 q10 -4 20 0 M30 170 q8 -3 16 0 M150 176 q8 -3 16 0", 2)
     d.band("lagoon2", waves(190, 3, 40), line=False)
 
@@ -1357,7 +1357,7 @@ def parrot_flight(d: Drawing):
     for x in range(-6, 220, 30):
         d.shape("near", scallop(x, 192 - (x * 3 % 8), 16, 8, 0.16), shadow=False, line=False)
     d.band("near", hills(190, 3), line=False)
-    group(d, "translate(96 92) scale(1.3) translate(-110 -90)", lambda: macaw_flying(d))
+    group(d, "translate(98 104) scale(1.24) translate(-110 -90)", lambda: macaw_flying(d))
 
 
 # ================================================================ colours
@@ -1381,7 +1381,7 @@ OWL = {"hero": "#D9A35E", "hero2": "#8F8A86", "light": "#FFFDF7", "rim": "#B9773
 ALBA = {"hero": "#3B414D", "hero2": "#C9D0D8", "light": "#FFFFFF", "mark": "#1C2027", "beak": "#F2A93B", "beak2": "#C47A20", "pop": "#E8697A"}
 PELICAN = {"light": "#FFFFFF", "mark": "#22252B", "pouch": "#F4A44E", "pouch2": "#D9822E", "beak": "#F08A6E", "pop": "#D9433B",
            "skin": "#F7C9A9", "legs": "#E79A7E", "wood": "#8A6440", "wood2": "#5E4228"}
-SWAN = {"light": "#FFFFFF", "hero2": "#A8ADB6", "mark": "#1C1C1E", "beak": "#F08A2E", "lake": "#7FB9D6", "lake2": "#5C9CC0"}
+SWAN = {"light": "#FFFFFF", "hero2": "#A8ADB6", "mark": "#1C1C1E", "beak": "#F08A2E", "lake": "#7FB9D6", "lake2": "#5C9CC0", "cyg": "#8E8780"}
 HERON = {"hero": "#8E99A6", "hero2": "#DDE2E8", "light": "#FFFFFF", "mark": "#1E2228", "beak": "#F2B23A", "beak2": "#B9801F",
          "eye": "#F6D24A", "legs": "#C9A060", "reed": "#7A4E2C", "water": "#8EC5DE", "water2": "#6AAACB"}
 FALCON = {"hero": "#3E4A5C", "hero2": "#56647A", "light": "#FBF5EA", "mark": "#151A22", "beak": "#6C7C96", "pop": "#F6C33E"}
@@ -1470,7 +1470,7 @@ CONCEPTS = [
             checks=[("light", "glow"), ("light", "sky"), ("light", "mid"), ("light", "near")],
             fixes={"glow": ["far", "mid", "near"], "sky": ["sky2", "far"], "mid": ["near", "deep"], "near": ["deep", "mid"]}),
     Concept("swan-cygnets", "animal-swan", "Swan & cygnets", swan_cygnets, ["coastal", "meadow", "blush", "dusk"], SWAN,
-            checks=[("light", "lake"), ("hero2", "lake"), ("mid", "far")],
+            checks=[("light", "lake"), ("cyg", "lake"), ("mid", "far")],
             fixes={"mid": ["near", "deep"]}),
     Concept("heron-portrait", "animal-heron", "Grey heron", heron_portrait, overrides=HERON,
             checks=[("light", "glow"), ("hero", "glow"), ("beak", "glow"), ("light", "sky"), ("hero", "sky")],

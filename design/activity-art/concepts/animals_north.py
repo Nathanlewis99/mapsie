@@ -428,9 +428,9 @@ def moose(d: Drawing):
     """Side-on bull moose facing right; hooves at y=170. Hump, long legs, overhanging muzzle, dewlap, palm antler."""
     for x0, x1 in [(120, 122), (66, 62)]:
         d.limb("hero3", f"M{x0} 120 L{x1} 168", 8)
-    group(d, "translate(12 4)", lambda: d.shape("antler2", MOOSE_ANTLER))
+    group(d, "rotate(-18 154 82)", lambda: flip(d, lambda: d.shape("antler2", MOOSE_ANTLER), cx=154))
     d.shape("hero", leaf(150, 82, 18, 5, -150))
-    d.shape("antler", MOOSE_ANTLER, spot=True)
+    group(d, "rotate(22 154 82)", lambda: d.shape("antler", MOOSE_ANTLER, spot=True))
     for x0, x1 in [(136, 138), (80, 76)]:
         d.limb("hero2", f"M{x0} 120 C{x0 + 2} 140 {x1} 150 {x1} 168", 9)
     d.shape("hero", MOOSE)
@@ -650,19 +650,21 @@ def otter_float(d: Drawing):
     for x, y, a in [(16, 132, -10), (170, 128, 190), (150, 146, 170)]:
         d.shape("kelp", leaf(x, y, 30, 6, a), shadow=False, line=False)
     # otter on its back: tail and hind feet at right, head at left, shell on its chest
-    d.shape("hero", leaf(150, 118, 28, 6, -6))
-    d.shape("mark", leaf(140, 110, 18, 6, -70) + leaf(146, 112, 18, 6, -50))
-    d.shape("hero", "M40 116 C40 104 60 98 96 98 C124 98 146 104 150 114 C152 122 140 128 100 128 C64 128 40 126 40 116Z")
-    d.shape("hero2", "M60 104 C80 100 110 100 130 104 C120 108 90 108 60 104Z", shadow=False, line=False)
-    d.shape("hero", circle(38, 92, 4.5) + circle(54, 86, 4.5))
-    d.shape("hero2", circle(46, 102, 15))
-    d.marks("mark", "M38 99 q3 -2 6 0 M48 97 q3 -2 6 0")
-    d.stroke("mark", "M37 99 q3.5 2 7 0 M48 96 q3.5 2 7 0", 1.4)
-    d.marks("mark", ellipse(50, 106, 3.4, 2.4))
-    d.shape("light", circle(47, 110, 4) + circle(54, 109, 4), shadow=False)
-    d.shape("pop", "M78 98 C76 86 84 80 90 80 C96 80 104 86 102 98Z", spot=True)
-    d.stroke("pop2", "M90 82 V97 M84 85 L82 97 M96 85 L98 97", 1.3)
-    d.shape("mark", ellipse(74, 98, 6, 5) + ellipse(106, 98, 6, 5))
+    def otter():
+        d.shape("hero", leaf(150, 118, 28, 6, -6))
+        d.shape("mark", leaf(140, 110, 18, 6, -70) + leaf(146, 112, 18, 6, -50))
+        d.shape("hero", "M40 116 C40 104 60 98 96 98 C124 98 146 104 150 114 C152 122 140 128 100 128 C64 128 40 126 40 116Z")
+        d.shape("hero2", "M60 104 C80 100 110 100 130 104 C120 108 90 108 60 104Z", shadow=False, line=False)
+        d.shape("hero", circle(38, 92, 4.5) + circle(54, 86, 4.5))
+        d.shape("hero2", circle(46, 102, 15))
+        d.marks("mark", "M38 99 q3 -2 6 0 M48 97 q3 -2 6 0")
+        d.stroke("mark", "M37 99 q3.5 2 7 0 M48 96 q3.5 2 7 0", 1.4)
+        d.marks("mark", ellipse(50, 106, 3.4, 2.4))
+        d.shape("light", circle(47, 110, 4) + circle(54, 109, 4), shadow=False)
+        d.shape("pop", "M78 98 C76 86 84 80 90 80 C96 80 104 86 102 98Z", spot=True)
+        d.stroke("pop2", "M90 82 V97 M84 85 L82 97 M96 85 L98 97", 1.3)
+        d.shape("mark", ellipse(74, 98, 6, 5) + ellipse(106, 98, 6, 5))
+    place(d, otter, 100, 112, 1.35, 96, 112)
     d.band("near", waves(122, 3, 28))
     ripples(d, [(30, 136, 1.4), (120, 138, 1.6), (70, 150, 1.2)])
     for x, y, a in [(60, 160, -20), (100, 170, 200), (180, 160, 170)]:
@@ -698,19 +700,21 @@ BEAVER = ("M54 160 C44 146 44 118 58 102 C70 88 92 82 110 86 C124 90 134 98 140 
 
 
 def beaver_lodge(d: Drawing):
-    d.disc("glow", 120, 54, 18)
-    pines(d, [(80, 46), (96, 58), (112, 44)], 116, "mid")
-    d.band("far", hills(112, 4), line=False)
-    d.band("water", "M-30 118 L230 118")
-    d.shape("bark2", "M-6 132 C-2 104 18 92 40 92 C62 92 80 106 86 130Z")
-    d.stroke("bark", "M4 118 L30 104 M16 126 L56 100 M40 128 L70 108 M58 128 L80 116 M8 106 L24 96", 2.2)
-    d.stroke("water2", "M90 126 H120 M100 134 H130", 2.2)
-    # gnawed tree
-    d.limb("bark", "M180 210 L180 136", 16)
-    d.limb("bark", "M180 120 L180 10", 16)
-    d.shape("wood", "M172 120 L188 120 L182 128 L188 136 L172 136 L178 128Z", shadow=False, spot=True)
-    d.band("ground", "M-30 152 Q60 144 120 148 T230 146")
-    d.shape("wood", "M150 150 l6 -3 l2 3Z M162 154 l6 -2 l1 3Z M136 156 l5 -3 l2 3Z", shadow=False)
+    d.disc("glow", 150, 46, 16)
+    pines(d, [(70, 40), (86, 52), (102, 38)], 108, "mid")
+    d.band("far", hills(106, 4), line=False)
+    d.band("water", "M-30 110 L230 110")
+    d.shape("bark2", "M112 128 C116 100 136 88 158 88 C180 88 198 102 204 126Z")
+    d.stroke("bark", "M122 114 L148 100 M134 122 L174 96 M158 124 L188 104 M176 124 L198 112 M126 104 L142 94", 2.2)
+    d.stroke("water2", "M30 120 H60 M70 126 H100", 2.2)
+    # gnawed aspen
+    d.shape("leafc", scallop(42, 40, 26, 9, 0.18) + scallop(22, 66, 18, 8, 0.2), line=False)
+    d.limb("bark", "M44 210 L44 142", 15)
+    d.limb("bark", "M44 126 L44 40 M44 70 L26 56", 15)
+    d.shape("wood", "M36.5 126 L51.5 126 L46 134 L51.5 142 L36.5 142 L42 134Z", shadow=False, spot=True)
+    d.stroke("bark2", "M40 90 l3 -2 M46 104 l3 -2 M40 160 l3 -2", 1.6, line=False)
+    d.band("ground", "M-30 146 Q60 138 120 142 T230 140")
+    d.shape("wood", "M60 150 l6 -3 l2 3Z M70 156 l6 -2 l1 3Z M22 154 l5 -3 l2 3Z", shadow=False)
 
     def beaver():
         d.shape("mark", "M58 158 C40 160 18 164 10 172 C8 178 16 182 30 180 C44 178 56 170 62 164Z")
@@ -721,7 +725,7 @@ def beaver_lodge(d: Drawing):
         d.marks("mark", circle(145, 106, 2) + ellipse(162, 121, 3, 2.4))
         d.shape("teeth", rrect(150, 130, 6, 8, 1.5), shadow=False)
         d.shape("mark", ellipse(146, 142, 6, 4.5) + ellipse(84, 162, 14, 5))
-    place(d, beaver, 98, 168, 0.92, 100, 168)
+    place(d, beaver, 120, 170, 0.78, 100, 168, mirror=True)
     d.band("deep", hills(190, 3, 30), line=False)
 
 
@@ -858,33 +862,43 @@ def gator_portrait(d: Drawing):
     ripples(d, [(30, 180, 1.4), (150, 182, 1.6)])
 
 
-def cypress(d: Drawing, x, y, h, role="dark", moss=True):
-    d.shape(role, f"M{x - 10} {y} C{x - 4} {y - 10} {x - 3} {y - 30} {x - 3} {y - h} L{x + 3} {y - h} "
-                  f"C{x + 3} {y - 30} {x + 4} {y - 10} {x + 10} {y}Z")
-    d.shape(role, ellipse(x, y - h, 26, 8) + ellipse(x - 12, y - h + 10, 16, 6) + ellipse(x + 14, y - h + 8, 16, 6))
+def cypress(d: Drawing, x, y, h, role="dark", moss=True, s=1.0):
+    d.shape(role, f"M{x - 12 * s} {y} C{x - 4 * s} {y - 12 * s} {x - 3 * s} {y - 30 * s} {x - 3 * s} {y - h} L{x + 3 * s} {y - h} "
+                  f"C{x + 3 * s} {y - 30 * s} {x + 4 * s} {y - 12 * s} {x + 12 * s} {y}Z")
+    d.stroke(role, f"M{x} {y - h * 0.55} L{x - 18 * s} {y - h * 0.7} M{x} {y - h * 0.75} L{x + 16 * s} {y - h * 0.88}", 2.4 * s)
+    d.shape(role, ellipse(x, y - h, 24 * s, 7 * s) + ellipse(x - 18 * s, y - h * 0.7, 14 * s, 5 * s)
+            + ellipse(x + 16 * s, y - h * 0.88, 14 * s, 5 * s))
     if moss:
-        d.shape("moss", f"M{x - 20} {y - h + 4} l3 22 l3 -14 l3 18 l3 -24Z M{x + 8} {y - h + 6} l3 18 l3 -10 l3 24 l3 -30Z",
-                shadow=False, line=False)
+        m = ""
+        for mx, my, ml in [(x - 26 * s, y - h * 0.7, 20), (x - 12 * s, y - h * 0.7, 16), (x + 8 * s, y - h * 0.88, 22),
+                           (x + 22 * s, y - h * 0.88, 14), (x - 14 * s, y - h, 18), (x + 10 * s, y - h, 24)]:
+            ml *= s
+            m += f"M{mx:.1f} {my:.1f} l2 {ml * 0.8:.1f} l2 {-ml * 0.5:.1f} l2 {ml:.1f} l2 {-ml * 1.3:.1f}Z "
+        d.shape("moss", m, shadow=False, line=False)
 
 
 def gator_swamp(d: Drawing):
-    d.disc("glow", 100, 96, 34)
-    cypress(d, 20, 128, 84)
-    cypress(d, 176, 128, 92)
-    cypress(d, 150, 126, 50, "near", moss=False)
-    d.band("mid", "M-30 124 L230 124")
-    d.stroke("glow2", "M80 134 H120 M88 142 H112", 2.4)
-    d.shape("hero", "M24 140 C44 134 70 132 100 132 C114 124 126 122 134 126 C146 128 160 130 172 134 "
-                    "C176 138 172 141 164 141 L24 142Z")
-    d.shape("hero", circle(128, 124, 6) + circle(168, 132, 3.5), shadow=False)
-    d.shape("eye", ellipse(128, 123, 3.4, 2.4), shadow=False)
-    d.marks("mark", ellipse(128, 123, 0.9, 2.2))
-    d.shape("hero", "".join(f"M{x} 134 l4 -7 l4 7Z" for x in range(36, 100, 10)), shadow=False)
-    d.stroke("light", "M18 146 q8 -4 16 0 M180 146 q6 -3 12 0", 2)
-    for x, y in [(50, 168), (150, 162), (90, 182)]:
+    d.disc("glow", 100, 92, 30)
+    d.band("far", hills(118, 4), line=False)
+    cypress(d, 26, 124, 90)
+    cypress(d, 172, 124, 100)
+    cypress(d, 140, 120, 56, "near", moss=False, s=0.6)
+    d.band("mid", "M-30 122 L230 122")
+    d.stroke("glow2", "M84 130 H116 M90 136 H110", 2.4)
+
+    def gator():
+        d.shape("hero", "M24 140 C44 134 70 132 100 132 C114 124 126 122 134 126 C146 128 160 130 172 134 "
+                        "C176 138 172 141 164 141 L24 142Z")
+        d.shape("hero", circle(128, 124, 6) + circle(168, 132, 3.5), shadow=False)
+        d.shape("eye", ellipse(128, 123, 3.4, 2.4), shadow=False)
+        d.marks("mark", ellipse(128, 123, 0.9, 2.2))
+        d.shape("hero", "".join(f"M{x} 134 l4 -7 l4 7Z" for x in range(36, 100, 10)), shadow=False)
+    place(d, gator, 104, 148, 1.3, 100, 140)
+    d.stroke("light", "M18 156 q8 -4 16 0 M178 156 q6 -3 12 0", 2)
+    for x, y in [(40, 174), (150, 170), (96, 186)]:
         d.shape("hero2", f"M{x} {y} m-12 0 a12 5 0 1 0 24 0 a12 5 0 1 0 -24 0Z M{x} {y} L{x + 12} {y - 2} L{x + 10} {y + 2}Z", shadow=True)
-    d.shape("pop", "M150 160 l-4 -8 l4 3 l4 -3Z", shadow=False, spot=True)
-    d.band("near", waves(190, 3, 40), line=False)
+    d.shape("pop", "M150 168 l-4 -8 l4 3 l4 -3Z", shadow=False, spot=True)
+    d.band("near", waves(194, 3, 40), line=False)
 
 
 # ================================================================ MANATEE
@@ -972,8 +986,12 @@ def orca_fin(d: Drawing, x, y, h, s=1.0, blow=False):
                     f"C{x + 4 * s} {y - h * 0.7} {x + 8 * s} {y - h * 0.4} {x + 12 * s} {y - 11 * s}Z")
     d.shape("hero2", ellipse(x - 14 * s, y - 8 * s, 8 * s, 3 * s), shadow=False, line=False)
     if blow:
-        d.shape("light", f"M{x + 28 * s} {y - 6 * s} C{x + 20 * s} {y - 26 * s} {x + 26 * s} {y - 40 * s} {x + 34 * s} {y - 42 * s} "
-                         f"C{x + 42 * s} {y - 40 * s} {x + 46 * s} {y - 26 * s} {x + 36 * s} {y - 6 * s}Z", shadow=False)
+        bx, by = x + 30 * s, y - 8 * s
+        d.shape("light", f"M{bx - 2} {by} C{bx - 10} {by - 14} {bx - 22} {by - 24} {bx - 26} {by - 34} C{bx - 16} {by - 30} {bx - 6} {by - 22} "
+                         f"{bx} {by - 12} C{bx + 2} {by - 24} {bx + 8} {by - 34} {bx + 16} {by - 40} C{bx + 14} {by - 28} {bx + 8} {by - 14} {bx + 3} {by}Z",
+                spot=True)
+        for dx, dy, r in [(-28, -40, 2.4), (-18, -44, 2), (18, -46, 2.4), (6, -48, 2), (-8, -42, 1.8)]:
+            d.shape("light", drop(bx + dx * s, by + dy * s, r), shadow=False)
 
 
 def orca_islands(d: Drawing):
@@ -1010,7 +1028,7 @@ def hummingbird(d: Drawing, flower=True):
 def humming_portrait(d: Drawing):
     d.disc("glow", 100, 100, 70)
     d.shape("leafc", leaf(186, 170, 40, 10, -150) + leaf(14, 180, 50, 12, -40), line=False)
-    place(d, hummingbird, 96, 104, 1.08, 110, 100)
+    place(d, hummingbird, 92, 98, 1.04, 110, 100)
     d.stroke("light", "M30 96 q-6 6 0 12 M22 90 q-8 10 0 20", 2)
 
 
@@ -1030,12 +1048,12 @@ def humming_flowers(d: Drawing):
     trumpet(d, 168, 70, 168, 1.0)
     trumpet(d, 160, 100, 200, 0.9)
     trumpet(d, 154, 130, 150, 0.9)
-    place(d, hummingbird, 82, 102, 0.62, 186, 80)
+    place(d, hummingbird, 128, 76, 0.66, 186, 80)
     d.band("near", hills(180, 4))
 
 
 # ================================================================ ARCTIC FOX
-FOX_EAR = "M66 72 C60 58 62 44 70 36 C80 42 86 54 86 64Z"
+FOX_EAR = "M66 72 C60 64 60 52 66 46 C76 46 84 54 86 64Z"
 
 
 def fox_portrait(d: Drawing):
@@ -1050,8 +1068,8 @@ def fox_portrait(d: Drawing):
     d.stroke("hero2", "M88 120 Q100 130 112 120", 1.6, line=False)
     d.shape("hero", FOX_EAR)
     flip(d, lambda: d.shape("hero", FOX_EAR))
-    d.shape("hero2", "M70 66 C68 56 70 48 72 44 C78 50 80 56 80 62Z", shadow=False)
-    flip(d, lambda: d.shape("hero2", "M70 66 C68 56 70 48 72 44 C78 50 80 56 80 62Z", shadow=False))
+    d.shape("hero2", "M70 66 C66 60 66 54 68 51 C74 52 78 56 80 62Z", shadow=False)
+    flip(d, lambda: d.shape("hero2", "M70 66 C66 60 66 54 68 51 C74 52 78 56 80 62Z", shadow=False))
     d.shape("hero", "M100 50 C124 50 140 64 140 82 C140 100 124 114 100 122 C76 114 60 100 60 82 C60 64 76 50 100 50Z")
     d.shape("hero2", "M60 84 C64 96 74 104 86 108 L76 112 C68 106 62 96 60 84Z M140 84 C136 96 126 104 114 108 L124 112 "
                      "C132 106 138 96 140 84Z", shadow=False, line=False)
@@ -1122,9 +1140,9 @@ def walrus_rock(d: Drawing):
     d.shape("ice2", "M170 70 L186 92 L192 108 L176 108 L178 90Z", shadow=False, line=False)
     d.band("far", waves(106, 2, 30))
     d.band("mid", waves(124, 3, 34))
-    d.shape("rock", "M10 168 C14 146 34 134 60 134 L140 132 C166 132 186 144 190 168Z")
-    place(d, walrus, 132, 142, 0.62, 100, 150, mirror=True)
-    place(d, walrus, 70, 152, 0.82, 100, 150)
+    d.shape("rock", "M-10 172 C-6 146 24 132 60 132 L150 130 C180 130 204 144 210 172Z")
+    place(d, walrus, 156, 136, 0.5, 100, 150, mirror=True)
+    place(d, walrus, 82, 154, 0.74, 100, 150)
     d.band("near", waves(166, 4, 34))
     ripples(d, [(30, 180, 1.6), (130, 182, 1.6)])
     d.band("deep", waves(190, 3, 38), line=False)
@@ -1168,7 +1186,7 @@ def narwhal_portrait(d: Drawing):
     rays(d)
     d.band("near", waves(132, 6, 34))
     d.band("deep", waves(162, 5, 36), line=False)
-    narwhal(d, ((22, 132), (50, 118), (96, 112), (130, 104)), 1.35, 62)
+    narwhal(d, ((16, 136), (44, 122), (90, 114), (120, 106)), 1.35, 52)
     bubbles(d, [(30, 92, 2.5), (24, 80, 3.5), (32, 68, 2.4)])
 
 
@@ -1193,8 +1211,8 @@ def narwhal_ice(d: Drawing):
     d.band("far", waves(104, 2, 30))
     d.shape("light", "M10 128 C10 120 30 116 50 118 C62 120 64 128 58 132 L16 134Z M150 124 C152 116 178 116 196 120 L196 132 "
                      "L154 132Z", shadow=True)
-    narwhal_head(d, 76, 140, 22, 92)
-    narwhal_head(d, 124, 140, -22, 92)
+    group(d, "translate(76 144) scale(1.5) translate(-76 -144)", lambda: narwhal_head(d, 76, 144, 22, 58))
+    group(d, "translate(124 144) scale(1.5) translate(-124 -144)", lambda: narwhal_head(d, 124, 144, -22, 58))
     d.band("mid", waves(140, 3, 32))
     ripples(d, [(58, 140, 1.4), (110, 140, 1.4)])
     d.band("near", waves(160, 4, 36))
@@ -1379,7 +1397,7 @@ def puffin_cliff(d: Drawing):
     d.stroke("deep", "M30 176 L40 200 M120 172 L112 196 M160 174 L172 200", 2, line=False)
     for x, y in [(30, 150), (150, 154), (176, 152)]:
         d.shape("turf", f"M{x} {y} l3 -9 l2 8 l3 -10 l2 11Z", shadow=False, line=False)
-    place(d, puffin_standing, 96, 160, 1.15, 104, 162)
+    place(d, puffin_standing, 92, 160, 1.5, 106, 162)
 
 
 # ================================================================ BELUGA
@@ -1433,7 +1451,7 @@ def beluga_kayak(d: Drawing):
 
 # ================================================================ colours
 BLACK_BEAR_C = {"hero": "#2B2A2F", "hero2": "#C49A6C", "mark": "#121115", "bark": "#7A5236"}
-GRIZZLY_C = {"hero": "#7E5130", "hero2": "#B68A5C", "mark": "#2B1B10", "pop": "#E0603F", "pop2": "#F29A84",
+GRIZZLY_C = {"hero": "#7E5130", "hero2": "#A87C50", "mark": "#2B1B10", "pop": "#E0603F", "pop2": "#F29A84",
              "light": "#F3E6CF", "water": "#7CC6E8", "water2": "#E6F6FD"}
 POLAR_C = {"hero": "#F7F4EC", "hero2": "#D9D2C2", "mark": "#16171C", "ice": "#A9CFE2", "ice2": "#7FB0C9"}
 MOOSE_C = {"hero": "#4B3427", "hero2": "#7B604C", "hero3": "#36261C", "mark": "#16100C", "antler": "#CDAE78", "antler2": "#A88A58",
@@ -1446,7 +1464,7 @@ EAGLE_C = {"hero": "#4A3122", "hero2": "#6E4A33", "mark": "#1E140D", "light": "#
 OTTER_C = {"hero": "#6B4630", "hero2": "#D8C3A5", "mark": "#20150F", "light": "#F7EFE2", "pop": "#E89AA6", "pop2": "#B85D6C",
            "kelp": "#8A7B2C"}
 BEAVER_C = {"hero": "#7A4E30", "hero2": "#A87A55", "mark": "#24170E", "teeth": "#F08A24", "bark": "#8A5E3B", "bark2": "#A08E70",
-            "wood": "#EBCB93", "kelp": "#5E8C4A", "water": "#6FB5D6", "water2": "#DDF0F8"}
+            "wood": "#EBCB93", "kelp": "#5E8C4A", "leafc": "#7FA650", "water": "#6FB5D6", "water2": "#DDF0F8"}
 RACCOON_C = {"hero": "#8E9097", "hero2": "#6B6D74", "mark": "#1C1D22", "light": "#F4F2EE", "bark": "#6E4A30", "wood": "#D9B47E"}
 GOAT_C = {"hero": "#F7F5EF", "hero2": "#DDD8CB", "mark": "#1E1E22"}
 GATOR_C = {"hero": "#4B5A36", "hero2": "#C9C08A", "mark": "#20271A", "eye": "#E8C23A", "light": "#FFFDF2", "moss": "#A9B596",
@@ -1603,7 +1621,7 @@ CONCEPTS = [
             fixes={"sky": ["sky2", "far", "mid"], "far": ["mid", "near", "deep"], "mid": ["near", "deep"]}),
     Concept("reindeer-lapland", "animal-reindeer", "Lapland lights", reindeer_lapland, overrides=REINDEER_C,
             checks=[("hero", "snow"), ("hero", "far"), ("antler", "sky"), ("antler", "far"), ("tent", "far"), ("hero", "sky")],
-            fixes={"far": ["mid", "near", "deep"], "sky": ["sky2", "far", "mid"]}),
+            fixes={"far": ["mid", "near", "deep"], "sky": ["sky2", "far", "mid"], "tent": ["#B8966A", "light"]}),
     # snowy owl
     Concept("snowyowl-portrait", "animal-snowy-owl", "Snowy owl", owl_portrait, overrides=OWL_C,
             checks=[("hero", "sky"), ("hero", "far"), ("hero2", "sky"), ("hero", "glow")],
@@ -1614,7 +1632,7 @@ CONCEPTS = [
     # puffin
     Concept("puffin-portrait", "animal-puffin", "Puffin", puffin_portrait, NO_GOLD, PUFFIN_C,
             checks=[("dark", "sky"), ("face", "sky"), ("pop", "sky"), ("dark", "mid"), ("dark", "near"), ("face", "glow")],
-            fixes={"sky": ["sky2", "far"], "mid": ["far", "near"], "near": ["mid", "far"], "glow": ["glow2", "pop"]}),
+            fixes={"sky": ["sky2", "far", "mid"], "mid": ["far", "near"], "near": ["mid", "far"], "glow": ["glow2", "pop"]}),
     Concept("puffin-cliff", "animal-puffin", "Puffin with fish", puffin_cliff, NO_GOLD, PUFFIN_C,
             checks=[("dark", "sky"), ("dark", "far"), ("dark", "mid"), ("face", "mid"), ("pop", "mid"), ("dark", "turf")],
             fixes={"sky": ["sky2", "far"], "mid": ["far", "near"], "far": ["sky2", "mid"]}),

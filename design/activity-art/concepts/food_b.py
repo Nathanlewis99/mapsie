@@ -678,20 +678,21 @@ def picnic_tree(d: Drawing):
     d.shape("near", "M104 96 C96 70 120 46 146 52 C164 34 196 52 190 76 C204 92 186 114 166 108 C154 120 130 116 124 106 C108 112 98 104 104 96Z")
     d.shape("deep", "M118 92 C126 82 140 86 144 94 C134 100 124 98 118 92Z", shadow=False, line=False)
     # blanket and basket under it
-    d.shape("light", "M86 152 L150 140 L172 160 L102 174Z")
-    def blk():
-        for i in range(4):
-            t = i / 4
-            d.shape("pop", f"M{86 + 64*t:.1f} {152 - 12*t:.1f} L{86 + 64*(t+.125):.1f} {152 - 12*(t+.125):.1f} L{102 + 70*(t+.125):.1f} {174 - 14*(t+.125):.1f} L{102 + 70*t:.1f} {174 - 14*t:.1f}Z", shadow=False, line=False, extra='opacity=".6"')
-        for j in range(4):
-            u = j / 4
-            a0 = (86 + 16*u, 152 + 22*u); a1 = (86 + 16*(u+.125), 152 + 22*(u+.125))
-            b0 = (150 + 22*u, 140 + 20*u); b1 = (150 + 22*(u+.125), 140 + 20*(u+.125))
-            d.shape("pop", f"M{a0[0]:.1f} {a0[1]:.1f} L{b0[0]:.1f} {b0[1]:.1f} L{b1[0]:.1f} {b1[1]:.1f} L{a1[0]:.1f} {a1[1]:.1f}Z", shadow=False, line=False, extra='opacity=".6"')
-    blk()
-    d.shape("hero", rrect(112, 140, 26, 16, 3))
-    d.stroke("dark", "M114 142 C114 128 136 128 136 142", 2.4)
-    d.stroke("mark", "M114 148 H136", 1.2, line=False)
+    A, B, C, D = (58, 156), (146, 140), (178, 162), (88, 182)
+    lerp = lambda p, q, t: (p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t)
+    def quad(u0, u1, v0, v1):
+        pts = []
+        for u, v in [(u0, v0), (u1, v0), (u1, v1), (u0, v1)]:
+            top, bot = lerp(A, B, u), lerp(D, C, u)
+            pts.append(lerp(top, bot, v))
+        return "M" + " L".join(f"{x:.1f} {y:.1f}" for x, y in pts) + "Z"
+    d.shape("light", quad(0, 1, 0, 1))
+    for k in range(0, 8, 2):
+        d.shape("pop", quad(k / 8, (k + 1) / 8, 0, 1), shadow=False, line=False, extra='opacity=".6"')
+        d.shape("pop", quad(0, 1, k / 8, (k + 1) / 8), shadow=False, line=False, extra='opacity=".6"')
+    d.stroke("dark", "M116 146 C116 128 144 128 144 146", 2.6)
+    d.shape("hero", rrect(112, 142, 36, 20, 3), spot=True)
+    d.stroke("mark", "M114 150 H146 M114 156 H146", 1.2, line=False)
 
 
 # ================================================================ FRUIT MARKET
@@ -763,9 +764,9 @@ def fruit_boat(d: Drawing):
     d.band("mid", waves(112, 3, 30))
     d.band("near", waves(150, 3, 34), line=False)
     # rower with conical hat and paddle
-    d.limb("dark", "M36 92 L22 152", 3.4)
-    d.shape("mark", rrect(34, 104, 18, 30, 7))
-    d.shape("light", "M26 106 L43 90 L60 106Z", spot=True)
+    d.limb("dark", "M50 88 L24 156", 3.4)
+    d.shape("mark", rrect(30, 98, 22, 34, 9))
+    d.shape("light", "M20 102 L41 84 L62 102Z", spot=True)
     # piles of fruit
     fruit_heap(d, [(70, 124), (80, 122), (75, 114)], "pop", 6.5)
     fruit_heap(d, [(94, 124), (104, 124), (99, 115)], "hero", 6.5)
@@ -799,17 +800,16 @@ def tapas_plates(d: Drawing):
         d.shape("near", ellipse(x, y, 6.5, 5), shadow=False, spot=True)
         d.marks("pop", circle(x + 2, y - 1, 1.8))
     # gambas al ajillo
-    cazuela(d, 100, 138, 34)
-    d.shape("glow2", circle(100, 138, 25), shadow=False, line=False)
-    for x, y, r in [(86, 130, 0), (108, 126, 60), (112, 148, 160), (88, 150, 230)]:
+    cazuela(d, 100, 138, 36)
+    d.shape("glow2", circle(100, 138, 27), shadow=False, line=False)
+    for x, y, r in [(88, 128, -10), (114, 132, 80), (96, 152, 200)]:
         def pr(x=x, y=y, r=r):
-            d.limb("sky2", "M-8 -4 C-8 -12 6 -12 8 -2 C9 6 2 10 -4 8", 6, shadow=False)
-            d.marks("dark", circle(-6, -6, 1.4))
+            d.limb("sky2", "M-10 -2 C-10 -14 10 -14 10 0 C10 8 4 12 -2 11", 8, shadow=False, spot=True)
+            d.shape("sky2", "M-2 11 L-10 6 L-8 16Z", shadow=False)
+            d.stroke("pop", "M-4 -9 l2 4 M3 -8 l-1 5 M8 -2 l-4 2", 1.2, line=False)
+            d.marks("dark", circle(-9, -5, 1.6))
         group(d, f"translate({x} {y}) rotate({r})", pr)
     d.marks("near", circle(100, 138, 1.6) + circle(96, 142, 1.4) + circle(104, 134, 1.4))
-    # bread and toothpick
-    d.shape("hero2", rrect(32, 128, 30, 20, 8), extra='transform="rotate(-20 47 138)"')
-    d.shape("light", rrect(37, 132, 20, 12, 5), shadow=False, line=False, extra='transform="rotate(-20 47 138)"')
 
 
 def pintxo(d: Drawing, x, top):
@@ -839,9 +839,11 @@ def tapas_pintxos(d: Drawing):
         d.stroke("light", "M136 104 L152 102", 1.2, line=False)
         d.stroke("ground", "M146 118 V80", 2.2)
         d.shape("near", "M140 84 C142 76 150 76 152 84 L146 96Z")
-    pintxo(d, 43, p1)
-    pintxo(d, 94, p2)
-    pintxo(d, 146, p3)
+    def row():
+        pintxo(d, 43, p1)
+        pintxo(d, 94, p2)
+        pintxo(d, 146, p3)
+    group(d, "translate(100 130) scale(1.16) translate(-96 -130)", row)
 
 
 def tapas_jamon(d: Drawing):
@@ -868,23 +870,22 @@ def tapas_jamon(d: Drawing):
 def pasta_machine(d: Drawing):
     d.disc("glow", 100, 80, 58, line=False)
     table(d, 150, "far", "mid")
-    # sheet of dough coming out over the table
-    d.shape("hero", "M66 128 H118 L124 150 C102 160 64 146 24 156 L26 148 C58 140 64 144 66 128Z", spot=True)
-    # clamp
-    d.shape("dark", "M86 136 H104 V160 H86Z")
-    # body
-    d.shape("hero2", rrect(56, 76, 76, 58, 6))
-    d.shape("light", rrect(62, 82, 64, 10, 3), shadow=False, line=False)
-    d.shape("dark", rrect(64, 120, 60, 6, 3), shadow=False)
-    d.shape("mark", circle(54, 102, 9))
-    d.marks("light", circle(54, 102, 3))
-    d.stroke("mark", "M64 110 H124", 1.6, line=False)
-    # crank
-    d.limb("dark", "M132 104 H148 L156 72", 5)
-    d.shape("pop", rrect(150, 58, 12, 18, 5), spot=False)
-    # flour and a nest of tagliatelle
-    d.stroke("hero", "M140 148 C150 140 168 140 172 148 C168 156 150 156 144 150 C150 146 162 146 166 150", 3)
-    d.marks("light", circle(36, 140, 1.8) + circle(44, 136, 1.4) + circle(160, 132, 1.6))
+    # dough going in at the top
+    d.shape("hero", "M70 40 H120 L116 86 H74Z", spot=True)
+    d.stroke("mark", "M72 52 H118", 1, line=False)
+    # body with rollers
+    d.limb("dark", "M132 104 H150 L158 74", 5)
+    d.shape("pop", rrect(152, 58, 12, 18, 5))
+    d.shape("hero2", rrect(60, 84, 72, 66, 8))
+    d.shape("mark", rrect(60, 84, 72, 10, 4), shadow=False, line=False)
+    d.shape("dark", rrect(68, 84, 56, 5, 2), shadow=False)
+    d.shape("light", rrect(66, 98, 8, 44, 3), shadow=False, line=False)
+    d.stroke("mark", "M80 102 V140 M112 102 V140", 1.4, line=False)
+    d.shape("mark", circle(58, 112, 9))
+    d.marks("light", circle(58, 112, 3))
+    # thin sheet coming out at the bottom, draped over the table edge
+    d.shape("hero", "M68 146 H124 L136 158 C112 164 72 158 40 166 L34 186 C30 178 34 168 40 160 C56 152 62 156 68 146Z", spot=True)
+    d.marks("light", circle(36, 140, 1.8) + circle(44, 136, 1.4) + circle(160, 132, 1.6) + circle(150, 140, 1.2))
 
 
 def pasta_well(d: Drawing):
@@ -979,13 +980,13 @@ def dimsum_stack(d: Drawing):
 
 def bao(d: Drawing, x, y, s=1.0, split=False):
     def f():
-        d.shape("light", "M-26 0 C-30 -32 30 -32 26 0 Q0 7 -26 0Z")
+        d.shape("light", "M-29 0 C-36 -46 36 -46 29 0 Q0 7 -29 0Z")
         if split:
-            d.shape("pop", "M-12 -20 Q0 -28 13 -19 L8 -11 Q0 -6 -7 -11Z", shadow=False, spot=True)
-            d.stroke("mark", "M-12 -20 Q0 -28 13 -19", 1.4, line=False)
+            d.shape("pop", "M-14 -30 Q0 -40 15 -29 L9 -19 Q0 -13 -8 -19Z", shadow=False, spot=True)
+            d.stroke("mark", "M-14 -30 Q0 -40 15 -29", 1.4, line=False)
         else:
-            d.stroke("mark", "M0 -21 l-8 6 M0 -21 l-3 8 M0 -21 l3 8 M0 -21 l8 6", 1.6)
-            d.marks("mark", circle(0, -21, 2))
+            d.stroke("mark", "M0 -32 l-9 7 M0 -32 l-3 9 M0 -32 l3 9 M0 -32 l9 7", 1.6)
+            d.marks("mark", circle(0, -32, 2.2))
         d.stroke("sky2", "M-18 -2 Q0 3 18 -2", 1.4, line=False)
     group(d, f"translate({x} {y}) scale({s})", f)
 
@@ -997,10 +998,10 @@ def dimsum_bao(d: Drawing):
     d.shape("hero", "M24 132 H176 L170 152 H30Z")
     d.stroke("mark", "M28 140 H172", 1.4, line=False)
     d.shape("hero2", ellipse(100, 132, 76, 7), shadow=False)
-    steam(d, [74, 126], 78, 22)
-    bao(d, 70, 120, 1.05)
-    bao(d, 130, 120, 1.05)
-    bao(d, 100, 138, 1.2, split=True)
+    steam(d, [68, 132], 70, 22)
+    bao(d, 66, 124, 1.05)
+    bao(d, 134, 124, 1.05)
+    bao(d, 100, 144, 1.15, split=True)
 
 
 def dimsum_cart(d: Drawing):
@@ -1040,7 +1041,7 @@ def pub_front(d: Drawing):
     for y in range(14, 92, 9):
         off = 0 if (y // 9) % 2 else 9
         d.stroke("mark", " ".join(f"M{x} {y} h14" for x in range(-10 + off, 220, 18)), 1, line=False)
-    for x in [42, 86, 130]:
+    for x in [34, 78, 122]:
         d.shape("light", rrect(x, 30, 28, 40, 2))
         d.shape("sky2", rrect(x + 3, 33, 22, 16, 1), shadow=False)
         d.shape("sky2", rrect(x + 3, 52, 22, 15, 1), shadow=False)
@@ -1056,16 +1057,16 @@ def pub_front(d: Drawing):
     d.marks("hero2", circle(108, 142, 1.8))
     d.stroke("hero2", "M24 108 H176", 2, line=False)
     # hanging baskets
-    for x in [28, 172]:
+    for x in [28]:
         d.shape("near", "M" + f"{x-11} 84 a11 9 0 0 0 22 0Z")
         d.marks("pop", circle(x - 6, 84, 2.6) + circle(x + 1, 88, 2.6) + circle(x + 7, 83, 2.4) + circle(x - 1, 81, 2.2))
     # hanging sign on a bracket
-    d.stroke("dark", "M150 18 H182 M156 18 V24 M174 18 V24", 2.6)
-    d.shape("dark", rrect(150, 24, 30, 36, 3))
-    d.shape("deep", rrect(153, 27, 24, 30, 2), shadow=False)
-    d.stroke("hero2", rrect(155, 29, 20, 26, 1.5), 1.2, line=False)
-    d.shape("glow2", "M159 32 H171 L169 52 H161Z", shadow=False)
-    d.shape("light", "M159 32 H171 L170.5 37 H159.5Z", shadow=False)
+    d.stroke("dark", "M150 52 H180 M154 52 V58 M170 52 V58", 2.6)
+    d.shape("dark", rrect(148, 58, 26, 32, 3))
+    d.shape("deep", rrect(151, 61, 20, 26, 2), shadow=False)
+    d.stroke("hero2", rrect(153, 63, 16, 22, 1.5), 1.2, line=False)
+    d.shape("glow2", "M156 66 H166 L164.5 82 H157.5Z", shadow=False)
+    d.shape("light", "M156 66 H166 L165.6 70 H156.4Z", shadow=False)
     d.band("ground", "M-30 168 L230 168")
 
 
@@ -1185,7 +1186,8 @@ def bgarden_tables(d: Drawing):
     d.stroke("hero", "M42 156 V170 M158 156 V170", 4)
 
 
-PRETZEL = "M52 98 C88 112 116 130 136 140 C178 120 172 50 100 52 C28 50 22 120 64 140 C84 130 112 112 148 98"
+PRETZEL = [((40, 84), (70, 104), (104, 128), (132, 148)), ((132, 148), (180, 126), (178, 44), (100, 44)),
+           ((100, 44), (22, 44), (20, 126), (68, 148)), ((68, 148), (96, 128), (130, 104), (160, 84))]
 
 
 def bgarden_pretzel(d: Drawing):
@@ -1196,15 +1198,16 @@ def bgarden_pretzel(d: Drawing):
                 x, y = i * 24 + (12 if j % 2 else 0), j * 24
                 d.shape("pop", f"M{x} {y-12} L{x+12} {y} L{x} {y+12} L{x-12} {y}Z", shadow=False, line=False)
     d.disc("glow", 100, 100, 70, line=False)
-    d.shape("light", ellipse(100, 152, 70, 12))
-    d.limb("hero", PRETZEL, 18)
-    d.stroke("hero2", "M40 96 C34 70 60 56 100 58 C140 56 166 70 160 96", 3, line=False)
-    d.stroke("hero2", "M70 120 Q100 106 128 122", 2.4, line=False)
-    for x, y in [(60, 62), (84, 52), (112, 52), (138, 60), (156, 80), (44, 80), (86, 116), (116, 116), (150, 116), (50, 116), (100, 100)]:
-        d.marks("light", rrect(x - 1.8, y - 1.8, 3.6, 3.6, 0.6))
+    path = "M40 84 " + " ".join(f"C{a[0]} {a[1]} {b[0]} {b[1]} {c[0]} {c[1]}" for _, a, b, c in PRETZEL)
+    d.limb("hero", path, 15, spot=True)
+    d.stroke("hero2", "M38 80 C34 60 60 48 100 48 C140 48 166 60 162 80", 3, line=False)
+    for p0, p1, p2, p3 in PRETZEL:
+        for t in (0.25, 0.6):
+            x = (1-t)**3*p0[0] + 3*(1-t)**2*t*p1[0] + 3*(1-t)*t*t*p2[0] + t**3*p3[0]
+            y = (1-t)**3*p0[1] + 3*(1-t)**2*t*p1[1] + 3*(1-t)*t*t*p2[1] + t**3*p3[1]
+            d.marks("light", rrect(x - 1.8, y - 3.4, 3.6, 3.6, 0.6))
 
 
-# ================================================================ FOOD TRUCK
 def ftruck_van(d: Drawing):
     d.disc("glow", 150, 46, 15)
     # string lights
@@ -1231,10 +1234,6 @@ def ftruck_van(d: Drawing):
     for x in [60, 146]:
         d.shape("dark", circle(x, 148, 13))
         d.shape("light", circle(x, 148, 5), shadow=False)
-    # chalkboard A-frame
-    d.stroke("dark", "M10 166 L18 130 L26 166", 2.6)
-    d.shape("dark", rrect(8, 128, 22, 26, 2))
-    d.stroke("light", "M12 136 h12 M12 142 h9 M12 148 h11", 1.4)
 
 
 def ftruck_burger(d: Drawing):
@@ -1425,7 +1424,7 @@ CONCEPTS += [
             checks=[("ground", "glow"), ("hero2", "glow"), ("near", "glow"), ("pop", "far")],
             fixes={"glow": ["light", "sky2", "#7FB7BE", "deep"], "far": ["mid", "deep"]}),
     Concept("fruit-boat", "fruit-market", "Floating market", fruit_boat,
-            overrides={**FRUIT, "ground": "#A0673F", "mark": "#3E5F8A", "glow2": "#8DBF4A", "light": "#F3E6C4"},
+            overrides={**FRUIT, "ground": "#A0673F", "mark": "#3E5F8A", "glow2": "#8DBF4A", "light": "#F3E6C4", "mid": "#7FB5A6", "near": "#5A9488"},
             checks=[("ground", "mid"), ("ground", "near"), ("light", "far"), ("far", "sky")],
             fixes={"mid": ["far", "light"], "near": ["deep", "far"]}),
     # tapas crawl
@@ -1435,7 +1434,7 @@ CONCEPTS += [
     Concept("tapas-pintxos", "tapas-crawl", "Pintxos bar", tapas_pintxos,
             overrides={"hero2": "#D9A066", "light": "#FFF6E6", "hero": "#F2C14E", "mark": "#C99A2E", "near": "#6B7F2A", "pop": "#C8414B", "dark": "#4A4E5A", "ground": "#E8D3A8"},
             checks=[("hero2", "glow"), ("light", "glow"), ("pop", "glow"), ("hero", "glow")],
-            fixes={"glow": ["mid", "near", "deep", "#7FB7BE"]}),
+            fixes={"glow": ["#7FB7BE", "mid", "deep"]}),
     Concept("tapas-jamon", "tapas-crawl", "Jamón on the stand", tapas_jamon,
             overrides={"hero": "#8A4A2B", "hero2": "#A8603A", "pop": "#B5303A", "light": "#FFF4E6", "dark": "#3B2A20", "ground": "#C68B59", "sky2": "#C9CED6"},
             checks=[("hero", "glow"), ("dark", "glow"), ("ground", "far")],
@@ -1486,8 +1485,8 @@ CONCEPTS += [
             checks=[("near", "sky"), ("hero", "ground"), ("pop", "sky"), ("near", "far"), ("light", "ground")],
             fixes={"ground": ["far", "mid", "deep"], "far": ["mid", "light", "#D9C38C"]}),
     Concept("bgarden-pretzel", "beer-garden", "Giant pretzel", bgarden_pretzel,
-            overrides={"hero": "#A0592A", "hero2": "#C47A3F", "pop": "#7DB9E8", "light": "#FFFFFF"},
-            checks=[("hero", "glow"), ("light", "glow")], fixes={"glow": ["glow2", "far", "sky2", "#F6D58A"]}),
+            overrides={"hero": "#9A5226", "hero2": "#C47A3F", "pop": "#7DB9E8", "light": "#FFFFFF"},
+            checks=[("hero", "glow"), ("light", "glow"), ("glow", "pop")], fixes={"glow": ["glow2", "sky2", "#F6E7C1", "far"]}),
     # food truck
     Concept("ftruck-van", "food-truck", "Vintage food van", ftruck_van,
             overrides={"glow2": "#FFD98A"},

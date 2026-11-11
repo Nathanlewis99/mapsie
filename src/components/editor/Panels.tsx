@@ -556,6 +556,11 @@ function OriginalsPanel() {
   const placed = design.stickers.filter((s) => s.kind === "original").length;
 
   const place = (id: string) => addSticker({ kind: "original", name: id, origStyle: style, palette, src: "", ...at(), size: 15, rotation: 0 });
+  // Animals are listed by region (the catalogue is sorted by label, so sort by region first).
+  const regionOf = (o?: OriginalDef) => (o?.keywords ?? "").replace(/ wildlife animal$/, "");
+  const prevAnimal = { current: null as OriginalDef | null };
+  const animalOrder = (a: [string, OriginalDef[]], b: [string, OriginalDef[]]) =>
+    a[1][0].category === "Animals" && b[1][0].category === "Animals" ? regionOf(a[1][0]).localeCompare(regionOf(b[1][0])) : 0;
 
   return (
     <div className="space-y-5">
@@ -621,8 +626,12 @@ function OriginalsPanel() {
           <div className="space-y-3">
             {[...byActivity.entries()]
               .filter(([, list]) => list[0].category === cat)
+              .sort(animalOrder)
               .map(([activity, list]) => (
                 <div key={activity}>
+                  {cat === "Animals" && regionOf(list[0]) !== regionOf(prevAnimal.current ?? undefined) && (
+                    <div className="text-xs font-extrabold text-coral mt-4 mb-1">{regionOf((prevAnimal.current = list[0]))}</div>
+                  )}
                   <div className="text-sm font-extrabold mb-1">{list[0].label}</div>
                   <div className="grid grid-cols-3 gap-2">
                     {list.map((o) => (

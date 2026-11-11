@@ -196,8 +196,10 @@ def brew_hops(d: Drawing):
         y = 60 + i * 13
         for k in (-1, 1):
             d.shape("hero2", leaf(152 - i * 0.6, y + 6, 14, 6, -90 + k * 32), shadow=False)
-    vine_leaf(d, 62, 70, 1.5, -40, role="near")
-    d.stroke("near", "M100 62 Q96 44 80 40", 3.2, shadow=True)
+    d.stroke("near", "M100 62 Q96 44 72 44", 3.2, shadow=True)
+    for L, W, ang in [(40, 24, 200), (36, 20, 250), (34, 20, 150)]:
+        d.shape("near", leaf(72, 50, L, W, ang), shadow=ang == 200)
+        d.stroke("mark", leaf_vein(72, 50, L, ang), 1.4, line=False)
     hop_cone(d)
 
 
@@ -290,42 +292,49 @@ def sake_set(d: Drawing):
 
 
 def sake_masu(d: Drawing):
-    d.disc("glow", 100, 78, 56, line=False)
-    table(d, 152, "far", "mid")
-    # masu box: back rim and the sake pooled in it
-    d.shape("hero", "M46 116 L66 100 H160 L140 116Z")
-    d.shape("hero2", "M54 113 L69 103 H151 L137 113Z", shadow=False)
-    # glass standing in it, overflowing
-    d.shape("light", "M82 54 H126 L121 110 H87Z")
-    d.shape("hero2", "M83 60 H125 L120.6 108 H87.4Z", shadow=False)
-    d.shape("hero2", "M80 56 Q104 50 128 56 Q130 64 126 66 Q104 60 82 66 Q78 64 80 56Z", shadow=False, spot=True)
-    d.stroke("hero2", "M82 62 Q80 80 84 96 M126 62 Q129 78 124 92", 2.6, line=False)
-    d.stroke("light", "M92 66 V100", 2.4, line=False)
-    # front faces
-    d.shape("hero", "M46 116 H140 V156 H46Z", spot=False)
-    d.shape("mark", "M140 116 L160 100 V140 L140 156Z")
-    d.stroke("mark", "M52 124 H134", 1.2, line=False)
-    for x, y in [(64, 46), (140, 44), (148, 70)]:
-        d.marks("hero2", circle(x, y, 3))
+    d.disc("glow", 100, 80, 58, line=False)
+    table(d, 154, "far", "mid")
+    # masu box: top rim seen from slightly above, sake pooled inside
+    d.shape("hero", "M40 112 L60 92 H164 L144 112Z")
+    d.shape("hero2", "M50 109 L64 96 H154 L140 109Z", shadow=False, spot=True)
+    # glass standing in it, brimming over
+    d.shape("light", "M86 46 H122 L118 104 H90Z")
+    d.shape("hero2", "M87.5 52 H120.5 L117 102 H91Z", shadow=False)
+    d.stroke("light", "M95 58 L97 96", 3, line=False)
+    d.shape("hero2", "M84 44 Q104 38 124 44 Q126 50 122 51 Q104 47 86 51 Q82 50 84 44Z", shadow=False)
+    d.stroke("hero2", "M86 50 Q84 70 88 90 M122 50 Q125 66 121 84", 2.6, line=False)
+    # front faces with cedar grain
+    d.shape("hero", "M40 112 H144 V158 H40Z")
+    d.shape("mark", "M144 112 L164 92 V138 L144 158Z")
+    d.stroke("mark", "M48 124 Q92 120 136 126 M48 140 Q92 136 136 142", 1.3, line=False)
+    for x, y, r in [(70, 52, 2.6), (136, 48, 3), (142, 70, 2.2)]:
+        d.marks("hero2", circle(x, y, r))
 
 
-def komodaru(d: Drawing, x, yb, crest, w=44, h=40):
-    d.shape("light", rrect(x - w / 2, yb - h, w, h, 4))
-    d.shape("ground", ellipse(x, yb - h, w / 2, 5), shadow=False)
-    d.shape("pop", rrect(x - w / 2, yb - h + 3, w, 6, 1), shadow=False)
-    d.shape("pop", rrect(x - w / 2, yb - 9, w, 6, 1), shadow=False)
-    d.shape(crest, circle(x, yb - h / 2 + 1, 8), shadow=False, spot=crest == "mark")
-    d.stroke("dark", f"M{x - w/2 + 4} {yb - h + 9} L{x - w/2 + 10} {yb - 3} M{x + w/2 - 4} {yb - h + 9} L{x + w/2 - 10} {yb - 3}", 1.4, line=False)
+def komodaru(d: Drawing, x, yb, label, w=48, h=36):
+    d.shape("light", rrect(x - w / 2, yb - h, w, h, 5))
+    d.shape("ground", ellipse(x, yb - h, w / 2, 4.5), shadow=False)
+    d.shape(label, rrect(x - 15, yb - h + 6, 30, h - 12, 2), shadow=False, spot=label == "pop")
+    d.shape("light", circle(x, yb - h / 2, 6), shadow=False, line=False)
+    d.marks("hero", circle(x, yb - h / 2, 3))
+    d.stroke("dark", f"M{x - w/2 + 4} {yb - h + 4} V{yb - 4} M{x + w/2 - 4} {yb - h + 4} V{yb - 4}", 1.6)
+    d.stroke("ground", f"M{x - w/2 + 1} {yb - 6} H{x + w/2 - 1}", 2.6, line=False)
 
 
 def sake_barrels(d: Drawing):
-    d.disc("glow", 100, 90, 60, line=False)
-    d.band("far", "M-30 152 L230 152")
+    d.band("deep", "M-30 -30 L230 -30", line=False)
+    d.disc("glow", 100, 96, 64, line=False)
+    d.band("far", "M-30 150 L230 150")
     def stack():
-        for x, yb, cr in [(54, 160, "hero"), (100, 160, "mark"), (146, 160, "hero"), (77, 120, "mark"), (123, 120, "hero"), (100, 80, "mark")]:
-            komodaru(d, x, yb, cr)
-    group(d, "translate(100 112) scale(.86) translate(-100 -110)", stack)
-    d.band("near", "M-30 174 L230 174", line=False)
+        for x, yb, lab in [(52, 160, "pop"), (100, 160, "mark"), (148, 160, "pop"), (76, 124, "mark"), (124, 124, "pop"), (100, 88, "mark")]:
+            komodaru(d, x, yb, lab)
+    group(d, "translate(100 116) scale(.9) translate(-100 -112)", stack)
+    d.band("near", "M-30 172 L230 172", line=False)
+    # shimenawa rope with paper streamers across the top
+    d.limb("ground", "M-30 30 Q100 54 230 30", 7)
+    for x in [60, 100, 140]:
+        y = 30 + 24 * (1 - ((x - 100) / 130) ** 2) * 0.98
+        d.shape("light", f"M{x-4} {y+3} H{x+4} L{x+1} {y+9} H{x+5} L{x+2} {y+15} H{x+6} L{x} {y+22} L{x-4} {y+15} H{x-1} L{x-4} {y+9} H{x}Z", shadow=False)
 
 
 # ================================================================ COFFEE PLANTATION
@@ -359,7 +368,7 @@ def coffee_hills(d: Drawing):
             x = -10 + t * 220
             y = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * cy + t * t * y1
             r = 8 + row * 2.5
-            d.shape("near", circle(x, y, r), shadow=row > 0)
+            d.shape("near", circle(x, y, r), shadow=row > 0, line=row > 0)
             if (i + row) % 2 == 0:
                 d.marks("pop", circle(x - 2, y + 1, 1.8 + row * 0.4) + circle(x + 3, y + 3, 1.8 + row * 0.4))
     # shade tree
@@ -374,8 +383,9 @@ def bean(x, y, rot, s=1.0):
 def coffee_sack(d: Drawing):
     d.disc("glow", 100, 86, 58, line=False)
     table(d, 158, "far", "mid")
-    d.shape("hero2", "M48 160 C38 130 46 102 58 90 H142 C154 102 162 130 152 160Z", spot=True)
+    d.shape("hero2", "M48 160 C38 130 46 102 58 90 H142 C154 102 162 130 152 160Z")
     d.stroke("mark", "M60 106 V154 M76 100 V158 M92 100 V158 M108 100 V158 M124 100 V158 M140 106 V154", 1.2, line=False)
+    line_only(d, "M54 120 Q100 126 146 120 M50 140 Q100 146 150 140", 1.6)
     d.shape("hero2", ellipse(100, 90, 46, 11))
     d.shape("dark", "M58 90 C62 70 138 70 142 90 Q100 98 58 90Z", shadow=False)
     for x, y, r in [(74, 84, 20), (86, 78, -30), (98, 75, 10), (110, 78, 60), (124, 82, -20), (92, 86, 80), (114, 88, -50), (80, 90, 30), (132, 88, 10)]:
@@ -383,7 +393,7 @@ def coffee_sack(d: Drawing):
         d.stroke("hero2", f"M{x-3} {y} Q{x} {y+1.2} {x+3} {y}", 1, line=False)
     # scoop with beans in front
     d.limb("hero", "M150 150 L176 134", 6)
-    d.shape("hero", "M120 146 H160 C160 160 150 166 140 166 C130 166 120 160 120 146Z")
+    d.shape("hero", "M120 146 H160 C160 160 150 166 140 166 C130 166 120 160 120 146Z", spot=True)
     for x, y in [(130, 145), (140, 142), (150, 145)]:
         d.shape("dark", ellipse(x, y, 5, 3.6), shadow=False)
     for x, y, r in [(52, 168, 20), (66, 172, -30), (96, 170, 40)]:
@@ -482,11 +492,12 @@ def choc_pod(d: Drawing):
         d.stroke("dark", "M-56 0 L-62 -2", 3)
     group(d, "translate(118 80) rotate(-30)", whole)
     # split pod in front
-    d.shape("hero", "M28 124 C40 104 160 104 172 124 C164 150 36 150 28 124Z", spot=True)
-    d.shape("light", "M36 124 C48 110 152 110 164 124 C156 140 44 140 36 124Z", shadow=False)
-    for x, y in [(58, 120), (76, 116), (94, 115), (112, 116), (130, 117), (148, 121), (66, 130), (84, 131), (102, 131), (120, 131), (138, 129)]:
-        d.shape("mark", ellipse(x, y, 7.5, 5), shadow=False)
-    d.stroke("mark", "M28 124 C40 140 160 140 172 124", 1.4, line=False)
+    d.shape("hero", "M24 118 C44 96 156 96 176 118 C162 160 38 160 24 118Z", spot=True)
+    d.stroke("pop", "M40 136 Q100 150 160 136 M56 148 Q100 156 144 148", 1.8, line=False)
+    d.shape("light", "M34 118 C52 104 148 104 166 118 C152 134 48 134 34 118Z", shadow=False)
+    for x, y in [(56, 116), (74, 111), (92, 109), (110, 109), (128, 111), (146, 116), (66, 124), (84, 123), (102, 123), (120, 123), (138, 123)]:
+        d.shape("mark", ellipse(x, y, 8.5, 5.6), shadow=False)
+        d.shape("hero2", ellipse(x - 2, y - 1.5, 3.4, 1.8), shadow=False, line=False)
 
 
 def bonbon(d: Drawing, x, y, kind):
@@ -515,7 +526,6 @@ def choc_truffles(d: Drawing):
             for i in range(3):
                 bonbon(d, 67 + i * 33, 67 + j * 33, (i + j * 2) % 4)
     group(d, "rotate(-10 100 100)", box)
-    d.limb("pop", "M150 34 Q160 60 168 64", 5, spot=True)
 
 
 # ================================================================ CHEESE TASTING
@@ -525,25 +535,26 @@ def holes(d: Drawing, pts):
 
 
 def cheese_board(d: Drawing):
-    d.disc("glow", 100, 82, 58, line=False)
-    table(d, 150, "far", "mid")
-    d.shape("ground", "M28 118 H172 L180 146 H20Z")
-    d.shape("near", rrect(20, 145, 160, 9, 3), shadow=False)
+    d.disc("glow", 100, 80, 58, line=False)
+    table(d, 152, "far", "mid")
+    d.shape("ground", "M26 122 H174 L182 150 H18Z")
+    d.shape("near", rrect(18, 149, 164, 9, 3), shadow=False)
     # grapes behind
-    grape_pile(d, [(92, 96), (104, 98), (98, 108), (110, 108), (86, 106), (104, 116)], "pop", r=7)
-    d.stroke("near", "M98 90 Q100 82 108 80", 2.4)
-    # wedge
-    d.shape("hero2", "M36 132 L92 98 L98 104 L44 138Z", shadow=False)
-    d.shape("hero", "M34 136 L96 102 V138 H34Z", spot=True)
-    holes(d, [(70, 128, 4, 3), (84, 116, 3.5, 3), (86, 131, 3, 2.4), (56, 132, 2.5, 2)])
+    d.stroke("near", "M108 66 Q112 56 122 54", 2.6)
+    grape_pile(d, [(100, 76), (113, 74), (124, 80), (106, 88), (119, 90), (112, 101)], "pop", r=7.5)
     # round soft cheese with a slice cut out
-    d.shape("light", "M118 112 C118 102 170 102 170 112 V134 C170 144 118 144 118 134Z")
-    d.shape("hero2", "M144 112 L170 112 V134 L144 120Z", shadow=False)
-    d.shape("light", ellipse(144, 112, 26, 7), shadow=False)
-    d.shape("hero2", "M144 112 L170 112 C170 116 160 118 152 119Z", shadow=False, line=False)
-    # cheese knife on the board front
-    d.shape("dark", rrect(40, 140, 30, 6, 3), shadow=False)
-    d.shape("sky2", "M70 140 H120 L126 143 L120 146 H70Z", shadow=False)
+    d.shape("light", "M104 104 C104 90 176 90 176 104 V128 C176 142 104 142 104 128Z")
+    d.shape("hero2", "M140 104 L176 104 V128 L140 116Z", shadow=False)
+    d.shape("light", ellipse(140, 104, 36, 10), shadow=False)
+    d.shape("hero2", "M140 104 L176 104 C176 109 164 112 154 113Z", shadow=False, line=False)
+    # big wedge
+    d.shape("hero2", "M28 128 L98 82 L108 90 L38 136Z", shadow=False)
+    d.shape("hero", "M26 134 L104 86 V140 H26Z", spot=True)
+    d.shape("pop", "M104 86 L110 90 V140 H104Z", shadow=False, line=False)
+    holes(d, [(70, 124, 6, 4.5), (88, 108, 4.5, 3.5), (92, 128, 4, 3), (52, 130, 3.4, 2.6), (80, 136, 3, 2)])
+    # knife on the front lip
+    d.shape("dark", rrect(118, 142, 22, 6, 3), shadow=False)
+    d.shape("sky2", "M140 142 H170 L176 145 L170 148 H140Z", shadow=False)
 
 
 def cheese_swiss(d: Drawing):
@@ -564,7 +575,7 @@ def cheese_swiss(d: Drawing):
 
 
 def cheese_wheel(d: Drawing, x, yb, w, h, role="hero"):
-    d.shape(role, f"M{x-w/2} {yb-4} Q{x-w/2-3} {yb-h/2} {x-w/2} {yb-h+4} Q{x-w/2} {yb-h} {x-w/2+6} {yb-h} H{x+w/2-6} "
+    d.shape(role, spot=role == "pop", d=f"M{x-w/2} {yb-4} Q{x-w/2-3} {yb-h/2} {x-w/2} {yb-h+4} Q{x-w/2} {yb-h} {x-w/2+6} {yb-h} H{x+w/2-6} "
                   f"Q{x+w/2} {yb-h} {x+w/2} {yb-h+4} Q{x+w/2+3} {yb-h/2} {x+w/2} {yb-4} Q{x+w/2} {yb} {x+w/2-6} {yb} H{x-w/2+6} Q{x-w/2} {yb} {x-w/2} {yb-4}Z")
     d.stroke("hero2", f"M{x-w/2+4} {yb-h/2} H{x+w/2-4}", 2, line=False)
 
@@ -591,7 +602,7 @@ CONCEPTS = [
     Concept("vtour-hills", "vineyard-tour", "Tuscan vine rows", vtour_hills,
             overrides={"mid": "#A3C46F", "deep": "#5C8A3F", "near": "#4E7D3A", "pop": "#C8643B", "dark": "#2F4F33"},
             checks=[("far", "mid"), ("dark", "far"), ("light", "far"), ("glow", "sky")],
-            fixes={"far": ["near", "#D9C38C", "light"], "dark": ["deep", "mark"]}),
+            fixes={"far": ["near", "#D9C38C", "light"], "dark": ["deep", "mark"], "glow": ["glow2", "#F6A96B", "pop"]}),
     Concept("vtour-crate", "vineyard-tour", "Harvest crate", vtour_crate,
             overrides={"hero": WOOD, "mark": "#8A5A3B", "hero2": GRAPE, "pop": "#A7C957", "near": "#5E9C4A"},
             checks=[("hero", "glow"), ("hero2", "glow"), ("pop", "glow"), ("near", "glow")],
@@ -635,9 +646,9 @@ CONCEPTS = [
             checks=[("hero", "glow"), ("light", "glow"), ("hero", "far")],
             fixes={"glow": ["mid", "near", "deep"], "far": ["mid", "deep", "near"]}),
     Concept("sake-barrels", "sake-tasting", "Sake barrels", sake_barrels,
-            overrides={"pop": "#C8302E", "mark": "#2E4A7D", "hero": "#D9A520", "ground": "#C9A46E"},
-            checks=[("light", "glow"), ("light", "far"), ("light", "sky")],
-            fixes={"glow": ["mid", "near", "deep"], "far": ["mid", "near", "deep"]}),
+            overrides={"pop": "#C8302E", "mark": "#2E4A7D", "hero": "#D9A520", "ground": "#C9A46E", "light": "#FBF7EE"},
+            checks=[("light", "glow"), ("light", "far"), ("pop", "glow"), ("glow", "deep")],
+            fixes={"glow": ["mid", "near", "deep", "#7FB7BE"], "far": ["mid", "near", "deep"], "deep": ["dark", "mark"]}),
     # coffee plantation
     Concept("coffee-branch", "coffee-plantation", "Coffee cherries", coffee_branch,
             overrides={"pop": "#C8202E", "hero2": "#E8783A", "hero": "#9CC25A", "near": "#3F7D3A", "mid": "#6FA858", "dark": "#6B4A2E", "mark": "#5A1A12"},
@@ -666,7 +677,7 @@ CONCEPTS = [
     Concept("choc-bar", "chocolate-tasting", "Broken bar", choc_bar,
             overrides={"hero": "#6B3E26", "hero2": "#86513A", "mark": "#4A2A1A", "light": "#D9DCE3"},
             checks=[("hero", "glow"), ("pop", "glow"), ("light", "glow"), ("hero", "sky")],
-            fixes={"glow": ["light", "sky2", "far", "mid"], "pop": ["hero2", "near", "deep"]}),
+            fixes={"glow": ["sky2", "far", "mid", "#F1E6CF", "#7FB7BE", "deep"]}),
     Concept("choc-pod", "chocolate-tasting", "Cacao pod", choc_pod,
             overrides={"hero": "#E0A33A", "mark": "#6B3E26", "near": "#4F8A3C", "mid": "#7FB069", "light": "#FFF6E8", "dark": "#5A3A22"},
             checks=[("hero", "glow"), ("near", "glow")], fixes={"glow": ["mid", "near", "deep", "#7FB7BE"]}),

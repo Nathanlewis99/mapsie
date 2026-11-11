@@ -159,7 +159,7 @@ def canyon_abseil(d: Drawing):
     d.shape("near", "M-30 36 Q30 30 84 34 Q94 36 94 46 L92 110 L96 180 H-30Z")
     d.shape("deep", "M-30 34 Q20 22 40 30 Q54 18 66 30 Q78 24 86 34 Q50 40 -30 42Z", shadow=False)
     d.shape("light", "M54 36 Q84 30 94 44 L98 172 L82 172 L80 54 Q72 42 54 42Z")
-    d.stroke("far", "M86 56 V160 M92 70 V150", 1.6, line=False)
+    d.stroke("far", "M86 56 V160 M92 70 V150", 1.6)
     d.band("teal", waves(168, 4, 26))
     d.shape("light", splash(90, 170, 0.7), shadow=False)
     # rope and canyoner
@@ -179,7 +179,7 @@ def canyon_gear(d: Drawing):
     d.shape("near", "M-30 -30 H58 Q48 40 62 80 Q52 120 56 160 H-30Z")
     d.shape("deep", "M230 -30 H142 Q154 40 138 84 Q150 120 146 160 H230Z")
     d.shape("light", "M78 -30 H122 Q120 60 126 132 H74 Q80 60 78 -30Z")
-    d.stroke("far", "M92 0 V120 M106 10 V126", 1.6, line=False)
+    d.stroke("far", "M92 0 V120 M106 10 V126", 1.6)
     d.band("teal", waves(128, 3, 24))
     d.stroke("light", "M74 136 Q84 132 94 136 M110 140 Q120 136 130 140", 2)
     d.band("ground", "M-30 152 Q40 140 100 146 T230 144")

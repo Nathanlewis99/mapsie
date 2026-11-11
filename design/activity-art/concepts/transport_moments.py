@@ -146,6 +146,22 @@ def _annulus(cx, cy, r1, r2, a1, a2):
     return f"M{p(r2, a1)} A{r2} {r2} 0 {big} 1 {p(r2, a2)} L{p(r1, a2)} A{r1} {r1} 0 {big} 0 {p(r1, a1)}Z"
 
 
+def _u_shape(cx, cy, r1, r2, a1, a2):
+    """A thick ring segment from a1 to a2 (clockwise, degrees) with round end caps."""
+    p = lambda r, a: f"{cx + r * math.cos(math.radians(a)):.1f} {cy + r * math.sin(math.radians(a)):.1f}"
+    big = 1 if (a2 - a1) % 360 > 180 else 0
+    rc = (r2 - r1) / 2
+    return (f"M{p(r2, a1)} A{r2} {r2} 0 {big} 1 {p(r2, a2)} A{rc} {rc} 0 0 1 {p(r1, a2)} "
+            f"A{r1} {r1} 0 {big} 0 {p(r1, a1)} A{rc} {rc} 0 0 1 {p(r2, a1)}Z")
+
+
+def _hood(d: Drawing, x, y, role="pop"):
+    """A folding pram-style rickshaw hood seen side-on; (x, y) is its lower back corner."""
+    d.shape(role, f"M{x} {y} C{x - 2} {y - 40} {x + 22} {y - 58} {x + 58} {y - 56} L{x + 60} {y - 42} "
+                  f"C{x + 38} {y - 42} {x + 26} {y - 28} {x + 26} {y}Z", spot=True)
+    d.stroke("dark", f"M{x + 26} {y - 2} L{x + 4} {y - 30} M{x + 30} {y - 20} L{x + 22} {y - 50} M{x + 40} {y - 34} L{x + 44} {y - 56}", 1.4, line=False)
+
+
 def _flute(d: Drawing, x, base, s=1.0, glass="light", fizz="hero2", spot=False):
     """A champagne flute standing on `base`."""
     X = lambda dx: round(x + dx * s, 1)
@@ -170,17 +186,17 @@ def fc_seat(d: Drawing):
     _clip(d, "fcwin", rrect(132, 40, 30, 54, 15), view)
     d.band("mid", "M-30 160 H230")
     # seat, facing left
-    d.shape("dark", "M70 134 H128 L124 162 H74Z")
-    d.shape("hero", "M96 138 L104 46 C105 32 126 30 128 44 L134 138Z")
-    d.shape("hero2", "M104 46 C105 32 126 30 128 44 L129.5 62 H103Z", shadow=False, spot=True)
-    d.shape("hero", "M52 120 L28 146 C25 150 29 155 33 153 L64 132Z")
-    d.shape("hero", rrect(46, 114, 92, 20, 9))
-    d.shape("light", "M62 112 C78 108 104 108 116 112 L118 134 C102 138 80 138 60 134Z", shadow=False, spot=True)
-    d.stroke("far", "M66 120 C82 117 100 117 116 120", 1.4, line=False)
-    d.shape("hero", rrect(84, 98, 54, 11, 5.5))
-    d.shape("dark", rrect(140, 124, 34, 6, 3))
-    _post(d, "dark", 157, 128, 160, 4, shadow=False)
-    _flute(d, 157, 124, 0.66, spot=False)
+    d.shape("dark", "M54 134 H110 L106 162 H58Z")
+    d.shape("hero", "M80 138 L88 50 C89 36 110 34 112 48 L118 138Z")
+    d.shape("hero2", "M88 50 C89 36 110 34 112 48 L113.5 64 H87Z", shadow=False, spot=True)
+    d.shape("light", ellipse(99, 76, 11, 7))
+    d.shape("hero", "M44 122 L32 150 C30 156 36 159 40 155 L58 130Z")
+    d.shape("hero", rrect(36, 114, 86, 20, 9))
+    d.stroke("mark", "M44 120 H114", 1.4, line=False)
+    d.shape("hero", rrect(68, 98, 56, 11, 5.5))
+    d.shape("dark", rrect(132, 122, 34, 6, 3))
+    _post(d, "dark", 149, 126, 160, 4, shadow=False)
+    _flute(d, 149, 122, 0.66)
 
 
 def fc_mask(d: Drawing):
@@ -257,8 +273,7 @@ def lh_pillow(d: Drawing):
     d.shape("hero2", rrect(126, 58, 6, 24, 3), shadow=False, spot=True)
     cx, cy, r1, r2, a1, a2 = 100, 128, 19, 50, -28, 208
     rm, rc = (r1 + r2) / 2, (r2 - r1) / 2
-    end = lambda a: circle(round(cx + rm * math.cos(math.radians(a)), 1), round(cy + rm * math.sin(math.radians(a)), 1), rc)
-    d.shape("hero", _annulus(cx, cy, r1, r2, a1, a2) + " " + end(a1) + " " + end(a2), spot=True)
+    d.shape("hero", _u_shape(cx, cy, r1, r2, a1, a2), spot=True)
     a, b = math.radians(a1 + 8), math.radians(a2 - 8)
     d.stroke("mark", f"M{cx + rm * math.cos(a):.1f} {cy + rm * math.sin(a):.1f} A{rm} {rm} 0 1 1 {cx + rm * math.cos(b):.1f} {cy + rm * math.sin(b):.1f}",
              1.4, line=False)
@@ -558,8 +573,7 @@ def rk_cycle(d: Drawing):
     _bulbs(d, -10, 30, 210, 30, 24, 9, ["pop", "hero2", "light"])
     d.band("ground", "M-30 168 H230")
     # passenger seat and hood
-    d.shape("pop", "M30 112 C26 74 48 54 82 56 L86 64 C62 68 52 84 54 112Z", spot=True)
-    d.stroke("dark", "M38 104 C36 84 46 70 62 64 M46 108 C44 90 52 76 70 66", 1.4, line=False)
+    _hood(d, 28, 112)
     d.shape("hero", "M34 108 H90 L94 136 H40Z")
     d.shape("hero2", rrect(42, 100, 46, 10, 5), shadow=False)
     d.limb("dark", "M66 150 L120 130 L152 152 M120 130 L122 110 M66 150 L94 136", 4)
@@ -587,7 +601,7 @@ def rk_pulled(d: Drawing):
         group(d, f"translate({x} {y}) rotate({a})", leaf)
     d.band("ground", "M-30 168 H230")
     # rickshaw, facing right
-    d.shape("pop", "M28 112 C24 74 46 56 80 58 L84 66 C60 70 50 86 52 112Z", spot=True)
+    _hood(d, 26, 110)
     d.shape("hero", "M32 106 H88 Q94 106 94 112 V130 H40 Q32 130 32 122Z")
     d.shape("hero2", rrect(38, 98, 44, 10, 5), shadow=False)
     d.limb("dark", "M84 126 L158 138", 3.6)

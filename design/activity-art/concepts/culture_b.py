@@ -493,29 +493,28 @@ def citybike_basket(d: Drawing):
     d.band("near", "M-30 180 H230", line=False)
 
 
-def citybike_bell(d: Drawing):
-    d.disc("glow", 100, 100, 64, line=False)
-    d.shape("light", cloud(20, 52, .9))
-    d.band("far", hills(170, 6))
-    # handlebar sweeping across the circle
-    d.limb("dark", "M10 120 C40 98 70 92 100 92 C130 92 160 98 190 120", 9)
-    d.limb("hero", "M100 92 L100 196", 12, spot=True)
-    d.shape("dark", rrect(90, 86, 20, 14, 4))
-    d.limb("wicker2", "M10 120 L36 104", 13)
-    d.limb("wicker2", "M190 120 L164 104", 13)
-    d.limb("dark", "M150 104 C160 114 170 120 178 124", 3)
-    # the bell
-    d.limb("silver2", "M66 96 L66 84", 4)
-    d.shape("silver", dome(66, 86, 50, 38))
-    d.shape("silver2", rrect(40, 82, 52, 8, 4), shadow=False)
-    d.shape("light", "M52 78 Q50 64 62 54 Q56 66 58 78Z", shadow=False, line=False)
-    d.marks("dark", circle(66, 46, 3.5))
-    d.limb("pop", "M88 88 L108 74", 5, spot=True)
-    d.stroke("dark", "M28 46 q-6 -6 -4 -14 M38 38 q-4 -8 0 -14 M98 46 q6 -6 4 -14", 2.4)
-    # headlamp
-    d.shape("silver", ellipse(100, 140, 16, 13))
-    d.shape("glow2", ellipse(100, 140, 11, 9), shadow=False)
-    d.marks("light", ellipse(96, 136, 4, 3))
+def citybike_ride(d: Drawing):
+    d.disc("glow", 100, 96, 44)
+    birds(d, [(40, 56, 1), (54, 48, .8)])
+    d.band("far", "M-30 116 H6 V96 H20 V84 H30 V104 H48 V90 L56 78 L64 90 V112 H136 V92 H146 V80 H154 V100 H170 V88 H186 V110 H230")
+    d.band("mid", "M-30 128 H230", line=False)
+    # arched river bridge
+    d.shape("near", "M-30 124 Q100 100 230 124 V134 Q100 112 -30 134Z")
+    d.shape("near", "M-30 134 Q100 112 230 134 V176 H200 V150 A28 22 0 0 0 144 150 V176 H56 V150 A28 22 0 0 0 0 150 V176 H-30Z", shadow=False)
+    d.stroke("dark", "M-30 118 Q100 94 230 118", 1.8)
+    d.stroke("dark", " ".join(f"M{x} {118 - 24 * (1 - ((x - 100) / 130) ** 2):.1f} v9" for x in range(-20, 230, 14)), 1.4, line=False)
+    d.band("deep", waves(170, 3, 28))
+    d.stroke("glow2", "M80 180 h40 M90 188 h22", 2.2, line=False)
+
+    def rider():
+        bike(d, frame="dark", tyre="dark")
+        d.limb("dark", "M84 90 L106 104 L100 146", 9)
+        d.limb("dark", "M84 90 L94 120 L90 136", 9)
+        d.limb("dark", "M84 92 L106 56", 13)
+        d.limb("dark", "M106 58 L120 80", 6)
+        d.shape("dark", circle(114, 44, 9))
+        d.shape("pop", "M104 40 Q112 28 124 38 L124 42 H104Z", spot=True)
+    group(d, "translate(100 112) scale(.5) translate(-100 -112) translate(0 -14)", rider)
 
 
 def citybike_sign(d: Drawing):
@@ -1167,8 +1166,9 @@ CONCEPTS = [
     Concept("citybike-basket", "city-bike-tour", "Bike with basket", citybike_basket, overrides={"wicker": "#C98F52", "wicker2": "#9C6A38"},
             checks=[("hero", "far"), ("hero", "sky"), ("dark", "far"), ("pop", "far"), ("wicker", "far")],
             fixes={"far": ["sky2", "light", "mid"], "hero": ["pop", "deep"]}),
-    Concept("citybike-bell", "city-bike-tour", "Bike bell", citybike_bell, overrides={**SILVER, "wicker2": "#7A4A26"},
-            checks=[("silver", "glow"), ("hero", "glow"), ("dark", "glow"), ("silver", "sky")], fixes={"glow": ["far", "mid", "near"]}),
+    Concept("citybike-ride", "city-bike-tour", "Riverside ride", citybike_ride,
+            checks=[("dark", "glow"), ("dark", "sky"), ("far", "sky"), ("near", "mid"), ("dark", "near"), ("glow", "far")],
+            fixes={"far": ["mid", "sky2"], "near": ["deep", "mid"], "glow": ["glow2", "pop"]}),
     Concept("citybike-sign", "city-bike-tour", "Cycle-route sign", citybike_sign, overrides={**SILVER, "sign": "#2E6DA4"},
             checks=[("light", "glow"), ("sign", "glow"), ("pop", "far"), ("pop", "mid")], fixes={"glow": ["far", "mid", "sky2"], "mid": ["near", "deep"]}),
     # hop-on bus

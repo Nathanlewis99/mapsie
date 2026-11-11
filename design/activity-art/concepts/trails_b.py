@@ -85,7 +85,7 @@ def horse_head(d: Drawing):
     d.disc("glow", 128, 76, 40)
     d.band("far", hills(150, 10))
     d.band("mid", hills(172, 8, 30))
-    d.shape("mark", "M86 46 C62 84 44 140 32 200 L14 200 C26 140 50 84 82 40Z")
+    d.shape("mark", "M86 46 C62 84 44 140 32 200 L14 200 C26 140 50 84 82 40Z", spot=True)
     d.shape("hero", HORSE_HEAD)
     d.shape("mark", "M84 30 L97 42 L92 46Z", shadow=False)
     d.shape("light", "M108 50 C122 68 140 92 152 108 L147 114 C134 98 118 74 103 56Z", shadow=False)
@@ -600,7 +600,7 @@ def volcano_trail(d: Drawing):
     for x, y, r in [(100, 62, 12), (90, 50, 11), (106, 42, 13), (96, 30, 10)]:
         d.shape("far", circle(x, y, r))
     d.band("mid", hills(150, 6))
-    d.shape("near", "M6 178 C40 150 62 112 78 84 L88 90 L100 86 L112 90 L122 84 C138 112 160 150 194 178Z")
+    d.shape("deep", "M6 178 C40 150 62 112 78 84 L88 90 L100 86 L112 90 L122 84 C138 112 160 150 194 178Z")
     d.shape("pop", "M80 86 Q100 78 120 86 Q100 94 80 86Z", shadow=False, spot=True)
     trail = [(70, 170), (124, 156), (70, 140), (116, 126), (82, 112), (108, 100), (94, 90)]
     segs = []
@@ -611,7 +611,7 @@ def volcano_trail(d: Drawing):
     d.stroke("light", " ".join(segs), 2.6)
     d.stroke("dark", "M152 182 V140", 3.5)
     d.shape("hero2", "M136 132 H164 L172 139 L164 146 H136Z", spot=True)
-    d.band("deep", hills(178, 4, -30))
+    d.band("near", hills(178, 4, -30))
 
 
 def volcano_boot(d: Drawing):
@@ -681,10 +681,10 @@ def glacier_cave(d: Drawing):
         d.shape(role, "M-30 -30 H230 V230 H-30Z " + hole, extra='fill-rule="evenodd"', line=False)
     d.stroke("light", "M40 70 L52 92 M150 54 L142 74 M164 120 L174 138 M30 130 L24 150", 2.2, line=False)
     ink = d.c.get("ink", "")
-    d.raw("", f'<path d="M60 150 L64 118 L80 100 L100 76 L120 100 L136 116 L142 150" fill="none" stroke="{ink}" stroke-width="3" stroke-linejoin="round"/>'
-              + "".join(f'<path d="{h}" fill="none" stroke="{ink}" stroke-width="3"/>' for _, h in CAVE[1:])
-              + f'<path d="{CAVE[0][1]}" fill="none" stroke="{ink}" stroke-width="3.2"/>'
-              + f'<path d="M50 150 C46 100 70 66 100 62 C134 64 156 102 150 150 Z M40 160 C34 96 64 48 102 46 C144 48 170 98 162 160 L150 150 C156 102 134 64 100 62 C70 66 46 100 50 150Z" fill="{d.c.get("spot", "")}" fill-rule="evenodd" opacity="0"/>')
+    spot = d.c.get("spot", "")
+    d.raw("", f'<path d="{CAVE[1][1]} {CAVE[2][1]}" fill="{spot}" fill-rule="evenodd"/>'
+              f'<path d="M60 150 L64 118 L80 100 L100 76 L120 100 L136 116 L142 150" fill="none" stroke="{ink}" stroke-width="3" stroke-linejoin="round"/>'
+              + "".join(f'<path d="{h}" fill="none" stroke="{ink}" stroke-width="3"/>' for _, h in CAVE))
     d.band("light", "M-30 160 Q100 146 230 160")
     d.shape("dark", circle(100, 132, 4))
     d.shape("dark", "M96 137 Q100 135 104 137 L105 150 H95Z")
@@ -836,13 +836,13 @@ CONCEPTS = [
     Concept("star-observatory", "stargazing", "Observatory", star_observatory, NIGHT,
             checks=[("light", "deep"), ("far", "deep"), ("light", "far"), ("hero", "far"), ("near", "far")],
             fixes={"far": ["mid", "near"], "near": ["dark"]}),
-    Concept("volcano-erupt", "volcano-hike", "Eruption", volcano_erupt, overrides=SMOKE,
+    Concept("volcano-erupt", "volcano-hike", "Eruption", volcano_erupt, overrides={"deep": "#5A4A48", **SMOKE},
             checks=[("deep", "sky"), ("deep", "mid"), ("pop", "deep"), ("far", "sky"), ("deep", "near")],
             fixes={"far": ["#8E8A86", "light"], "near": ["dark", "mid"]}),
     Concept("volcano-trail", "volcano-hike", "Crater trail", volcano_trail,
-            overrides={"far": "#B9B4AE", **LAVA},
-            checks=[("near", "sky"), ("near", "mid"), ("light", "near"), ("hero2", "deep"), ("far", "sky"), ("pop", "near")],
-            fixes={"near": ["deep", "dark"], "far": ["#8E8A86"], "mid": ["far", "ground"]}),
+            overrides={"deep": "#5A4A48", **SMOKE},
+            checks=[("deep", "sky"), ("deep", "mid"), ("light", "deep"), ("hero2", "near"), ("far", "sky"), ("pop", "deep"), ("near", "deep")],
+            fixes={"far": ["#8E8A86"], "near": ["mid", "ground", "far"]}),
     Concept("volcano-boot", "volcano-hike", "Boot on lava", volcano_boot, overrides=LAVA,
             checks=[("hero", "glow"), ("hero", "deep"), ("pop", "deep"), ("hero2", "hero"), ("dark", "deep")],
             fixes={"glow": ["glow2", "far", "sky2"], "dark": ["mark", "#111111"]}),

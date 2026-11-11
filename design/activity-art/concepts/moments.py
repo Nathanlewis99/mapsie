@@ -769,10 +769,10 @@ def honeymoon_champagne(d: Drawing):
         d.limb("light", "M0 -4 L0.4 34", 3.5)
         d.shape("light", ellipse(0, 36, 15, 4.5))
         d.marks("light", circle(-4, -24, 1.6) + circle(3, -34, 1.3) + circle(-2, -40, 1.1) + circle(4, -18, 1.4))
-    group(d, "translate(82 140) rotate(-16)", lambda: flute(True))
-    group(d, "translate(118 140) rotate(16)", lambda: flute(False))
-    d.stroke("hero2", "M100 66 L100 52 M92 68 L84 56 M108 68 L116 56", 2.6)
-    d.shape("pop", _heart(100, 42, 0.9), spot=True)
+    group(d, "translate(72 152) rotate(17)", lambda: flute(True))
+    group(d, "translate(128 152) rotate(-17)", lambda: flute(False))
+    d.stroke("hero2", "M100 78 L100 64 M90 80 L82 68 M110 80 L118 68", 2.6)
+    d.shape("pop", _heart(100, 50, 0.9), spot=True)
 
 
 def honeymoon_chairs(d: Drawing):
@@ -849,8 +849,6 @@ def proposal_kneel(d: Drawing):
 # ================================================================ WEDDING
 def wedding_bells(d: Drawing):
     d.disc("glow", 100, 104, 58)
-    _leaf(d, 100, 52, 40, 9, 200, "near", "deep")
-    _leaf(d, 100, 52, 40, 9, -20, "near", "deep")
     bell = "M0 -34 C-13 -34 -18 -20 -18 -8 C-18 6 -22 12 -28 18 H28 C22 12 18 6 18 -8 C18 -20 13 -34 0 -34Z"
 
     def b(spot):

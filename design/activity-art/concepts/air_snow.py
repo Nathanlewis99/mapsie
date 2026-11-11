@@ -812,15 +812,16 @@ def sm_side(d: Drawing):
 
 
 def sm_lake(d: Drawing):
-    d.disc("glow", 60, 70, 22)
+    d.disc("glow", 150, 56, 18)
     _peaks(d, "far", [(-30, 112), (24, 82), (60, 104), (102, 70), (140, 100), (176, 84), (230, 106)])
-    d.band("mid", hills(124, 6, 20))
-    d.band("sky2", "M-30 132 Q100 126 230 132")
-    d.band("light", "M-30 156 Q100 146 230 156")
-    d.stroke("mid", "M-10 182 C30 170 50 154 90 150", 2.4)
-    d.stroke("mid", "M-10 190 C34 178 56 160 94 155", 2.4)
-    d.shape("light", cloud(74, 144, 0.55), line=False)
-    group(d, "translate(86 108) scale(.55)", lambda: _snowmobile(d))
+    d.band("mid", hills(122, 6, 20))
+    d.band("sky2", "M-30 128 Q100 122 230 128")
+    d.stroke("light", "M20 138 H50 M130 134 H170", 1.6, line=False)
+    d.band("light", "M-30 154 Q100 140 230 154")
+    d.stroke("mid", "M-10 184 C30 170 40 156 60 150", 2.4)
+    d.stroke("mid", "M-4 190 C36 176 48 160 66 154", 2.4)
+    d.shape("light", cloud(36, 144, 0.55), line=False)
+    group(d, "translate(44 100) scale(.62)", lambda: _snowmobile(d))
 
 
 def sm_jump(d: Drawing):
@@ -839,7 +840,7 @@ SKATE = ("M66 34 L102 32 Q110 32 110 40 L110 84 C116 92 130 98 142 102 Q154 106 
 
 def _skate(d: Drawing, boot="light", trim="hero", blade="dark"):
     """A figure skate facing right, x ~50-166, y ~30-148."""
-    d.shape(blade, "M52 144 H150 Q160 144 164 136 L166 130 Q160 132 158 136 Q154 140 148 140 H56 Q50 140 52 144Z")
+    d.shape(blade, "M52 144 H150 Q160 144 164 136 L166 128 L162 128 L162 132 L158 132 L158 136 L154 136 Q152 140 148 140 H56 Q50 140 52 144Z")
     d.stroke(blade, "M70 128 L68 141 M140 128 L144 140", 3.6)
     d.shape(boot, SKATE)
     d.shape(trim, "M66 34 L102 32 Q110 32 110 40 L110 46 L65 48Z", shadow=False, spot=True)
@@ -911,14 +912,18 @@ def skate_pond(d: Drawing):
 
 # ================================================================ NORTHERN LIGHTS
 def _aurora(d: Drawing, y=0, s=1.0):
+    """Aurora ribbons: soft paper curtains in papercut, two clipped spot-colour waves in line style."""
     def g():
         d.shape("hero", "M-30 70 C10 30 40 80 80 40 C110 12 140 50 170 20 L230 10 L230 30 C190 44 160 70 130 62 C100 54 80 100 40 90 C20 86 0 100 -30 110Z",
-                shadow=False, spot=True, extra='opacity=".88"')
+                shadow=False, line=False, extra='opacity=".9"')
         d.shape("hero2", "M-30 96 C10 70 40 108 80 74 C110 50 140 80 170 54 L230 44 L230 56 C190 70 160 92 130 86 C100 80 80 118 40 110 C20 106 0 116 -30 122Z",
                 shadow=False, extra='opacity=".7"', line=False)
-        for x in (20, 46, 70, 96, 122, 148, 176):
-            d.stroke("hero", f"M{x} {60 - (x % 50) * .4:.0f} L{x + 2} {96 - (x % 40) * .3:.0f}", 1.4, line=False)
+        d.shape("light", "M-30 70 C10 30 40 80 80 40 C110 12 140 50 170 20 L230 10 L230 16 C176 28 140 56 112 34 C92 22 80 66 40 70 C10 72 0 70 -30 84Z",
+                shadow=False, line=False, extra='opacity=".25"')
     group(d, f"translate(0 {y}) scale(1 {s})", g)
+    if not d.paper:
+        for path, w in [("M-30 84 C10 46 40 90 80 54 C110 28 140 62 170 34 L230 22", 9), ("M-30 108 C10 82 40 118 80 88 C110 64 140 92 170 66 L230 54", 4)]:
+            d.bands.append(f'<path transform="translate(0 {y})" d="{path}" fill="none" stroke="{d.c["spot"]}" stroke-width="{w}" stroke-linecap="round"/>')
 
 
 def _stars(d: Drawing, pts):
@@ -928,6 +933,7 @@ def _stars(d: Drawing, pts):
 
 NIGHT = {"hero": "#5EE6A8", "hero2": "#7FD8F0"}
 NIGHT_FIX = {"sky": ["deep", "mark", "#1F2A44"]}
+NIGHT_PALETTES = ["dusk", "coastal", "blush", "meadow"]
 
 
 def aurora_cabin(d: Drawing):
@@ -945,21 +951,22 @@ def aurora_cabin(d: Drawing):
     d.shape("glow", rrect(104, 124, 16, 28, 2), shadow=False)
     d.stroke("near", "M86 124 V138 M78 131 H94", 1.6, line=False)
     d.band("light", "M-30 158 Q100 148 230 158")
-    d.shape("glow", "M104 158 L120 158 L136 176 L96 176Z", shadow=False, line=False, extra='opacity=".45"')
 
 
 def aurora_lake(d: Drawing):
     _stars(d, [(30, 40, 1.4), (160, 24, 1.6), (176, 56, 1.2), (60, 20, 1.2), (130, 36, 1.0)])
     _aurora(d, 0)
     _peaks(d, "far", [(-30, 120), (16, 98), (40, 108), (78, 66), (110, 102), (136, 84), (170, 106), (230, 96)])
-    d.band("mid", "M-30 122 Q100 116 230 122")
-    d.shape("far", "M-30 126 L16 142 L40 136 L78 168 L110 140 L136 154 L170 138 L230 144 L230 126Z", shadow=False, line=False, extra='opacity=".55"')
-    d.shape("hero", "M-30 160 C10 170 40 150 80 170 L110 180 L60 182 C30 176 0 186 -30 180Z", shadow=False, line=False, extra='opacity=".45"')
-    d.stroke("light", "M40 150 H70 M110 160 H150 M60 172 H90", 1.6, line=False)
-    _line_only(d, "M40 150 H70 M110 160 H150", 1.6)
-    d.band("near", "M-30 178 Q60 170 120 178 T230 176")
-    for x, y, h in [(150, 184, 40), (168, 186, 30), (30, 186, 28)]:
-        d.shape("dark", _pine(x, y, h))
+    for x in range(-14, 214, 9):
+        d.shape("dark", _pine(x, 128 + (x % 2), 9 + (x * 7) % 6), shadow=False, line=False)
+    d.band("dark", "M-30 126 Q100 122 230 126", shadow=False)
+    d.band("mid", "M-30 130 Q100 126 230 130", line=False)
+    d.shape("far", "M-30 130 L16 150 L40 142 L78 184 L110 146 L136 162 L170 144 L230 152 L230 130Z", shadow=False, line=False, extra='opacity=".45"')
+    d.shape("hero", "M-30 168 C10 178 40 158 80 176 C110 188 140 168 170 180 L230 186 L230 192 C190 192 160 178 130 190 C100 198 70 184 40 186 C10 186 0 190 -30 188Z",
+            shadow=False, line=False, extra='opacity=".5"')
+    d.stroke("light", "M40 150 H64 M120 158 H150 M60 170 H84", 1.6, line=False)
+    _line_only(d, "M40 150 H64 M120 158 H150 M60 170 H84", 1.6)
+    d.band("light", "M-30 186 Q60 178 120 184 T230 182", line=False)
 
 
 REINDEER = ("M60 120 C60 108 72 102 92 102 L116 102 C124 102 128 96 130 88 L134 74 C136 68 144 66 148 70 L160 80 "
@@ -1034,11 +1041,14 @@ def apres_fondue(d: Drawing):
     d.shape("hero2", ellipse(100, 92, 46, 8), shadow=False, spot=True)
     d.shape("light", "M60 104 H140", shadow=False, line=False)
     d.stroke("light", "M64 106 Q100 114 136 106", 2.4, line=False)
-    d.shape("dark", _bar(84, 92, 58, 34, 3))
-    d.shape("dark", _bar(114, 92, 138, 30, 3))
-    d.shape("ground", rrect(48, 22, 15, 15, 3), extra='transform="rotate(-20 55 29)"')
-    d.shape("ground", rrect(132, 18, 15, 15, 3), extra='transform="rotate(16 139 25)"')
-    d.shape("hero2", "M48 28 Q54 36 62 34 L62 38 Q54 40 48 32Z", shadow=False, line=False)
+    d.shape("dark", _bar(86, 84, 60, 28, 3))
+    d.shape("dark", _bar(112, 84, 140, 26, 3))
+    d.shape("pop", _bar(64, 36, 56, 20, 7), spot=True)
+    d.shape("pop", _bar(136, 34, 144, 18, 7), spot=True)
+    d.shape("ground", rrect(80, 74, 14, 14, 3), extra='transform="rotate(-20 87 81)"')
+    d.shape("ground", rrect(106, 72, 14, 14, 3), extra='transform="rotate(18 113 79)"')
+    d.shape("hero2", "M80 82 Q86 90 94 86 L94 92 Q86 94 82 90Z M108 84 Q114 92 120 86 L120 92 Q112 94 108 90Z", shadow=False, line=False)
+    d.shape("hero2", "M62 96 Q66 108 70 100 Q72 94 76 98 L76 94 H62Z", shadow=False)
     d.band("near", "M-30 172 Q100 166 230 172", line=False)
 
 
@@ -1098,20 +1108,20 @@ CONCEPTS = [
     Concept("sled-trail", "dog-sledding", "Forest trail", sled_trail, checks=[("light", "far"), ("mid", "light"), ("deep", "light")]),
     Concept("snowmobile-side", "snowmobiling", "Snowmobile", sm_side, checks=[("hero", "sky"), ("hero", "light"), ("pop", "sky"), ("dark", "light")],
             fixes={"pop": ["hero2", "deep"]}),
-    Concept("snowmobile-lake", "snowmobiling", "Frozen lake", sm_lake, checks=[("hero", "light"), ("light", "sky2"), ("light", "mid")],
+    Concept("snowmobile-lake", "snowmobiling", "Frozen lake", sm_lake, overrides={"sky2": "#A9D6E5"}, checks=[("hero", "light"), ("light", "sky2"), ("light", "mid")],
             fixes={"sky2": ["far", "mid"]}),
     Concept("snowmobile-jump", "snowmobiling", "Jump", sm_jump, checks=[("hero", "glow"), ("pop", "glow"), ("dark", "glow")],
             fixes={"glow": ["light", "far", "glow2"]}),
     Concept("skate-boot", "ice-skating", "Figure skate", skate_boot, checks=[("light", "mid"), ("hero", "light"), ("dark", "mid")]),
     Concept("skate-rink", "ice-skating", "City rink", skate_rink, checks=[("deep", "sky"), ("deep", "far"), ("far", "sky"), ("pop", "deep")],
             fixes={"far": ["mid", "near"]}),
-    Concept("skate-pond", "ice-skating", "Frozen pond", skate_pond, checks=[("sky2", "light"), ("hero", "sky2"), ("light", "far")],
+    Concept("skate-pond", "ice-skating", "Frozen pond", skate_pond, overrides={"sky2": "#A9D6E5"}, checks=[("sky2", "light"), ("hero", "sky2"), ("light", "far")],
             fixes={"sky2": ["far", "mid"]}),
-    Concept("aurora-cabin", "northern-lights", "Cabin & aurora", aurora_cabin, overrides=NIGHT,
+    Concept("aurora-cabin", "northern-lights", "Cabin & aurora", aurora_cabin, NIGHT_PALETTES, overrides=NIGHT,
             checks=[("sky", "light"), ("hero", "sky"), ("far", "sky"), ("dark", "light"), ("near", "light")], fixes=NIGHT_FIX),
-    Concept("aurora-lake", "northern-lights", "Mountain lake", aurora_lake, overrides=NIGHT,
-            checks=[("sky", "light"), ("hero", "sky"), ("far", "sky"), ("mid", "far")], fixes=NIGHT_FIX),
-    Concept("aurora-reindeer", "northern-lights", "Reindeer", aurora_reindeer, overrides={**NIGHT, "ground": "#9C6B43"},
+    Concept("aurora-lake", "northern-lights", "Mountain lake", aurora_lake, NIGHT_PALETTES, overrides=NIGHT,
+            checks=[("sky", "light"), ("hero", "sky"), ("far", "sky"), ("dark", "far")], fixes=NIGHT_FIX),
+    Concept("aurora-reindeer", "northern-lights", "Reindeer", aurora_reindeer, NIGHT_PALETTES, overrides={**NIGHT, "ground": "#9C6B43"},
             checks=[("sky", "light"), ("hero", "sky"), ("ground", "sky"), ("ground", "light"), ("far", "sky")], fixes=NIGHT_FIX),
     Concept("apres-mug", "apres-ski", "Hot chocolate", apres_mug, checks=[("hero", "far"), ("light", "far"), ("hero", "ground")],
             fixes={"hero": ["pop", "deep"]}),

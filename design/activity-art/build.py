@@ -84,11 +84,11 @@ def build_module(mod: str, seen: set[str]) -> list[dict]:
     return manifest
 
 
-def export():
-    """Copy every built concept into the app and write the catalogue."""
+def export(mods: list[str]):
+    """Copy the built concepts of these modules into the app and write the catalogue."""
     items = []
-    for f in sorted(OUT.glob("manifest-*.json")):
-        items += json.loads(f.read_text())
+    for mod in mods:
+        items += json.loads((OUT / f"manifest-{mod}.json").read_text())
     dest = ROOT / "public" / "stickers" / "originals"
     if dest.exists():
         shutil.rmtree(dest)
@@ -107,7 +107,8 @@ if __name__ == "__main__":
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     OUT.mkdir(exist_ok=True)
     seen: set[str] = set()
-    for mod in args or all_modules():
+    mods = args or all_modules()
+    for mod in mods:
         build_module(mod, seen)
     if "--export" in sys.argv:
-        export()
+        export(mods)

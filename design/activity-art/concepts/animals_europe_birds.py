@@ -360,22 +360,26 @@ def highlandcow_portrait(d: Drawing):
 
 def coo_side(d: Drawing):
     # far legs
-    d.limb("hero2", "M76 132 L78 162", 8)
-    d.limb("hero2", "M136 132 L134 162", 8)
+    d.limb("hero2", "M78 132 L79 160", 11)
+    d.limb("hero2", "M134 132 L133 160", 11)
     # tail
     d.limb("hero", "M152 104 Q160 120 158 140", 3)
     d.shape("hero", P(zig([(160, 136), (156, 148)], 2, 4)), shadow=False)
     body = [(52, 106), (70, 94), (110, 96), (146, 96), (158, 106), (160, 124)] + zig([(158, 138), (110, 142), (60, 140)], 9, -6)[:] + [(48, 124)]
     d.shape("hero", P(body))
-    d.limb("hero", "M66 134 L64 164", 9)
-    d.limb("hero", "M146 134 L148 164", 9)
-    d.marks("mark", "M59 162 h10 v4 h-10Z M143 162 h10 v4 h-10Z M73 160 h10 v4 h-10Z M129 160 h10 v4 h-10Z")
+    d.limb("hero", "M66 134 L65 162", 12)
+    d.limb("hero", "M146 134 L147 162", 12)
+    d.marks("mark", "M58 160 h14 v5 h-14Z M140 160 h14 v5 h-14Z M72 158 h14 v4 h-14Z M126 158 h14 v4 h-14Z")
+    group(d, "translate(46 112) scale(1.3) translate(-46 -112)", lambda: coo_head(d))
+
+
+def coo_head(d: Drawing):
     # horns: one swinging toward us, one behind
     d.shape("horn", taper([(52, 98), (64, 88), (72, 74), (70, 62)], 4.5, 1.2))
     d.shape("hero", P([(28, 108), (34, 96), (52, 94), (62, 104), (58, 124), (48, 136), (34, 138), (26, 128)]))
     d.shape("horn", taper([(40, 98), (26, 92), (16, 80), (16, 68)], 5, 1.2))
-    d.shape("nose", P([(24, 120), (34, 120), (38, 132), (30, 140), (22, 136)]))
-    d.marks("mark", ellipse(25.5, 129, 2.2, 1.6))
+    d.shape("nose", P([(25, 122), (34, 122), (37, 131), (31, 137), (24, 134)]))
+    d.marks("mark", ellipse(26.5, 129, 2, 1.5))
     d.shape("hero2", P(zig([(30, 96), (48, 92), (60, 100)], 5, 3) + [(56, 106, 1), (50, 116, 1), (46, 106, 1), (40, 118, 1), (36, 106, 1), (30, 114, 1)]),
             shadow=False, spot=True)
     d.shape("hero", P(zig([(58, 106), (68, 110), (74, 104)], 2, -4)), shadow=False, line=False)
@@ -553,6 +557,10 @@ def bear_side(d: Drawing):
     d.limb("hero", P([(86, 126), (84, 162)], False), 16)
     d.limb("hero", P([(152, 120), (158, 142), (154, 162)], False), 16)
     d.marks("mark", "M76 160 h16 l2 5 h-20Z M146 160 h16 l2 5 h-20Z")
+    group(d, "translate(64 112) scale(1.28) translate(-64 -112)", lambda: bear_head(d))
+
+
+def bear_head(d: Drawing):
     head = [(70, 104), (62, 92), (50, 88), (38, 94), (26, 104), (16, 110, 1), (16, 116), (30, 122), (50, 126), (68, 122)]
     d.shape("hero", P(head))
     d.shape("hero", circle(54, 86, 6.5))

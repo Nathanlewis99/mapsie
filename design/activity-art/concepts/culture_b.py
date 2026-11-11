@@ -177,10 +177,8 @@ def cathedral_onion(d: Drawing):
         d.shape("light", rrect(x - 13, 90, 26, 48, 1))
         d.marks("dark", arch(x - 3.5, 100, 7, 12))
         d.shape(role, onion(x, 92, 34, 46), spot=role == "pop")
-        for k, y in enumerate((82, 70)):
-            hw = 14 if k == 0 else 11
-            zz = f"M{x - hw} {y}" + "".join(f" L{x - hw + (j + 1) * hw / 3:.1f} {y + (4 if j % 2 == 0 else 0)}" for j in range(6))
-            d.stroke(stripe, zz, 2.2, line=False)
+        d.shape(stripe, f"M{x} 46 C{x - 9} 58 {x - 10} 80 {x - 6} 92 H{x + 6} C{x + 10} 80 {x + 9} 58 {x} 46Z", shadow=False, line=False)
+        d.stroke(stripe, f"M{x} 46 C{x - 20} 62 {x - 22} 80 {x - 15} 92 M{x} 46 C{x + 20} 62 {x + 22} 80 {x + 15} 92", 2.2, line=False)
         d.stroke("hero2", f"M{x} 46 V36 M{x - 4} 40 H{x + 4}", 1.6)
     # galleried base
     d.shape("light", rrect(28, 126, 144, 40, 1))
@@ -228,7 +226,6 @@ def mosque_domes(d: Drawing):
 
 
 def mosque_lantern(d: Drawing):
-    d.disc("glow", 160, 90, 20, line=False)
     d.band("far", hills(150, 6, 10))
     holes = " ".join(parch(x, 42, 46, 130) for x in (-34, 18, 70, 122, 174))
     d.shape("wall", "M-30 -10 H230 V200 H-30Z " + holes, extra='fill-rule="evenodd"', line=False)
@@ -242,7 +239,11 @@ def mosque_lantern(d: Drawing):
     clip_open(d)
     d.stroke("dark", "M100 -10 V44", 1.6)
     clip_close(d)
-    glow_halo(d, 100, 88, 34)
+    glow_halo(d, 100, 92, 46)
+    group(d, "translate(100 88) scale(1.45) translate(-100 -88)", lambda: lantern_body(d))
+
+
+def lantern_body(d: Drawing):
     d.shape("brass", "M88 52 Q100 36 112 52Z")
     d.shape("brass", "M84 54 H116 L124 78 L114 110 H86 L76 78Z", spot=True)
     for pts in [((88, 60), (100, 60), (100, 102), (90, 102), (82, 78)), ((100, 60), (112, 60), (118, 78), (110, 102), (100, 102))]:
@@ -436,11 +437,11 @@ def streetart_gable(d: Drawing):
     d.band("far", "M-30 120 H10 V90 H30 V104 H44 V70 H160 V96 H176 V84 H196 V110 H230")
     d.shape("wall", "M44 176 V40 L58 30 H146 L156 40 V176Z")
     # the mural: a giant flower
-    d.shape("mid", rrect(54, 42, 92, 128, 2), shadow=False)
+    d.shape("muralbg", rrect(54, 42, 92, 128, 2), shadow=False)
     d.shape("hero2", circle(122, 64, 14), shadow=False)
-    d.limb("near", "M98 168 C96 140 102 120 100 100", 5)
-    d.shape("near", "M99 140 C84 128 70 132 64 144 C78 148 90 146 99 140Z", shadow=False)
-    d.shape("near", "M101 130 C114 118 128 122 134 132 C122 138 110 136 101 130Z", shadow=False)
+    d.limb("leaf", "M98 168 C96 140 102 120 100 100", 5)
+    d.shape("leaf", "M99 140 C84 128 70 132 64 144 C78 148 90 146 99 140Z", shadow=False)
+    d.shape("leaf", "M101 130 C114 118 128 122 134 132 C122 138 110 136 101 130Z", shadow=False)
     for i in range(8):
         a = i * math.pi / 4
         x, y = round(100 + 17 * math.cos(a), 1), round(90 + 17 * math.sin(a), 1)
@@ -561,7 +562,7 @@ def hopbus_front(d: Drawing):
     d.shape("far", "M-30 200 V60 H14 V42 H32 V70 H48 V200Z")
     d.shape("far", "M230 200 V54 H188 V34 H170 V66 H152 V200Z")
     for x, y in [(20, 80), (20, 100), (30, 120), (160, 80), (172, 100), (160, 120)]:
-        d.marks("sky", rrect(x, y, 8, 10, 1))
+        d.shape("sky", rrect(x, y, 8, 10, 1), shadow=False, line=False)
     d.band("ground", "M-30 160 H230")
     d.shape("road", "M78 160 H122 L178 200 H22Z", line=False)
     d.stroke("light", "M100 164 V170 M100 176 V184 M100 190 V200", 3, line=False)
@@ -657,8 +658,8 @@ def obsdeck_tower(d: Drawing):
 
 def obsdeck_clouds(d: Drawing):
     d.disc("glow", 50, 120, 26)
-    d.shape("far", "M150 200 V110 H160 V96 H170 V110 H180 V200Z")
-    d.shape("far", "M14 200 V124 H24 V112 H36 V200Z")
+    d.shape("mid", "M150 200 V110 H160 V96 H170 V110 H180 V200Z")
+    d.shape("mid", "M14 200 V124 H24 V112 H36 V200Z")
     # art deco skyscraper
     d.shape("stone", "M70 200 V96 H130 V200Z")
     d.shape("stone", "M78 98 V74 H122 V98Z")
@@ -957,7 +958,7 @@ def monastery_cloister(d: Drawing):
 
 # ================================================================ PILGRIMAGE WALK
 def pilgrim_shell(d: Drawing):
-    d.disc("glow", 100, 100, 66, line=False)
+    d.disc("glow", 100, 102, 82, line=False)
     d.limb("wood", "M150 186 L60 18", 6)
     d.stroke("dark", "M82 58 Q76 72 74 80", 1.4)
     d.shape("gourd", "M74 80 C66 80 66 92 70 96 C60 100 60 120 74 122 C88 120 88 100 78 96 C82 92 82 80 74 80Z", spot=True)
@@ -983,8 +984,7 @@ def pilgrim_waymarker(d: Drawing):
     d.band("far", "M-30 118 Q20 96 60 104 Q100 84 140 98 Q180 88 230 108")
     d.shape("far", "M140 98 V80 L144 70 L148 80 V98Z M134 98 V88 H156 V98Z")
     d.band("mid", hills(134, 6, 10))
-    d.shape("ground", "M98 200 Q112 170 132 150 Q148 136 146 128 L152 128 Q158 140 148 154 Q130 176 140 200Z", shadow=False)
-    d.band("near", "M-30 156 Q30 150 70 158 Q110 166 120 200 H-30Z", line=False)
+    d.shape("ground", "M150 126 Q132 140 116 150 Q90 166 100 200 H168 Q146 176 152 156 Q158 140 156 126Z", shadow=False)
     # waymarker post
     d.shape("stone", "M44 176 V82 Q44 74 52 74 H84 Q92 74 92 82 V176Z")
     d.shape("tile", rrect(51, 82, 34, 34, 3), spot=True)
@@ -1127,7 +1127,7 @@ CONCEPTS = [
     # cathedral
     Concept("cathedral-gothic", "cathedral-visit", "Gothic spires", cathedral_gothic, overrides=STONE,
             checks=[("stone", "sky"), ("stone", "far"), ("stone", "glow"), ("pop", "stone")],
-            fixes={"far": ["mid", "near"], "sky": ["sky2", "far"], "stone": ["#C2B194", "#B3A285"]}),
+            fixes={"far": ["mid", "near"], "glow": ["glow2", "light"], "stone": ["#C2B194", "#B3A285", "#A69577"], "pop": ["#D7372B"]}),
     Concept("cathedral-rose", "cathedral-visit", "Rose window", cathedral_rose, overrides=STONE,
             checks=[("pop", "hero"), ("hero2", "mid"), ("pop", "dark"), ("hero", "dark")], fixes={"mid": ["far", "near", "light"]}),
     Concept("cathedral-onion", "cathedral-visit", "Onion domes", cathedral_onion,
@@ -1159,9 +1159,10 @@ CONCEPTS = [
     Concept("streetart-spray", "street-art-tour", "Spray can", streetart_spray,
             checks=[("hero", "glow"), ("pop", "glow"), ("hero", "hero2"), ("pop", "hero2"), ("hero", "pop")],
             fixes={"glow": ["light", "sky2", "far"], "hero2": ["glow2", "light", "mid"]}),
-    Concept("streetart-gable", "street-art-tour", "Gable-end mural", streetart_gable, overrides={"wall": "#F4EFE6"},
-            checks=[("pop", "mid"), ("near", "mid"), ("hero2", "mid"), ("wall", "far"), ("wall", "sky")],
-            fixes={"mid": ["far", "sky2", "light"], "far": ["mid", "near", "deep"]}),
+    Concept("streetart-gable", "street-art-tour", "Gable-end mural", streetart_gable,
+            overrides={"wall": "#C46A4A", "muralbg": "#2F4B7C", "leaf": "#6DAA4F"},
+            checks=[("pop", "muralbg"), ("hero2", "muralbg"), ("wall", "far"), ("wall", "sky"), ("wall", "muralbg")],
+            fixes={"far": ["sky2", "light", "mid"], "pop": ["#F28F3B", "hero2"]}),
     # city bike
     Concept("citybike-basket", "city-bike-tour", "Bike with basket", citybike_basket, overrides={"wicker": "#C98F52", "wicker2": "#9C6A38"},
             checks=[("hero", "far"), ("hero", "sky"), ("dark", "far"), ("pop", "far"), ("wicker", "far")],
@@ -1181,17 +1182,17 @@ CONCEPTS = [
     Concept("obsdeck-viewer", "observation-deck", "Coin viewer", obsdeck_viewer,
             checks=[("hero", "sky"), ("hero", "far"), ("dark", "far"), ("hero", "near")], fixes={"far": ["sky2", "mid"], "hero": ["pop", "deep"]}),
     Concept("obsdeck-tower", "observation-deck", "Sky tower", obsdeck_tower, overrides=STONE,
-            checks=[("stone", "sky"), ("hero", "sky"), ("stone", "far"), ("hero", "far")], fixes={"sky": ["sky2", "far"], "far": ["mid", "near"]}),
+            checks=[("stone", "sky"), ("hero", "sky"), ("stone", "far"), ("hero", "far")], fixes={"stone": ["#C2B194", "#B3A285", "#A69577"], "sky": ["sky2", "far"], "far": ["mid", "near"]}),
     Concept("obsdeck-clouds", "observation-deck", "Above the clouds", obsdeck_clouds, overrides={"stone": "#D9CDB6", "stone2": "#BCAE94"},
-            checks=[("stone", "sky"), ("stone", "far"), ("light", "sky"), ("far", "sky")], fixes={"sky": ["sky2", "far"], "far": ["mid", "near"]}),
+            checks=[("stone", "sky"), ("stone", "mid"), ("light", "sky"), ("mid", "sky"), ("stone", "glow")], fixes={"sky": ["sky2", "far", "mid", "near"], "mid": ["near", "deep"], "glow": ["glow2", "pop"]}),
     # bridges
     Concept("bridge-suspension", "famous-bridge", "Suspension bridge", bridge_suspension, overrides={"bridge": "#C8452C"},
             checks=[("bridge", "sky"), ("bridge", "glow"), ("bridge", "far"), ("bridge", "mid")], fixes={"glow": ["glow2", "light"], "far": ["mid", "near", "deep"], "mid": ["near", "deep"]}),
     Concept("bridge-bascule", "famous-bridge", "Twin-tower bridge", bridge_bascule, overrides={**STONE, "roof": "#3E5A78"},
             checks=[("stone", "sky"), ("stone", "far"), ("hero", "sky"), ("stone", "glow"), ("dark", "mid")],
-            fixes={"glow": ["glow2", "light", "mid"], "far": ["mid", "near"], "hero": ["near", "deep"]}),
+            fixes={"stone": ["#C2B194", "#B3A285", "#A69577"], "glow": ["glow2", "light", "mid"], "far": ["mid", "near"], "hero": ["near", "deep"]}),
     Concept("bridge-stone", "famous-bridge", "Old stone bridge", bridge_stone, overrides=STONE,
-            checks=[("stone", "sky"), ("stone", "mid"), ("stone", "near"), ("mid", "sky")], fixes={"mid": ["near", "deep"], "near": ["deep", "mid"]}),
+            checks=[("stone", "sky"), ("stone", "mid"), ("stone", "near"), ("mid", "sky")], fixes={"stone": ["#C2B194", "#B3A285", "#A69577"], "mid": ["near", "deep"], "near": ["deep", "mid"]}),
     # lighthouse
     Concept("lighthouse-cliff", "lighthouse", "Clifftop lighthouse", lighthouse_cliff,
             overrides={"rock": "#9A8676", "rock2": "#7A6656", "grass": "#7DB46C"}, palettes=["coastal", "meadow", "blush", "dusk"],
@@ -1200,22 +1201,22 @@ CONCEPTS = [
             checks=[("glow", "sky2"), ("pop", "sky"), ("light", "sky")]),
     Concept("lighthouse-gull", "lighthouse", "Harbour gull", lighthouse_gull, palettes=["coastal", "meadow", "blush", "dusk"],
             overrides={**STONE, "gull": "#FFFFFF", "gull2": "#A9B4C2", "beak": "#F2C14E", "feet": "#E8954A", "rope": "#D9B98A"},
-            checks=[("gull", "sky"), ("gull", "mid"), ("gull", "near"), ("gull2", "sky"), ("pop", "mid")], fixes={"sky": ["sky2", "far"]}),
+            checks=[("gull", "sky"), ("gull", "mid"), ("gull", "near"), ("gull2", "sky"), ("pop", "mid")], fixes={"sky": ["sky2", "far", "glow2"], "pop": ["#D7372B"]}),
     # monastery
     Concept("monastery-meteora", "monastery-stay", "Clifftop monastery", monastery_meteora, overrides=ROCK,
             checks=[("light", "sky"), ("rock", "far"), ("rock", "sky"), ("roof", "sky")], fixes={"sky": ["sky2", "far"], "far": ["sky2", "light"]}),
     Concept("monastery-bell", "monastery-stay", "Bell gable", monastery_bell, overrides={**STONE, "bell": "#C08A3E", "bell2": "#8E6224", "rope": "#8A5A33"},
-            checks=[("stone", "sky"), ("bell", "sky"), ("bell", "glow"), ("stone", "far")], fixes={"glow": ["light", "sky2"], "far": ["mid", "near"], "sky": ["sky2", "far"]}),
+            checks=[("stone", "sky"), ("bell", "sky"), ("bell", "glow"), ("stone", "far")], fixes={"stone": ["#C2B194", "#B3A285", "#A69577"], "glow": ["light", "sky2"], "far": ["mid", "near"], "sky": ["sky2", "far"]}),
     Concept("monastery-cloister", "monastery-stay", "Cloister garden", monastery_cloister,
             overrides={**STONE, "wall": "#F2E8D6", "roof": "#C8643B", "roof2": "#A64E2C", "grass": "#79AE6E", "wood": "#9C6A38"},
             checks=[("wall", "deep"), ("roof", "sky"), ("deep", "grass"), ("stone", "grass")]),
     # pilgrimage
     Concept("pilgrim-shell", "pilgrimage-walk", "Scallop shell & staff", pilgrim_shell,
             overrides={"shell": "#F6E3BC", "shell2": "#D49A52", "wood": "#8A5A33", "gourd": "#D9893B"},
-            checks=[("shell", "glow"), ("gourd", "glow"), ("wood", "glow"), ("shell", "sky")], fixes={"glow": ["far", "mid", "near"]}),
+            checks=[("shell", "glow"), ("gourd", "glow"), ("wood", "glow"), ("shell2", "shell")], fixes={"glow": ["far", "mid", "near"]}),
     Concept("pilgrim-waymarker", "pilgrimage-walk", "Waymarker", pilgrim_waymarker,
             overrides={**STONE, "tile": "#2E5FA8", "arrow": "#F2C230", "grass": "#5E9C6A"},
-            checks=[("stone", "mid"), ("stone", "sky"), ("arrow", "stone"), ("pop", "near")], fixes={"mid": ["near", "deep"], "near": ["deep", "mid"]}),
+            checks=[("stone", "mid"), ("stone", "sky"), ("arrow", "stone"), ("pop", "near")], fixes={"stone": ["#C2B194", "#B3A285", "#A69577"], "mid": ["near", "deep"], "near": ["deep", "mid"]}),
     Concept("pilgrim-walker", "pilgrimage-walk", "Pilgrim on the way", pilgrim_walker,
             overrides={"coat": "#3E7CB1", "coat2": "#2C5D88", "pack": "#E07A3F", "pack2": "#B85A28", "skin": "#E8B48A", "hat": "#C9A16B", "wood": "#8A5A33"},
             checks=[("coat", "far"), ("pack", "far"), ("dark", "mid"), ("hat", "sky"), ("coat", "mid")], fixes={"far": ["sky2", "light"], "mid": ["near", "far"]}),

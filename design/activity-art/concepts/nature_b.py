@@ -668,7 +668,7 @@ def reef_glassboat(d: Drawing):
 
 
 # ================================================================ BOTANICAL GARDENS
-GARDEN = {"glass": "#CFE8E4", "leaf": "#5E9C6A", "leaf2": "#3F7A52", "bloom": "#E76F6F", "bloom2": "#F6C445",
+GARDEN = {"glass": "#8EC9C2", "leaf": "#5E9C6A", "leaf2": "#3F7A52", "bloom": "#E76F6F", "bloom2": "#F6C445",
           "water": "#6FB7C9", "water2": "#9FD3DE", "pad": "#5E9C4A", "pad2": "#86BE62", "lily": "#F7B7CB"}
 
 
@@ -868,7 +868,7 @@ def crown(d: Drawing, x, y, r, role, spot=False):
 def autumn_newengland(d: Drawing):
     d.disc("glow", 152, 44, 14)
     birds(d, [(36, 40, 1), (52, 32, 0.8)])
-    d.band("far", "M-30 88 Q30 64 90 78 T230 70")
+    d.band("far", "M-30 66 Q30 42 90 52 T230 50")
     d.band("mid", "M-30 116 Q50 92 120 106 T230 100")
     for x, y, r, role in [(4, 104, 12, "leafB"), (26, 98, 13, "leafC"), (150, 98, 12, "leafA"), (172, 96, 13, "leafB"), (194, 100, 12, "leafC")]:
         crown(d, x, y, r, role)
@@ -909,7 +909,7 @@ def autumn_avenue(d: Drawing):
 
 # ================================================================ TULIP FIELDS
 TULIP = {"tR": "#E63946", "tY": "#F6C445", "tP": "#EE7FB0", "tO": "#F2832B", "stem": "#5E9C4A", "stem2": "#3E7A3A",
-         "mill": "#5A4636", "sail": "#F4ECDD"}
+         "mill": "#5A4636", "sail": "#B5523B"}
 
 
 def fan_rows(d: Drawing, vx, vy, roles, x0=-120, x1=320, bottom=210, gap=0.35):
@@ -1059,7 +1059,7 @@ CONCEPTS = [
     Concept("autumn-maple-leaf", "autumn-leaves", "Maple leaf", autumn_maple, overrides=FALL,
             checks=[("leafA", "glow"), ("leafA", "sky"), ("leafC", "sky")], fixes={"glow": ["light", "sky2"], "sky": ["sky2", "far"]}),
     Concept("autumn-new-england", "autumn-leaves", "New England fall", autumn_newengland, overrides=FALL,
-            checks=[("light", "mid"), ("light", "sky"), ("leafA", "near"), ("leafC", "near")], fixes={"mid": ["near", "deep"], "near": ["deep", "mid"]}),
+            checks=[("light", "mid"), ("light", "far"), ("leafA", "near"), ("leafC", "near")], fixes={"mid": ["near", "deep"], "near": ["deep", "mid"]}),
     Concept("autumn-golden-avenue", "autumn-leaves", "Golden avenue", autumn_avenue, overrides=FALL,
             checks=[("leafC", "sky"), ("leafB", "ground"), ("light", "ground")], fixes={"sky": ["sky2", "far"], "ground": ["mid", "near"]}),
     Concept("tulip-windmill", "tulip-fields", "Windmill & stripes", tulip_windmill, overrides=TULIP,

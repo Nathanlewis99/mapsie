@@ -250,19 +250,19 @@ def lh_night(d: Drawing):
 def lh_pillow(d: Drawing):
     d.disc("glow", 100, 104, 60)
     _stars(d, [(36, 56, 5), (166, 136, 4.5), (40, 148, 3.5), (164, 44, 4)], "pop")
-    d.limb("dark", "M59 76 C59 26 141 26 141 76", 6)
-    d.shape("dark", rrect(48, 64, 20, 32, 8))
-    d.shape("dark", rrect(132, 64, 20, 32, 8))
-    d.shape("hero2", rrect(64, 68, 6, 24, 3), shadow=False, spot=True)
-    d.shape("hero2", rrect(130, 68, 6, 24, 3), shadow=False, spot=True)
-    cx, cy, r1, r2 = 100, 126, 15, 43
-    rm = (r1 + r2) / 2
-    d.shape("hero", _annulus(cx, cy, r1, r2, -52, 232) + " " +
-            circle(round(cx + rm * math.cos(math.radians(-52)), 1), round(cy + rm * math.sin(math.radians(-52)), 1), (r2 - r1) / 2) + " " +
-            circle(round(cx + rm * math.cos(math.radians(232)), 1), round(cy + rm * math.sin(math.radians(232)), 1), (r2 - r1) / 2), spot=True)
-    a, b = math.radians(-30), math.radians(210)
+    d.limb("dark", "M64 66 C64 22 136 22 136 66", 6)
+    d.shape("dark", rrect(52, 54, 20, 32, 8))
+    d.shape("dark", rrect(128, 54, 20, 32, 8))
+    d.shape("hero2", rrect(68, 58, 6, 24, 3), shadow=False, spot=True)
+    d.shape("hero2", rrect(126, 58, 6, 24, 3), shadow=False, spot=True)
+    cx, cy, r1, r2, a1, a2 = 100, 128, 19, 50, -28, 208
+    rm, rc = (r1 + r2) / 2, (r2 - r1) / 2
+    end = lambda a: circle(round(cx + rm * math.cos(math.radians(a)), 1), round(cy + rm * math.sin(math.radians(a)), 1), rc)
+    d.shape("hero", _annulus(cx, cy, r1, r2, a1, a2) + " " + end(a1) + " " + end(a2), spot=True)
+    a, b = math.radians(a1 + 8), math.radians(a2 - 8)
     d.stroke("mark", f"M{cx + rm * math.cos(a):.1f} {cy + rm * math.sin(a):.1f} A{rm} {rm} 0 1 1 {cx + rm * math.cos(b):.1f} {cy + rm * math.sin(b):.1f}",
              1.4, line=False)
+    d.stroke("light", f"M{cx - 38} {cy + 10} A40 40 0 0 0 {cx - 12} {cy + 40}", 2.4, line=False)
 
 
 @framed

@@ -145,7 +145,7 @@ def freedive_manta(d: Drawing):
         d.stroke("manta", "M100 136 Q102 160 96 186", 2.4)
         d.shape("manta", "M86 70 C80 60 82 52 88 50 C90 58 93 64 96 68Z M114 70 C120 60 118 52 112 50 C110 58 107 64 104 68Z")
         d.shape("manta", MANTA, spot=True)
-        d.shape("light", "M72 96 C84 92 92 96 94 106 C86 106 78 102 72 96Z M128 96 C116 92 108 96 106 106 C114 106 122 102 128 96Z", shadow=False)
+        d.shape("manta2", "M66 94 C78 88 90 92 94 104 C84 106 74 102 66 94Z M134 94 C122 88 110 92 106 104 C116 106 126 102 134 94Z", shadow=False, line=False)
         d.stroke("light", "M88 70 Q100 75 112 70", 1.6, line=False)
     group(d, "translate(100 116) rotate(-12) scale(.86) translate(-100 -100)", manta)
     group(d, "translate(118 44) rotate(-8) scale(.42) translate(-100 -100)", lambda: freediver(d))
@@ -718,10 +718,12 @@ def lagoon_cliffs(d: Drawing):
     d.band("lagoon", "M-30 132 Q100 126 230 132")
     d.band("lagoon2", waves(160, 3, 26))
     d.stroke("light", "M40 150 Q50 146 60 150 M130 176 Q140 172 150 176", 2, line=False)
-    ripples(d, 104, 148, 14, 4)
-    d.limb("skin", "M96 146 L84 132 M112 146 L124 132", 4.5)
-    d.shape("skin", circle(104, 140, 7.5))
-    d.shape("pop", "M96.5 139 A7.5 7.5 0 0 1 111.5 139Z", shadow=False, spot=True)
+    def swimmer():
+        ripples(d, 0, 8, 14, 4)
+        d.limb("skin", "M-8 6 L-20 -8 M8 6 L20 -8", 4.5)
+        d.shape("skin", circle(0, 0, 7.5))
+        d.shape("pop", "M-7.5 -1 A7.5 7.5 0 0 1 7.5 -1Z", shadow=False, spot=True)
+    group(d, "translate(102 146) scale(1.5)", swimmer)
     d.shape("hero2", "M168 126 L190 126 L186 132 H172Z")
     d.stroke("dark", "M179 126 V112", 1.4)
     d.shape("light", "M180 112 L188 124 H180Z", shadow=False)
@@ -774,7 +776,7 @@ CONCEPTS = [
             checks=[("dark", "mid"), ("dark", "near"), ("hero", "far"), ("hero", "mid")], fixes={"hero": ["pop", "hero2", "light"]}),
     Concept("freedive-buoy", "freediving", "Buoy & dive line", freedive_buoy, SEA, ov(),
             checks=[("hero2", "sky"), ("hero2", "mid"), ("pop", "sky"), ("dark", "near")], fixes={"hero2": ["glow2", "pop", "hero"]}),
-    Concept("freedive-manta", "freediving", "Manta ray", freedive_manta, UNDERWATER, ov(manta="#2E3A48"),
+    Concept("freedive-manta", "freediving", "Manta ray", freedive_manta, UNDERWATER, ov(manta="#2E3A48", manta2="#56677A"),
             checks=[("manta", "mid"), ("manta", "near"), ("dark", "far")], fixes={"manta": ["#4A5868", "#26303B"]}),
     # canyoning
     Concept("canyon-abseil", "canyoning", "Abseiling the falls", clipped(canyon_abseil), ALL, ov(**TEAL),
@@ -816,9 +818,9 @@ CONCEPTS = [
     Concept("banana-wipeout", "banana-boat", "Wipeout", banana_wipeout, SEA, ov(banana="#FFD43B", banana2="#E9AE12"),
             checks=[("banana", "mid"), ("banana", "far"), ("pop", "near"), ("hero", "near")], fixes={"hero": ["pop", "light"], "pop": ["hero2", "light"]}),
     # sunbathing
-    Concept("sunbathe-lounger", "sunbathing", "On the lounger", sunbathe_lounger, ALL, ov(suit="#E4572E"),
+    Concept("sunbathe-lounger", "sunbathing", "On the lounger", sunbathe_lounger, SEA, ov(suit="#E4572E"),
             checks=[("hero2", "ground"), ("skin", "far"), ("skin", "hero2"), ("glow2", "ground"), ("suit", "skin"), ("suit", "far")],
-            fixes={"hero2": ["hero", "pop", "deep"], "glow2": ["hero2", "pop", "near"], "suit": ["#2E86AB", "#1D3557"]}),
+            fixes={"far": ["near", "deep"], "hero2": ["hero", "pop", "deep"], "glow2": ["hero2", "pop", "near"], "suit": ["#2E86AB", "#1D3557"]}),
     Concept("sunbathe-lotion", "sunbathing", "Sun cream", sunbathe_lotion, ALL, ov(),
             checks=[("hero", "ground"), ("hero", "hero2"), ("hero", "sky"), ("hero2", "ground")], fixes={"hero2": ["pop", "far", "mid"], "hero": ["deep", "pop"]}),
     Concept("sunbathe-sun", "sunbathing", "Sun in shades", sunbathe_sun, ALL,

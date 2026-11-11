@@ -1048,7 +1048,7 @@ EAGLE_C = {"hero": "#4A3122", "hero2": "#6E4A33", "mark": "#1E140D", "light": "#
            "eye": "#F6D348", "eyebrow": "#C9C3B8", "water": "#6FB5D6", "water2": "#DDF0F8"}
 OTTER_C = {"hero": "#6B4630", "hero2": "#D8C3A5", "mark": "#20150F", "light": "#F7EFE2", "pop": "#E89AA6", "pop2": "#B85D6C",
            "kelp": "#8A7B2C"}
-BEAVER_C = {"hero": "#7A4E30", "hero2": "#A87A55", "mark": "#24170E", "teeth": "#F08A24", "bark": "#8A5E3B", "bark2": "#5E3F27",
+BEAVER_C = {"hero": "#7A4E30", "hero2": "#A87A55", "mark": "#24170E", "teeth": "#F08A24", "bark": "#8A5E3B", "bark2": "#A08E70",
             "wood": "#EBCB93", "kelp": "#5E8C4A", "water": "#6FB5D6", "water2": "#DDF0F8"}
 RACCOON_C = {"hero": "#8E9097", "hero2": "#6B6D74", "mark": "#1C1D22", "light": "#F4F2EE", "bark": "#6E4A30", "wood": "#D9B47E"}
 GOAT_C = {"hero": "#F7F5EF", "hero2": "#DDD8CB", "mark": "#1E1E22"}
@@ -1056,7 +1056,7 @@ GATOR_C = {"hero": "#4B5A36", "hero2": "#C9C08A", "mark": "#20271A", "eye": "#E8
            "pop": "#F3A6C0"}
 MANATEE_C = {"hero": "#8C959B", "hero2": "#A9B1B6", "mark": "#3A4044", "pop": "#F6C445"}
 ORCA_C = {"hero": "#1D1F25", "hero2": "#8C939C", "light": "#FFFFFF", "mark": "#0B0C0F"}
-HUMMING_C = {"hero": "#3C9A63", "pop": "#D8304A", "light": "#FFFFFF", "mark": "#1E2420", "wing": "#B9D4CC", "wing2": "#8FB5AA",
+HUMMING_C = {"hero": "#3C9A63", "pop": "#D8304A", "light": "#FFFFFF", "mark": "#1E2420", "wing": "#86BCB2", "wing2": "#5F958A",
              "leafc": "#4E8A4A", "flower": "#E8503A", "flower2": "#F6A23B"}
 
 SKY_DARK = ["sky2", "far", "mid", "near", "deep"]
@@ -1111,13 +1111,13 @@ CONCEPTS = [
             fixes={"sky": ["sky2", "far", "mid", "near"], "far": ["mid", "near", "deep"], "mid": ["near", "deep"]}),
     Concept("eagle-flight", "animal-bald-eagle", "Eagle over the lake", eagle_flight, NO_GOLD, EAGLE_C,
             checks=[("hero", "sky"), ("light", "sky"), ("hero", "far"), ("light", "far"), ("hero", "near"), ("far", "sky")],
-            fixes={"sky": ["sky2", "glow2", "far"], "far": ["mid", "sky2"], "near": ["mid", "deep"]}),
+            fixes={"sky": ["sky2", "glow2", "#8EC3DD", "#79B2D2"], "far": ["mid", "near"], "near": ["mid", "deep"]}),
     # sea otter
     Concept("seaotter-portrait", "animal-sea-otter", "Sea otter", otter_portrait, NO_GOLD, OTTER_C,
             checks=[("hero2", "sky"), ("hero2", "mid"), ("hero", "mid"), ("hero", "near"), ("hero2", "far")],
-            fixes={"sky": ["sky2", "far"], "mid": ["near", "far"], "near": ["deep", "mid"], "far": ["mid", "near"]}),
+            fixes={"sky": ["sky2", "far", "mid", "near"], "mid": ["near", "far"], "near": ["deep", "mid"], "far": ["mid", "near"]}),
     Concept("seaotter-float", "animal-sea-otter", "Floating otter", otter_float, NO_GOLD, OTTER_C,
-            checks=[("hero", "mid"), ("hero", "near"), ("hero2", "mid"), ("pop", "hero2")],
+            checks=[("hero", "mid"), ("hero", "near"), ("hero2", "mid"), ("pop", "hero")],
             fixes={"mid": ["far", "near"], "near": ["deep", "far"]}),
     # beaver
     Concept("beaver-portrait", "animal-beaver", "Beaver", beaver_portrait, overrides=BEAVER_C,
@@ -1146,7 +1146,7 @@ CONCEPTS = [
             fixes={"sky": ["sky2", "glow2", "light"], "mid": ["far", "sky2"], "near": ["far", "mid"]}),
     Concept("gator-swamp", "animal-alligator", "Cypress swamp", gator_swamp, overrides=GATOR_C,
             checks=[("hero", "mid"), ("hero", "glow"), ("dark", "sky"), ("hero2", "near"), ("dark", "glow")],
-            fixes={"mid": ["far", "glow2", "sky2"], "near": ["deep", "mid"]}),
+            fixes={"mid": ["far", "glow2", "sky2"], "near": ["deep", "mid"], "sky": ["sky2", "far", "mid"]}),
     # manatee
     Concept("manatee-portrait", "animal-manatee", "Manatee", manatee_portrait, ["coastal", "dusk", "meadow", "blush"], MANATEE_C,
             checks=[("hero", "mid"), ("hero", "near"), ("hero", "far"), ("hero", "sky2")],

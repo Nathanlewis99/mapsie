@@ -196,7 +196,7 @@ ORANG = {"hero": "#C2602A", "hero2": "#E39050", "mark": "#2A160C", "face": "#5B4
 
 def orangutan_face(d: Drawing):
     for a, x, y in [(-150, 30, 150), (-30, 170, 150), (-120, 40, 60), (-60, 160, 60)]:
-        d.shape("leaf", leaf(x - 40 * math.cos(math.radians(a)), y - 40 * math.sin(math.radians(a)), 60, 16, a))
+        d.shape("leaf", leaf(x - 40 * math.cos(math.radians(a)), y - 40 * math.sin(math.radians(a)), 60, 16, a), line=False)
     # long shaggy hair
     d.shape("hero", "M30 200 C30 150 40 112 62 90 C70 62 86 50 100 50 C114 50 130 62 138 90 C160 112 170 150 170 200Z")
     d.shape("hero2", "M48 200 L54 150 L60 196Z M140 200 L146 150 L152 196Z M72 200 L76 160 L82 200Z M118 200 L124 160 L128 200Z",
@@ -498,18 +498,18 @@ def migration_herd(d: Drawing):
     birds(d, [(40, 44, 1), (56, 36, 0.8), (140, 40, 0.9)])
     d.band("far", hills(124, 5))
     acacia(d, 26, -6, 0.6)
-    d.raw('<g opacity=".55">', "")
-    d.band("light", "M-30 130 Q30 112 70 124 T150 118 T230 126", shadow=False, line=False)
+    gnu = WILDEBEEST + GNU_EXTRA
+    for x, y in [(4, 118), (20, 119), (150, 116), (166, 118), (182, 117)]:
+        group(d, f"translate({x} {y}) scale(.13)", lambda: d.marks("dark", gnu))
+    d.raw('<g opacity=".5">', "")
+    d.band("light", "M-30 140 Q30 122 70 132 T150 126 T230 134", shadow=False, line=False)
     d.raw("</g>", "")
-    for x, y, s in [(4, 108, .22), (26, 110, .2), (48, 108, .22), (152, 108, .22), (172, 110, .2)]:
-        group(d, f"translate({x} {y}) scale({s})", lambda: d.shape("dark", WILDEBEEST + GNU_EXTRA, shadow=False))
-    d.band("mid", hills(136, 4, 30))
-    for x, y, s in [(-10, 104, .44), (36, 108, .42), (124, 106, .44), (164, 104, .42)]:
-        group(d, f"translate({x} {y}) scale({s})", lambda: d.shape("dark", WILDEBEEST + GNU_EXTRA))
-    d.band("near", hills(160, 4, -20))
-    for x, y, s in [(14, 100, .66), (96, 96, .7)]:
-        group(d, f"translate({x} {y}) scale({s})", lambda: d.shape("dark", WILDEBEEST + GNU_EXTRA))
-    d.band("deep", hills(182, 4, 10))
+    d.band("mid", hills(146, 4, 30))
+    herd = [(180, 123, .22), (160, 120, .27), (134, 116, .33), (100, 110, .40), (58, 104, .48), (4, 98, .58)]
+    for x, y, k in herd:
+        group(d, f"translate({x} {y}) scale({k})", lambda: d.shape("dark", gnu))
+    d.band("near", hills(178, 4, -20))
+    d.band("deep", hills(190, 4, 10), line=False)
 
 
 def migration_river(d: Drawing):
@@ -518,7 +518,7 @@ def migration_river(d: Drawing):
     # far bank with waiting herd
     d.shape("ground", "M120 200 L120 100 C140 92 180 90 230 92 L230 200Z")
     for x, y, s in [(140, 74, .24), (166, 72, .24), (188, 76, .22)]:
-        group(d, f"translate({x} {y}) scale({s})", lambda: d.shape("dark", WILDEBEEST + GNU_EXTRA, shadow=False))
+        group(d, f"translate({x} {y}) scale({s})", lambda: d.marks("dark", WILDEBEEST + GNU_EXTRA))
     d.band("water", "M-30 118 Q40 112 100 118 T230 116")
     d.stroke("water2", "M10 140 q8 -4 16 0 M60 150 q8 -4 16 0 M130 134 q8 -4 16 0 M30 170 q8 -4 16 0", 2, line=False)
     # swimming heads
@@ -601,11 +601,11 @@ def reef_garden(d: Drawing):
     sea_bg(d, 168)
     for x, y, s in [(120, 48, 0.8), (134, 42, 0.7), (136, 56, 0.75), (150, 48, 0.7), (60, 70, 0.7)]:
         d.shape("hero2", fish(x, y, s), shadow=False)
-    seafan(d, 50, 168, 82, spot=True)
+    seafan(d, 50, 168, 82)
     for x, h in [(84, 40), (94, 52), (104, 36)]:
         d.shape("sponge", rrect(x - 5, 168 - h, 10, h, 5))
         d.shape("deep", ellipse(x, 168 - h + 3, 3, 2), shadow=False)
-    staghorn(d, 156, 170, 1.15)
+    staghorn(d, 156, 170, 1.15, spot=True)
     brain(d, 120, 176, 26)
     d.shape("hero", fish(98, 104, 1.4, right=True))
     d.marks("mark", circle(106, 103, 1.6))
@@ -718,7 +718,7 @@ def lilypad(d: Drawing, x, y, r, rot=0, spot=False):
     for i in range(1, 12):
         a = notch + 2 * math.pi * i / 12
         v += f"M{pt(x, y)} L{pt(x + rr * 0.9 * math.cos(a), y + rr * 0.82 * 0.9 * math.sin(a))} "
-    d.stroke("pad2", v, 1.2, line=False)
+    d.stroke("pad2", v, 1.2)
 
 
 def botanic_lily(d: Drawing):
@@ -772,13 +772,15 @@ def lake_scene(d: Drawing, shore=112, trees=True):
     d.stroke("water2", f"M30 {shore + 14} H60 M130 {shore + 10} H170 M70 {shore + 30} H100", 2, line=False)
 
 
-def chair(d: Drawing, x, y, role):
+def chair(d: Drawing, x, y, role, spot=False):
     def draw():
-        d.shape(role, "M-18 -6 H18 V-1 H-18Z")
-        d.shape(role, "M-14 -46 C-14 -54 14 -54 14 -46 L14 0 H-14Z", spot=role == "pop")
-        d.stroke("dark", "M-7 -50 V0 M0 -51 V0 M7 -50 V0", 1.2, line=True)
-        d.shape(role, "M-20 -22 H-12 V0 H-20Z M12 -22 H20 V0 H12Z", shadow=False)
-        d.shape(role, "M-23 -24 H-10 V-20 H-23Z M10 -24 H23 V-20 H10Z", shadow=False)
+        d.shape(role, rrect(-24, -27, 13, 4, 1.5) + rrect(11, -27, 13, 4, 1.5), shadow=False)
+        d.shape(role, rrect(-22, -25, 4, 25, 1) + rrect(18, -25, 4, 25, 1))
+        d.shape(role, rrect(-17, -22, 34, 4, 1), shadow=False)
+        for i in range(-2, 3):
+            top = -54 + abs(i) * 4 + (i * i) * 0.8
+            d.shape(role, rrect(i * 6.6 - 2.6, top, 5.2, -8 - top, 2.6), spot=spot)
+        d.shape(role, rrect(-17, -14, 34, 4, 1), shadow=False)
     group(d, f"translate({x} {y})", draw)
 
 
@@ -788,8 +790,8 @@ def lakeday_dock(d: Drawing):
     d.shape("wood", "M44 210 L84 120 H116 L156 210Z")
     d.stroke("wood2", "M78 134 H122 M72 148 H128 M64 164 H136 M56 182 H144", 1.8, line=False)
     d.stroke("wood2", "M88 118 V128 M112 118 V128", 3)
-    chair(d, 82, 168, "pop")
-    chair(d, 122, 168, "hero2")
+    chair(d, 78, 170, "chairA", spot=True)
+    chair(d, 124, 170, "chairB")
 
 
 def lakeday_canoe(d: Drawing):
@@ -1034,12 +1036,13 @@ def lavender_rows(d: Drawing):
 
 
 def lavender_bundle(d: Drawing):
-    d.disc("glow", 100, 100, 64, line=False)
+    d.disc("light", 100, 100, 66, line=False)
     stems = [(-26, 70), (-16, 80), (-6, 88), (4, 90), (14, 84), (24, 74), (-20, 60), (20, 62)]
     for ang, h in stems:
-        lav_spike(d, 100, 160, h + 30, ang * 0.9, stem=False)
+        a = math.radians(ang * 0.9)
+        d.stroke("stem2", f"M100 160 L{100 + math.sin(a) * (h + 6):.1f} {160 - math.cos(a) * (h + 6):.1f}", 2.2)
     for ang, h in stems:
-        d.stroke("stem2", f"M100 160 L{100 + math.sin(math.radians(ang * 0.9)) * (h - 14):.1f} {160 - math.cos(math.radians(ang * 0.9)) * (h - 14):.1f}", 2.2, line=False)
+        lav_spike(d, 100, 160, h + 34, ang * 0.9, stem=False)
     d.limb("stem", "M92 150 L88 192 M100 150 L100 194 M108 150 L112 192", 4)
     # ribbon bow
     d.shape("ribbon", rrect(86, 150, 28, 10, 3), spot=True)
@@ -1134,7 +1137,7 @@ def rainbow_road(d: Drawing):
 
 
 # ================================================================ FIREFLIES
-FLY = {"bug": "#F7F06B", "bug2": "#FFFBC9", "fly": "#3B3530", "flyR": "#E0584A", "wing": "#EEF2F4", "jar": "#CFE5E8",
+FLY = {"sky": "#1F2A44", "sky2": "#2E3B5E", "light": "#E8EDF7", "bug": "#F7F06B", "bug2": "#FFFBC9", "fly": "#6B5A4A", "flyR": "#E0584A", "wing": "#EEF2F4", "jar": "#CFE5E8",
        "lid": "#B9A27A", "trunkN": "#2A2F3A", "grassN": "#2F4A3A"}
 NIGHT_PAL = ["dusk", "coastal", "meadow", "blush"]
 
@@ -1169,7 +1172,7 @@ def firefly_forest(d: Drawing):
     d.disc("glow", 140, 42, 14)
     stars(d, [(40, 30, 1.2), (70, 18, 1), (176, 70, 1.1), (110, 26, 1)])
     for x in range(-10, 220, 24):
-        pine(d, x, 130, 50 + (x * 7) % 20, "far", shadow=False, line=False)
+        pine(d, x, 130, 50 + (x * 7) % 20, "deep", shadow=False, line=False)
     d.band("mid", hills(132, 4))
     for x, w in [(24, 14), (66, 10), (150, 12), (184, 16)]:
         d.shape("trunkN", f"M{x - w / 2} 200 L{x - w / 2 + 1} -10 L{x + w / 2 - 1} -10 L{x + w / 2} 200Z")
@@ -1225,8 +1228,8 @@ CONCEPTS = [
     Concept("hatch-egg", "turtle-hatching", "Just hatched", hatch_egg, overrides=HATCH,
             checks=[("egg", "ground"), ("hero", "egg")], fixes={"ground": ["far", "mid", "#E7C78E"]}),
     Concept("hatch-moonlit-dash", "turtle-hatching", "Dash to the sea", hatch_moon, ["dusk", "coastal", "meadow", "blush"],
-            overrides={**HATCH, "glow": "#FFF6DA", "glow2": "#FFF6DA"},
-            checks=[("sky", "light"), ("hero", "ground"), ("glow", "sky")], fixes=NIGHT_FIX),
+            overrides={**HATCH, "sky": "#1F2A44", "light": "#E8EDF7", "glow": "#FFF6DA", "glow2": "#FFF6DA"},
+            checks=[("far", "sky"), ("hero", "ground"), ("glow", "sky")], fixes={"far": ["mid", "near"]}),
     Concept("hatch-nest", "turtle-hatching", "Inside the nest", hatch_nest, overrides=HATCH,
             checks=[("egg", "deep"), ("hero", "near"), ("hero", "ground"), ("near", "ground")],
             fixes={"near": ["#E2B97C", "mid"], "deep": ["#8A5A3A", "dark"]}),
@@ -1245,7 +1248,7 @@ CONCEPTS = [
     Concept("migration-wildebeest", "great-migration", "Wildebeest", migration_face, overrides=GNU,
             checks=[("hero", "glow"), ("hero", "sky"), ("hero2", "glow")], fixes={"glow": ["glow2", "light", "far"]}),
     Concept("reef-coral-garden", "reef-exploring", "Coral garden", reef_garden, ["coastal", "dusk", "meadow"], {**REEF, "hero": "#F28C28"},
-            checks=[("fan", "near"), ("coral", "near"), ("sponge", "near"), ("hero", "mid")]),
+            checks=[("fan", "near"), ("coral", "near"), ("sponge", "near"), ("hero", "mid")], fixes={"sponge": ["#7FD1C1", "light"]}),
     Concept("reef-moorish-idol", "reef-exploring", "Moorish idol", reef_idol, ["coastal", "dusk", "meadow"],
             {**REEF, "hero": "#F6C445", "mark": "#1C1C22", "light": "#FFFFFF"}, checks=[("light", "mid"), ("hero", "mid")]),
     Concept("reef-glass-boat", "reef-exploring", "Glass-bottom boat", reef_glassboat, ["coastal", "dusk", "meadow", "blush"], REEF,
@@ -1257,8 +1260,8 @@ CONCEPTS = [
     Concept("botanic-bird-of-paradise", "botanical-gardens", "Bird of paradise", botanic_strelitzia,
             overrides={**GARDEN, "spathe": "#4F7A5E", "spathe2": "#9E4A6A", "orange": "#F4892E", "blue": "#3C5DC8"},
             checks=[("orange", "glow"), ("orange", "sky"), ("spathe", "glow")], fixes={"glow": ["light", "sky2", "far"]}),
-    Concept("lakeday-dock-chairs", "lake-day", "Dock chairs", lakeday_dock, ["coastal", "meadow", "blush", "dusk"], LAKE,
-            checks=[("pop", "wood"), ("hero2", "wood"), ("wood", "water")], fixes={"hero2": ["light", "hero"], "pop": ["hero", "dark"]}),
+    Concept("lakeday-dock-chairs", "lake-day", "Dock chairs", lakeday_dock, ["coastal", "meadow", "blush", "dusk"], {**LAKE, "chairA": "#C23B2E", "chairB": "#F7F3EA"},
+            checks=[("chairA", "wood"), ("chairB", "wood"), ("wood", "water"), ("chairA", "water"), ("chairB", "water")]),
     Concept("lakeday-canoe", "lake-day", "Red canoe", lakeday_canoe, ["coastal", "meadow", "blush", "dusk"], {**LAKE, "hero": "#D64545", "hero2": "#F4E3C1"},
             checks=[("hero", "water"), ("hero", "pine")]),
     Concept("lakeday-swan-pedalo", "lake-day", "Swan pedalo", lakeday_swan, ["coastal", "meadow", "blush", "dusk"],
@@ -1279,7 +1282,7 @@ CONCEPTS = [
     Concept("lavender-provence-rows", "lavender-fields", "Provence rows", lavender_rows, overrides={**LAV, "trunk": "#4A3A2A"},
             checks=[("lav", "stone"), ("tree", "sky"), ("tree", "glow"), ("lav", "glow")], fixes={"glow": ["glow2", "pop", "hero2"]}),
     Concept("lavender-bundle", "lavender-fields", "Lavender bunch", lavender_bundle, overrides=LAV,
-            checks=[("lav", "glow"), ("lav", "sky"), ("ribbon", "lav")], fixes={"glow": ["light", "sky2", "far"]}),
+            checks=[("lav", "light"), ("lav", "sky"), ("ribbon", "lav"), ("ribbon", "light")], fixes={"ribbon": ["#D9A33A", "pop"]}),
     Concept("lavender-bee", "lavender-fields", "Bee on lavender", lavender_bee,
             overrides={**LAV, "beeY": "#F6C445", "beeD": "#2A2420", "wing": "#FFFFFF"},
             checks=[("beeY", "sky"), ("lav", "far"), ("beeY", "lav"), ("lav", "sky")], fixes={"far": ["mid", "near"], "sky": ["sky2"]}),
@@ -1291,11 +1294,11 @@ CONCEPTS = [
             checks=[("r1", "sky"), ("r6", "sky"), ("hero", "dark"), ("dark", "mid"), ("r3", "sky")],
             fixes={"sky": ["sky2", "#DCE9F2"], "hero": ["pop", "hero2", "light"]}),
     Concept("firefly-jar", "fireflies", "Jar of fireflies", firefly_jar, NIGHT_PAL, overrides=FLY,
-            checks=[("sky", "light"), ("jar", "sky"), ("lid", "sky")], fixes=NIGHT_FIX),
+            checks=[("jar", "sky"), ("lid", "sky"), ("far", "sky")], fixes={"far": ["mid", "near"]}),
     Concept("firefly-forest", "fireflies", "Glowing forest", firefly_forest, NIGHT_PAL, overrides=FLY,
-            checks=[("sky", "light"), ("far", "sky"), ("trunkN", "mid")], fixes={**NIGHT_FIX, "far": ["near", "deep"]}),
+            checks=[("deep", "sky"), ("trunkN", "mid"), ("far", "sky")], fixes={"deep": ["near", "mid"], "mid": ["near", "far"]}),
     Concept("firefly-closeup", "fireflies", "Firefly", firefly_bug, NIGHT_PAL, overrides=FLY,
-            checks=[("sky", "light"), ("fly", "sky"), ("bug", "sky")], fixes={"sky": ["deep", "mark", "#1F2A44"], "fly": ["#5A4E44"]}),
+            checks=[("fly", "sky"), ("bug", "sky"), ("grassN", "far")], fixes={"far": ["mid", "near", "far"]}),
 ]
 
 

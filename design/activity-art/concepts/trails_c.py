@@ -225,7 +225,7 @@ def canyon_switchback(d: Drawing):
     d.stroke("deep", "M-30 134 H44 M-30 160 H68 M-30 188 H88", 2, line=False)
     d.stroke("near", "M230 132 H156 M230 160 H130 M230 190 H116", 2, line=False)
     # zig-zag trail down the right wall
-    d.stroke("ground", "M206 110 L164 128 L206 142 L146 156 L204 170 L130 184 L196 200 L122 214", 3.6)
+    d.stroke("ground", "M170 110 L154 128 L190 140 L142 154 L184 168 L128 182 L176 198 L120 212", 3.6)
 
     def hiker():
         d.limb("dark", "M0 -6 L-4 8 M2 -6 L6 8", 3.4)
@@ -233,7 +233,7 @@ def canyon_switchback(d: Drawing):
         d.shape("pop", rrect(-11, -22, 7, 13, 2.5))
         d.shape("dark", circle(1, -29, 4.6))
         d.stroke("dark", "M6 -16 L10 8", 1.4)
-    group(d, "translate(182 124) scale(1.2)", hiker)
+    group(d, "translate(160 120) scale(1.2)", hiker)
 
 
 
@@ -414,9 +414,8 @@ def marathon_finish(d: Drawing):
     d.limb("hero", arch, 20, spot=True)
     d.stroke("light", "M30 120 V96 C30 52 170 52 170 96 V120", 8, line=False)
     d.raw(f'<path d="M30 120 V96 C30 52 170 52 170 96 V120" fill="none" stroke="{d.c.get("mark", "")}" stroke-width="8" stroke-dasharray="6 6"/>', "")
-    # broken finish tape, ends fluttering down
-    d.limb("pop", "M40 128 C58 126 74 130 84 138 C90 144 92 152 88 160", 4, spot=True)
-    d.limb("pop", "M160 128 C142 126 126 130 116 138 C110 144 108 152 112 160", 4, spot=True)
+    # finish tape stretched across
+    d.limb("pop", "M38 134 Q100 146 162 134", 5, spot=True)
     d.shape("dark", rrect(20, 164, 20, 8, 3))
     d.shape("dark", rrect(160, 164, 20, 8, 3))
 
@@ -523,26 +522,26 @@ def cavetube_dark(d: Drawing):
 
 def cavetube_ring(d: Drawing):
     d.band("deep", "M-30 -30 L230 -30", shadow=False, line=False)
-    d.shape("near", "M-30 -30 H230 V60 C200 46 196 70 188 46 C176 40 170 56 164 36 C150 32 146 52 138 30 C124 26 118 46 110 26 "
-                    "C96 26 92 44 84 27 C72 28 64 48 58 31 C46 34 40 50 32 38 C14 44 0 52 -30 60Z")
-    d.shape("mid", "M-30 230 V70 C20 44 60 36 100 36 C140 36 180 44 230 70 V230Z", line=False)
-    _line_only(d, "M-30 70 C20 44 60 36 100 36 C140 36 180 44 230 70", 3)
-    d.band("far", waves(112, 4, 30))
-    d.stroke("light", "M30 132 H56 M150 136 H176 M40 176 H62 M140 180 H166", 2)
+    d.shape("near", STALACTITES)
+    d.shape("near", "M-30 230 V96 L-6 90 L10 110 L24 120 L-30 128Z M230 230 V92 L206 88 L190 108 L178 118 L230 126Z", line=False)
+    beam = "M146 112 L230 40 L230 110Z"
+    if d.paper:
+        d.raw(f'<path d="{beam}" fill="{d.c["glow2"]}" opacity=".4"/>')
+    else:
+        d.raw("", f'<path d="{beam}" fill="{d.c["spot"]}" opacity=".3"/>')
+    d.band("mid", waves(118, 3, 28))
+    d.stroke("far", "M24 134 H50 M156 138 H182 M30 178 H54 M148 182 H172", 2)
     # big inner tube on the water
     d.shape("hero", ellipse(100, 146, 64, 30), spot=True)
     d.shape("deep", ellipse(100, 140, 30, 12), shadow=False)
-    d.shape("far", "M70 142 C76 148 88 152 100 152 C112 152 124 148 130 142 C128 150 116 156 100 156 C84 156 72 150 70 142Z", shadow=False, line=False)
+    d.shape("mid", "M70 142 C76 148 88 152 100 152 C112 152 124 148 130 142 C128 150 116 156 100 156 C84 156 72 150 70 142Z", shadow=False, line=False)
     d.stroke("light", "M52 130 C58 122 70 118 80 116", 4, line=False)
     d.shape("dark", rrect(97, 116, 6, 6, 1.5))
     # headlamp resting on the tube
     d.limb("dark", "M120 120 C128 108 152 108 160 120", 4)
     d.shape("dark", rrect(128, 106, 24, 14, 5))
     d.disc("glow2", 140, 113, 5)
-    if d.paper:
-        d.raw(f'<path d="M146 110 L230 70 L230 120Z" fill="{d.c["glow2"]}" opacity=".35"/>')
-    else:
-        d.raw("", f'<path d="M146 110 L230 70 L230 120Z" fill="{d.c["spot"]}" opacity=".3"/>')
+
 
 
 # ================================================================ HAMMOCK CAMPING
@@ -559,15 +558,15 @@ def hammock_forest(d: Drawing):
     d.limb("deep", "M30 -10 V184", 14)
     d.limb("deep", "M170 -10 V184", 14)
     d.shape("deep", "M-30 -30 H60 C40 0 30 20 -30 40Z M230 -30 H140 C160 0 170 20 230 40Z", line=False)
-    d.stroke("dark", "M36 86 L58 104 M164 86 L142 104", 1.8)
-    # hammock with a sleeper
-    hm = "M56 104 C80 142 120 142 144 104 C126 124 112 128 100 128 C88 128 74 124 56 104Z"
-    d.shape("hero", "M56 104 C70 150 130 150 144 104 C128 118 116 124 100 124 C84 124 70 118 56 104Z", spot=True)
-    d.shape("pop", "M66 120 C84 140 116 140 134 120 L136 116 C118 132 82 132 64 116Z", shadow=False)
-    d.shape("light", ellipse(68, 110, 7, 7))
-    d.shape("pop", "M61 108 C62 101 74 100 76 106Z", shadow=False)
-    d.shape("hero2", "M76 112 C96 104 120 106 134 110 C132 118 124 122 104 124 C88 124 80 120 76 112Z")
-    d.limb("dark", "M24 112 H36 M164 112 H176", 4)
+    d.stroke("dark", "M36 80 L50 98 M164 80 L150 98", 1.8)
+    d.limb("dark", "M24 80 H36 M164 80 H176", 4)
+    # sleeper tucked into the hammock
+    d.shape("light", circle(66, 100, 9))
+    d.shape("pop", "M57 98 C57 86 75 86 76 96Z", shadow=False)
+    d.shape("hero2", "M68 108 C90 96 124 98 140 104 C138 116 126 122 104 122 C86 122 72 118 68 108Z")
+    # hammock
+    d.shape("hero", "M48 98 C60 160 140 160 152 98 C134 120 118 128 100 128 C82 128 66 120 48 98Z", spot=True)
+    d.shape("pop", "M58 122 C80 148 120 148 142 122 L144 116 C120 140 80 140 56 116Z", shadow=False)
     d.band("near", hills(186, 3, -20), line=False)
 
 
@@ -575,7 +574,7 @@ def _foot(d: Drawing, x, left=True):
     k = 1 if left else -1
     d.shape("ground", f"M{x - 8} 176 C{x - 12} 160 {x - 13} 140 {x - 12} 128 C{x - 11} 118 {x - 6} 114 {x} 114 "
                       f"C{x + 6} 114 {x + 11} 118 {x + 12} 128 C{x + 13} 140 {x + 10} 160 {x + 8} 176Z")
-    for dx, dy, r in [(6.5, 110, 4.6), (0, 107.5, 3.5), (-5, 108.5, 3.1), (-9, 111.5, 2.7), (-12, 116, 2.3)]:
+    for dx, dy, r in [(6.5, 109, 5), (-.5, 106.5, 3.8), (-5.8, 108, 3.3), (-9.8, 111.5, 2.9), (-12.6, 116, 2.5)]:
         d.shape("ground", circle(x + dx * k, dy, r), shadow=False)
     d.stroke("glow2", f"M{x - 3 * k} 132 C{x - 7 * k} 142 {x - 6 * k} 152 {x - 2 * k} 160", 2, line=False)
 
@@ -589,8 +588,8 @@ def hammock_feet(d: Drawing):
     d.band("sky2", "M-30 124 Q100 118 230 124")
     d.stroke("mid", "M130 134 H164 M140 144 H176 M20 136 H44", 1.8, line=False)
     # bare feet propped up in the hammock
-    group(d, "rotate(-10 86 176)", lambda: _foot(d, 86, True))
-    group(d, "rotate(10 114 176)", lambda: _foot(d, 114, False))
+    group(d, "rotate(-9 82 184) translate(82 184) scale(1.3) translate(-82 -176)", lambda: _foot(d, 82, True))
+    group(d, "rotate(9 118 184) translate(118 184) scale(1.3) translate(-118 -176)", lambda: _foot(d, 118, False))
     # hammock edge filling the bottom of the frame
     d.shape("hero", "M-30 230 V150 C30 168 70 174 100 172 C140 170 200 150 230 140 V230Z", spot=True)
     d.shape("hero2", "M-30 162 C30 180 80 188 120 184 C160 180 200 162 230 152 V160 C200 172 160 190 120 194 C80 198 30 190 -30 172Z", shadow=False)
@@ -765,7 +764,7 @@ def heli_dropoff(d: Drawing):
     # summit plateau of snow on a rocky base
     d.shape("deep", "M-30 230 V160 L30 136 H170 L230 158 V230Z")
     d.shape("light", "M-30 230 V166 L30 140 H170 L230 164 V230Z", shadow=False)
-    group(d, "translate(100 121) scale(.62) translate(-104 -104)", lambda: _heli(d))
+    group(d, "translate(100 124) scale(.62) translate(-104 -104)", lambda: _heli(d))
     # skis stuck upright beside it
     d.shape("pop", _bar(160, 150, 164, 104, 4.5))
     d.shape("hero2", _bar(170, 150, 168, 104, 4.5))
@@ -873,20 +872,14 @@ def snowshoe_tracks(d: Drawing):
     d.band("light", "M-30 122 Q100 116 230 122")
     for x, b, h in [(22, 168, 84), (184, 176, 76)]:
         _snowy_pine(d, x, b, h, h * .3)
-    # snowshoe prints wandering away across the snow
-    x0, y0, x1, y1 = 52, 192, 136, 132
-    n = 6
-    for i in range(n):
-        t = i / (n - 1)
-        s = 1.55 - t * .95
-        x, y = x0 + (x1 - x0) * t, y0 + (y1 - y0) * (t ** .8)
-        off = (8 if i % 2 else -8) * s
-        px, py = x + off * .5, y + off * .86
-
+    # a line of snowshoe prints running away into the forest
+    for x, y, s in [(84, 182, 1.25), (116, 158, .95), (90, 142, .72), (110, 132, .55), (96, 126, .42)]:
         def g():
-            d.shape("mid", PRINT, shadow=False)
-            d.stroke("light", "M-5 -3 H5 M-4 5 H4", 1.6, line=False)
-        group(d, f"translate({px:.1f} {py:.1f}) scale({s:.2f} {s * .62:.2f}) rotate(60)", g)
+            d.shape("mid", SNOWSHOE, shadow=False)
+            d.stroke("light", "M-14 -18 H14 M-14 14 H14", 4, line=False)
+            d.shape("near", "M-9 -6 L-11 6 L-4 3 L0 10 L4 3 L11 6 L9 -6Z", shadow=False, line=False)
+        group(d, f"translate({x} {y}) scale({s * .55:.2f} {s * .32:.2f})", g)
+
 
 
 

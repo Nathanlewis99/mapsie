@@ -492,13 +492,13 @@ def redfox_portrait(d: Drawing):
 
 
 def fox_side(d: Drawing):
-    tail = [(134, 104), (152, 110), (170, 124), (186, 136)]
+    tail = [(134, 104), (152, 112), (166, 126), (176, 140)]
     d.limb("hero2", P([(80, 116), (88, 132), (90, 150)], False), 5)
     d.limb("hero2", P([(122, 112), (130, 130), (124, 150)], False), 5)
     d.limb("mark", P([(88, 136), (90, 150)], False), 5, shadow=False)
     d.limb("mark", P([(129, 136), (124, 150)], False), 5, shadow=False)
     d.shape("hero", taper(tail, 7, 4, wf=lambda t: 5 + 9 * math.sin(math.pi * min(1, t * 1.15)) + 2))
-    d.shape("light", taper(tail[2:] + [(194, 141)], 7, 1, wf=lambda t: 8 * (1 - t) + 1.5), shadow=False, spot=True)
+    d.shape("light", taper(tail[2:] + [(182, 148)], 7, 1, wf=lambda t: 8 * (1 - t) + 1.5), shadow=False, spot=True)
     d.shape("hero", P([(58, 106), (68, 96), (100, 98), (128, 96), (140, 104), (134, 116), (110, 120), (80, 120), (62, 118)]))
     d.limb("hero", P([(68, 114), (64, 132), (60, 150)], False), 5.5)
     d.limb("hero", P([(132, 110), (144, 130), (142, 150)], False), 5.5)
@@ -521,7 +521,7 @@ def redfox_snow(d: Drawing):
         pine(d, x, 132, h, "near", snow=True)
     d.band("far", hills(130, 4), line=False)
     d.band("light", "M-30 146 Q40 132 100 140 T230 136")
-    group(d, "translate(96 156) scale(1.14) translate(-100 -150)", lambda: fox_side(d))
+    group(d, "translate(100 156) scale(.94) translate(-106 -150)", lambda: fox_side(d))
     d.stroke("far", "M30 166 h8 M50 172 h6 M150 168 h8 M170 160 h6", 2, line=False)
     d.band("far", hills(186, 3, 20), line=False)
 
@@ -621,10 +621,10 @@ def lynx_face(d: Drawing):
 
 
 def lynx_side(d: Drawing):
-    d.limb("hero2", P([(84, 116), (86, 146), (87, 162)], False), 8)
-    d.limb("hero2", P([(126, 112), (132, 138), (128, 162)], False), 8)
-    d.shape("hero2", ellipse(88, 164, 7, 4), shadow=False)
-    d.shape("hero2", ellipse(128, 164, 7, 4), shadow=False)
+    d.limb("legs2", P([(84, 116), (86, 146), (87, 162)], False), 8)
+    d.limb("legs2", P([(126, 112), (132, 138), (128, 162)], False), 8)
+    d.shape("legs2", ellipse(88, 164, 7, 4), shadow=False)
+    d.shape("legs2", ellipse(128, 164, 7, 4), shadow=False)
     d.limb("hero", P([(146, 98), (156, 94), (160, 92)], False), 8)
     d.limb("mark", P([(157, 93), (160, 92)], False), 8, shadow=False)
     d.shape("hero", P([(58, 102), (72, 92), (104, 94), (130, 86), (146, 92), (150, 106), (140, 120), (108, 122), (78, 122), (60, 118)]))
@@ -635,7 +635,10 @@ def lynx_side(d: Drawing):
         d.stroke("mark", f"M{x - 6} 166 v-3 M{x - 2} 167 v-3 M{x + 2} 166 v-3", 1.2, line=False)
     d.marks("mark", "".join(circle(x, y, 1.6) for x, y in [(84, 102), (98, 100), (112, 102), (124, 98), (136, 100), (92, 112),
                                                           (106, 112), (120, 110), (134, 110), (146, 116), (70, 128), (144, 128)]))
-    # big round head, tufted ears, ruff
+    group(d, "translate(50 96) scale(1.12) translate(-50 -88)", lambda: lynx_side_head(d))
+
+
+def lynx_side_head(d: Drawing):
     d.shape("hero", P([(46, 72, 1), (44, 52, 1), (56, 70, 1)]))
     d.stroke("mark", "M44 53 L43 40", 2.4)
     d.shape("hero", P([(58, 76, 1), (60, 56, 1), (68, 76, 1)]))
@@ -759,7 +762,7 @@ def squirrel(d: Drawing, nut=True):
 
 def redsquirrel_portrait(d: Drawing):
     d.disc("glow", 92, 90, 60)
-    for x, y, a in [(4, 40, 30), (8, 70, 10), (196, 160, 200), (190, 130, 170)]:
+    for x, y, a in [(196, 160, 200), (190, 130, 170), (6, 150, -20)]:
         d.shape("near", leaf(x, y, 40, 9, a), line=False)
     d.band("far", hills(176, 4))
     d.limb("dark", "M-10 180 C40 174 120 176 210 168", 10)
@@ -803,7 +806,7 @@ HOG = {"hero": "#6B4A33", "hero2": "#CFA77C", "mark": "#1E1612", "light": "#EBDC
        "leaf3": "#E8B23C", "pop": "#D23B2C"}
 FOX = {"hero": "#DE6A2A", "hero2": "#B9541F", "light": "#FFF8EE", "mark": "#1F1A17", "eye": "#F2B33D"}
 BEAR = {"hero": "#7A4E2E", "hero2": "#A97A4E", "mark": "#22160E", "light": "#FFFFFF"}
-LYNX = {"hero": "#C69A64", "hero2": "#EAD8B6", "light": "#FBF3E4", "mark": "#2A2018", "eye": "#C9C44E", "pop": "#C98580"}
+LYNX = {"hero": "#C69A64", "hero2": "#EAD8B6", "light": "#FBF3E4", "mark": "#2A2018", "eye": "#C9C44E", "pop": "#C98580", "legs2": "#A57E50"}
 IBEX = {"hero": "#9C8468", "hero2": "#5E4B3A", "mark": "#231C15", "light": "#EFE6D8", "horn": "#6A5644", "horn2": "#4A3B2E",
         "eye": "#D9A84A"}
 SQUIRREL = {"hero": "#C8551E", "hero2": "#E07A3A", "light": "#FFF3E2", "mark": "#1F1712", "nut": "#7A4A24", "nut2": "#4A2A14",

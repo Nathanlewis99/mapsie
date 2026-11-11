@@ -1172,8 +1172,8 @@ def firefly_forest(d: Drawing):
     d.disc("glow", 140, 42, 14)
     stars(d, [(40, 30, 1.2), (70, 18, 1), (176, 70, 1.1), (110, 26, 1)])
     for x in range(-10, 220, 24):
-        pine(d, x, 130, 50 + (x * 7) % 20, "deep", shadow=False, line=False)
-    d.band("mid", hills(132, 4))
+        pine(d, x, 130, 50 + (x * 7) % 20, "deep", shadow=False, line=x % 48 == 14)
+    d.band("hillN", hills(132, 4))
     for x, w in [(24, 14), (66, 10), (150, 12), (184, 16)]:
         d.shape("trunkN", f"M{x - w / 2} 200 L{x - w / 2 + 1} -10 L{x + w / 2 - 1} -10 L{x + w / 2} 200Z")
     d.band("grassN", hills(170, 6))
@@ -1296,7 +1296,8 @@ CONCEPTS = [
     Concept("firefly-jar", "fireflies", "Jar of fireflies", firefly_jar, NIGHT_PAL, overrides=FLY,
             checks=[("jar", "sky"), ("lid", "sky"), ("far", "sky")], fixes={"far": ["mid", "near"]}),
     Concept("firefly-forest", "fireflies", "Glowing forest", firefly_forest, NIGHT_PAL, overrides=FLY,
-            checks=[("deep", "sky"), ("trunkN", "mid"), ("far", "sky")], fixes={"deep": ["near", "mid"], "mid": ["near", "far"]}),
+            overrides={**FLY, "hillN": "#273150"}.items() and {**FLY, "hillN": "#273150"},
+            checks=[("deep", "sky"), ("trunkN", "hillN"), ("deep", "hillN")], fixes={"deep": ["near", "mid"]}),
     Concept("firefly-closeup", "fireflies", "Firefly", firefly_bug, NIGHT_PAL, overrides=FLY,
             checks=[("fly", "sky"), ("bug", "sky"), ("grassN", "far")], fixes={"far": ["mid", "near", "far"]}),
 ]

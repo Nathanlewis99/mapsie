@@ -1363,7 +1363,7 @@ def croc_head(d: Drawing, plover=True):
 def croc_plover(d: Drawing):
     d.disc("glow", 46, 50, 26)
     d.band("far", hills(170, 5), line=False)
-    group(d, "translate(100 110) scale(1.04) translate(-96 -110)", croc_head)
+    group(d, "translate(100 110) scale(1.04) translate(-96 -110)", lambda: croc_head(d))
     d.band("water", waves(166, 4, 30))
     ripples(d, [(30, 180, 1.2), (130, 184, 1.4)])
     d.band("deep", waves(190, 3, 34), line=False)

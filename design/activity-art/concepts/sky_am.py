@@ -540,8 +540,6 @@ def las_vegas(d: Drawing):
         x = 96
         if dd.paper:
             dd.raw(f'<path d="M{x - 3} {y(105):.1f} L{x - 9} -10 L{x + 9} -10 L{x + 3} {y(105):.1f}Z" fill="{dd.c["light"]}" opacity=".55"/>')
-        else:
-            dd.stroke("dark", f"M{x} {y(105) - 4:.1f} V0", 1.4)
         dd.shape("pyr", poly((x - 30, B), (x, y(105)), (x + 30, B)))
         dd.shape("pyr2", poly((x, y(105)), (x + 30, B), (x + 6, B)), shadow=False, line=False)
         # curved bronze resort tower
@@ -1153,7 +1151,7 @@ CONCEPTS = [
                  fixes={"far": ["#C9D3DC", "sky2", "mid"], "stade": ["#C9C0B0", "#B7AD9B", "#A9B3C2", "#98A3B3", "#8C96A6", "#7F8A9A"]}),
     city_concept("sky-mexicocity", "skyline-mexico-city", "Mexico City", mexico_city,
                  {"mtn": "#8E9CB0", "snow": "#F5F8FB", "stone": "#E6DFD0", "stone2": "#BFB5A3", "gold": "#E8B33A", "jac": "#9B7BC8", "road": "#5A5E66", "trunk": "#5A4038"},
-                 checks=[("mtn", "sky"), ("far", "mtn"), ("gold", "sky"), ("gold", "glow"), ("stone", "mid"), ("jac", "near")],
+                 checks=[("mtn", "sky"), ("far", "mtn"), ("gold", "sky"), ("stone", "mid"), ("jac", "near")],
                  fixes={"far": ["#C9D3DC", "sky2", "mid", "#6F8296", "#5F7088"], "gold": ["#D19A2A", "#B8801E"], "glow": ["glow2", "pop", "light"], "jac": ["#7A5AA8", "#B39AE0"]}),
     city_concept("sky-havana", "skyline-havana", "Havana", havana,
                  {"stone": "#EDE6D8", "stone2": "#C2B8A6", "rock": "#9C8670", "c1": "#F2A7A0", "c2": "#F6D28B", "c3": "#8FD3C8",

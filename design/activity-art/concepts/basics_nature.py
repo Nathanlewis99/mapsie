@@ -288,7 +288,7 @@ def lake(d: Drawing):
 
 
 # ================================================================ FIELD
-FIELD = {"wheat": "#F0C75E", "wheat2": "#D9A23E", "stalk": "#C8902F", "tree": "#4F8A55"}
+FIELD = {"wheat": "#F0C75E", "wheat2": "#BE8630", "stalk": "#C8902F", "tree": "#4F8A55"}
 
 
 def wheat_ear(d: Drawing, x, y, h, rot, spot=False):

@@ -14,7 +14,9 @@ export const metadata = { title: "My account · Mapsie" };
 const STATUS: Record<string, { label: string; cls: string }> = {
   paid: { label: "Paid", cls: "bg-sea/15 text-sea" },
   rendering: { label: "Preparing print", cls: "bg-amber-100 text-amber-800" },
+  ready: { label: "Final check", cls: "bg-amber-100 text-amber-800" },
   submitted: { label: "Sent to print", cls: "bg-emerald-100 text-emerald-800" },
+  cancelled: { label: "Cancelled", cls: "bg-ink/10 text-ink/60" },
   failed: { label: "Delayed: we're on it", cls: "bg-coral/15 text-coral-dark" },
 };
 const date = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });

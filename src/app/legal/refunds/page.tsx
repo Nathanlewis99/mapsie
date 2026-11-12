@@ -22,8 +22,8 @@ export default function RefundsPage() {
             we&apos;ll reprint it free or refund you in full, whichever you prefer.
           </li>
           <li>
-            <strong>Changed your mind?</strong> Email us straight away and we&apos;ll cancel for a full refund if your order
-            hasn&apos;t been sent to print yet. Orders usually go to print within minutes, so we can&apos;t promise to catch it.
+            <strong>Changed your mind?</strong> You can cancel for a full refund within 1 hour of ordering, using the
+            Cancel button on your order page. After that it goes to print and can&apos;t be cancelled.
           </li>
           <li>
             <strong>No change-of-mind returns</strong>, because each print is personalised. Your legal rights for faulty goods
@@ -48,14 +48,15 @@ export default function RefundsPage() {
 
       <Section id="cancel" n={2} title="Cancelling an order">
         <p>
-          You can cancel your order for a <strong>full refund</strong>, including any delivery charge, if it{" "}
-          <strong>hasn&apos;t been sent to print yet</strong>. Orders usually go to our print partner within minutes of payment, so
-          please check your design carefully before you pay. We can&apos;t promise to catch an order in time.
+          You can cancel your order for a <strong>full refund</strong>, including any delivery charge, within{" "}
+          <strong>1 hour of placing it</strong>. We hold every order for an hour before sending it to print, so you have time to
+          spot a mistake. Use the <strong>Cancel order</strong> button on your order page (the link is in your confirmation and in
+          your account), and the refund is made automatically.
         </p>
         <p>
-          To cancel, email <Email to={COMPANY.supportEmail} /> as soon as possible with your order number and the email address
-          you ordered with. We&apos;ll confirm by email whether we caught it in time. Once your order has been sent to our print
-          partner, it can&apos;t be cancelled or changed, including the design, size, frame or delivery address.
+          If you can&apos;t use the button, email <Email to={COMPANY.supportEmail} /> within the hour with your order number and
+          we&apos;ll cancel it for you. Once your order has been sent to our print partner, it can&apos;t be cancelled or changed,
+          including the design, size, frame or delivery address.
         </p>
       </Section>
 

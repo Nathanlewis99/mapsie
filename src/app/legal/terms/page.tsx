@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { COMPANY } from "@/lib/company";
 import { PRODUCTS } from "@/lib/products";
-import { Email, Ext, In, LegalTitle, Section, Sub, Summary, Todo } from "../_ui";
+import { Email, Ext, In, LegalTitle, Section, Sub, Summary} from "../_ui";
 
 export const metadata: Metadata = {
   title: "Terms & Conditions · Mapsie",
@@ -241,7 +241,8 @@ export default function TermsPage() {
           </li>
           <li>For UK orders, prices include VAT where applicable.</li>
           <li>
-            Sales taxes for the US and Australia: <Todo>confirm how US state sales tax and Australian GST are charged and shown at checkout</Todo>
+            For US and Australian orders, the price shown at checkout is the full amount you pay us. If we&apos;re required to
+            charge a sales tax or GST, we&apos;ll show it at checkout before you pay.
           </li>
           <li>
             Delivery charges, if any, are shown at checkout before you pay. Standard delivery is free. See our{" "}
@@ -303,8 +304,8 @@ export default function TermsPage() {
           28(1)(b) of the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013.
         </p>
         <p>
-          But we know mistakes happen. We&apos;ll cancel your order for a full refund <strong>if it hasn&apos;t been sent to print
-          yet</strong>. Orders usually go to print within minutes of payment, so we can&apos;t promise to catch it. Email <Email to={COMPANY.supportEmail} /> with your order
+          But we know mistakes happen. You can cancel your order for a full refund <strong>within 1 hour of ordering</strong>, using the
+          Cancel button on your order page. We hold every order for that hour before it goes to print. Email <Email to={COMPANY.supportEmail} /> with your order
           number as quickly as you can. Once production has started we can&apos;t cancel or change the order. Full details are
           in our <In href="/legal/refunds#cancel">Returns, Refunds &amp; Reprints policy</In>.
         </p>
@@ -400,7 +401,7 @@ export default function TermsPage() {
         </p>
         <p>
           If we can&apos;t resolve a complaint between us, you may be able to use an alternative dispute resolution scheme,
-          or go to court (see section 18). <Todo>confirm whether DayzeOut Limited uses an ADR provider and, if so, name it here; if not, keep the sentence below</Todo>{" "}
+          or go to court (see section 18).{" "}
           We aren&apos;t currently a member of an alternative dispute resolution scheme. UK customers can get free advice from{" "}
           <Ext href="https://www.citizensadvice.org.uk/consumer/">Citizens Advice</Ext>; Australian customers can contact their
           state or territory consumer protection agency.

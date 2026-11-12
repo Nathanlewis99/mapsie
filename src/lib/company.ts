@@ -6,7 +6,8 @@ export const COMPANY = {
   jurisdiction: "England and Wales",
   address: "124–128 City Road, London, EC1V 2NX, United Kingdom",
   site: "mapsie.shop",
-  supportEmail: "hello@mapsie.shop",
+  supportEmail: "support@mapsie.shop",
+  helloEmail: "hello@mapsie.shop",
   privacyEmail: "privacy@mapsie.shop",
   legalUpdated: "12 November 2026",
 } as const;

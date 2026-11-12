@@ -100,9 +100,6 @@ export default function Poster({ design, width, editable = false, print, selecte
 
       {design.theme.texture && <div className="mapsie-paper pointer-events-none absolute inset-0" />}
 
-      <div className="absolute pointer-events-none" style={{ right: u * 1.2, bottom: u * 0.6, fontSize: Math.max(7, u * 0.85), color: c.ink, opacity: 0.45, fontFamily: "sans-serif" }}>
-        © OpenStreetMap · OpenFreeMap
-      </div>
     </div>
   );
 }

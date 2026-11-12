@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { COMPANY } from "@/lib/company";
 import { SESSION_DAYS } from "@/lib/session";
-import { Email, Ext, In, LegalTitle, Section, Sub, Summary, Table, Todo } from "../_ui";
+import { Email, Ext, In, LegalTitle, Section, Sub, Summary, Table} from "../_ui";
 
 export const metadata: Metadata = {
   title: "Privacy Policy · Mapsie",
@@ -201,7 +201,7 @@ export default function PrivacyPage() {
             ["Designs saved to your account (including photos)", "Until you delete them or close your account"],
             [
               "Designs sent to checkout but not ordered",
-              <Todo key="t">confirm and implement a deletion period, e.g. 90 days</Todo>,
+              "90 days, then deleted automatically. This also applies to designs shared by link",
             ],
             ["Your account (name, email, profile picture)", "Until you ask us to close it"],
             [
@@ -210,10 +210,10 @@ export default function PrivacyPage() {
             ],
             [
               "The design and print file for an order",
-              <>So we can deal with reprints and problems: <Todo key="t">confirm period, e.g. 12 months after the order, then delete</Todo></>,
+              "12 months after the order, so we can deal with reprints and problems, then deleted automatically",
             ],
-            ["Emails and support messages", <Todo key="t">confirm period, e.g. 2 years after the matter is resolved</Todo>],
-            ["Server technical logs", <Todo key="t">confirm Render log retention period for our plan</Todo>],
+            ["Emails and support messages", "2 years after the matter is resolved"],
+            ["Server technical logs", "Up to 30 days, kept by our hosting provider"],
             ["Sign-in cookie", <>Up to {SESSION_DAYS} days, or until you sign out (see our <In href="/legal/cookies">Cookie policy</In>)</>],
           ]}
         />

@@ -7,6 +7,8 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
   const { id } = await params;
   const o = await getOrder(id);
   if (!o?.address) return NextResponse.json({ error: "Order has no address yet" }, { status: 400 });
-  after(() => fulfilOrder(id, o.address!));
+  // Admin re-send: no new cancellation window.
+  const now = new Date().toISOString();
+  after(() => fulfilOrder(id, o.address!, { paidAt: o.paidAt ?? now, holdUntil: now, stripePaymentIntent: o.stripePaymentIntent }));
   return NextResponse.json({ ok: true });
 }

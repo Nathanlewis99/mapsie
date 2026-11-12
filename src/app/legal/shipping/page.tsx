@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { COMPANY } from "@/lib/company";
 import { money, REGIONS, SHIPPING } from "@/lib/products";
-import { Email, In, LegalTitle, Section, Summary, Table, Todo } from "../_ui";
+import { Email, In, LegalTitle, Section, Summary, Table} from "../_ui";
 
 export const metadata: Metadata = {
   title: "Shipping & Delivery · Mapsie",
@@ -66,7 +66,7 @@ export default function ShippingPage() {
       <Section id="tracking" n={4} title="Tracking your order">
         <p>
           You can check the progress of your order on your order page, and in your order history if you&apos;re signed in.{" "}
-          <Todo>confirm how customers receive courier tracking details (e.g. Prodigi shipping emails, or a tracking link on the order page)</Todo>
+          When your print is dispatched we&apos;ll email you, with the courier&apos;s tracking link where the courier provides one.
         </p>
       </Section>
 

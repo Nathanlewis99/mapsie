@@ -19,7 +19,9 @@ export interface Address {
   country: string; // ISO-2
 }
 
-export type OrderStatus = "pending_payment" | "paid" | "rendering" | "submitted" | "failed";
+// pending_payment -> paid -> rendering -> ready (print file done, waiting out the
+// cancellation window) -> submitted (sent to the printer). Or cancelled / failed.
+export type OrderStatus = "pending_payment" | "paid" | "rendering" | "ready" | "submitted" | "cancelled" | "failed";
 
 export interface Order {
   id: string;
@@ -35,6 +37,12 @@ export interface Order {
   renderFile?: string;
   renderInfo?: { width: number; height: number; dpi: number; mapDpi?: number };
   printProviderOrderId?: string;
+  paidAt?: string;
+  /** Sent to the printer after this time; until then the customer can cancel. */
+  holdUntil?: string;
+  stripePaymentIntent?: string;
+  cancelledAt?: string;
+  refunded?: boolean;
   error?: string;
   createdAt: string;
 }
@@ -264,4 +272,17 @@ export function getCachedRoute(key: string): unknown | undefined {
 }
 export function putCachedRoute(key: string, value: unknown) {
   open().prepare("INSERT OR REPLACE INTO route_cache (key, json, created_at) VALUES (?, ?, ?)").run(key, JSON.stringify(value), now());
+}
+
+/** Orders whose cancellation window has ended and are ready to go to the printer. */
+export async function listOrdersDueForPrint(nowIso: string): Promise<Order[]> {
+  const rows = open().prepare("SELECT json FROM orders WHERE status = 'ready'").all() as { json: string }[];
+  return rows.map((r) => JSON.parse(r.json) as Order).filter((o) => !o.holdUntil || o.holdUntil <= nowIso);
+}
+
+/** Delete design snapshots older than the cutoff that no order uses. Returns how many. */
+export function deleteUnorderedDesigns(beforeIso: string): number {
+  return open()
+    .prepare("DELETE FROM designs WHERE created_at < ? AND id NOT IN (SELECT json_extract(json, '$.designId') FROM orders)")
+    .run(beforeIso).changes;
 }

@@ -25,7 +25,7 @@ export async function POST(req: Request) {
           city: a.city ?? "",
           postcode: a.postal_code ?? "",
           country: a.country ?? "GB",
-        }),
+        }, { stripePaymentIntent: typeof s.payment_intent === "string" ? s.payment_intent : s.payment_intent?.id }),
       );
     }
   }

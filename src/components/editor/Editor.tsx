@@ -12,18 +12,28 @@ import { itemPrice, money, posterAspect, REGIONS } from "@/lib/products";
 import { FONTS, fontBold, fontCss } from "@/lib/fonts";
 import { ART_STYLES, stickerSrc, type ArtStyleId } from "@/lib/stickers";
 import { PALETTE_NAMES, getOriginal, type OriginalStyle } from "@/lib/originals";
-import { normalizeDesign, type Design } from "@/lib/types";
+import { normalizeDesign, type Design, type TextEffect } from "@/lib/types";
 import { TripPanel, StylePanel, StickersPanel, TextPanel, SizePanel } from "./Panels";
 import { track } from "@/lib/track";
 
 const TABS = [
-  { id: "trip", label: "Trip", icon: "route" },
-  { id: "style", label: "Style", icon: "palette" },
-  { id: "stickers", label: "Stickers", icon: "sticker" },
-  { id: "text", label: "Text", icon: "type" },
-  { id: "size", label: "Size", icon: "frame" },
+  { id: "trip", label: "Trip", icon: "🧭" },
+  { id: "style", label: "Style", icon: "🎨" },
+  { id: "stickers", label: "Stickers", icon: "🐊" },
+  { id: "text", label: "Text", icon: "✍️" },
+  { id: "size", label: "Size", icon: "🖼️" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
+
+/** Text sticker effects, with the CSS used for the little previews in the picker. */
+const EFFECTS: { id: TextEffect; label: string; preview: React.CSSProperties }[] = [
+  { id: "none", label: "None", preview: {} },
+  { id: "glow", label: "Glow", preview: { textShadow: "0 0 3px rgba(255,255,255,.9), 0 0 8px rgba(255,255,255,.7)" } },
+  { id: "outline", label: "Outline", preview: { WebkitTextStroke: "3px #fff", paintOrder: "stroke fill" } },
+  { id: "shadow", label: "Shadow", preview: { textShadow: "1.5px 2px 2px rgba(0,0,0,.45)" } },
+  { id: "neon", label: "Neon", preview: { textShadow: "0 0 3px #ff6b4a, 0 0 9px rgba(255,107,74,.7), 0 0 16px rgba(255,107,74,.5)" } },
+  { id: "label", label: "Label", preview: { background: "#fff", padding: "0 8px", borderRadius: 8 } },
+];
 
 async function saveSnapshot(design: Design): Promise<string> {
   const r = await fetch("/api/designs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(design) });
@@ -42,7 +52,11 @@ export default function Editor() {
   const [toast, setToast] = useState("");
   const [wall, setWall] = useState(false);
   const [fontMenu, setFontMenu] = useState(false);
-  useEffect(() => setFontMenu(false), [selectedSticker]);
+  const [fxMenu, setFxMenu] = useState(false);
+  useEffect(() => {
+    setFontMenu(false);
+    setFxMenu(false);
+  }, [selectedSticker]);
   // "Lock framing": the map stays put and the poster itself can be zoomed and panned,
   // so labels and stickers are easy to rearrange on a phone.
   const [locked, setLocked] = useState(false);
@@ -317,8 +331,13 @@ export default function Editor() {
               <Icon name="share" />
               <span className="hidden lg:inline">{busy === "share" ? "Sharing…" : "Share"}</span>
             </button>
-            <button title={me?.user ? "Save to your account" : "Sign in to save"} className={textBtn} onClick={save} disabled={busy === "save" || (!!savedId && !dirty)}>
-              <Icon name={savedId && !dirty ? "check" : "save"} />
+            <button
+              title={savedId && !dirty ? "Saved to your account" : me?.user ? "Save to your account" : "Sign in to save"}
+              className={`${textBtn} ${savedId && !dirty ? "!opacity-100 text-coral-dark" : ""}`}
+              onClick={save}
+              disabled={busy === "save" || (!!savedId && !dirty)}
+            >
+              <Icon name="heart" className={savedId && !dirty ? "text-coral fill-coral" : ""} />
               <span className="hidden lg:inline">{busy === "save" ? "Saving…" : savedId && !dirty ? "Saved" : "Save"}</span>
             </button>
             <button title="Start a new map" onClick={() => confirm("Start a fresh map? (You can undo this.)") && store.reset()} className={`${textBtn} hidden md:inline-flex`}>
@@ -327,20 +346,29 @@ export default function Editor() {
             </button>
           </div>
           <span className="w-px h-6 bg-ink/10 mx-1 sm:mx-2 hidden sm:block" />
-          <label className="hidden sm:flex items-center gap-1.5 rounded-full border border-ink/15 pl-3 pr-1 h-9 text-sm font-semibold text-ink/70 hover:border-ink/30 cursor-pointer" title="Where should we ship it? Prices and printing are local to each country.">
-            <Icon name="globe" size={16} />
+          <label className="hidden sm:flex items-center rounded-full border border-ink/15 pl-2 pr-1 h-9 text-sm font-semibold text-ink/70 hover:border-ink/30 cursor-pointer" title="Where should we ship it? Prices and printing are local to each country.">
             <select value={region} onChange={(e) => store.setRegion(e.target.value as typeof region)} aria-label="Ship to" className="bg-transparent outline-none cursor-pointer pr-1">
               {REGIONS.map((r) => (
-                <option key={r.id} value={r.id}>{r.id === "GB" ? "UK" : r.id}</option>
+                <option key={r.id} value={r.id}>{r.flag} {r.id === "GB" ? "UK" : r.id}</option>
               ))}
             </select>
           </label>
           <button
             onClick={order}
             disabled={!!busy || design.stops.length === 0}
-            className="ml-1 sm:ml-2 h-9 sm:h-10 rounded-full bg-coral px-4 sm:px-5 text-sm sm:text-[15px] font-bold text-white shadow-sm hover:bg-coral-dark disabled:opacity-40 transition whitespace-nowrap"
+            className="group ml-1 sm:ml-3 inline-flex items-center gap-2 h-10 sm:h-11 rounded-full bg-coral pl-4 pr-3 sm:pl-6 sm:pr-4 text-sm sm:text-base font-extrabold text-white shadow-lg shadow-coral/40 ring-1 ring-coral-dark/20 hover:bg-coral-dark hover:shadow-xl hover:shadow-coral/40 hover:-translate-y-px active:translate-y-0 disabled:opacity-40 disabled:shadow-none transition whitespace-nowrap"
           >
-            {busy === "order" ? "Saving…" : <>Order<span className="hidden sm:inline"> print</span> · {money(region, price)}</>}
+            {busy === "order" ? (
+              "Saving…"
+            ) : (
+              <>
+                <span>
+                  Order<span className="hidden sm:inline"> print</span>
+                </span>
+                <span className="rounded-full bg-white/20 px-2 py-0.5 text-[13px] sm:text-sm">{money(region, price)}</span>
+                <span aria-hidden className="transition group-hover:translate-x-0.5">→</span>
+              </>
+            )}
           </button>
           {me?.user ? (
             <Link href="/account" title="My account" className="ml-1 sm:ml-2 shrink-0">
@@ -468,6 +496,57 @@ export default function Editor() {
             </div>
           )}
 
+          {sel?.kind === "text" && fxMenu && (
+            <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 w-[min(30rem,94%)] rounded-3xl bg-white shadow-2xl p-4 space-y-3" role="dialog" aria-label="Text effect">
+              <div className="grid grid-cols-3 gap-2">
+                {EFFECTS.map((e) => {
+                  const on = (sel.effect ?? "glow") === e.id;
+                  return (
+                    <button
+                      key={e.id}
+                      onClick={() => store.updateSticker(sel.id, { effect: e.id, effectColor: e.id === (sel.effect ?? "glow") ? sel.effectColor : undefined })}
+                      className={`rounded-2xl border-2 px-2 pt-2 pb-1.5 transition ${on ? "border-coral bg-coral/5" : "border-ink/10 hover:border-ink/30"}`}
+                      style={{ background: on ? undefined : "#cfe0e6" }}
+                    >
+                      <span className="block text-2xl leading-tight" style={{ fontFamily: fontCss(sel.font ?? "caveat"), fontWeight: fontBold(sel.font ?? "caveat"), color: sel.color ?? design.theme.colors.ink, ...e.preview }}>
+                        Aa
+                      </span>
+                      <span className="block text-[11px] font-bold text-ink/60 mt-0.5">{e.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {(sel.effect ?? "glow") !== "none" && (
+                <div className="flex items-center gap-3 text-sm font-semibold">
+                  <label className="flex items-center gap-2">
+                    Colour
+                    <input
+                      type="color"
+                      value={sel.effectColor ?? ((sel.effect ?? "glow") === "shadow" ? "#000000" : (sel.effect ?? "glow") === "neon" ? (sel.color ?? "#ff6b4a") : "#ffffff")}
+                      onChange={(e) => store.updateSticker(sel.id, { effectColor: e.target.value }, `fxcolor-${sel.id}`)}
+                      className="w-8 h-8 rounded-full border-0 p-0 bg-transparent cursor-pointer"
+                    />
+                  </label>
+                  <label className="flex flex-1 items-center gap-2">
+                    Strength
+                    <input
+                      type="range"
+                      min={0.25}
+                      max={3}
+                      step={0.05}
+                      value={sel.effectSize ?? 1}
+                      onChange={(e) => store.updateSticker(sel.id, { effectSize: Number(e.target.value) }, `fxsize-${sel.id}`)}
+                      className="flex-1 accent-coral"
+                    />
+                  </label>
+                </div>
+              )}
+              <div className="text-right">
+                <button onClick={() => setFxMenu(false)} className="text-sm font-bold text-ink/60 hover:text-ink">Done</button>
+              </div>
+            </div>
+          )}
+
           {sel?.kind === "text" && fontMenu && (
             <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 w-[min(30rem,94%)] max-h-[60%] overflow-y-auto rounded-3xl bg-white shadow-2xl p-3 grid grid-cols-2 sm:grid-cols-3 gap-2" role="listbox" aria-label="Fonts">
               {FONTS.map((f) => (
@@ -501,7 +580,10 @@ export default function Editor() {
                   />
                   <span className="relative">
                     <button
-                      onClick={() => setFontMenu((v) => !v)}
+                      onClick={() => {
+                        setFontMenu((v) => !v);
+                        setFxMenu(false);
+                      }}
                       className="bg-white/10 rounded-full px-3 py-1 whitespace-nowrap"
                       style={{ fontFamily: fontCss(sel.font ?? "caveat"), fontWeight: fontBold(sel.font ?? "caveat") }}
                       aria-haspopup="listbox"
@@ -510,6 +592,17 @@ export default function Editor() {
                       {FONTS.find((f) => f.id === (sel.font ?? "caveat"))?.name ?? "Font"} ▾
                     </button>
                   </span>
+                  <button
+                    onClick={() => {
+                      setFxMenu((v) => !v);
+                      setFontMenu(false);
+                    }}
+                    className="bg-white/10 rounded-full px-3 py-1 whitespace-nowrap"
+                    aria-haspopup="dialog"
+                    aria-expanded={fxMenu}
+                  >
+                    ✨ {EFFECTS.find((e) => e.id === (sel.effect ?? "glow"))?.label} ▾
+                  </button>
                   <input type="color" value={sel.color ?? design.theme.colors.ink} onChange={(e) => store.updateSticker(sel.id, { color: e.target.value }, `color-${sel.id}`)} className="w-7 h-7 rounded-full bg-transparent border-0 p-0" />
                   <label className="flex items-center gap-1.5 bg-white/10 rounded-full pl-2.5 pr-3 py-1 whitespace-nowrap" title="Curve the text">
                     <span aria-hidden>{(sel.curve ?? 0) < 0 ? "◡" : "◠"}</span>
@@ -592,7 +685,7 @@ export default function Editor() {
                 onClick={() => setTab(t.id)}
                 className={`flex-1 rounded-xl py-2 text-xs font-semibold tracking-wide transition ${tab === t.id ? "bg-white shadow-sm text-ink" : "text-ink/45 hover:text-ink"}`}
               >
-                <Icon name={t.icon} size={19} className="mx-auto mb-1" />
+                <div className="text-lg leading-none mb-1">{t.icon}</div>
                 {t.label}
               </button>
             ))}

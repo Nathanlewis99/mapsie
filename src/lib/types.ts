@@ -47,6 +47,10 @@ export interface Sticker {
   color?: string;
   /** Text only: bend the text along an arc, -100 (a "smile") to 100 (an arch). 0 = straight. */
   curve?: number;
+  /** Text only: the effect around the letters (default "glow", the original white halo). */
+  effect?: TextEffect;
+  effectColor?: string;
+  effectSize?: number; // 0.25–3, 1 = normal
 }
 
 export interface ThemeColors {
@@ -161,6 +165,8 @@ export const DEFAULT_TEXT: TextStyle = {
   labelItalic: false,
   align: "center",
 };
+
+export type TextEffect = "none" | "glow" | "outline" | "shadow" | "neon" | "label";
 
 export type FontId = "playfair" | "caveat" | "montserrat" | "pacifico" | "bebas" | "cormorant" | "josefin" | "abril" | "courier" | "vibes" | "marker" | "amatic" | "indie" | "patrick" | "kalam" | "dancing" | "satisfy" | "lobster" | "righteous" | "fredoka" | "elite" | "rocksalt";
 

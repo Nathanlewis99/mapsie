@@ -486,8 +486,9 @@ export default function MapView(props: Props) {
           if (st.kind === "text") {
             inner = document.createElement("div");
             inner.className = "mapsie-note";
-            inner.style.cssText = `font-family:${fontCss(st.font ?? "caveat")};font-weight:${fontBold(st.font ?? "caveat")};color:${st.color ?? design.theme.colors.ink};font-size:${px}px`;
-            if (st.curve) curvedText(inner, (st.text || "Your note").replace(/\s*\n\s*/g, " "), st.curve, st.font ?? "caveat");
+            const fx = textEffect(st, design.theme.colors.ink);
+            inner.style.cssText = `font-family:${fontCss(st.font ?? "caveat")};font-weight:${fontBold(st.font ?? "caveat")};color:${st.color ?? design.theme.colors.ink};font-size:${px}px;${st.curve ? "" : fx.css}`;
+            if (st.curve) curvedText(inner, (st.text || "Your note").replace(/\s*\n\s*/g, " "), st.curve, st.font ?? "caveat", fx);
             else inner.textContent = st.text || "Your note";
           } else {
             node.style.width = `${px}px`;
@@ -648,7 +649,7 @@ function detailIcon(id: string): ImageData | null {
  * (100 = a half-circle arch, -100 = a half-circle smile). The SVG is sized in em,
  * so resizing the sticker (which changes the font size) scales it with the text.
  */
-function curvedText(host: HTMLElement, text: string, curve: number, font: FontId) {
+function curvedText(host: HTMLElement, text: string, curve: number, font: FontId, fx: ReturnType<typeof textEffect>) {
   const NS = "http://www.w3.org/2000/svg";
   const fs = 100; // work in a 100-unit em, then size the SVG in em
   // Canvas can't read CSS variables, so swap var(--f-x) for the real family name.
@@ -671,11 +672,15 @@ function curvedText(host: HTMLElement, text: string, curve: number, font: FontId
   t.setAttribute("text-anchor", "middle");
   t.setAttribute("font-size", String(fs));
   t.setAttribute("fill", "currentColor");
-  // the same soft white halo straight notes have
-  t.setAttribute("stroke", "rgba(255,255,255,0.8)");
-  t.setAttribute("stroke-width", String(fs * 0.08));
-  t.setAttribute("stroke-linejoin", "round");
-  t.setAttribute("paint-order", "stroke");
+  // the chosen effect: an outline/halo/label is a stroke behind the letters, shadows and glows are filters
+  if (fx.svgStroke) {
+    t.setAttribute("stroke", fx.svgStroke.color);
+    t.setAttribute("stroke-width", String(fs * fx.svgStroke.width));
+    t.setAttribute("stroke-linejoin", "round");
+    t.setAttribute("stroke-linecap", "round");
+    t.setAttribute("paint-order", "stroke");
+  }
+  if (fx.svgFilter) svg.style.filter = fx.svgFilter;
   const tp = document.createElementNS(NS, "textPath");
   tp.setAttribute("href", `#${id}`);
   tp.setAttribute("startOffset", "50%");
@@ -711,4 +716,49 @@ function curvedText(host: HTMLElement, text: string, curve: number, font: FontId
   layout();
   // Re-measure once the font has loaded (the first pass may use a fallback font's widths).
   document.fonts?.load(spec).then(layout).catch(() => {});
+}
+
+/**
+ * The look around a text sticker's letters. Returns CSS for straight text and the
+ * equivalent stroke/filter for curved (SVG) text, so both look the same.
+ */
+function textEffect(st: Sticker, ink: string) {
+  const kind = st.effect ?? "glow";
+  const k = Math.max(0.25, Math.min(3, st.effectSize ?? 1));
+  const col = st.effectColor ?? (kind === "shadow" ? "#000000" : kind === "neon" ? (st.color ?? "#ff6b4a") : kind === "label" ? "#ffffff" : "#ffffff");
+  const rgba = (hex: string, a: number) => {
+    const h = hex.replace("#", "");
+    const n = parseInt(h.length === 3 ? h.replace(/(.)/g, "$1$1") : h, 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+  };
+  switch (kind) {
+    case "none":
+      return { css: "", svgStroke: null as null | { color: string; width: number }, svgFilter: "" };
+    case "outline":
+      return {
+        css: `-webkit-text-stroke:${0.09 * k}em ${col};paint-order:stroke fill;`,
+        svgStroke: { color: col, width: 0.18 * k },
+        svgFilter: "",
+      };
+    case "shadow": {
+      const sh = `${0.05 * k}em ${0.07 * k}em ${0.06 * k}em ${rgba(col, 0.45)}`;
+      return { css: `text-shadow:${sh};`, svgStroke: null, svgFilter: `drop-shadow(${sh})` };
+    }
+    case "neon": {
+      const g = `0 0 ${0.08 * k}em ${rgba(col, 0.9)}, 0 0 ${0.25 * k}em ${rgba(col, 0.7)}, 0 0 ${0.5 * k}em ${rgba(col, 0.5)}`;
+      return { css: `text-shadow:${g};`, svgStroke: null, svgFilter: `drop-shadow(0 0 ${0.12 * k}em ${rgba(col, 0.9)}) drop-shadow(0 0 ${0.35 * k}em ${rgba(col, 0.6)})` };
+    }
+    case "label":
+      // A solid tag behind the text (on curved text: a fat rounded stroke, like a sticker).
+      return {
+        css: `background:${col};padding:${0.12 * k}em ${0.4 * k}em;border-radius:${0.35 * k}em;box-shadow:0 0.06em 0.18em rgba(0,0,0,0.18);`,
+        svgStroke: { color: col, width: 0.42 * k },
+        svgFilter: "drop-shadow(0 0.05em 0.08em rgba(0,0,0,0.18))",
+      };
+    default: {
+      // glow: the original soft halo (white unless another colour is chosen)
+      const g = `0 0 ${0.12 * k}em ${rgba(col, 0.85)}, 0 0 ${0.35 * k}em ${rgba(col, 0.6)}`;
+      return { css: `text-shadow:${g};`, svgStroke: { color: rgba(col, 0.8), width: 0.08 * k }, svgFilter: "" };
+    }
+  }
 }

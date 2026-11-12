@@ -380,7 +380,7 @@ def toronto(d: Drawing):
 
 # ================================================================ RIO DE JANEIRO
 RIO = {"forest": "#3E7348", "forest2": "#2C5636", "rock": "#9A948A", "rock2": "#76706A", "statue": "#F4F1EA",
-       "sand": "#F2D9A6", "palm": "#2F5E45", "sea": "#3F92BE", "sea2": "#2C6F99"}
+       "sand": "#F2D9A6", "palm": "#2F5E45", "sea": "#3F92BE", "sea2": "#2C6F99", "town": "#EDE6D8"}
 
 
 def rio(d: Drawing):
@@ -402,7 +402,7 @@ def rio(d: Drawing):
     d.stroke("dark", "M116 113 L156 65", 1)
     d.marks("pop", rrect(134, 89, 5, 4, 1))
     # city along the shore
-    d.band("mid", roofline(W + 4, [(40, 0), (8, 12), (10, 18), (8, 10), (12, 16), (10, 12), (8, 20), (10, 14), (160, 0)]), line=False)
+    d.shape("town", blocks(W + 6, [(8, 12), (10, 18), (8, 10), (12, 16), (10, 12), (8, 20), (10, 14), (8, 9)], 30), line=False)
     water(d, W + 4, deep=False)
     # Copacabana beach with palms
     d.band("sand", "M-30 176 Q60 160 230 172")
@@ -506,10 +506,13 @@ def seattle(d: Drawing):
     d.stroke("pier", "M140 160 V170 M150 160 V170 M170 160 V170 M190 160 V170", 2)
     ferris(d, 166, W - 36, 25, W - 6)
     # ferry
-    d.shape("light", "M34 176 H76 L72 184 H38Z")
-    d.shape("hull", "M34 182 H76 L74 186 H36Z", shadow=False, spot=True)
-    d.shape("light", rrect(42, 169, 26, 7, 1.5))
-    d.shape("hull", rrect(53, 164, 4, 6, 1), shadow=False)
+    def ferry():
+        d.shape("light", "M0 8 H44 L40 16 H4Z")
+        d.shape("hull", "M0 13 H44 L42 16 H2Z", shadow=False, spot=True)
+        d.shape("light", rrect(8, 1, 28, 7, 1.5))
+        d.shape("hull", rrect(19, -4, 4, 6, 1), shadow=False)
+        d.marks("hull", " ".join(rrect(11 + i * 6, 3, 3.5, 2.5, .5) for i in range(4)))
+    group(d, "translate(54 160)", ferry)
 
 
 # ================================================================ LAS VEGAS
@@ -548,11 +551,11 @@ def las_vegas(d: Drawing):
         tower(dd, 120, B, [(10, y(110)), (6, y(118))], "tw", "tw2")
     front(d)
     # big wheel on the Strip edge
-    ferris(d, 176, W - 34, 22, W + 2, "tw", "pop")
+    ferris(d, 168, W - 30, 19, W + 2, "tw", "pop")
     # desert floor with palms
     d.band("ground", f"M-30 {W} H230")
     d.band("near", hills(W + 20, 3), line=False)
-    for x, h, ln in [(18, 52, -3), (190, 48, 3)]:
+    for x, h, ln in [(26, 44, -3), (186, 40, 3)]:
         palm(d, x, W + 14, h, ln, s=.85)
     d.stroke("dark", "M70 172 h20 M120 176 h16", 2)
 
@@ -605,11 +608,6 @@ def new_orleans(d: Drawing):
     d.disc("glow", 152, 66, 20)
     # Crescent City Connection, cantilever truss in the distance
     d.band("far", roofline(W, [(40, 16), (10, 26), (12, 34), (10, 22), (14, 30), (100, 14)]), line=False)
-    if d.paper:
-        d.stroke("truss", "M120 116 Q140 92 160 112 Q180 92 200 116 M230 116 H110 " +
-                 " ".join(f"M{x} 116 L{x + 5} {104 - abs((x - 150) % 40 - 20) * .2:.1f}" for x in range(118, 210, 8)), 2)
-    else:
-        d.stroke("dark", "M112 116 H230 M120 116 Q140 92 160 112 Q180 92 200 116", 2)
     d.band("mid", roofline(W, [(40, 12), (10, 22), (12, 28), (14, 18), (10, 34), (12, 24), (14, 16), (100, 10)]))
 
     def front(dd):
@@ -639,17 +637,17 @@ def new_orleans(d: Drawing):
     water(d, W, front, [(130, 176, 20)])
     # paddle steamer
     def boat():
-        dd = d
-        dd.shape("light", "M30 172 H96 L90 180 H34Z")
-        dd.shape("light", rrect(38, 164, 50, 8, 1))
-        dd.shape("light", rrect(46, 157, 32, 7, 1))
-        dd.stroke("hull", "M38 168 H88 M46 161 H78", 1.2, line=False)
-        dd.shape("hull", rrect(52, 140, 4, 17, 1))
-        dd.shape("hull", rrect(62, 140, 4, 17, 1))
-        dd.shape("hull", "M50 140 H58 L57 137 H51Z M60 140 H68 L67 137 H61Z", shadow=False)
-        dd.shape("wheel", "M96 166 A8 8 0 0 1 96 182 L90 182 V166Z", spot=True)
-        dd.stroke("light", "M93 168 V180 M96 170 L91 174", 1, line=False)
-    boat()
+        d.shape("hull", rrect(14, -10, 3.5, 14, 1))
+        d.shape("hull", rrect(22, -10, 3.5, 14, 1))
+        d.shape("hull", "M12.5 -10 H19 L18 -13 H13.5Z M20.5 -10 H27 L26 -13 H21.5Z", shadow=False)
+        d.shape("light", rrect(8, 4, 40, 7, 1))
+        d.shape("light", rrect(4, 11, 50, 7, 1))
+        d.shape("light", "M0 18 H58 L54 25 H4Z")
+        d.stroke("hull", "M8 14.5 H52 M12 7.5 H44", 1.2, line=False)
+        d.shape("wheel", "M58 10 A8 8 0 0 1 58 26 H52 V10Z", spot=True)
+        d.stroke("light", "M55 12 V24 M53 18 H62", 1, line=False)
+        d.shape("pop", poly((30, 4), (30, -6), (38, -3), (30, 0)), shadow=False)
+    group(d, "translate(40 152)", boat)
 
 
 # ================================================================ BOSTON
@@ -729,10 +727,10 @@ def washington(d: Drawing):
     water(d, W, front, [(76, 168, 14), (110, 174, 16)])
     # cherry blossoms at the water's edge
     d.band("grass", "M-30 184 Q100 176 230 184")
-    for cx, cy, r in [(4, 160, 22), (24, 150, 16), (198, 160, 22), (178, 152, 15)]:
-        d.shape("blossom", circle(cx, cy, r), spot=True)
-    d.limb("trunk", "M12 186 Q14 172 8 162 M188 186 Q186 172 192 162", 3)
-    d.marks("blossom2", " ".join(circle(x, y, 2.2) for x, y in [(10, 150, ), (26, 146), (16, 164), (190, 150), (178, 156), (200, 168)]))
+    d.limb("trunk", "M26 188 Q28 176 20 166 M24 178 L36 168 M174 188 Q172 176 180 166 M176 178 L164 168", 3)
+    for cx, cy, r in [(10, 160, 13), (24, 152, 13), (38, 160, 11), (22, 166, 10), (190, 160, 13), (176, 152, 13), (162, 160, 11), (178, 166, 10)]:
+        d.shape("blossom", circle(cx, cy, r), spot=True, shadow=cy == 152)
+    d.marks("blossom2", " ".join(circle(x, y, 1.8) for x, y in [(16, 150), (28, 158), (8, 164), (36, 156), (184, 150), (172, 158), (192, 164), (164, 156)]))
 
 
 # ================================================================ NASHVILLE
@@ -822,7 +820,7 @@ def vancouver(d: Drawing):
 def montreal(d: Drawing):
     W = 152
     s = 0.4
-    d.disc("glow", 160, 56, 16)
+    d.disc("glow", 150, 48, 15)
     # Mount Royal with its lit cross
     d.shape("mtnr", "M-30 130 Q0 100 30 92 Q56 86 80 98 Q104 110 130 124 V160 H-30Z")
     d.stroke("cross", "M40 66 V90 M33 74 H47", 2.4, shadow=True)
@@ -833,31 +831,33 @@ def montreal(d: Drawing):
         B = base_y(dd, W)
         y = lambda m: W - m * s
         # 1000 de La Gauchetiere: copper pyramid roof
-        x = 78
+        x = 66
         dd.shape("b3", poly((x - 10, B), (x - 10, y(180)), (x + 10, y(180)), (x + 10, B)))
         dd.shape("b2", poly((x + 4, B), (x + 4, y(180)), (x + 10, y(180)), (x + 10, B)), shadow=False, line=False)
         dd.shape("copper", poly((x - 11, y(180)), (x, y(205)), (x + 11, y(180))), spot=True)
         dd.shape("copper2", poly((x, y(205)), (x + 11, y(180)), (x + 3, y(180))), shadow=False, line=False)
         # Place Ville Marie: cruciform slab with its rooftop beacon
-        x = 102
+        x = 90
         tower(dd, x, B, [(12, y(188))], "b1", "b2")
         dd.stroke("b2", f"M{x - 4} {y(186):.1f} V{B} M{x + 4} {y(186):.1f} V{B}", 1, line=False)
         mast(dd, x, y(200), y(188), "b1", 1.6)
-        tower(dd, 124, B, [(8, y(150))], "b3", "b2")
+        tower(dd, 112, B, [(8, y(150))], "b3", "b2")
         # Olympic Stadium with its leaning tower
-        dd.shape("stade", f"M124 {B} V{W - 10} Q150 {W - 26} 186 {W - 18} L190 {B}Z")
-        dd.stroke("stade2", f"M130 {W - 10} Q150 {W - 22} 184 {W - 14}", 1.4)
-        dd.shape("stade", f"M150 {W - 20} L140 {W - 26} Q156 {W - 64} 182 {W - 84} L188 {W - 78} Q166 {W - 56} 160 {W - 22}Z")
-        dd.shape("stade2", f"M182 {W - 84} L188 {W - 78} L184 {W - 74} L178 {W - 80}Z", shadow=False)
+        dd.shape("stade", f"M116 {B} V{W - 10} Q142 {W - 26} 176 {W - 18} L180 {B}Z")
+        dd.stroke("stade2", f"M122 {W - 10} Q142 {W - 22} 174 {W - 14}", 1.4)
+        dd.shape("stade", f"M140 {W - 20} L130 {W - 26} Q146 {W - 64} 170 {W - 84} L176 {W - 78} Q156 {W - 56} 150 {W - 22}Z")
+        dd.shape("stade2", f"M170 {W - 84} L176 {W - 78} L172 {W - 74} L166 {W - 80}Z", shadow=False)
     front(d)
     water(d, W, front, [(120, 170, 20), (70, 178, 14)])
     # the Biosphere on its island
-    d.shape("isle", "M4 176 Q30 164 64 176Z")
-    d.shape("bio", f"M14 172 A20 20 0 1 1 54 172Z", spot=True)
-    if d.paper:
-        d.stroke("bio2", "M16 164 H52 M22 154 H46 M34 152 V172 M24 156 Q20 164 22 172 M44 156 Q48 164 46 172", 1, line=False)
-    else:
-        d.stroke("dark", "M18 162 H50 M34 152 V172", 1.4)
+    def bio():
+        d.shape("isle", "M-30 24 Q0 12 30 24Z")
+        d.shape("bio", "M-17 20 A17 17 0 1 1 17 20Z", spot=True)
+        if d.paper:
+            d.stroke("bio2", "M-15 12 H15 M-10 2 H10 M0 -0.5 V20 M-9 4 Q-13 12 -11 20 M9 4 Q13 12 11 20", 1, line=False)
+        else:
+            d.stroke("dark", "M-15 12 H15 M0 -0.5 V20", 1.4)
+    group(d, "translate(46 154)", bio)
 
 
 # ================================================================ MEXICO CITY
@@ -901,8 +901,9 @@ def mexico_city(d: Drawing):
     d.band("near", f"M-30 {W} H230")
     d.band("road", f"M-30 {W + 12} H230")
     d.stroke("light", " ".join(f"M{x} {W + 20} h12" for x in range(4, 200, 26)), 2)
-    for cx, cy, r in [(12, W - 2, 16), (30, W + 4, 12), (188, W - 2, 16), (172, W + 4, 12)]:
-        d.shape("jac", circle(cx, cy, r), spot=True)
+    d.limb("trunk", f"M24 {W + 22} L22 {W - 2} M176 {W + 22} L178 {W - 2}", 3)
+    for cx, cy, r in [(12, W - 4, 11), (26, W - 12, 12), (38, W - 2, 10), (22, W + 2, 9), (188, W - 4, 11), (174, W - 12, 12), (162, W - 2, 10), (178, W + 2, 9)]:
+        d.shape("jac", circle(cx, cy, r), spot=True, shadow=cy == W - 12)
     d.band("deep", hills(W + 30, 2), line=False)
 
 
@@ -944,7 +945,8 @@ def havana(d: Drawing):
     d.band("wall", f"M-30 {W - 12} H230")
     d.band("wall2", f"M-30 {W - 4} H230", line=False)
     d.band("sea", f"M-30 {W + 2} H230")
-    d.shape("light", "M150 158 Q156 140 166 144 Q172 130 182 138 Q192 134 194 146 Q200 150 196 158Z")
+    d.shape("light", "M140 156 Q142 146 148 147 Q150 138 157 142 Q162 134 167 141 Q174 140 173 148 Q178 150 176 156Z")
+    d.marks("light", circle(150, 136, 1.6) + " " + circle(164, 131, 1.4) + " " + circle(174, 138, 1.2))
     d.band("sea2", waves(W + 24, 2, 24), line=False)
     d.stroke("light", "M40 170 h20 M100 176 h16 M150 184 h22", 2)
     # vintage car on the Malecon
@@ -974,8 +976,8 @@ def buenos_aires(d: Drawing):
         dd.shape("glow2", rrect(x - 2, W - 90, 4, 6, 1), spot=True)
         dd.shape("stone", poly((x - 3, W - 89), (x, W - 94), (x + 3, W - 89)), shadow=False)
         # glass towers of Puerto Madero
-        tower(dd, 140, B, [(10, W - 90)], "b1", "b2")
-        tower(dd, 160, B, [(8, W - 76), (5, W - 82)], "b3", "b2")
+        tower(dd, 136, B, [(10, W - 90)], "b1", "b2")
+        tower(dd, 156, B, [(8, W - 76), (5, W - 82)], "b3", "b2")
         tower(dd, 72, B, [(8, W - 58)], "b3", "b2")
         # the Obelisco
         x = 104
@@ -989,12 +991,14 @@ def buenos_aires(d: Drawing):
         d.limb("crane", f"M{x - 6} {W} L{x - 2} {W - 22} M{x + 6} {W} L{x + 2} {W - 22}", 2.4)
         d.shape("crane", rrect(x - 6, W - 30, 12, 9, 1.5))
         d.limb("crane", f"M{x + 4} {W - 28} L{x - 18} {W - 50}", 2.2)
-    crane(186)
-    # Puente de la Mujer: white leaning mast with cables
-    deck = 168
-    d.stroke("cable2", " ".join(f"M{70 - i * 4} {deck - 52 + i * 6} L{100 + i * 12} {deck}" for i in range(6)), 1, line=True)
-    d.shape("bridge", rrect(-30, deck, 260, 5, 1.5))
-    d.shape("bridge", poly((86, deck), (54, deck - 54), (60, deck - 56), (94, deck)), spot=True)
+    crane(178)
+    # Puente de la Mujer: white leaning mast with a fan of cables to the deck
+    deck = 174
+    bx, tx, ty = 64, 34, 134
+    pts = [(bx + (tx - bx) * t, deck + (ty - deck) * t) for t in (.55, .7, .85, 1.0)]
+    d.stroke("cable2", " ".join(f"M{x:.1f} {y:.1f} L{bx + 14 + i * 14} {deck}" for i, (x, y) in enumerate(pts)), 1.1)
+    d.shape("bridge", rrect(-30, deck, 180, 4.5, 1.5))
+    d.shape("bridge", poly((bx - 3, deck + 2), (tx - 1.5, ty), (tx + 1.5, ty - 1), (bx + 4, deck + 2)), spot=True)
     d.band("sea2", waves(184, 2, 24), line=False)
 
 
@@ -1148,9 +1152,9 @@ CONCEPTS = [
                  checks=[("mtnr", "sky"), ("far", "mtnr"), ("stade", "mid"), ("stade", "sky"), ("copper", "sky"), ("bio", "sea")],
                  fixes={"far": ["#C9D3DC", "sky2", "mid"], "stade": ["#C9C0B0", "#B7AD9B", "#A9B3C2", "#98A3B3", "#8C96A6", "#7F8A9A"]}),
     city_concept("sky-mexicocity", "skyline-mexico-city", "Mexico City", mexico_city,
-                 {"mtn": "#8E9CB0", "snow": "#F5F8FB", "stone": "#E6DFD0", "stone2": "#BFB5A3", "gold": "#E8B33A", "jac": "#9B7BC8", "road": "#5A5E66"},
+                 {"mtn": "#8E9CB0", "snow": "#F5F8FB", "stone": "#E6DFD0", "stone2": "#BFB5A3", "gold": "#E8B33A", "jac": "#9B7BC8", "road": "#5A5E66", "trunk": "#5A4038"},
                  checks=[("mtn", "sky"), ("far", "mtn"), ("gold", "sky"), ("gold", "glow"), ("stone", "mid"), ("jac", "near")],
-                 fixes={"far": ["#C9D3DC", "sky2", "mid", "#6F8296"], "gold": ["#D19A2A", "#B8801E"], "glow": ["glow2", "pop", "light"], "jac": ["#7A5AA8", "#B39AE0"]}),
+                 fixes={"far": ["#C9D3DC", "sky2", "mid", "#6F8296", "#5F7088"], "gold": ["#D19A2A", "#B8801E"], "glow": ["glow2", "pop", "light"], "jac": ["#7A5AA8", "#B39AE0"]}),
     city_concept("sky-havana", "skyline-havana", "Havana", havana,
                  {"stone": "#EDE6D8", "stone2": "#C2B8A6", "rock": "#9C8670", "c1": "#F2A7A0", "c2": "#F6D28B", "c3": "#8FD3C8",
                   "wall": "#D9CDB6", "wall2": "#B5A68E", "car": "#E85D75"},

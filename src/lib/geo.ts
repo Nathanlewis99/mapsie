@@ -123,7 +123,7 @@ export const guessMode = (a: { lng: number; lat: number }, b: { lng: number; lat
   distanceKm(a, b) > 700 ? "plane" : "car";
 
 // Douglas–Peucker, keeps road lines light enough to store in the design.
-function simplify(pts: LngLat[], tol: number): LngLat[] {
+export function simplify(pts: LngLat[], tol: number): LngLat[] {
   if (pts.length < 3) return pts;
   const [a, b] = [pts[0], pts[pts.length - 1]];
   let max = 0;
@@ -143,21 +143,28 @@ function simplify(pts: LngLat[], tol: number): LngLat[] {
 }
 
 /**
- * Road route between two points (via our /api/route).
- * Returns null if there's no sensible road (e.g. across sea), undefined if the lookup failed (try again later).
+ * Road routes for consecutive stops, in one request (via our /api/route).
+ * One entry per leg: a path, null if there's no sensible road (e.g. across sea),
+ * or undefined if the lookup failed (try again later).
  */
-export async function fetchRoad(a: { lng: number; lat: number }, b: { lng: number; lat: number }): Promise<LngLat[] | null | undefined> {
+export async function fetchRoads(points: { lng: number; lat: number }[]): Promise<(LngLat[] | null | undefined)[]> {
+  const legs = points.length - 1;
   try {
-    const r = await fetch(`/api/route?fromLng=${a.lng}&fromLat=${a.lat}&toLng=${b.lng}&toLat=${b.lat}`);
-    const j: { distance: number; coordinates: LngLat[]; error?: string } = await r.json();
-    if (!r.ok || j.error) return undefined;
-    if (!j.coordinates?.length) return null;
-    // Reject "routes" that are mostly ferry/detour nonsense: > 3x the straight distance.
-    if (j.distance / 1000 > distanceKm(a, b) * 3 + 50) return null;
-    const tol = Math.max(0.0005, distanceKm(a, b) / 100000);
-    return simplify(j.coordinates, tol).map(([x, y]) => [+x.toFixed(5), +y.toFixed(5)] as LngLat);
+    const r = await fetch("/api/route", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ points: points.map((p) => [p.lng, p.lat]) }),
+    });
+    if (!r.ok) return Array(legs).fill(undefined);
+    const j: { legs: ({ distance: number; coordinates: LngLat[] } | null)[] } = await r.json();
+    return j.legs.map((leg, i) => {
+      if (!leg?.coordinates?.length) return null;
+      // Reject "routes" that are mostly ferry/detour nonsense: > 3x the straight distance.
+      if (leg.distance / 1000 > distanceKm(points[i], points[i + 1]) * 3 + 50) return null;
+      return leg.coordinates;
+    });
   } catch {
-    return undefined;
+    return Array(legs).fill(undefined);
   }
 }
 
@@ -178,28 +185,19 @@ export interface PlaceResult {
   lat: number;
 }
 
-// Place search via Photon (OpenStreetMap-based, free).
-export async function searchPlaces(q: string, signal?: AbortSignal): Promise<PlaceResult[]> {
-  const r = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6&lang=en`, { signal });
-  const j = await r.json();
-  return (j.features ?? []).map((f: { properties: Record<string, string>; geometry: { coordinates: LngLat } }) => {
-    const p = f.properties;
-    return {
-      name: p.name ?? p.city ?? p.country,
-      detail: [p.city !== p.name ? p.city : null, p.state, p.country].filter(Boolean).join(", "),
-      lng: f.geometry.coordinates[0],
-      lat: f.geometry.coordinates[1],
-    };
-  });
+/** Place search, through our server (which tries several services). full=true is the "Enter" search. */
+export async function searchPlaces(q: string, signal?: AbortSignal, full = false): Promise<PlaceResult[]> {
+  const r = await fetch(`/api/geocode?q=${encodeURIComponent(q)}${full ? "&full=1" : ""}`, { signal });
+  if (!r.ok) throw new Error("search failed");
+  return r.json();
 }
 
-export async function reverseGeocode(lng: number, lat: number): Promise<string> {
+/** Name of the place at a point, or null if there isn't one (e.g. open sea). */
+export async function reverseGeocode(lng: number, lat: number): Promise<string | null> {
   try {
-    const r = await fetch(`https://photon.komoot.io/reverse?lon=${lng}&lat=${lat}&lang=en`);
-    const j = await r.json();
-    const p = j.features?.[0]?.properties;
-    return p?.city ?? p?.name ?? p?.state ?? p?.country ?? "New stop";
+    const r = await fetch(`/api/reverse?lng=${lng.toFixed(5)}&lat=${lat.toFixed(5)}`);
+    return (await r.json()).name ?? null;
   } catch {
-    return "New stop";
+    return null;
   }
 }

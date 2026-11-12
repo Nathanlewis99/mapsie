@@ -107,6 +107,12 @@ function open(): Database.Database {
     );
     CREATE INDEX IF NOT EXISTS orders_user ON orders(user_id, created_at DESC);
     CREATE INDEX IF NOT EXISTS orders_email ON orders(email COLLATE NOCASE);
+    -- Road geometry per leg, so a route is only ever fetched once.
+    CREATE TABLE IF NOT EXISTS route_cache (
+      key TEXT PRIMARY KEY,
+      json TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
   `);
   importLegacyJson(db);
   return db;
@@ -249,4 +255,13 @@ export function upsertSavedDesign(userId: string, design: Design, id?: string): 
 }
 export function deleteSavedDesign(userId: string, id: string) {
   open().prepare("DELETE FROM saved_designs WHERE id = ? AND user_id = ?").run(id, userId);
+}
+
+// ---------------------------------------------------------------- route cache
+export function getCachedRoute(key: string): unknown | undefined {
+  const r = open().prepare("SELECT json FROM route_cache WHERE key = ?").get(key) as { json: string } | undefined;
+  return r ? JSON.parse(r.json) : undefined;
+}
+export function putCachedRoute(key: string, value: unknown) {
+  open().prepare("INSERT OR REPLACE INTO route_cache (key, json, created_at) VALUES (?, ?, ?)").run(key, JSON.stringify(value), now());
 }

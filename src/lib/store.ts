@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
 import { normalizeDesign, type Design, type Stop, type Sticker } from "./types";
 import { PRESETS, themeFromPreset } from "./themes";
-import { fetchRoad, guessMode, legKey } from "./geo";
+import { fetchRoads, guessMode, legKey } from "./geo";
 import { guessRegion, type RegionId } from "./products";
 import { templateStops, type TripTemplate } from "./templates";
 import { suggestedStyleFor, stickerSrc, type ArtStyleId } from "./stickers";
@@ -52,6 +52,10 @@ interface EditorState {
   setView: (view: Design["view"]) => void;
   addStop: (s: Pick<Stop, "name" | "lng" | "lat">) => void;
   addStops: (s: Pick<Stop, "name" | "lng" | "lat">[]) => void;
+  /** Tap-to-add: drops a stop at once (without moving the map) and returns its id. */
+  addStopAt: (lng: number, lat: number, name: string) => string;
+  /** Set a stop's name without making an undo step (e.g. when the place lookup returns). */
+  nameStopQuietly: (id: string, name: string) => void;
   updateStop: (id: string, patch: Partial<Stop>, key?: string) => void;
   removeStop: (id: string) => void;
   moveStop: (from: number, to: number) => void;
@@ -128,6 +132,18 @@ export const useEditor = create<EditorState>()(
           );
           afterStopsChange();
         },
+        addStopAt: (lng, lat, name) => {
+          const id = nanoid(8);
+          commit((d) => {
+            const prev = d.stops[d.stops.length - 1];
+            const stop = { id, name, lng, lat, showLabel: true, arriveBy: prev ? guessMode(prev, { lng, lat }) : undefined };
+            return { ...d, stops: [...d.stops, stop] };
+          });
+          afterStopsChange();
+          return id;
+        },
+        nameStopQuietly: (id, name) =>
+          set((s) => ({ design: { ...s.design, stops: s.design.stops.map((x) => (x.id === id ? { ...x, name } : x)) } })),
         updateStop: (id, patch, key) => {
           commit((d) => ({ ...d, stops: d.stops.map((x) => (x.id === id ? { ...x, ...patch } : x)) }), key);
           if ("lng" in patch || "arriveBy" in patch) afterStopsChange();
@@ -223,23 +239,35 @@ export const useEditor = create<EditorState>()(
         /** Fetch road geometry for any car/bus leg that doesn't have it yet. */
         ensureRoads: async () => {
           const stops = get().design.stops;
-          const todo = stops
-            .map((b, i) => ({ a: stops[i - 1], b }))
-            .filter(({ a, b }) => a && (b.arriveBy === "car" || b.arriveBy === "bus") && b.pathFor !== legKey(a, b));
-          if (!todo.length) return;
-          set((s) => ({ roadsLoading: s.roadsLoading + todo.length }));
+          const needs = (i: number) =>
+            i > 0 && (stops[i].arriveBy === "car" || stops[i].arriveBy === "bus") && stops[i].pathFor !== legKey(stops[i - 1], stops[i]);
+          // Group consecutive drives into runs: each run is one request.
+          const runs: number[][] = [];
+          for (let i = 1; i < stops.length; i++) {
+            if (!needs(i)) continue;
+            const last = runs[runs.length - 1];
+            if (last && last[last.length - 1] === i - 1) last.push(i);
+            else runs.push([i]);
+          }
+          if (!runs.length) return;
+          const total = runs.reduce((n, r) => n + r.length, 0);
+          set((s) => ({ roadsLoading: s.roadsLoading + total }));
           await Promise.all(
-            todo.map(async ({ a, b }) => {
-              const key = legKey(a, b);
-              const path = await fetchRoad(a, b);
+            runs.map(async (run) => {
+              const pts = [stops[run[0] - 1], ...run.map((i) => stops[i])];
+              const paths = await fetchRoads(pts);
               set((s) => ({
-                roadsLoading: s.roadsLoading - 1,
+                roadsLoading: s.roadsLoading - run.length,
                 // Write straight into the design (not an undo step) if the leg hasn't changed meanwhile.
                 design: {
                   ...s.design,
-                  stops: s.design.stops.map((x, i, arr) =>
-                    x.id === b.id && arr[i - 1] && legKey(arr[i - 1], x) === key && path !== undefined ? { ...x, path: path ?? undefined, pathFor: key } : x,
-                  ),
+                  stops: s.design.stops.map((x, i, arr) => {
+                    const k = run.findIndex((idx) => stops[idx].id === x.id);
+                    if (k < 0 || !arr[i - 1]) return x;
+                    const key = legKey(pts[k], pts[k + 1]);
+                    const path = paths[k];
+                    return legKey(arr[i - 1], x) === key && path !== undefined ? { ...x, path: path ?? undefined, pathFor: key } : x;
+                  }),
                 },
               }));
             }),

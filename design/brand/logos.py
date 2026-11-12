@@ -85,3 +85,18 @@ if __name__ == "__main__":
         (OUT / f"{name}-wordmark.svg").write_text(word)
         (OUT / f"{name}-icon.svg").write_text(icon)
     print("wrote", len(DIRECTIONS) * 2, "files to", OUT)
+
+
+# ---------------------------------------------------------------- Final: classic square + pin
+def final_icon():
+    """The app icon: dark square, cream M, coral pin in place of the full stop."""
+    m, mw = text_path("M", 84, 0, 0)
+    x0 = (128 - mw) / 2 - 8
+    return svg(128, 128, f'<rect width="128" height="128" rx="30" fill="{INK}"/>'
+                         f'<g transform="translate({x0} 92)"><path d="{m}" fill="{CREAM}"/></g>'
+                         f'{pin(x0 + mw + 9, 92, 7.5, CORAL, INK)}')
+
+
+if __name__ == "__main__":
+    (OUT / "final-icon.svg").write_text(final_icon())
+    print("wrote final-icon.svg")

@@ -86,6 +86,7 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
   const { design, addStop, addStops, updateStop, removeStop, moveStop, set, requestFit, applyTemplate, roadsLoading } = useEditor();
   const [q, setQ] = useState("");
   const [results, setResults] = useState<PlaceResult[]>([]);
+  const [searchState, setSearchState] = useState<"idle" | "searching" | "done" | "error">("idle");
   const [active, setActive] = useState(0);
   const [pasteOpen, setPasteOpen] = useState(false);
   const [paste, setPaste] = useState("");
@@ -93,11 +94,32 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
   const [openStop, setOpenStop] = useState<string | null>(null);
   const dragFrom = useRef<number | null>(null);
 
+  const runSearch = (query: string, full: boolean, signal?: AbortSignal) => {
+    setSearchState("searching");
+    return searchPlaces(query, signal, full)
+      .then((r) => {
+        setResults(r);
+        setActive(0);
+        setSearchState("done");
+      })
+      .catch((e) => {
+        if ((e as Error).name !== "AbortError") setSearchState("error");
+      });
+  };
+
   useEffect(() => {
-    if (q.trim().length < 2) return setResults([]);
+    if (q.trim().length < 2) {
+      setResults([]);
+      setSearchState("idle");
+      return;
+    }
     const ctl = new AbortController();
-    const t = setTimeout(() => searchPlaces(q, ctl.signal).then((r) => (setResults(r), setActive(0))).catch(() => {}), 220);
-    return () => (clearTimeout(t), ctl.abort());
+    setSearchState("searching");
+    const t = setTimeout(() => runSearch(q, false, ctl.signal), 250);
+    return () => {
+      clearTimeout(t);
+      ctl.abort();
+    };
   }, [q]);
 
   const pick = (r: PlaceResult) => {
@@ -148,13 +170,25 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
             onKeyDown={(e) => {
               if (e.key === "ArrowDown") setActive((a) => Math.min(a + 1, results.length - 1));
               if (e.key === "ArrowUp") setActive((a) => Math.max(a - 1, 0));
-              if (e.key === "Enter" && results[active]) pick(results[active]);
+              if (e.key === "Enter") {
+                if (results[active]) pick(results[active]);
+                else if (q.trim().length >= 2) runSearch(q, true);
+              }
+              if (e.key === "Escape") setQ("");
             }}
             placeholder="Search a city, island, park…"
             className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral"
           />
-          {results.length > 0 && (
+          {searchState === "searching" && (
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 border-coral/30 border-t-coral animate-spin" aria-label="Searching" />
+          )}
+          {q.trim().length >= 2 && searchState !== "idle" && (
             <div className="absolute z-20 mt-2 w-full rounded-2xl bg-white shadow-xl border border-ink/5 overflow-hidden">
+              {searchState === "searching" && results.length === 0 && <div className="px-4 py-3 text-sm text-ink/50">Searching…</div>}
+              {searchState === "error" && <div className="px-4 py-3 text-sm text-coral-dark font-bold">Search isn&apos;t responding. Try again in a moment.</div>}
+              {searchState === "done" && results.length === 0 && (
+                <div className="px-4 py-3 text-sm text-ink/60">No places found for “{q.trim()}”.</div>
+              )}
               {results.map((r, i) => (
                 <button
                   key={`${r.lng},${r.lat},${i}`}
@@ -166,6 +200,11 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
                   <div className="text-xs text-ink/50">{r.detail}</div>
                 </button>
               ))}
+              {searchState === "done" && (
+                <button onClick={() => runSearch(q, true)} className="block w-full text-left px-4 py-2.5 text-sm font-bold text-coral border-t border-ink/5">
+                  🔍 Not here? Search more places
+                </button>
+              )}
             </div>
           )}
         </div>

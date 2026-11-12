@@ -31,7 +31,7 @@ async function saveSnapshot(design: Design): Promise<string> {
 
 export default function Editor() {
   const store = useEditor();
-  const { design, selectedSticker, fitRequest, region, past, future, savedId, dirty } = store;
+  const { design, selectedSticker, fitRequest, region, past, future, savedId, dirty, roadsLoading } = store;
   const [me, setMe] = useState<{ user: { email: string; name: string | null; picture: string | null } | null; googleEnabled: boolean } | null>(null);
   const [tab, setTab] = useState<Tab>("trip");
   const [pickMode, setPickMode] = useState(false);
@@ -260,12 +260,28 @@ export default function Editor() {
                     store.addSticker({ kind: "sticker", name, art, src: stickerSrc(name, art), lng, lat, size: 9, rotation: 0 });
                   },
                   onMapClick: async (lng, lat) => {
-                    if (!pickMode) return;
+                    if (!pickMode) {
+                      if (tab === "trip") setToast("To add a stop by tapping, press “📍 Tap on the map” first");
+                      return;
+                    }
+                    // Drop the pin straight away; fill in the place name when the lookup returns.
+                    const st = useEditor.getState();
+                    const id = st.addStopAt(lng, lat, "Finding place…");
                     const name = await reverseGeocode(lng, lat);
-                    useEditor.getState().addStop({ name, lng, lat });
+                    st.nameStopQuietly(id, name ?? "New stop");
+                    if (!name) setToast("No town there. Rename the stop in the list if you like.");
                   },
                 }}
               />
+            </div>
+          )}
+
+          {roadsLoading > 0 && (
+            <div className="absolute inset-0 z-10 grid place-items-center bg-cream/40 backdrop-blur-[1px] pointer-events-none" role="status" aria-live="polite">
+              <div className="flex items-center gap-3 rounded-full bg-white px-5 py-3 shadow-xl font-extrabold text-sm">
+                <span className="w-5 h-5 rounded-full border-2 border-coral/30 border-t-coral animate-spin" aria-hidden />
+                🚗 Plotting the roads ({roadsLoading} {roadsLoading === 1 ? "drive" : "drives"})…
+              </div>
             </div>
           )}
 

@@ -548,8 +548,8 @@ def chicken(d: Drawing):
     d.limb("pop", "M86 142 V168 M108 142 V168", 4.5)
     d.stroke("pop", "M78 170 H94 M100 170 H116 M86 168 L82 164 M108 168 L104 164", 3)
     # tail: three rounded feathers fanning up behind the body
-    for rot in (-34, -10, 14):
-        d.shape("hero2", ellipse(52, 70, 11, 30), extra=f'transform="rotate({rot} 62 100)"')
+    for rot in (-26, -4):
+        d.shape("hero2", ellipse(56, 72, 11, 26), extra=f'transform="rotate({rot} 62 100)"')
     # neck + head
     d.shape("hero", "M108 84 Q124 74 126 58 Q130 42 146 42 Q162 44 162 60 Q162 74 152 84 Q150 104 136 112Z")
     # plump body

@@ -608,20 +608,28 @@ def sea_cliffs(d: Drawing):
 
 # ================================================================ ROLLING HILLS
 def rolling_hills(d: Drawing):
-    d.disc("glow", 140, 56, 18)
-    d.shape("light", cloud(30, 50, 0.8), shadow=False)
-    d.band("far", "M-30 100 Q30 76 90 92 T230 84")
-    d.band("mid", "M-30 124 Q50 96 120 112 T230 104")
-    d.stroke("far", "M20 120 Q60 104 100 116 M60 128 Q110 112 150 120 M150 108 Q180 98 210 104", 2, line=False)
-    for x, y, r in [(54, 108, 8), (160, 102, 7)]:
-        d.limb("dark", f"M{x} {y} V{y + 10}", 2.4, shadow=False)
+    d.disc("glow", 146, 52, 17)
+    d.shape("light", cloud(28, 52, 0.8), shadow=False)
+    d.band("far", "M-30 100 Q20 76 70 90 Q120 66 170 86 Q200 78 230 82")
+    mid = "M-30 132 Q40 92 110 114 Q160 94 230 108 V230 H-30Z"
+    d.shape("mid", mid)
+
+    def patches():
+        d.shape("ground", "M30 100 L70 104 L60 126 L14 128Z M120 108 L160 98 L176 116 L132 126Z", shadow=False, line=False)
+        d.shape("near", "M70 104 L110 114 L104 132 L60 126Z M176 104 L230 108 L230 124 L176 116Z", shadow=False, line=False)
+        d.stroke("deep", "M30 100 L14 128 M70 104 L60 126 M110 114 L104 134 M160 98 L176 116 L174 128 M-30 128 L230 120", 1.8,
+                 line=False)
+    clipped(d, mid, patches)
+    for x, y, r in [(70, 102, 7), (160, 96, 6)]:
+        d.limb("dark", f"M{x} {y} V{y + 8}", 2.2, shadow=False)
         d.shape("deep", scallop(x, y, r, 8, 0.12))
-    d.band("near", "M-30 150 Q60 118 130 140 T230 132")
-    d.stroke("deep", "M-10 170 Q50 140 110 156 M10 190 Q70 160 140 176 M130 158 Q170 140 220 146 M150 180 Q190 162 230 168",
-             2.2, line=False)
-    d.limb("dark", "M150 134 V148", 3, shadow=False)
-    d.shape("deep", scallop(150, 126, 12, 9, 0.12), spot=True)
-    d.band("deep", "M-30 184 Q60 166 120 178 T230 172")
+    near = "M-30 164 Q50 120 130 140 Q180 126 230 134 V230 H-30Z"
+    d.shape("near", near, spot=True)
+    clipped(d, near, lambda: d.stroke("mid", "M-30 156 Q50 126 130 150 M-30 170 Q60 140 140 162 M-30 186 Q70 154 150 176 "
+                                             "M120 146 Q180 132 230 142 M130 160 Q190 146 230 156", 2.6, line=False))
+    d.limb("dark", "M140 134 V146", 3, shadow=False)
+    d.shape("deep", scallop(140, 126, 12, 9, 0.12))
+    d.band("deep", "M-30 186 Q80 168 230 184")
 
 
 # ================================================================ STARRY NIGHT
@@ -733,7 +741,7 @@ CONCEPTS = [
     Concept("basic-sea-cliffs", "basic-sea-cliffs", "Sea cliffs", sea_cliffs, NO_GOLD, overrides=CLIFF,
             checks=[("cliff", "far"), ("cliff", "near"), ("grass", "sky"), ("cliff", "sky")], fixes={"sky": ["sky2", "far"]}),
     Concept("basic-rolling-hills", "basic-rolling-hills", "Rolling hills", rolling_hills,
-            checks=[("far", "sky"), ("mid", "far"), ("near", "mid"), ("deep", "near")]),
+            checks=[("near", "sky"), ("deep", "near"), ("ground", "mid")], fixes={"ground": ["light", "far"]}),
     Concept("basic-starry-night", "basic-starry-night", "Starry night", starry_night, ["dusk", "coastal", "meadow", "blush", "golden"],
             overrides=NIGHT, checks=[("far", "sky"), ("near", "far")], fixes={"far": ["mid", "near"], "near": ["deep", "mid"]}),
     Concept("basic-sunshine", "basic-sunshine", "Sunshine", sunshine, overrides=SUN,

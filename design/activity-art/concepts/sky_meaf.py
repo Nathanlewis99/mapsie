@@ -483,13 +483,13 @@ def marrakech(d: Drawing):
 
 
 MARRAKECH = {"stone": "#D99470", "stone2": "#B06A4A", "tile": "#3BA58B", "gold": "#E8B64A", "leaf": "#4E8A4A",
-             "trunk": "#8A5A33", "wall": "#C27048", "town": "#EDB894", "town2": "#E0A27E", "town3": "#B77856"}
+             "trunk": "#8A5A33", "wall": "#C27048", "town": "#F6D9BF", "town2": "#E7B08C", "town3": "#B77856"}
 
 
 # ================================================================ CASABLANCA
 def casablanca(d: Drawing):
     d.disc("glow", 156, 56, 14)
-    d.band("far", skyline(142, [(96, 8, 30), (106, 7, 40), (118, 9, 34), (170, 8, 42), (180, 9, 32), (192, 8, 24)]), line=False)
+    d.band("far", skyline(142, [(86, 10, 30), (96, 9, 40), (106, 10, 36), (116, 8, 32), (124, 10, 44), (134, 8, 40), (142, 10, 30), (152, 8, 36), (160, 10, 40), (170, 10, 38), (180, 8, 30), (188, 12, 24), (200, 30, 20)]), line=False)
     # the white city
     d.band("town", skyline(142, [(90, 12, 18), (104, 10, 26), (116, 14, 20), (130, 12, 30), (168, 12, 26), (182, 10, 18), (194, 30, 12)]))
     d.marks("town2", " ".join(rrect(x, y, 2.4, 3, .5) for x, y in [(93, 128), (98, 128), (107, 120), (111, 120), (119, 126), (124, 126),
@@ -523,7 +523,7 @@ def casablanca(d: Drawing):
     d.band("deep", waves(184, 2.4, 30), line=False)
 
 
-CASA = {"stone": "#F2E8D6", "stone2": "#CDBEA3", "tile": "#2E8A6E", "gold": "#E1B04A", "town": "#FFFFFF", "town2": "#9FB3C6",
+CASA = {"stone": "#D8BE92", "stone2": "#AE946A", "tile": "#2E8A6E", "gold": "#E1B04A", "town": "#FFFFFF", "town2": "#9FB3C6",
         "tw": "#7D93AA", "tw2": "#5E7489"}
 
 
@@ -560,7 +560,7 @@ def cape_town(d: Drawing):
     d.band("deep", waves(186, 2.4, 30), line=False)
 
 
-CAPE = {"tw": "#FFFFFF", "tw2": "#D3D8DE", "water": "#3E86A8", "pier": "#C9A27A", "pop2": "#8E2C22", "hull": "#2B3E50"}
+CAPE = {"tw": "#7E8C9A", "tw2": "#626F7D", "water": "#3E86A8", "pier": "#C9A27A", "pop2": "#8E2C22", "hull": "#2B3E50"}
 
 
 # ================================================================ JOHANNESBURG
@@ -596,7 +596,7 @@ def johannesburg(d: Drawing):
     d.stroke("tw2", "M58 30 V14", 1.6)
     d.shape("tw2", "M60 60 H62 L65 150 H61Z", shadow=False, line=False)
     # Nelson Mandela Bridge
-    d.band("ground", "M-30 158 H230")
+    d.band("near", "M-30 158 H230")
     pylons = [(70, 104), (136, 120)]
     for px, top in pylons:
         fan = " ".join(f"M{px} {top + 3 + i * 4} L{px + k * (14 + i * 11)} 156" for k in (-1, 1) for i in range(4))
@@ -609,7 +609,7 @@ def johannesburg(d: Drawing):
     d.band("deep", hills(186, 3, 20), line=False)
 
 
-JOBURG = {"tw": "#A9A6A0", "tw2": "#7F7C76", "dark2": "#5B6878", "dark3": "#465363", "crown": "#C8553D", "dump": "#E6C66E", "dump2": "#C9A54C",
+JOBURG = {"tw": "#85827C", "tw2": "#66635E", "dark2": "#5B6878", "dark3": "#465363", "crown": "#C8553D", "dump": "#D9B65A", "dump2": "#B8963A",
           "deck": "#FFFFFF", "cable": "#F2F2F2", "jac": "#9B7BC8", "jac2": "#C3AAE6", "trunk": "#5E4636"}
 
 
@@ -684,7 +684,7 @@ def lagos(d: Drawing):
     d.band("deep", waves(184, 2.4, 30), line=False)
 
 
-LAGOS = {"tw": "#8A97A6", "tw2": "#687585", "tw3": "#B2A691", "tw4": "#8C806C", "glass": "#5E8FB0", "glass2": "#467492",
+LAGOS = {"tw": "#6A8098", "tw2": "#50657C", "tw3": "#85827C", "tw4": "#66635E", "glass": "#5E8FB0", "glass2": "#467492",
          "deck": "#FFFFFF", "cable": "#F2F2F2", "danfo": "#F2C230"}
 
 
@@ -707,15 +707,16 @@ def star5(cx, cy, r, ri=.42) -> str:
 
 
 def accra(d: Drawing):
-    d.disc("glow", 152, 58, 14)
-    d.band("far", skyline(146, [(70, 8, 30), (80, 7, 40), (120, 8, 36), (150, 8, 48), (160, 9, 36), (172, 8, 28)]), line=False)
-    d.band("mid", skyline(146, [(64, 10, 18), (76, 9, 26), (124, 10, 22), (140, 9, 30), (166, 10, 20), (180, 10, 14)]))
+    d.disc("glow", 100, 70, 20)
+    d.band("far", skyline(146, [(14, 10, 70), (40, 9, 74), (60, 10, 62), (130, 10, 64), (150, 8, 76), (160, 9, 66), (172, 8, 56), (182, 10, 40)]), line=False)
+    d.band("mid", skyline(146, [(18, 12, 56), (32, 14, 58), (46, 12, 60), (58, 12, 58), (70, 14, 54), (84, 10, 56), (94, 12, 52), (106, 12, 56),
+                                (118, 10, 54), (128, 14, 58), (142, 10, 52), (166, 10, 36), (180, 10, 24)]))
     # World Trade Center Accra
     block(d, 148, 162, 82, 146, "tw", "tw2")
     floors(d, "tw2", 148, 157, 86, 146, 6)
     # Jamestown Lighthouse, red and white
     d.shape("light", poly((28, 146), (31, 82), (39, 82), (42, 146)))
-    for y0, y1 in [(90, 100), (110, 120), (130, 140)]:
+    for y0, y1 in [(82, 98), (110, 120), (130, 140)]:
         k0, k1 = (146 - y0) / 64 * 3, (146 - y1) / 64 * 3
         d.shape("lred", poly((28 + k0, y0), (28 + k1, y1), (42 - k1, y1), (42 - k0, y0)), shadow=False, spot=True)
     d.shape("lred", rrect(29, 78, 12, 4, 1))
@@ -742,7 +743,7 @@ def accra(d: Drawing):
     d.band("deep", waves(188, 2.4, 30), line=False)
 
 
-ACCRA = {"gate": "#ECE5D7", "gate2": "#C3B9A6", "star": "#1E1E22", "lred": "#D2412F", "tw": "#7F94AA", "tw2": "#61768C"}
+ACCRA = {"gate": "#ECE5D7", "gate2": "#C3B9A6", "star": "#1E1E22", "lred": "#D2412F", "tw": "#6A8098", "tw2": "#50657C"}
 
 
 # ================================================================ AMMAN
@@ -833,8 +834,8 @@ def riyadh(d: Drawing):
     d.band("dune", "M-30 182 Q50 172 110 178 T230 176", line=False)
 
 
-RIYADH = {"glass": "#7896B0", "glass2": "#5A7892", "tw": "#9AA9B8", "tw2": "#76869A", "gold": "#E5B548", "mud": "#C99868",
-          "mud2": "#A07444", "leaf": "#4E8A4A", "trunk": "#8A5A33", "dune": "#D9A05A"}
+RIYADH = {"glass": "#7896B0", "glass2": "#5A7892", "tw": "#7D8896", "tw2": "#606B79", "gold": "#E5B548", "mud": "#A87648",
+          "mud2": "#7E5530", "leaf": "#4E8A4A", "trunk": "#8A5A33", "dune": "#D9A05A"}
 
 
 # ================================================================ SYDNEY
@@ -960,7 +961,7 @@ def melbourne(d: Drawing):
     d.band("deep", waves(186, 2.4, 30), line=False)
 
 
-MELB = {"tw": "#6C7D90", "tw2": "#53637A", "tw3": "#8B9AAB", "tw4": "#6C7C8E", "gold": "#E4B44C", "spire": "#F4F1EA", "spire2": "#B8B2A6",
+MELB = {"tw": "#6C7D90", "tw2": "#53637A", "tw3": "#7D8896", "tw4": "#606B79", "gold": "#E4B44C", "spire": "#F4F1EA", "spire2": "#B8B2A6",
         "ochre": "#E3A64A", "ochre2": "#B67A2A", "copper": "#5E9E86", "hull": "#C8553D"}
 
 
@@ -1007,7 +1008,7 @@ def brisbane(d: Drawing):
     d.band("deep", waves(186, 2.4, 30), line=False)
 
 
-BRIS = {"sand": "#E3C48E", "sand2": "#BFA06A", "tw": "#7891AA", "tw2": "#5B748D", "tw3": "#97A6B6", "tw4": "#76879A",
+BRIS = {"sand": "#D9A85E", "sand2": "#B0803A", "tw": "#6A8098", "tw2": "#50657C", "tw3": "#7D8896", "tw4": "#606B79",
         "steel": "#5F6E7E", "pier": "#C9B48E", "wheel": "#FFFFFF", "cat": "#2E6FA3"}
 
 
@@ -1043,7 +1044,7 @@ def perth(d: Drawing):
     d.band("deep", waves(188, 2.4, 30), line=False)
 
 
-PERTH = {"tw": "#7D93A9", "tw2": "#5F758C", "tw3": "#9AA8B8", "tw4": "#7A889A", "copper": "#C9814A", "glass": "#BFDCE8",
+PERTH = {"tw": "#6A8098", "tw2": "#50657C", "tw3": "#7D8896", "tw4": "#606B79", "copper": "#B8703A", "glass": "#BFDCE8",
          "glass2": "#86AFC4", "deck": "#FFFFFF", "swan": "#1E1E24", "beak": "#D7263D"}
 
 
@@ -1052,7 +1053,7 @@ def auckland(d: Drawing):
     d.disc("glow", 54, 56, 14)
     # Rangitoto, the low volcano across the harbour
     d.band("far", "M-30 134 L-10 132 Q14 118 32 110 Q44 104 54 110 Q72 120 96 134 H230", line=False)
-    d.band("mid", skyline(134, [(70, 10, 20), (82, 9, 30), (110, 10, 36), (122, 9, 26), (134, 10, 18), (146, 10, 10)]))
+    d.band("mid", skyline(134, [(66, 10, 20), (78, 8, 30), (106, 12, 36), (122, 9, 26), (134, 10, 18), (146, 10, 10)]))
     # Vero Centre and other towers
     d.shape("tw", "M112 134 V78 Q118 72 126 76 V134Z")
     d.shape("tw2", "M121 134 V74.4 Q124 74.8 126 76 V134Z", shadow=False, line=False)
@@ -1117,7 +1118,7 @@ CONCEPTS = [
     C("sky-cape-town", "skyline-cape-town", "Cape Town", cape_town, NO_SEA_GOLD, CAPE,
       [("near", "sky"), ("light", "near"), ("deep", "near"), ("far", "mid"), ("tw", "far"), ("tw", "mid"), ("far", "water")]),
     C("sky-johannesburg", "skyline-johannesburg", "Johannesburg", johannesburg, None, JOBURG,
-      [("tw", "sky"), ("tw", "mid"), ("dark2", "mid"), ("dark2", "sky"), ("deck", "mid"), ("deck", "ground"), ("far", "sky"), ("dump", "sky")]),
+      [("tw", "sky"), ("tw", "mid"), ("dark2", "mid"), ("dark2", "sky"), ("deck", "mid"), ("deck", "near"), ("far", "sky"), ("dump", "sky")]),
     C("sky-nairobi", "skyline-nairobi", "Nairobi", nairobi, None, NAIROBI,
       [("tw", "sky"), ("tw", "mid"), ("kicc", "mid"), ("kicc", "sky"), ("dark", "ground"), ("dark", "glow"), ("far", "sky"), ("tw", "glow")]),
     C("sky-lagos", "skyline-lagos", "Lagos", lagos, NO_SEA_GOLD, LAGOS,

@@ -30,10 +30,11 @@ async function saveSnapshot(design: Design): Promise<string> {
 
 export default function Editor() {
   const store = useEditor();
-  const { design, selectedSticker, fitRequest, region, past, future } = store;
+  const { design, selectedSticker, fitRequest, region, past, future, savedId, dirty } = store;
+  const [me, setMe] = useState<{ user: { email: string; name: string | null; picture: string | null } | null; googleEnabled: boolean } | null>(null);
   const [tab, setTab] = useState<Tab>("trip");
   const [pickMode, setPickMode] = useState(false);
-  const [busy, setBusy] = useState<"" | "order" | "share">("");
+  const [busy, setBusy] = useState<"" | "order" | "share" | "save">("");
   const [toast, setToast] = useState("");
   const [wall, setWall] = useState(false);
   const router = useRouter();
@@ -48,6 +49,56 @@ export default function Editor() {
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    fetch("/api/auth/me").then((r) => r.json()).then(setMe).catch(() => setMe({ user: null, googleEnabled: false }));
+  }, []);
+
+  /** Save to the signed-in user's account (sends them to sign in first if needed). */
+  const save = async () => {
+    if (!me?.user) {
+      window.location.href = `/signin?next=${encodeURIComponent("/create?save=1")}`;
+      return;
+    }
+    setBusy("save");
+    try {
+      const st = useEditor.getState();
+      const r = await fetch("/api/me/designs", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ design: st.design, id: st.savedId ?? undefined }),
+      });
+      if (!r.ok) throw new Error();
+      st.setSaved((await r.json()).id);
+      setToast("Saved to your account ✓");
+    } catch {
+      setToast("Couldn't save, please try again.");
+    }
+    setBusy("");
+  };
+
+  // /create?saved=<id> opens a design from the account, ?new=1 starts fresh,
+  // ?save=1 finishes a save that was interrupted by signing in.
+  useEffect(() => {
+    if (!me) return;
+    const saved = params.get("saved");
+    if (saved) {
+      fetch(`/api/me/designs/${saved}`)
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((s: { id: string; design: Design }) => {
+          useEditor.getState().loadSaved(s.id, s.design);
+          router.replace("/create");
+        })
+        .catch(() => setToast("Sorry, we couldn't open that map."));
+    } else if (params.get("new")) {
+      useEditor.getState().reset();
+      router.replace("/create");
+    } else if (params.get("save") && me.user) {
+      router.replace("/create");
+      save();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params, me]);
 
   // Open a shared design: /create?d=<id>
   useEffect(() => {
@@ -144,6 +195,15 @@ export default function Editor() {
             🔗<span className="hidden sm:inline ml-1">{busy === "share" ? "…" : "Share"}</span>
           </button>
           <button
+            title={me?.user ? "Save to your account" : "Sign in to save"}
+            className={`${iconBtn} sm:w-auto sm:px-3 sm:text-sm sm:font-bold`}
+            onClick={save}
+            disabled={busy === "save" || (!!savedId && !dirty)}
+          >
+            {savedId && !dirty ? "✓" : "💾"}
+            <span className="hidden sm:inline ml-1">{busy === "save" ? "Saving…" : savedId && !dirty ? "Saved" : "Save"}</span>
+          </button>
+          <button
             onClick={() => confirm("Start a fresh map? (You can undo this.)") && store.reset()}
             className="hidden md:block text-sm font-bold text-ink/50 hover:text-ink px-2"
           >
@@ -152,6 +212,22 @@ export default function Editor() {
           <button onClick={order} disabled={!!busy || design.stops.length === 0} className="ml-1 rounded-full bg-coral px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-extrabold text-white shadow-lg shadow-coral/30 hover:bg-coral-dark disabled:opacity-40 transition whitespace-nowrap">
             {busy === "order" ? "Saving…" : <>Order<span className="hidden sm:inline"> print</span> · {money(region, price)}</>}
           </button>
+          {me?.user ? (
+            <Link href="/account" title="My account" className="ml-1 shrink-0">
+              {me.user.picture ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={me.user.picture} alt="My account" referrerPolicy="no-referrer" className="w-9 h-9 rounded-full" />
+              ) : (
+                <span className="grid place-items-center w-9 h-9 rounded-full bg-ink text-white font-extrabold">{(me.user.name ?? me.user.email)[0].toUpperCase()}</span>
+              )}
+            </Link>
+          ) : (
+            me && (
+              <Link href="/signin?next=/create" className="hidden sm:block ml-1 text-sm font-bold text-ink/60 hover:text-ink px-2 whitespace-nowrap">
+                Sign in
+              </Link>
+            )
+          )}
         </div>
       </header>
 

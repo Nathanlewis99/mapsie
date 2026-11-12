@@ -51,7 +51,21 @@ The repo includes a `Dockerfile` and a `render.yaml` blueprint.
 2. Render reads `render.yaml` and creates the `mapsie` web service (2 GB, Frankfurt) with a 5 GB disk.
    Leave the Stripe and Prodigi keys empty to start in test mode.
 3. Deploy. The site is at `https://mapsie.onrender.com` (or similar). Every push to `main` redeploys.
-4. Admin: `/admin`. The password is under the service's **Environment** tab (`ADMIN_PASSWORD`); any user name works.
+4. Admin: `/admin`. Sign in with Google as an address listed in `ADMIN_EMAILS` (default `admin@mapsie.shop`),
+   then enter the 6-digit code from an authenticator app. The first visit shows a QR code to set it up.
+
+### Accounts and Google sign-in
+
+Customers sign in with Google to save designs (`/account`) and see their orders. To switch it on:
+
+1. Google Cloud Console → **APIs & Services → OAuth consent screen**: External, app name "Mapsie",
+   support email, authorised domain `mapsie.shop`, scopes `openid`, `email`, `profile`. Publish the app.
+2. **Credentials → Create credentials → OAuth client ID** → Web application. Authorised redirect URIs:
+   `https://mapsie.shop/api/auth/google/callback` (and `https://mapsie.onrender.com/api/auth/google/callback`
+   while testing, or `http://localhost:3000/api/auth/google/callback` for local development).
+3. Put the client ID and secret in Render as `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
+
+Sessions are signed with `SESSION_SECRET`. Data (users, saved designs, orders) is in SQLite at `$DATA_DIR/mapsie.db`.
 
 Going live later: add `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` and `PRODIGI_API_KEY` in the
 Environment tab. Point a Stripe webhook at `/api/webhooks/stripe` (event `checkout.session.completed`).

@@ -26,6 +26,10 @@ export default function Checkout({ design }: { design: Design }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   useEffect(() => setRegion(storedRegion()), []);
+  // Signed-in customers: fill in their email.
+  useEffect(() => {
+    fetch("/api/auth/me").then((r) => r.json()).then((j) => j.user?.email && setEmail((e) => e || j.user.email)).catch(() => {});
+  }, []);
 
   const ship = SHIPPING.find((s) => s.id === shipping)!;
   const item = itemPrice(design.productId, design.frame, region);

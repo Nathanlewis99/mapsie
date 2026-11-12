@@ -34,6 +34,11 @@ const snap = ({ view: _v, ...rest }: Design): Snapshot => rest; // eslint-disabl
 interface EditorState {
   design: Design;
   region: RegionId;
+  /** Id of this design in the signed-in user's account, once saved. */
+  savedId: string | null;
+  /** Changes since the last save to the account. */
+  dirty: boolean;
+  setSaved: (id: string | null) => void;
   past: Snapshot[];
   future: Snapshot[];
   lastCommit: { key: string; at: number };
@@ -58,6 +63,8 @@ interface EditorState {
   undo: () => void;
   redo: () => void;
   reset: () => void;
+  /** Open a design from the user's account. */
+  loadSaved: (id: string, d: Design) => void;
   load: (d: Design) => void;
   applyTemplate: (t: TripTemplate) => void;
   setRegion: (r: RegionId) => void;
@@ -82,6 +89,7 @@ export const useEditor = create<EditorState>()(
           past: merge ? s.past : [...s.past.slice(-79), snap(s.design)],
           future: [],
           lastCommit: { key, at: now },
+          dirty: true,
           ...extra,
         });
       };
@@ -163,9 +171,15 @@ export const useEditor = create<EditorState>()(
           set({ design: { ...next, view: design.view }, past: [...past, snap(design)], future: future.slice(1), lastCommit: { key: "", at: 0 } });
         },
 
-        reset: () => commit(() => newDesign(), "edit", { selectedSticker: null }),
+        reset: () => commit(() => newDesign(), "edit", { selectedSticker: null, savedId: null }),
+        savedId: null,
+        dirty: true,
+        setSaved: (id) => set({ savedId: id, dirty: false }),
+        loadSaved: (id, d) => {
+          set({ design: normalizeDesign(d), past: [], future: [], selectedSticker: null, fitRequest: 0, savedId: id, dirty: false, lastCommit: { key: "", at: 0 } });
+        },
         load: (d) => {
-          commit(() => normalizeDesign({ ...d, id: nanoid(10) }), "edit", { selectedSticker: null, fitRequest: 0 });
+          commit(() => normalizeDesign({ ...d, id: nanoid(10) }), "edit", { selectedSticker: null, fitRequest: 0, savedId: null });
         },
         applyTemplate: (t) => {
           const preset = PRESETS.find((p) => p.id === t.preset) ?? PRESETS[0];
@@ -236,7 +250,7 @@ export const useEditor = create<EditorState>()(
     {
       name: "mapsie-design",
       version: 2,
-      partialize: (s) => ({ design: s.design, region: s.region }),
+      partialize: (s) => ({ design: s.design, region: s.region, savedId: s.savedId }),
       migrate: (persisted) => {
         const p = persisted as { design?: Design; region?: RegionId };
         return { ...p, design: p.design ? normalizeDesign(p.design) : newDesign(), region: p.region ?? guessRegion() };

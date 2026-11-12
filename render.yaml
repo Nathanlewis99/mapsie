@@ -15,8 +15,17 @@ services:
     envVars:
       - key: DATA_DIR
         value: /var/data
-      - key: ADMIN_PASSWORD   # for /admin (user name can be anything)
+      - key: SESSION_SECRET   # signs sign-in cookies
         generateValue: true
+      - key: ADMIN_EMAILS     # Google accounts that can open /admin (plus an authenticator code)
+        value: admin@mapsie.shop
+      - key: APP_URL
+        value: https://mapsie.shop
+      # Google sign-in: OAuth client from Google Cloud Console (see README).
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
       - key: PRODIGI_ENV
         value: sandbox
       # Print render settings sized for the 2 GB "standard" plan: the map layer of

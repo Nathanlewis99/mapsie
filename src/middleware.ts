@@ -1,18 +1,22 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { readSession, adminMfaValid, SESSION_COOKIE } from "@/lib/session";
 
-// Basic password protection for the admin area. Set ADMIN_PASSWORD in production;
-// without it the admin area only works in local development.
-export function middleware(req: NextRequest) {
-  const pass = process.env.ADMIN_PASSWORD;
-  if (!pass) {
-    if (process.env.NODE_ENV === "development") return NextResponse.next();
-    return new NextResponse("Admin disabled: set ADMIN_PASSWORD", { status: 403 });
-  }
-  const auth = req.headers.get("authorization") ?? "";
-  const [, encoded] = auth.split(" ");
-  const supplied = encoded ? atob(encoded).split(":").slice(1).join(":") : "";
-  if (supplied === pass) return NextResponse.next();
-  return new NextResponse("Authentication required", { status: 401, headers: { "WWW-Authenticate": 'Basic realm="Mapsie admin"' } });
+// Admin area: signed in with an admin Google account AND passed the
+// authenticator-app check within the last few hours.
+export async function middleware(req: NextRequest) {
+  const { pathname, search } = req.nextUrl;
+  const session = await readSession(req.cookies.get(SESSION_COOKIE)?.value);
+  const isApi = pathname.startsWith("/api/");
+  const deny = (to: string, status: number) =>
+    isApi ? NextResponse.json({ error: "Not authorised" }, { status }) : NextResponse.redirect(new URL(to, req.url));
+
+  // The 2FA page itself needs an admin session, but not a passed check.
+  const twoFactor = pathname === "/admin/2fa" || pathname.startsWith("/api/admin/2fa");
+
+  if (!session) return deny(`/signin?next=${encodeURIComponent(pathname + search)}`, 401);
+  if (!session.admin) return deny("/account", 403);
+  if (!twoFactor && !adminMfaValid(session)) return deny(`/admin/2fa?next=${encodeURIComponent(pathname + search)}`, 401);
+  return NextResponse.next();
 }
 
 export const config = { matcher: ["/admin/:path*", "/api/admin/:path*"] };

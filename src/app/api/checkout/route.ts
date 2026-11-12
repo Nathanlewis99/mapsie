@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import { getDesign, saveOrder, type Order } from "@/lib/server/db";
 import { FRAMES, getProduct, getRegion, itemPrice, SHIPPING, type RegionId, type ShippingId } from "@/lib/products";
 import { normalizeDesign } from "@/lib/types";
+import { currentUser } from "@/lib/server/auth";
 
 export async function POST(req: Request) {
   const body = (await req.json()) as { designId: string; email: string; shipping: ShippingId; region: RegionId };
@@ -19,6 +20,7 @@ export async function POST(req: Request) {
   const order: Order = {
     id: `ord_${nanoid(10)}`,
     designId: design.id,
+    userId: (await currentUser())?.id,
     email: body.email,
     shipping: ship.id,
     region: region.id,

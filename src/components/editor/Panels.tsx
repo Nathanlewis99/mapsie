@@ -20,8 +20,10 @@ import {
 import { FONTS } from "@/lib/fonts";
 import { getRegion, REGIONS } from "@/lib/products";
 import PrintOptionsPicker from "@/components/PrintOptionsPicker";
+import { crowding, MIN_STOP_SCALE, readability, recommendedProduct, sizeNote, smallestText, tidyCrowded } from "@/lib/legibility";
+import { getProduct } from "@/lib/products";
 import { TEMPLATES } from "@/lib/templates";
-import type { ThemeColors, Layout, TravelMode, MarkerStyle, RouteStyle, TextStyle, TextCase, FontId } from "@/lib/types";
+import type { Design, ThemeColors, Layout, TravelMode, MarkerStyle, RouteStyle, TextStyle, TextCase, FontId } from "@/lib/types";
 
 export const Label = ({ children }: { children: React.ReactNode }) => (
   <div className="text-xs font-bold uppercase tracking-wider text-ink/50 mb-2">{children}</div>
@@ -378,9 +380,10 @@ export function StylePanel() {
         <div className="mt-2">
           <Toggle on={design.markers.showDates} onChange={(v) => set({ markers: { ...design.markers, showDates: v } })} label="📅 Show dates under stop names" />
         </div>
-        <Slider label="Marker size" min={0.5} max={2.2} step={0.05} value={design.markers.size} onChange={(v) => set({ markers: { ...design.markers, size: v } }, "marker-size")} />
-        <Slider label="Label size" min={0.5} max={2.5} step={0.05} value={design.markers.labelSize} onChange={(v) => set({ markers: { ...design.markers, labelSize: v } }, "label-size")} />
-        <p className="text-xs text-ink/50">Tip: tap a place name on the map to resize it or drag it somewhere else. Drag the pin to move the stop itself.</p>
+        <Slider label="Marker size" min={0.25} max={2.2} step={0.05} value={design.markers.size} onChange={(v) => set({ markers: { ...design.markers, size: v } }, "marker-size")} />
+        <Slider label="Label size" min={0.25} max={2.5} step={0.05} value={design.markers.labelSize} onChange={(v) => set({ markers: { ...design.markers, labelSize: v } }, "label-size")} />
+        <p className="text-xs text-ink/50">Tip: tap a pin or place name on the map to resize just that stop, or drag the name somewhere else. Drag the pin to move the stop itself.</p>
+        <div className="mt-3"><StopsCheck /></div>
       </div>
 
       <div>
@@ -404,6 +407,61 @@ export function StylePanel() {
         <Toggle on={t.labels} onChange={(v) => setTheme({ labels: v })} label="🔤 Place names" />
         <Toggle on={t.texture} onChange={(v) => setTheme({ texture: v })} label="📜 Aged paper texture" />
       </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------- Stops check
+/** Overlapping stops and how readable the smallest name will be when printed. */
+export function StopsCheck() {
+  const { design, set } = useEditor();
+  if (design.stops.length < 1) return null;
+  const pairs = crowding(design);
+  const crowded = new Set(pairs.flat()).size;
+  const p = getProduct(design.productId);
+  const small = smallestText(design);
+  const status = readability(small.pt);
+  const rec = recommendedProduct(design);
+  const bigger = rec && rec.widthCm > p.widthCm ? rec : null;
+  const tidy = () => {
+    const patch = tidyCrowded(design);
+    set({ stops: design.stops.map((s) => (patch[s.id] ? { ...s, ...patch[s.id] } : s)) });
+  };
+  const what = small.number < small.label ? "pin numbers" : `“${small.labelStop}”`;
+  const crowdedIds = new Set(pairs.flat());
+  const canShrink = design.stops.some((s) => crowdedIds.has(s.id) && ((s.markerScale ?? 1) > MIN_STOP_SCALE + 0.01 || (s.labelScale ?? 1) > MIN_STOP_SCALE + 0.01));
+  return (
+    <div className="space-y-2">
+      {crowded > 0 && (
+        <div className="rounded-2xl bg-coral/10 p-3 text-sm">
+          <div className="font-extrabold">⚠️ {crowded} stops overlap at this zoom</div>
+          {canShrink ? (
+            <>
+              <p className="text-ink/60 text-xs mt-0.5">Shrink just the crowded ones (the rest stay as they are), or tap a pin to size it yourself.</p>
+              <button onClick={tidy} className="mt-2 rounded-full bg-coral px-4 py-1.5 text-sm font-extrabold text-white hover:bg-coral-dark">✨ Shrink crowded stops</button>
+            </>
+          ) : (
+            <p className="text-ink/60 text-xs mt-0.5">
+              They&apos;re as small as they go and still too close at this zoom. Tap a pin and choose Hide for some names, drag names apart (a line links them back to their pin), or zoom the map in a little.
+            </p>
+          )}
+        </div>
+      )}
+      {Number.isFinite(small.pt) && (
+        <div className={`rounded-2xl p-3 text-sm ${status === "good" ? "bg-sea/10" : status === "small" ? "bg-amber-100" : "bg-coral/10"}`}>
+          <div className="font-extrabold">
+            {status === "good" ? "✅ Easy to read" : status === "small" ? "👓 Small but readable" : "🔍 Too small to read"} on {p.label}
+          </div>
+          <p className="text-ink/60 text-xs mt-0.5">
+            Smallest text: {what} prints at about {small.pt.toFixed(1)}pt ({((small.pt / 72) * 25.4 * 0.7).toFixed(1)} mm tall letters).
+            {status !== "good" && (bigger ? ` On ${bigger.label} it would be ${smallestText(design, bigger.id).pt.toFixed(1)}pt.` : " Try bigger names, or hide a few.")}
+          </p>
+          {status !== "good" && bigger && (
+            <button onClick={() => set({ productId: bigger.id })} className="mt-2 rounded-full bg-ink px-4 py-1.5 text-sm font-extrabold text-white">Switch to {bigger.label}</button>
+          )}
+          <p className="text-ink/40 text-[11px] mt-1.5">Prints are always sharp (300 dpi), so small names stay crisp. This is about reading them from a step away.</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -854,6 +912,7 @@ export function TextPanel() {
 }
 
 // ---------------------------------------------------------------- Size
+
 export function SizePanel() {
   const { design, set, region, setRegion } = useEditor();
   return (
@@ -866,7 +925,8 @@ export function SizePanel() {
         <Label>Orientation</Label>
         <Chips value={design.orientation} options={[{ id: "portrait", label: "▯ Portrait" }, { id: "landscape", label: "▭ Landscape" }]} onChange={(v) => set({ orientation: v })} />
       </div>
-      <PrintOptionsPicker value={design} onChange={(patch) => set(patch)} region={region} />
+      <PrintOptionsPicker value={design} onChange={(patch) => set(patch)} region={region} sizeNote={(id) => sizeNote(design, id)} />
+      <StopsCheck />
       <p className="text-xs text-ink/50">
         Printed and shipped by our print partner in {getRegion(region).label}. Free delivery, or express.
       </p>

@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import type { Design } from "@/lib/types";
 import { describeOptions, getRegion, guessRegion, itemPrice, money, priceLines, REGIONS, SHIPPING, type PrintOptions, type RegionId, type ShippingId } from "@/lib/products";
 import PrintOptionsPicker from "@/components/PrintOptionsPicker";
+import { sizeNote } from "@/lib/legibility";
 
 const FramedPoster = dynamic(() => import("@/components/FramedPoster"), { ssr: false });
 const WallPreview = dynamic(() => import("@/components/WallPreview"), { ssr: false });
@@ -91,7 +92,7 @@ export default function Checkout({ design: saved }: { design: Design }) {
           </div>
           {showOptions && (
             <div className="rounded-3xl bg-cream border border-ink/5 p-4">
-              <PrintOptionsPicker value={opts} onChange={(patch) => setOpts((o) => ({ ...o, ...patch }))} region={region} />
+              <PrintOptionsPicker value={opts} onChange={(patch) => setOpts((o) => ({ ...o, ...patch }))} region={region} sizeNote={(id) => sizeNote(design, id)} />
             </div>
           )}
           <div className="space-y-2">

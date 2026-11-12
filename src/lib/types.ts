@@ -24,6 +24,8 @@ export interface Stop {
   labelOffset?: [number, number];
   /** Size of this stop's label relative to the design's label size. */
   labelScale?: number;
+  /** Size of this stop's marker relative to the design's marker size. */
+  markerScale?: number;
 }
 
 export interface Sticker {

@@ -10,7 +10,9 @@ export default function PrintOptionsPicker({
   onChange,
   region,
   showSizes = true,
+  sizeNote,
 }: {
+  sizeNote?: (productId: string) => string | undefined;
   value: Required<PrintOptions>;
   onChange: (patch: Partial<PrintOptions>) => void;
   region: RegionId;
@@ -27,7 +29,12 @@ export default function PrintOptionsPicker({
           <div className="space-y-2">
             {PRODUCTS.map((x) => (
               <button key={x.id} onClick={() => onChange({ productId: x.id })} className={`flex w-full items-center justify-between px-4 py-3 ${card(value.productId === x.id)}`}>
-                <span className="font-bold">{x.label}</span>
+                <span className="font-bold text-left">
+                  {x.label}
+                  {sizeNote?.(x.id) && (
+                    <span className={`block text-[11px] font-extrabold ${sizeNote(x.id) === "Recommended" ? "text-sea" : "text-coral-dark"}`}>{sizeNote(x.id)}</span>
+                  )}
+                </span>
                 <span className="text-sm text-ink/50">{x.widthCm} × {x.heightCm} cm</span>
                 <span className="font-extrabold">{money(region, x.price[region])}</span>
               </button>

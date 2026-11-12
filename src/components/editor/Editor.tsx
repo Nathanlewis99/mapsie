@@ -400,12 +400,23 @@ export default function Editor() {
 
           {labelStop && (
             <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full bg-ink text-white px-2 py-1.5 shadow-xl text-sm font-bold max-w-[96%] overflow-x-auto">
-              <span className="px-2 opacity-60 whitespace-nowrap">“{labelStop.name}”</span>
-              <button title="Smaller" className="px-3 py-1 rounded-full hover:bg-white/15" onClick={() => store.updateStop(labelStop.id, { labelScale: Math.max(0.4, (labelStop.labelScale ?? 1) / 1.15) }, `lsize-${labelStop.id}`)}>A−</button>
-              <button title="Bigger" className="px-3 py-1 rounded-full hover:bg-white/15 text-base" onClick={() => store.updateStop(labelStop.id, { labelScale: Math.min(4, (labelStop.labelScale ?? 1) * 1.15) }, `lsize-${labelStop.id}`)}>A+</button>
+              <span className="px-2 opacity-60 whitespace-nowrap max-w-32 truncate">“{labelStop.name}”</span>
+              <span className="text-[11px] uppercase tracking-wider opacity-50 pl-1">Pin</span>
+              <button title="Smaller pin" className="px-2.5 py-1 rounded-full hover:bg-white/15" onClick={() => store.updateStop(labelStop.id, { markerScale: Math.max(0.25, (labelStop.markerScale ?? 1) / 1.2) }, `msize-${labelStop.id}`)}>−</button>
+              <button title="Bigger pin" className="px-2.5 py-1 rounded-full hover:bg-white/15" onClick={() => store.updateStop(labelStop.id, { markerScale: Math.min(3, (labelStop.markerScale ?? 1) * 1.2) }, `msize-${labelStop.id}`)}>+</button>
               <span className="w-px h-5 bg-white/20 mx-1" />
-              <button title="Put the label back next to its pin" className="px-3 py-1 rounded-full hover:bg-white/15 whitespace-nowrap" onClick={() => store.updateStop(labelStop.id, { labelOffset: undefined, labelScale: undefined })}>↺ Reset</button>
-              <button title="Hide this label" className="px-3 py-1 rounded-full hover:bg-white/15 whitespace-nowrap" onClick={() => { store.updateStop(labelStop.id, { showLabel: false }); store.selectLabel(null); }}>Hide</button>
+              {labelStop.showLabel ? (
+                <>
+                  <span className="text-[11px] uppercase tracking-wider opacity-50 pl-1">Name</span>
+                  <button title="Smaller name" className="px-2.5 py-1 rounded-full hover:bg-white/15" onClick={() => store.updateStop(labelStop.id, { labelScale: Math.max(0.25, (labelStop.labelScale ?? 1) / 1.15) }, `lsize-${labelStop.id}`)}>A−</button>
+                  <button title="Bigger name" className="px-2.5 py-1 rounded-full hover:bg-white/15 text-base" onClick={() => store.updateStop(labelStop.id, { labelScale: Math.min(4, (labelStop.labelScale ?? 1) * 1.15) }, `lsize-${labelStop.id}`)}>A+</button>
+                  <button title="Hide this name" className="px-2.5 py-1 rounded-full hover:bg-white/15 whitespace-nowrap" onClick={() => store.updateStop(labelStop.id, { showLabel: false })}>Hide</button>
+                </>
+              ) : (
+                <button className="px-3 py-1 rounded-full hover:bg-white/15 whitespace-nowrap" onClick={() => store.updateStop(labelStop.id, { showLabel: true })}>Show name</button>
+              )}
+              <span className="w-px h-5 bg-white/20 mx-1" />
+              <button title="Back to the standard size and position" className="px-2.5 py-1 rounded-full hover:bg-white/15 whitespace-nowrap" onClick={() => store.updateStop(labelStop.id, { labelOffset: undefined, labelScale: undefined, markerScale: undefined })}>↺ Reset</button>
               <button className="px-3 py-1 rounded-full hover:bg-white/15 opacity-70" onClick={() => store.selectLabel(null)}>Done</button>
             </div>
           )}

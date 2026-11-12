@@ -10,6 +10,7 @@ import { fontCss } from "@/lib/fonts";
 import { getArtStyle, stickerSrc } from "@/lib/stickers";
 import { originalSrc, resolvePalette } from "@/lib/originals";
 import { filterId } from "./StickerFilters";
+import { TINY_PIN } from "@/lib/legibility";
 
 export interface MapHandlers {
   onView?: (v: Design["view"]) => void;
@@ -310,11 +311,18 @@ export default function MapView(props: Props) {
         stopMarkers.current = design.stops.map((s: Stop, i) => {
           const node = document.createElement("div");
           node.className = `mapsie-stop is-${style}`;
-          node.style.setProperty("--u", `${u * design.markers.size}px`);
-          if (editable) node.title = "Drag to move this stop";
+          node.style.setProperty("--u", `${u * design.markers.size * (s.markerScale ?? 1)}px`);
+          if (editable) {
+            node.title = "Drag to move this stop · tap to resize it";
+            // A tap (not a drag) selects the stop so its pin and label can be resized.
+            node.addEventListener("click", (e) => {
+              e.stopPropagation();
+              h.current?.onLabelSelect?.(s.id);
+            });
+          }
           const icon =
             style === "number"
-              ? `<div class="mapsie-stop-dot" style="background:${c.accent};color:${c.paper};border-color:${c.paper}">${i + 1}</div>`
+              ? `<div class="mapsie-stop-dot" style="background:${c.accent};color:${c.paper};border-color:${c.paper}">${design.markers.size * (s.markerScale ?? 1) > TINY_PIN ? i + 1 : ""}</div>`
               : style === "dot"
                 ? `<div class="mapsie-stop-dot" style="background:${c.accent};border-color:${c.paper}"></div>`
                 : `<div class="mapsie-stop-icon">${markerSvg(style, c.accent, c.paper)}</div>`;
@@ -377,6 +385,8 @@ export default function MapView(props: Props) {
         sy = cy + ((ty - cy) / dist) * r;
         if (dist <= r) leader.style.display = "none";
       }
+      // A name sitting right beside its pin doesn't need a line.
+      if (Math.hypot(tx - sx, ty - sy) < u * 1.5) leader.style.display = "none";
       line.setAttribute("x1", String(sx));
       line.setAttribute("y1", String(sy));
       line.setAttribute("x2", String(tx));

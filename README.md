@@ -43,6 +43,23 @@ Open http://localhost:3000. With no keys set, checkout uses a built-in **test ch
 | Admin | `/admin` | Basic-auth protected with `ADMIN_PASSWORD`. Open without a password in local dev only. |
 | Storage | `src/lib/server/db.ts` | JSON files in `./data` for now. Replace before deploying. |
 
+## Deploying (Render)
+
+The repo includes a `Dockerfile` and a `render.yaml` blueprint.
+
+1. In the Render dashboard: **New → Blueprint**, connect GitHub and pick this repo.
+2. Render reads `render.yaml` and creates the `mapsie` web service (2 GB, Frankfurt) with a 5 GB disk.
+   Leave the Stripe and Prodigi keys empty to start in test mode.
+3. Deploy. The site is at `https://mapsie.onrender.com` (or similar). Every push to `main` redeploys.
+4. Admin: `/admin`. The password is under the service's **Environment** tab (`ADMIN_PASSWORD`); any user name works.
+
+Going live later: add `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` and `PRODIGI_API_KEY` in the
+Environment tab. Point a Stripe webhook at `/api/webhooks/stripe` (event `checkout.session.completed`).
+To use your own domain, add it in Render under **Settings → Custom domains** and set `APP_URL` to it.
+
+Print renders on the 2 GB plan: A3 takes about a minute, A1 up to about five (in the background
+after payment). On a 4 GB plan, set `PRINT_MAX_PX=7680` and `PRINT_STRIP_PX=4000` for a sharper map layer on big prints.
+
 ## Environment variables (`.env.local`)
 
 ```
@@ -51,7 +68,9 @@ STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 PRODIGI_API_KEY=...             # sandbox key from the Prodigi dashboard
 PRODIGI_ENV=sandbox             # or live
-PRINT_MAX_PX=7680               # largest map canvas the renderer draws (16384 on a GPU box)
+PRINT_MAX_PX=7680               # largest map canvas the renderer draws (5120 on a 2 GB machine)
+PRINT_STRIP_PX=4000             # screenshot strip height (2000 on a 2 GB machine)
+DATA_DIR=./data                 # where orders, designs and print files are stored
 ADMIN_PASSWORD=...              # protects /admin
 OSRM_URL=https://router.project-osrm.org   # road routing (public demo server; fine for testing)
 ```

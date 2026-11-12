@@ -136,6 +136,8 @@ export default function Poster({ design, width, editable = false, print, selecte
           width: mapW,
           height: mapH,
           outline: design.layout === "border" ? `${Math.max(1, u * 0.25)}px solid ${c.ink}` : undefined,
+          // Aged paper also gently yellows and softens the map itself.
+          filter: design.theme.texture ? "sepia(0.22) saturate(0.88) contrast(0.97)" : undefined,
         }}
       >
         <MapView

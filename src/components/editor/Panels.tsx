@@ -34,10 +34,19 @@ export const Label = ({ children }: { children: React.ReactNode }) => (
   <div className="text-xs font-bold uppercase tracking-wider text-ink/50 mb-2">{children}</div>
 );
 
-function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
+/** On/off switch. `disabled` greys it out (with `hint` saying why) when another setting makes it irrelevant. */
+function Toggle({ on, onChange, label, disabled, hint }: { on: boolean; onChange: (v: boolean) => void; label: string; disabled?: boolean; hint?: string }) {
   return (
-    <button onClick={() => onChange(!on)} className="flex items-center justify-between w-full py-1.5 text-sm font-semibold">
-      {label}
+    <button
+      onClick={() => onChange(!on)}
+      disabled={disabled}
+      title={disabled ? hint : undefined}
+      className="flex items-center justify-between w-full py-1.5 text-sm font-semibold text-left disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      <span>
+        {label}
+        {disabled && hint && <span className="block text-[11px] font-semibold text-ink/60">{hint}</span>}
+      </span>
       <span className={`w-10 h-6 rounded-full p-0.5 transition shrink-0 ${on ? "bg-coral" : "bg-ink/15"}`}>
         <span className={`block w-5 h-5 rounded-full bg-white shadow transition ${on ? "translate-x-4" : ""}`} />
       </span>
@@ -45,12 +54,13 @@ function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) =
   );
 }
 
-function Chips<T extends string>({ value, options, onChange }: { value: T; options: { id: T; label: string }[]; onChange: (v: T) => void }) {
+function Chips<T extends string>({ value, options, onChange, disabled }: { value: T; options: { id: T; label: string }[]; onChange: (v: T) => void; disabled?: boolean }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className={`flex flex-wrap gap-2 ${disabled ? "opacity-40 pointer-events-none" : ""}`} aria-disabled={disabled}>
       {options.map((o) => (
         <button
           key={o.id}
+          disabled={disabled}
           onClick={() => onChange(o.id)}
           className={`px-3 py-1.5 rounded-full text-sm font-bold border-2 transition ${value === o.id ? "border-coral bg-coral text-white" : "border-ink/10 bg-white hover:border-ink/30"}`}
         >
@@ -61,11 +71,11 @@ function Chips<T extends string>({ value, options, onChange }: { value: T; optio
   );
 }
 
-function Slider({ value, min, max, step, onChange, label }: { value: number; min: number; max: number; step: number; onChange: (v: number) => void; label: string }) {
+function Slider({ value, min, max, step, onChange, label, disabled }: { value: number; min: number; max: number; step: number; onChange: (v: number) => void; label: string; disabled?: boolean }) {
   return (
-    <label className="flex items-center gap-3 py-1.5 text-sm font-semibold">
+    <label className={`flex items-center gap-3 py-1.5 text-sm font-semibold ${disabled ? "opacity-40" : ""}`}>
       <span className="w-24 shrink-0">{label}</span>
-      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(+e.target.value)} className="flex-1 accent-coral" />
+      <input type="range" min={min} max={max} step={step} value={value} disabled={disabled} onChange={(e) => onChange(+e.target.value)} className="flex-1 accent-coral disabled:cursor-not-allowed" />
     </label>
   );
 }
@@ -152,6 +162,8 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
     if (!missed.length) setPasteOpen(false);
   };
 
+  const routeOn = design.route.show;
+  const hasFlights = design.stops.slice(1).some((x) => (x.arriveBy ?? "plane") === "plane");
   return (
     <div className="space-y-5">
       {design.stops.length === 0 && (
@@ -299,17 +311,25 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
       {design.stops.length > 1 && (
         <div className="space-y-1">
           <Label>Route</Label>
+          {/* (settings below grey out when the route is hidden or has no flights) */}
           <Toggle on={design.route.show} onChange={(v) => set({ route: { ...design.route, show: v } })} label="Draw the route" />
-          <Toggle on={design.route.modeIcons} onChange={(v) => set({ route: { ...design.route, modeIcons: v } })} label="Show ✈️ 🚗 🚆 icons on legs" />
-          <Toggle on={design.route.curved} onChange={(v) => set({ route: { ...design.route, curved: v } })} label="Curvy flight paths" />
+          <Toggle disabled={!routeOn} hint="Turn on “Draw the route” first" on={design.route.modeIcons} onChange={(v) => set({ route: { ...design.route, modeIcons: v } })} label="Show ✈️ 🚗 🚆 icons on legs" />
+          <Toggle
+            disabled={!routeOn || !hasFlights}
+            hint={!routeOn ? "Turn on “Draw the route” first" : "No flights on this trip (set a leg to ✈️ in your stops)"}
+            on={design.route.curved}
+            onChange={(v) => set({ route: { ...design.route, curved: v } })}
+            label="Curvy flight paths"
+          />
           <div className="pt-2">
             <Chips<RouteStyle>
+              disabled={!routeOn}
               value={design.route.style}
               options={[{ id: "auto", label: "✨ Auto" }, { id: "dashed", label: "Dashed" }, { id: "dotted", label: "Dotted" }, { id: "solid", label: "Solid" }]}
               onChange={(v) => set({ route: { ...design.route, style: v } })}
             />
           </div>
-          <Slider label="Thickness" min={0.15} max={1.2} step={0.05} value={design.route.width} onChange={(v) => set({ route: { ...design.route, width: v } }, "route-width")} />
+          <Slider disabled={!routeOn} label="Thickness" min={0.15} max={1.2} step={0.05} value={design.route.width} onChange={(v) => set({ route: { ...design.route, width: v } }, "route-width")} />
         </div>
       )}
     </div>
@@ -332,6 +352,8 @@ const COLOR_FIELDS: { key: keyof ThemeColors; label: string }[] = [
 export function StylePanel() {
   const { design, set, setTheme, setColors } = useEditor();
   const t = design.theme;
+  const anyLabels = design.stops.some((x) => x.showLabel);
+  const anyDates = design.stops.some((x) => x.date?.trim());
   return (
     <div className="space-y-6">
       <div>
@@ -386,10 +408,16 @@ export function StylePanel() {
           <p className="text-xs text-ink/60 font-semibold mt-2">Tap a stop on the map, then choose its sticker in the Stickers tab. Stops without one show a pin.</p>
         )}
         <div className="mt-2">
-          <Toggle on={design.markers.showDates} onChange={(v) => set({ markers: { ...design.markers, showDates: v } })} label="📅 Show dates under stop names" />
+          <Toggle
+            disabled={!anyLabels || !anyDates}
+            hint={!anyLabels ? "All stop names are hidden" : "Add dates to your stops in the Trip tab"}
+            on={design.markers.showDates}
+            onChange={(v) => set({ markers: { ...design.markers, showDates: v } })}
+            label="📅 Show dates under stop names"
+          />
         </div>
         <Slider label="Marker size" min={0.25} max={2.2} step={0.05} value={design.markers.size} onChange={(v) => set({ markers: { ...design.markers, size: v } }, "marker-size")} />
-        <Slider label="Label size" min={0.25} max={2.5} step={0.05} value={design.markers.labelSize} onChange={(v) => set({ markers: { ...design.markers, labelSize: v } }, "label-size")} />
+        <Slider disabled={!anyLabels} label="Label size" min={0.25} max={2.5} step={0.05} value={design.markers.labelSize} onChange={(v) => set({ markers: { ...design.markers, labelSize: v } }, "label-size")} />
         <p className="text-xs text-ink/50">Tip: tap a pin or place name on the map to resize just that stop, or drag the name somewhere else. Drag the pin to move the stop itself.</p>
         <div className="mt-3"><StopsCheck /></div>
       </div>
@@ -959,6 +987,7 @@ export function TextPanel() {
         />
         {design.layout === "none" && <p className="text-xs text-ink/60 font-semibold mt-2">The whole print is map. Pick another layout to bring the title back.</p>}
       </div>
+      <fieldset disabled={design.layout === "none"} className={`space-y-5 ${design.layout === "none" ? "opacity-40" : ""}`} title={design.layout === "none" ? "Map only layout: no title or subtitle" : undefined}>
       <div>
         <Label>Title</Label>
         <input value={design.title} maxLength={48} onChange={(e) => set({ title: e.target.value }, "title")} className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-bold outline-none focus:border-coral" />
@@ -997,6 +1026,8 @@ export function TextPanel() {
           maxSize={2.5}
         />
       </div>
+      </fieldset>
+      <fieldset disabled={!design.stops.some((x) => x.showLabel)} className={design.stops.some((x) => x.showLabel) ? "" : "opacity-40"}>
       <div>
         <Label>Place name font</Label>
         <p className="text-xs text-ink/50 -mt-1 mb-2">The stop names on the map.</p>
@@ -1026,6 +1057,8 @@ export function TextPanel() {
         </div>
         <p className="text-xs text-ink/50 mt-2">Size: the Label size slider in Style, or tap a name on the map.</p>
       </div>
+      </fieldset>
+      <fieldset disabled={design.layout === "none"} className={`space-y-5 ${design.layout === "none" ? "opacity-40" : ""}`} title={design.layout === "none" ? "Map only layout: no title or subtitle" : undefined}>
       <div>
         <Label>Alignment</Label>
         <Chips<TextStyle["align"]>
@@ -1043,6 +1076,7 @@ export function TextPanel() {
           </button>
         )}
       </div>
+      </fieldset>
     </div>
   );
 }

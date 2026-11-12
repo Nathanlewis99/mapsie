@@ -504,20 +504,24 @@ def casablanca(d: Drawing):
     # Hassan II Mosque on its platform over the sea
     d.shape("stone", poly((22, 156), (26, 148), (150, 148), (154, 156)))
     d.marks("stone2", " ".join(round_arch(30 + i * 9, 150, 5, 6) for i in range(13)))
-    d.shape("stone", rrect(64, 126, 80, 22, 1))
-    d.shape("tile", poly((62, 128), (70, 120), (138, 120), (146, 128)), spot=True)
-    d.marks("stone2", " ".join(pointed_arch(70 + i * 10, 133, 5, 13) for i in range(7)))
+    d.shape("stone", rrect(30, 130, 34, 18, 1))
+    d.shape("tile", poly((28, 132), (34, 125), (60, 125), (66, 132)))
+    d.shape("stone", rrect(76, 126, 66, 22, 1))
+    d.shape("tile", poly((74, 128), (82, 120), (136, 120), (144, 128)), spot=True)
+    d.marks("stone2", " ".join(pointed_arch(81 + i * 10, 133, 5, 13) for i in range(6)) + " " +
+            " ".join(pointed_arch(34 + i * 8, 136, 4, 10) for i in range(4)))
     # the minaret, the tallest in Africa
-    d.shape("stone", poly((48, 148), (48, 36), (66, 36), (66, 148)))
-    d.shape("stone2", poly((60, 148), (60, 36), (66, 36), (66, 148)), shadow=False, line=False)
-    for y in (48, 84, 120):
-        d.shape("tile", rrect(51, y, 12, 20, 1), shadow=False, spot=True)
-        d.marks("stone", pointed_arch(54, y + 4, 6, 14))
-    d.shape("stone", poly((51, 36), (51, 24), (63, 24), (63, 36)))
-    d.shape("tile", dome(57, 24, 5.4, 5), shadow=False)
-    d.stroke("gold", "M57 19 V8", 1.4)
-    for y, r in [(15, 2.2), (11, 1.7)]:
-        d.shape("gold", circle(57, y, r), shadow=False)
+    d.shape("stone", poly((62, 148), (62, 50), (78, 50), (78, 148)))
+    d.shape("stone2", poly((73, 148), (73, 50), (78, 50), (78, 148)), shadow=False, line=False)
+    for y in (58, 88, 118):
+        d.shape("tile", rrect(64.5, y, 11, 20, 1), shadow=False, spot=True)
+        d.marks("stone", pointed_arch(67.5, y + 4, 5, 14))
+    d.shape("stone", rrect(61, 48, 18, 3, .8), shadow=False)
+    d.shape("stone", poly((65, 48), (65, 37), (75, 37), (75, 48)))
+    d.shape("tile", dome(70, 37, 5, 4.6), shadow=False)
+    d.stroke("gold", "M70 33 V22", 1.4)
+    for y, r in [(29, 2.1), (25.4, 1.6)]:
+        d.shape("gold", circle(70, y, r), shadow=False)
     # breaking surf
     d.stroke("light", "M14 162 q6 -4 12 0 q6 -4 12 0 M120 164 q6 -4 12 0 q6 -4 12 0 M64 172 q6 -4 12 0 q6 -4 12 0 q6 -4 12 0", 2)
     d.band("deep", waves(184, 2.4, 30), line=False)
@@ -536,7 +540,7 @@ TABLECLOTH = ("M46 70 C46 63 54 61 60 63 C64 58 74 58 78 62 C84 57 94 58 98 62 C
 
 
 def cape_town(d: Drawing):
-    d.disc("glow", 162, 44, 12)
+    d.disc("glow", 150, 44, 11)
     d.band("near", TABLE)
     d.shape("light", TABLECLOTH)
     d.shape("deep", LIONS_HEAD)
@@ -619,7 +623,7 @@ def nairobi(d: Drawing):
     d.band("far", skyline(130, [(40, 8, 20), (50, 7, 28), (60, 8, 22), (138, 8, 30), (148, 7, 22), (158, 9, 16)]), line=False)
     d.band("mid", skyline(130, [(34, 10, 12), (46, 8, 18), (100, 8, 34), (140, 10, 24), (152, 9, 14)]))
     # Times Tower
-    block(d, 92, 102, 74, 130, "tw3", "tw4")
+    block(d, 94, 104, 74, 130, "tw3", "tw4")
     # UAP Old Mutual Tower with its sloping cap
     d.shape("tw3", poly((126, 130), (126, 66), (138, 58), (138, 130)))
     d.shape("tw4", poly((133, 130), (133, 61.3), (138, 58), (138, 130)), shadow=False, line=False)
@@ -630,17 +634,17 @@ def nairobi(d: Drawing):
     d.stroke("tw2", "M121 36 V24", 1.2)
     floors(d, "tw2", 108, 116, 58, 130, 6)
     # KICC: the cylinder with its saucer crown and the conical amphitheatre
-    d.shape("kicc", "M54 130 Q60 112 70 104 Q80 112 86 130Z", spot=True)
-    d.stroke("kicc2", "M60 122 Q70 118 80 122 M64 114 Q70 111 76 114", 1.1, line=False)
-    d.shape("kicc", poly((74, 130), (74, 78), (88, 78), (88, 130)))
-    d.shape("kicc2", poly((84, 130), (84, 78), (88, 78), (88, 130)), shadow=False, line=False)
-    mullions(d, "kicc2", 74, 84, 80, 130, 3)
-    d.shape("kicc", "M68 78 Q70 72 81 71 Q92 72 94 78Z")
-    d.shape("kicc2", rrect(70, 70, 22, 2.2, 1), shadow=False)
-    d.stroke("kicc2", "M81 70 V64", 1.2)
+    d.shape("kicc", "M44 132 Q52 108 64 98 Q76 108 84 132Z", spot=True)
+    d.stroke("kicc2", "M52 122 Q64 116 76 122 M57 112 Q64 108 71 112", 1.1, line=False)
+    d.shape("kicc", poly((72, 132), (72, 70), (90, 70), (90, 132)))
+    d.shape("kicc2", poly((84, 132), (84, 70), (90, 70), (90, 132)), shadow=False, line=False)
+    mullions(d, "kicc2", 72, 84, 72, 132, 3)
+    d.shape("kicc", "M64 70 Q67 62 81 61 Q95 62 98 70Z")
+    d.shape("kicc2", rrect(66, 59, 30, 2.6, 1.2), shadow=False)
+    d.stroke("kicc2", "M81 59 V52", 1.2)
     # the national park in front
     d.band("ground", "M-30 132 Q100 128 230 132")
-    acacia(d, -78, 18, .9)
+    acacia(d, -100, 52, .78)
     group(d, "translate(104 64) scale(.62)", lambda: d.shape("dark", GIRAFFE))
     group(d, "translate(150 98) scale(.42)", lambda: d.shape("dark", GIRAFFE))
     d.stroke("dark", "M20 168 l2 -6 M24 168 l0 -7 M28 168 l-2 -6 M176 160 l2 -6 M180 160 l0 -7", 1.2)
@@ -675,17 +679,25 @@ def lagos(d: Drawing):
     fan = " ".join(f"M{px} {top + 4 + i * 5} L{px + k * (16 + i * 13)} {deck}" for k in (-1, 1) for i in range(6))
     d.stroke("cable", fan, .9)
     d.shape("deck", f"M-30 {deck} Q100 {deck - 4} 230 {deck} V{deck + 5} Q100 {deck + 1} -30 {deck + 5}Z")
-    d.shape("deck", poly((px - 3, 176), (px - 2, top), (px + 2, top), (px + 3, 176)), spot=True)
-    d.shape("danfo", rrect(58, 138, 30, 13, 3), spot=True)
-    d.marks("dark", rrect(58, 145, 30, 1.8, 0))
-    d.marks("glass2", " ".join(rrect(61 + i * 6.2, 140.5, 4.6, 3.6, .6) for i in range(4)))
-    d.marks("dark", circle(65, 151, 2.6) + circle(81, 151, 2.6))
-    glints(d, [(20, 166, 14), (70, 172, 18), (120, 168, 14), (168, 176, 12)])
+    d.shape("deck", poly((px - 4.4, 178), (px - 2.4, top), (px + 2.4, top), (px + 4.4, 178)), spot=True)
+    d.stroke("cable", f"M{px} {top} V{top - 8}", 1.4)
+    d.shape("danfo", rrect(98, 136, 30, 13, 3), spot=True)
+    d.marks("dark", rrect(98, 143, 30, 1.8, 0))
+    d.marks("glass2", " ".join(rrect(101 + i * 6.2, 138.5, 4.6, 3.6, .6) for i in range(4)))
+    d.marks("dark", circle(105, 149, 2.6) + circle(121, 149, 2.6))
+    glints(d, [(120, 168, 14), (168, 176, 12), (96, 182, 14)])
+    # the National Theatre, shaped like a general's cap, on the near shore
+    d.shape("shore", "M-30 178 Q30 170 92 174 Q104 176 106 200 H-30Z")
+    d.shape("cap", "M22 174 V162 H82 V174Z")
+    d.shape("cap", "M18 162 Q22 140 52 136 Q82 140 86 162Z", spot=True)
+    d.stroke("cap2", "M30 160 Q36 146 52 142 Q68 146 74 160 M52 137 V160 M40 140 Q36 150 38 160 M64 140 Q68 150 66 160", 1.1, line=False)
+    d.shape("cap2", "M12 164 H92 L88 160 H16Z", shadow=False)
+    d.marks("cap2", " ".join(rrect(26 + i * 8, 166, 4, 6, .8) for i in range(7)))
     d.band("deep", waves(184, 2.4, 30), line=False)
 
 
 LAGOS = {"tw": "#6A8098", "tw2": "#50657C", "tw3": "#85827C", "tw4": "#66635E", "glass": "#5E8FB0", "glass2": "#467492",
-         "deck": "#FFFFFF", "cable": "#F2F2F2", "danfo": "#F2C230"}
+         "deck": "#FFFFFF", "cable": "#F2F2F2", "danfo": "#F2C230", "cap": "#E9E3D6", "cap2": "#B9AE98", "shore": "#C9B48A"}
 
 
 # ================================================================ ACCRA
@@ -724,17 +736,13 @@ def accra(d: Drawing):
     d.shape("lred", "M30 70 Q35 62 40 70Z")
     # Independence Square: the Black Star Gate
     d.shape("ground", "M20 150 L26 144 H178 L184 150Z")
-    gate = (f"M58 146 V100 H142 V146 H120 V122 A20 18 0 0 0 80 122 V146Z "
-            f"M64 146 V128 A5 5 0 0 1 74 128 V146Z M126 146 V128 A5 5 0 0 1 136 128 V146Z")
-    d.shape("gate", "M56 100 H144 V146 H56Z")
-    d.marks("sky", "M80 146 V122 A20 18 0 0 1 120 122 V146Z")
-    d.marks("gate2", "M64 146 V128 A5 5 0 0 1 74 128 V146Z M126 146 V128 A5 5 0 0 1 136 128 V146Z")
-    d.raw("", "")  # keep layer order explicit
+    gate = ("M56 146 V100 H144 V146Z M80 146 V122 A20 18 0 0 1 120 122 V146Z "
+            "M64 146 V128 A5 5 0 0 1 74 128 V146Z M126 146 V128 A5 5 0 0 1 136 128 V146Z")
+    d.shape("gate", gate, extra='fill-rule="evenodd"')
     d.shape("gate", rrect(52, 96, 96, 6, 1), shadow=False)
     d.stroke("gate2", "M56 108 H144 M100 102 V104", 1.2, line=False)
     d.shape("gate", poly((90, 96), (92, 88), (108, 88), (110, 96)))
     d.shape("star", star5(100, 72, 15), spot=True)
-    _ = gate
     # the beach and painted fishing canoes
     d.band("near", waves(156, 1.6, 20))
     canoe(d, 58, 172, 1.0, "hero", "hero2", "pop")
@@ -773,6 +781,7 @@ def amman(d: Drawing):
     d.shape("fl2", "M150 43 Q158 41 168 45 V50 Q158 46 150 48Z", shadow=False)
     d.shape("fl3", "M150 48 Q158 46 168 50 V55 Q158 51 150 53Z", shadow=False)
     d.shape("fl4", "M150 38 L157 45.5 L150 53Z", shadow=False, spot=True)
+    d.marks("fl2", star5(152.6, 45.5, 1.7, .5))
     mid_y = lambda x: 132 - 10 * math.sin((x - 10) / 44)
     d.band("mid", hill_town(mid_y, -20, 220, [8, 10, 7, 9, 11, 8], [7, 10, 6, 9, 8, 11]))
     d.marks("mid2", " ".join(rrect(x, mid_y(x) - 6, 2.2, 2.6, .4) for x in range(-6, 206, 13)))
@@ -784,13 +793,13 @@ def amman(d: Drawing):
     minaret(d, 144, 132, 92, 3.6, "stone", "stone2", "gold", rings=2, pencil=True)
     # the Citadel hill and the Temple of Hercules
     d.shape("hill", "M-30 132 L-30 106 Q6 96 34 98 Q58 100 74 132Z")
-    d.shape("stone", rrect(6, 98, 50, 5, 1))
-    for x in (14, 26, 38):
+    d.shape("stone", rrect(14, 98, 50, 5, 1))
+    for x in (22, 34, 46):
         d.shape("stone", rrect(x, 66, 6, 33, 1))
         d.shape("stone2", rrect(x + 3.6, 66, 2.4, 33, .5), shadow=False, line=False)
         d.shape("stone", rrect(x - 1.5, 63, 9, 4, 1), shadow=False)
-    d.shape("stone", poly((11, 63), (11, 57), (34, 57), (34, 63)))
-    d.shape("stone", poly((48, 98), (48, 86), (52, 82), (54, 98)))
+    d.shape("stone", poly((19, 63), (19, 57), (42, 57), (42, 63)))
+    d.shape("stone", poly((56, 98), (56, 86), (60, 82), (62, 98)))
     # the Roman Theatre carved into the hill
     d.shape("stone", "M24 140 Q100 122 176 140 L162 172 Q100 160 38 172Z")
     d.stroke("stone2", " ".join(f"M{24 + i * 3.1:.1f} {140 + i * 6.4:.1f} Q100 {122 + i * 7.2:.1f} {176 - i * 3.1:.1f} {140 + i * 6.4:.1f}" for i in range(1, 5)), 1.3)
@@ -989,8 +998,7 @@ def brisbane(d: Drawing):
     d.band("near", waves(140, 1.4, 18))
     # Story Bridge: cantilever truss with two tall piers
     top = "M-30 122 L22 90 L50 112 L78 90 L130 122"
-    d.shape("steel", top + " V130 H-30Z")
-    d.shape("sky", "M-14 124 L22 98 L44 118 Z M56 118 L78 98 L114 124Z", shadow=False, line=False)
+    d.shape("steel", top + " V130 H-30Z M-14 124 L22 98 L44 118 L50 124 L56 118 L78 98 L114 124Z", extra='fill-rule="evenodd"')
     d.stroke("steel", "M-6 124 L4 108 L14 124 L22 98 M22 98 L30 124 L38 116 M62 116 L70 124 L78 98 L86 124 L96 110 L104 124", 1.4, line=False)
     d.shape("steel", "M-30 124 H130 V130 H-30Z", spot=True)
     for x in (22, 78):
@@ -1036,10 +1044,11 @@ def perth(d: Drawing):
     d.limb("deck", "M88 152 C100 128 120 128 130 160", 3.2)
     d.shape("deck", "M56 158 Q95 146 134 158 V161 Q95 149 56 161Z")
     # a black swan
-    d.shape("swan", "M144 176 Q140 164 152 162 Q164 160 176 166 Q168 166 170 170 Q166 178 150 178Z")
-    d.limb("swan", "M168 166 Q176 150 168 142 Q164 138 160 142", 3.4)
-    d.shape("beak", poly((158, 141), (151, 145), (160, 144)), shadow=False, spot=True)
-    d.stroke("light", "M152 168 Q158 164 164 168", 1, line=False)
+    group(d, "translate(-18 -8)", lambda: (
+        d.shape("swan", "M144 176 Q140 164 152 162 Q164 160 176 166 Q168 166 170 170 Q166 178 150 178Z"),
+        d.limb("swan", "M168 166 Q176 150 168 142 Q164 138 160 142", 3.4),
+        d.shape("beak", poly((158, 141), (151, 145), (160, 144)), shadow=False, spot=True),
+        d.stroke("light", "M150 168 Q157 163 164 167 M154 172 Q160 168 166 171", 1, line=False)))
     glints(d, [(20, 160, 14), (40, 176, 16), (110, 174, 16)])
     d.band("deep", waves(188, 2.4, 30), line=False)
 
@@ -1128,7 +1137,7 @@ CONCEPTS = [
     C("sky-nairobi", "skyline-nairobi", "Nairobi", nairobi, None, NAIROBI,
       [("tw", "sky"), ("tw", "mid"), ("kicc", "mid"), ("kicc", "sky"), ("dark", "ground"), ("dark", "glow"), ("far", "sky"), ("tw", "glow")]),
     C("sky-lagos", "skyline-lagos", "Lagos", lagos, NO_SEA_GOLD, LAGOS,
-      [("tw", "mid"), ("tw3", "mid"), ("glass", "mid"), ("tw3", "sky"), ("deck", "near"), ("danfo", "near"), ("far", "sky")]),
+      [("tw", "mid"), ("tw3", "mid"), ("glass", "mid"), ("tw3", "sky"), ("deck", "near"), ("danfo", "near"), ("far", "sky"), ("cap", "near"), ("shore", "near")]),
     C("sky-accra", "skyline-accra", "Accra", accra, NO_SEA_GOLD, ACCRA,
       [("gate", "mid"), ("star", "glow"), ("tw", "mid"), ("light", "mid"), ("lred", "sky"), ("lred", "mid"), ("far", "sky"), ("mid", "far")],
       fx(mid=["near"])),

@@ -148,12 +148,12 @@ def palm(d: Drawing, x0, y0, x1, y1, s=1.0, bend=14, nuts=True, spot=False):
     back = [(-150, 40, 22), (-30, 40, 22), (160, 30, 30), (20, 30, 30)]
     front = [(-175, 50, 30), (-125, 44, 10), (-80, 36, -4), (-50, 46, 10), (-5, 50, 30)]
     for a, L, dr in back:
-        d.shape("frond2", frond(x1, y1, a, L * s, dr * s, 0.42))
+        d.shape("frond2", frond(x1, y1, a, L * s, dr * s, 0.6))
     if nuts:
         for nx, ny in [(-5, 5), (4, 6), (0, 1)]:
             d.shape("nut", circle(x1 + nx * s, y1 + ny * s, 4.2 * s))
     for a, L, dr in front:
-        d.shape("frond", frond(x1, y1, a, L * s, dr * s, 0.42), spot=spot)
+        d.shape("frond", frond(x1, y1, a, L * s, dr * s, 0.6), spot=spot)
         d.stroke("frond2", frond_rib(x1, y1, a, L * s * 0.92, dr * s), 1.4 * s, line=False)
 
 
@@ -203,7 +203,7 @@ def palm_tree(d: Drawing):
     d.band("far", "M-30 140 H230")
     d.stroke("light", "M20 150 H50 M140 152 H176 M80 158 H110", 2, line=False)
     d.band("ground", "M-30 166 Q60 150 120 160 T230 158")
-    palm(d, 118, 176, 96, 70, 1.25, bend=22, spot=True)
+    palm(d, 120, 184, 98, 74, 1.45, bend=24, spot=True)
     d.shape("pop", star5(56, 176, 8, 3.6, -80), shadow=False)
     d.band("ground", hills(190, 3, 20), line=False)
 
@@ -438,7 +438,7 @@ def forest_path(d: Drawing):
 
 
 # ================================================================ DESERT DUNES
-DUNE = {"dune1": "#F3C98B", "dune2": "#E0A35F", "dune3": "#EBB370", "dune4": "#C98744"}
+DUNE = {"dune1": "#EDB872", "dune2": "#D08E48", "dune3": "#E3A65C", "dune4": "#B87638"}
 
 
 def desert_dunes(d: Drawing):
@@ -588,8 +588,8 @@ CLIFF = {"cliff": "#EFE6D2", "cliff2": "#CFC0A2", "grass": "#6FA85A", "grass2": 
 def sea_cliffs(d: Drawing):
     d.disc("glow", 48, 52, 14)
     birds(d, [(60, 80, 1), (78, 70, 0.8), (40, 92, 0.7)])
-    d.band("far", "M-30 112 H230")
-    d.band("mid", waves(126, 3, 26))
+    d.band("mid", "M-30 112 H230")
+    d.band("near", waves(126, 3, 26))
     # sea stack
     d.shape("cliff", "M40 150 L44 118 Q52 112 60 118 L64 150Z")
     d.shape("grass", "M43 120 Q52 110 61 120 Q52 116 43 120Z", shadow=False)
@@ -602,7 +602,7 @@ def sea_cliffs(d: Drawing):
     d.shape("grass2", "M98 54 Q140 46 230 40 V46 L100 56Z", shadow=False, line=False)
     # foam and nearer sea
     d.shape("light", "M76 166 C84 156 94 156 100 162 C104 156 112 156 116 162 L116 172 H76Z", shadow=False)
-    d.band("near", waves(170, 4, 28))
+    d.band("deep", waves(170, 4, 28))
     d.stroke("light", "M14 182 q10 -5 20 0 M50 190 q10 -5 20 0 M140 186 q10 -5 20 0", 2.2, line=False)
 
 
@@ -617,8 +617,7 @@ def rolling_hills(d: Drawing):
     def patches():
         d.shape("ground", "M30 100 L70 104 L60 126 L14 128Z M120 108 L160 98 L176 116 L132 126Z", shadow=False, line=False)
         d.shape("near", "M70 104 L110 114 L104 132 L60 126Z M176 104 L230 108 L230 124 L176 116Z", shadow=False, line=False)
-        d.stroke("deep", "M30 100 L14 128 M70 104 L60 126 M110 114 L104 134 M160 98 L176 116 L174 128 M-30 128 L230 120", 1.8,
-                 line=False)
+        d.stroke("deep", "M30 100 L14 128 M70 104 L60 126 M110 114 L104 134 M160 98 L176 116 L174 128", 1.8, line=False)
     clipped(d, mid, patches)
     for x, y, r in [(70, 102, 7), (160, 96, 6)]:
         d.limb("dark", f"M{x} {y} V{y + 8}", 2.2, shadow=False)
@@ -713,17 +712,17 @@ CONCEPTS = [
     Concept("basic-snowy-peak", "basic-snowy-peak", "Snowy peak", snowy_peak, overrides={"snow2": "#D6E2EC"},
             checks=[("light", "sky"), ("mid", "far"), ("deep", "light")], fixes={"sky": ["sky2", "far", "mid"], "far": ["mid", "near"]}),
     Concept("basic-beach", "basic-beach", "Beach", beach, NO_GOLD,
-            checks=[("hero", "sky"), ("hero", "far"), ("ground", "mid"), ("pop", "ground")], fixes={"hero": ["pop", "hero2"]}),
+            checks=[("hero", "sky"), ("hero", "far"), ("ground", "mid"), ("pop", "ground")], fixes={"hero": ["pop", "hero2"], "pop": ["hero", "deep"]}),
     Concept("basic-lake", "basic-lake", "Lake", lake, NO_GOLD, overrides=LAKE,
             checks=[("far", "sky"), ("pine", "water"), ("hero", "water")], fixes={"far": ["mid", "near"], "hero": ["pop", "hero2"]}),
     Concept("basic-field", "basic-field", "Field", field, overrides=FIELD,
             checks=[("wheat", "wheat2"), ("wheat", "far"), ("far", "sky")], fixes={"far": ["mid", "near"]}),
     Concept("basic-pond", "basic-pond", "Pond", pond, NO_GOLD, overrides=POND,
-            checks=[("water", "mid"), ("duck", "water"), ("pad", "water")]),
+            checks=[("water", "mid"), ("duck", "water"), ("pad", "water")], fixes={"mid": ["near", "far"]}),
     Concept("basic-ocean-wave", "basic-ocean-wave", "Ocean wave", ocean_wave, NO_GOLD,
             checks=[("mid", "sky"), ("mid", "far"), ("light", "mid")], fixes={"far": ["sky2", "light"]}),
     Concept("basic-river", "basic-river", "River", river, overrides=RIVER,
-            checks=[("water", "near"), ("water", "mid"), ("deep", "near")], fixes={"near": ["mid", "far"]}),
+            checks=[("water", "near"), ("water", "mid"), ("deep", "near")], fixes={"near": ["mid", "far"], "mid": ["far", "near", "ground"]}),
     Concept("basic-forest-path", "basic-forest-path", "Forest path", forest_path, overrides=GREEN,
             checks=[("ground", "mid"), ("leaf2", "sky"), ("leaf3", "glow"), ("leaf3", "far")],
             fixes={"mid": ["near", "deep"], "glow": ["glow2", "light"], "far": ["mid", "near"]}),
@@ -732,14 +731,14 @@ CONCEPTS = [
     Concept("basic-island", "basic-island", "Island", island, NO_GOLD, overrides=PALM,
             checks=[("ground", "mid"), ("frond", "sky"), ("frond", "mid")]),
     Concept("basic-volcano", "basic-volcano", "Volcano", volcano, overrides=VOLC,
-            checks=[("rock", "sky"), ("smoke", "sky"), ("rock", "far")], fixes={"far": ["mid", "sky2"]}),
+            checks=[("rock", "sky"), ("smoke", "sky"), ("rock", "far")], fixes={"far": ["mid", "sky2", "light"]}),
     Concept("basic-waterfall", "basic-waterfall", "Waterfall", waterfall, overrides=FALLS,
             checks=[("water", "rock"), ("moss", "sky"), ("water", "sky")], fixes={"sky": ["sky2", "far"]}),
     Concept("basic-wildflowers", "basic-wildflowers", "Wildflowers", wildflowers, overrides=FLOWERS,
             checks=[("daisy", "sky"), ("poppy", "far"), ("corn", "far"), ("daisy", "far")],
             fixes={"sky": ["sky2", "far"], "far": ["mid", "near"]}),
     Concept("basic-sea-cliffs", "basic-sea-cliffs", "Sea cliffs", sea_cliffs, NO_GOLD, overrides=CLIFF,
-            checks=[("cliff", "far"), ("cliff", "near"), ("grass", "sky"), ("cliff", "sky")], fixes={"sky": ["sky2", "far"]}),
+            checks=[("cliff", "mid"), ("cliff", "near"), ("cliff", "deep"), ("grass", "sky")], fixes={"sky": ["sky2", "far"]}),
     Concept("basic-rolling-hills", "basic-rolling-hills", "Rolling hills", rolling_hills,
             checks=[("near", "sky"), ("deep", "near"), ("ground", "mid")], fixes={"ground": ["light", "far"]}),
     Concept("basic-starry-night", "basic-starry-night", "Starry night", starry_night, ["dusk", "coastal", "meadow", "blush", "golden"],

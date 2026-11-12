@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { listOrders, getDesign } from "@/lib/server/db";
-import { getProduct, money, type RegionId, describeOptions } from "@/lib/products";
+import { money, type RegionId, describeOptions } from "@/lib/products";
 import RetryButton from "./RetryButton";
 
 export const dynamic = "force-dynamic";

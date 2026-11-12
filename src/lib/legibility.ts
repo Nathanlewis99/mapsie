@@ -159,7 +159,10 @@ export function tidyCrowded(d: Design): Record<string, Partial<Stop>> {
         for (const o of placements(cur(), s)) {
           stops[i] = { ...s, labelOffset: o };
           const n = hits(cur(), i, pos);
-          if (n < bestHits) (best = o), (bestHits = n);
+          if (n < bestHits) {
+            best = o;
+            bestHits = n;
+          }
         }
         stops[i] = { ...s, labelOffset: best[0] === 0 && best[1] === 0 ? undefined : best };
       });
@@ -248,7 +251,10 @@ export function smallestText(d: Design, productId = d.productId) {
   for (const s of d.stops) {
     if (!s.showLabel) continue;
     const pt = pctToPt(2 * labelScale(d, s), wcm);
-    if (pt < label) (label = pt), (labelStop = s.name);
+    if (pt < label) {
+      label = pt;
+      labelStop = s.name;
+    }
   }
   let number = Infinity;
   if (d.markers.style === "number")

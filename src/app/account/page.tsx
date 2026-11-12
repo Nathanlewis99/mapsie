@@ -3,7 +3,7 @@ import Logo from "@/components/Logo";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/server/auth";
 import { getDesign, listOrdersForUser, listSavedDesigns } from "@/lib/server/db";
-import { getProduct, money, type RegionId, describeOptions } from "@/lib/products";
+import { money, type RegionId, describeOptions } from "@/lib/products";
 import { normalizeDesign } from "@/lib/types";
 import SiteFooter from "@/components/SiteFooter";
 import DeleteDesignButton from "./DeleteDesignButton";

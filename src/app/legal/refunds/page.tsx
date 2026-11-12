@@ -107,7 +107,8 @@ export default function RefundsPage() {
         <p>
           If your order hasn&apos;t arrived by the end of its estimated delivery window (see our{" "}
           <In href="/legal/shipping">Shipping &amp; Delivery policy</In>), please email us. We&apos;ll chase it with the
-          courier, and if it has been lost we&apos;ll send a free reprint or give you a full refund.
+          courier, and if it has been lost we&apos;ll send a free reprint or give you a full refund. If the courier hasn&apos;t
+          found it within 5 working days of your email, we treat it as lost.
         </p>
         <p>
           If a parcel can&apos;t be delivered because the address given at checkout was incorrect or incomplete, we can&apos;t
@@ -119,7 +120,8 @@ export default function RefundsPage() {
         <p>
           Refunds are made to the card or payment method you used, through our payment provider Stripe. We&apos;ll process your
           refund within 14 days of agreeing that you&apos;re entitled to it. Depending on your bank, it can take a further 5 to 10
-          working days to appear in your account. Refunds are made in the currency you paid in.
+          working days to appear in your account. Refunds are made in the currency you paid in, and are for the amount you
+          actually paid (after any discount code).
         </p>
       </Section>
 

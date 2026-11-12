@@ -4,6 +4,7 @@ import { renderDesign, FALLBACK } from "./render";
 import { publicUrl } from "./urls";
 import { submitPrintOrder } from "./prodigi";
 import { logError } from "./log";
+import { alertAdmin, sendOrderEmail } from "./email";
 
 /** Minutes after payment during which the customer can cancel. */
 export const HOLD_MINUTES = Number(process.env.ORDER_HOLD_MINUTES ?? 60);
@@ -31,6 +32,7 @@ export async function fulfilOrder(orderId: string, address: Address, extra: Part
   });
   const paid = await getOrder(orderId);
   if (paid?.visitId) await recordEvent(paid.visitId, "paid", { total: paid.total, currency: paid.currency }).catch(() => {});
+  await sendOrderEmail(orderId, "confirmed");
   if (ROLE !== "web") void processPaidOrders();
 }
 
@@ -73,6 +75,7 @@ async function renderOrder(order: Order) {
     if (HOLD_MINUTES <= 0) await sendToPrint(orderId);
   } catch (e) {
     await logError("order.render", e, { orderId });
+    await alertAdmin(`Order ${orderId}: print file failed`, `The print file for order ${orderId} couldn't be made.\n\n${String(e).slice(0, 1500)}\n\nRetry it from the admin page.`);
     await updateOrder(orderId, { status: "failed", error: String(e) });
   }
 }
@@ -90,6 +93,7 @@ export async function sendToPrint(orderId: string) {
     await updateOrder(orderId, { status: "submitted", printProviderOrderId: sent.id, error: undefined });
   } catch (e) {
     await logError("order.print", e, { orderId });
+    await alertAdmin(`Order ${orderId}: couldn't send to the printer`, `Prodigi rejected or didn't accept order ${orderId}.\n\n${String(e).slice(0, 1500)}\n\nRetry it from the admin page.`);
     await updateOrder(orderId, { status: "failed", error: String(e) });
   }
 }

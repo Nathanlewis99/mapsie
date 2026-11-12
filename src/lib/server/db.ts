@@ -51,6 +51,8 @@ export interface Order {
   error?: string;
   /** Anonymous analytics visit that placed the order (for the funnel). */
   visitId?: string;
+  /** Which customer emails have gone out, so none is sent twice. */
+  emailsSent?: string[];
   createdAt: string;
 }
 

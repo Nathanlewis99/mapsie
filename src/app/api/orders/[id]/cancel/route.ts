@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { getOrder, updateOrder } from "@/lib/server/db";
 import { canCancel } from "@/lib/server/fulfil";
 import { logError } from "@/lib/server/log";
+import { sendOrderEmail } from "@/lib/server/email";
 
 /** Customer cancels within the hold window: full refund, never sent to print. */
 export async function POST(_: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -22,5 +23,6 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
     }
   }
   await updateOrder(id, { status: "cancelled", cancelledAt: new Date().toISOString(), refunded });
+  await sendOrderEmail(id, "cancelled");
   return NextResponse.json({ ok: true, refunded });
 }

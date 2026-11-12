@@ -25,7 +25,7 @@ import PrintOptionsPicker from "@/components/PrintOptionsPicker";
 import { crowding, MIN_STOP_SCALE, readability, recommendedProduct, sizeNote, smallestText, tidyCrowded } from "@/lib/legibility";
 import { getProduct } from "@/lib/products";
 import { TEMPLATES } from "@/lib/templates";
-import type { Design, ThemeColors, Layout, TravelMode, MarkerStyle, RouteStyle, TextStyle, TextCase, FontId } from "@/lib/types";
+import type { ThemeColors, Layout, TravelMode, MarkerStyle, RouteStyle, TextStyle, TextCase, FontId } from "@/lib/types";
 
 export const Label = ({ children }: { children: React.ReactNode }) => (
   <div className="text-xs font-bold uppercase tracking-wider text-ink/50 mb-2">{children}</div>

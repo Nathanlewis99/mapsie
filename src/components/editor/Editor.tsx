@@ -407,9 +407,9 @@ export default function Editor() {
           <div className="absolute right-3 bottom-3 z-20 flex flex-col items-end gap-2">
             {locked && (
               <div className="flex flex-col rounded-2xl bg-white shadow-lg overflow-hidden text-lg font-extrabold">
-                <button title="Zoom in" className="w-10 h-10 hover:bg-ink/5" onClick={() => setZoom((z) => ({ k: Math.min(5, z.k * 1.4), x: z.x * 1.4, y: z.y * 1.4 }))}>+</button>
-                <button title="Zoom out" className="w-10 h-10 hover:bg-ink/5 border-t border-ink/10" onClick={() => setZoom((z) => (z.k / 1.4 <= 1.01 ? { k: 1, x: 0, y: 0 } : { k: z.k / 1.4, x: z.x / 1.4, y: z.y / 1.4 }))}>−</button>
-                <button title="Fit the poster" className="w-10 h-10 hover:bg-ink/5 border-t border-ink/10 text-sm" onClick={() => setZoom({ k: 1, x: 0, y: 0 })}>⤢</button>
+                <button title="Zoom in" aria-label="Zoom in" className="w-10 h-10 hover:bg-ink/5" onClick={() => setZoom((z) => ({ k: Math.min(5, z.k * 1.4), x: z.x * 1.4, y: z.y * 1.4 }))}>+</button>
+                <button title="Zoom out" aria-label="Zoom out" className="w-10 h-10 hover:bg-ink/5 border-t border-ink/10" onClick={() => setZoom((z) => (z.k / 1.4 <= 1.01 ? { k: 1, x: 0, y: 0 } : { k: z.k / 1.4, x: z.x / 1.4, y: z.y / 1.4 }))}>−</button>
+                <button title="Fit the poster" aria-label="Fit the poster" className="w-10 h-10 hover:bg-ink/5 border-t border-ink/10 text-sm" onClick={() => setZoom({ k: 1, x: 0, y: 0 })}>⤢</button>
               </div>
             )}
             <button

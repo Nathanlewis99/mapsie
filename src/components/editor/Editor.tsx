@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Logo from "@/components/Logo";
+import Icon from "@/components/Icon";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import FramedPoster, { frameWidth } from "@/components/FramedPoster";
@@ -16,11 +17,11 @@ import { TripPanel, StylePanel, StickersPanel, TextPanel, SizePanel } from "./Pa
 import { track } from "@/lib/track";
 
 const TABS = [
-  { id: "trip", label: "Trip", icon: "🧭" },
-  { id: "style", label: "Style", icon: "🎨" },
-  { id: "stickers", label: "Stickers", icon: "🐊" },
-  { id: "text", label: "Text", icon: "✍️" },
-  { id: "size", label: "Size", icon: "🖼️" },
+  { id: "trip", label: "Trip", icon: "route" },
+  { id: "style", label: "Style", icon: "palette" },
+  { id: "stickers", label: "Stickers", icon: "sticker" },
+  { id: "text", label: "Text", icon: "type" },
+  { id: "size", label: "Size", icon: "frame" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
@@ -288,65 +289,71 @@ export default function Editor() {
     setBusy("");
   };
 
-  const iconBtn = "w-8 h-8 sm:w-10 sm:h-10 grid place-items-center rounded-full hover:bg-ink/5 disabled:opacity-25 text-base sm:text-lg";
+  const iconBtn = "w-9 h-9 grid place-items-center rounded-full text-ink/70 hover:text-ink hover:bg-ink/5 disabled:opacity-25 disabled:hover:bg-transparent transition";
+  const textBtn = "inline-flex items-center gap-2 h-9 px-2 lg:px-3 rounded-full text-sm font-semibold text-ink/70 hover:text-ink hover:bg-ink/5 disabled:opacity-30 disabled:hover:bg-transparent transition";
 
   return (
     <div className="h-dvh flex flex-col">
-      <header className="flex items-center justify-between gap-2 px-3 sm:px-5 py-2.5 border-b border-ink/5 bg-cream">
+      <header className="flex items-center justify-between gap-3 px-3 sm:px-6 h-14 sm:h-16 border-b border-ink/10 bg-cream">
         <Link href="/" className="font-display text-xl sm:text-2xl font-extrabold tracking-tight shrink-0">
           <Logo />
         </Link>
-        <div className="flex items-center gap-0.5 sm:gap-1">
-          <button title="Undo (Ctrl+Z)" className={iconBtn} disabled={!past.length} onClick={store.undo}>↶</button>
-          <button title="Redo (Ctrl+Shift+Z)" className={iconBtn} disabled={!future.length} onClick={store.redo}>↷</button>
-          <span className="w-px h-6 bg-ink/10 mx-1 hidden sm:block" />
-          <button title="See it on a wall" className={`${iconBtn} sm:w-auto sm:px-3 sm:text-sm sm:font-bold`} onClick={() => setWall(true)} disabled={!design.stops.length}>
-            🛋️<span className="hidden sm:inline ml-1">On the wall</span>
-          </button>
-          <button title="Share a link" className={`${iconBtn} sm:w-auto sm:px-3 sm:text-sm sm:font-bold`} onClick={share} disabled={!!busy || !design.stops.length}>
-            🔗<span className="hidden sm:inline ml-1">{busy === "share" ? "…" : "Share"}</span>
-          </button>
+        <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+          <div className="flex items-center">
+            <button title="Undo (Ctrl+Z)" aria-label="Undo" className={iconBtn} disabled={!past.length} onClick={store.undo}>
+              <Icon name="undo" />
+            </button>
+            <button title="Redo (Ctrl+Shift+Z)" aria-label="Redo" className={iconBtn} disabled={!future.length} onClick={store.redo}>
+              <Icon name="redo" />
+            </button>
+          </div>
+          <span className="w-px h-6 bg-ink/10 mx-1 sm:mx-2 hidden sm:block" />
+          <div className="flex items-center sm:gap-1">
+            <button title="See it on a wall" className={textBtn} onClick={() => setWall(true)} disabled={!design.stops.length}>
+              <Icon name="wall" />
+              <span className="hidden lg:inline">On the wall</span>
+            </button>
+            <button title="Share a link" className={textBtn} onClick={share} disabled={!!busy || !design.stops.length}>
+              <Icon name="share" />
+              <span className="hidden lg:inline">{busy === "share" ? "Sharing…" : "Share"}</span>
+            </button>
+            <button title={me?.user ? "Save to your account" : "Sign in to save"} className={textBtn} onClick={save} disabled={busy === "save" || (!!savedId && !dirty)}>
+              <Icon name={savedId && !dirty ? "check" : "save"} />
+              <span className="hidden lg:inline">{busy === "save" ? "Saving…" : savedId && !dirty ? "Saved" : "Save"}</span>
+            </button>
+            <button title="Start a new map" onClick={() => confirm("Start a fresh map? (You can undo this.)") && store.reset()} className={`${textBtn} hidden md:inline-flex`}>
+              <Icon name="plus" />
+              <span className="hidden lg:inline">New</span>
+            </button>
+          </div>
+          <span className="w-px h-6 bg-ink/10 mx-1 sm:mx-2 hidden sm:block" />
+          <label className="hidden sm:flex items-center gap-1.5 rounded-full border border-ink/15 pl-3 pr-1 h-9 text-sm font-semibold text-ink/70 hover:border-ink/30 cursor-pointer" title="Where should we ship it? Prices and printing are local to each country.">
+            <Icon name="globe" size={16} />
+            <select value={region} onChange={(e) => store.setRegion(e.target.value as typeof region)} aria-label="Ship to" className="bg-transparent outline-none cursor-pointer pr-1">
+              {REGIONS.map((r) => (
+                <option key={r.id} value={r.id}>{r.id === "GB" ? "UK" : r.id}</option>
+              ))}
+            </select>
+          </label>
           <button
-            title={me?.user ? "Save to your account" : "Sign in to save"}
-            className={`${iconBtn} sm:w-auto sm:px-3 sm:text-sm sm:font-bold`}
-            onClick={save}
-            disabled={busy === "save" || (!!savedId && !dirty)}
+            onClick={order}
+            disabled={!!busy || design.stops.length === 0}
+            className="ml-1 sm:ml-2 h-9 sm:h-10 rounded-full bg-coral px-4 sm:px-5 text-sm sm:text-[15px] font-bold text-white shadow-sm hover:bg-coral-dark disabled:opacity-40 transition whitespace-nowrap"
           >
-            {savedId && !dirty ? "✓" : "💾"}
-            <span className="hidden sm:inline ml-1">{busy === "save" ? "Saving…" : savedId && !dirty ? "Saved" : "Save"}</span>
-          </button>
-          <button
-            onClick={() => confirm("Start a fresh map? (You can undo this.)") && store.reset()}
-            className="hidden md:block text-sm font-bold text-ink/50 hover:text-ink px-2"
-          >
-            New
-          </button>
-          <select
-            value={region}
-            onChange={(e) => store.setRegion(e.target.value as typeof region)}
-            title="Where should we ship it? Prices and printing are local to each country."
-            aria-label="Ship to"
-            className="ml-1 rounded-full bg-white border border-ink/10 px-2 py-2 text-sm font-bold cursor-pointer"
-          >
-            {REGIONS.map((r) => (
-              <option key={r.id} value={r.id}>{r.flag} {r.id === "GB" ? "UK" : r.id}</option>
-            ))}
-          </select>
-          <button onClick={order} disabled={!!busy || design.stops.length === 0} className="ml-1 rounded-full bg-coral px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-extrabold text-white shadow-lg shadow-coral/30 hover:bg-coral-dark disabled:opacity-40 transition whitespace-nowrap">
             {busy === "order" ? "Saving…" : <>Order<span className="hidden sm:inline"> print</span> · {money(region, price)}</>}
           </button>
           {me?.user ? (
-            <Link href="/account" title="My account" className="ml-1 shrink-0">
+            <Link href="/account" title="My account" className="ml-1 sm:ml-2 shrink-0">
               {me.user.picture ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={me.user.picture} alt="My account" referrerPolicy="no-referrer" className="w-9 h-9 rounded-full" />
+                <img src={me.user.picture} alt="My account" referrerPolicy="no-referrer" className="w-9 h-9 rounded-full ring-1 ring-ink/10" />
               ) : (
-                <span className="grid place-items-center w-9 h-9 rounded-full bg-ink text-white font-extrabold">{(me.user.name ?? me.user.email)[0].toUpperCase()}</span>
+                <span className="grid place-items-center w-9 h-9 rounded-full bg-ink text-white font-semibold">{(me.user.name ?? me.user.email)[0].toUpperCase()}</span>
               )}
             </Link>
           ) : (
             me && (
-              <Link href="/signin?next=/create" className="hidden sm:block ml-1 text-sm font-bold text-ink/60 hover:text-ink px-2 whitespace-nowrap">
+              <Link href="/signin?next=/create" className="hidden sm:block ml-1 sm:ml-2 text-sm font-semibold text-ink/60 hover:text-ink px-2 whitespace-nowrap">
                 Sign in
               </Link>
             )
@@ -583,9 +590,9 @@ export default function Editor() {
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`flex-1 rounded-2xl py-1.5 sm:py-2 text-xs font-extrabold transition ${tab === t.id ? "bg-white shadow-sm text-ink" : "text-ink/50 hover:text-ink"}`}
+                className={`flex-1 rounded-xl py-2 text-xs font-semibold tracking-wide transition ${tab === t.id ? "bg-white shadow-sm text-ink" : "text-ink/45 hover:text-ink"}`}
               >
-                <div className="text-lg leading-none mb-0.5">{t.icon}</div>
+                <Icon name={t.icon} size={19} className="mx-auto mb-1" />
                 {t.label}
               </button>
             ))}

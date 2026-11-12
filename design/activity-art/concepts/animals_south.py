@@ -504,7 +504,7 @@ def alpaca_terraces(d: Drawing):
     d.shape("mid", "M80 132 C98 118 112 74 128 52 C138 40 152 44 158 62 C164 82 172 104 196 114 C210 120 220 122 236 124 V150 H80Z")
     d.stroke("near", "M120 72 h14 M114 84 h22 M108 96 h30", 1.6, line=False)
     # stone ruins on the saddle
-    for x, w, h in [(28, 22, 14), (54, 28, 18), (86, 22, 12)]:
+    for x, w, h in [(10, 20, 13), (34, 26, 17), (62, 18, 11)]:
         d.shape("stone", f"M{x} 132 V{132 - h} L{x + w / 2} {132 - h - 9} L{x + w} {132 - h} V132Z")
         d.marks("stone2", f"M{x + w / 2 - 3} {132 - h + 4} L{x + w / 2 + 3} {132 - h + 4} L{x + w / 2 + 4} {132 - h + 11} L{x + w / 2 - 4} {132 - h + 11}Z")
     for i, y in enumerate([134, 150, 166, 182]):
@@ -756,7 +756,7 @@ def iguana_lava(d: Drawing):
     d.band("mid", waves(104, 3, 26))
     d.shape("light", "M-30 118 Q10 104 40 112 Q60 100 84 112 Q120 102 150 112 Q180 100 230 112 V124 H-30Z", shadow=False)
     d.shape("lava", "M-30 140 C-10 118 20 110 50 114 C70 116 84 124 90 140Z")
-    at(d, 40, 116, 0.5, lambda: iguana_side(d), flipx=True, ox=100, oy=140)
+    at(d, 56, 116, 0.5, lambda: iguana_side(d), flipx=True, ox=100, oy=140)
     d.band("lava", "M-30 154 C20 140 60 140 100 146 C140 152 180 138 230 146")
     d.marks("lava2", circle(30, 172, 2) + circle(110, 176, 2.4) + circle(176, 166, 1.6) + circle(70, 188, 1.8) + circle(150, 190, 2))
     at(d, 106, 150, 0.98, lambda: iguana_side(d), ox=100, oy=140)
@@ -823,20 +823,21 @@ def sealion_bench(d: Drawing):
 
 
 # ================================================================ PINK RIVER DOLPHIN
-def boto(d: Drawing, s=1.0):
-    """An Amazon river dolphin swimming up and to the right, drawn around (100, 100)."""
-    p = ((28, 150), (62, 132), (110, 112), (138, 86))
-    prof = lambda t: (3 + 20 * math.sin(math.pi * (0.1 + 0.8 * t) ** 1.2), 3 + 22 * math.sin(math.pi * (0.1 + 0.8 * t) ** 1.2))
-    d.shape("hero", f"M26 150 Q12 132 6 132 Q14 146 22 152 Q14 160 8 172 Q18 166 30 154Z")
-    d.shape("hero", fin(p, 0.5, 5, 10, 20))
-    d.shape("hero", "M98 124 C96 140 88 152 76 160 C92 160 106 148 112 130Z")
-    d.shape("hero", spine(p, prof), spot=True)
-    d.shape("hero2", spine(p, lambda t: (-6, prof(t)[1] - 2), t0=0.4, t1=0.98), shadow=False)
-    d.shape("hero", ellipse(142, 80, 18, 15), extra='transform="rotate(-38 142 80)"')
-    d.shape("hero", "M150 74 C160 64 172 54 184 46 C186 48 186 50 184 52 C174 62 164 74 156 86Z")
-    d.stroke("mark", "M182 50 C172 60 164 70 156 80", 1.2)
-    d.marks("mark", circle(150, 82, 1.8))
-    d.stroke("hero2", "M128 102 q4 -4 8 -4", 1.4, line=False)
+BOTO_BODY = ("M40 108 C60 96 90 84 118 84 C132 84 138 74 150 72 C164 70 172 80 170 94 L194 101 C196 102 196 105 194 106 "
+             "L166 108 C158 113 148 115 140 116 C124 122 96 124 72 120 C56 118 46 116 40 114Z")
+
+
+def boto(d: Drawing, flipper=True):
+    """An Amazon river dolphin facing right: chunky body, round melon, long thin beak. Drawn around (100, 100)."""
+    d.shape("hero", "M44 111 C36 104 26 96 14 94 C20 104 24 110 28 112 C24 116 20 124 16 134 C28 128 38 120 46 114Z")
+    d.shape("hero", "M90 88 C98 80 106 78 116 80 C108 82 102 86 96 90Z")
+    d.shape("hero", BOTO_BODY, spot=True)
+    d.shape("hero2", "M72 118 C96 121 124 118 146 112 C136 117 122 121 104 122 C92 123 82 121 72 118Z", shadow=False)
+    if flipper:
+        d.shape("hero", "M120 112 C122 128 116 140 104 150 C120 148 132 136 134 116Z")
+    d.stroke("mark", "M194 104 L168 105", 1.2)
+    d.stroke("hero2", "M138 86 Q142 96 140 108", 1.6, line=False)
+    d.marks("mark", circle(160, 92, 1.9))
 
 
 def pinkdolphin_portrait(d: Drawing):
@@ -848,7 +849,7 @@ def pinkdolphin_portrait(d: Drawing):
     d.limb("dark", "M176 90 L156 70 M174 150 L196 168", 4)
     for x, y, a in [(44, 40, -40), (50, 150, 40), (156, 70, -140), (194, 166, 30)]:
         d.shape("near", leaf(x, y, 18, 5, a), shadow=False, line=False)
-    group(d, "translate(106 106) scale(.9) translate(-100 -100)", lambda: boto(d))
+    group(d, "translate(98 104) scale(1.0) rotate(-22) translate(-104 -100)", lambda: boto(d))
     for x, y, s in [(56, 64, 0.8), (70, 56, 0.7), (126, 154, 0.8), (140, 162, 0.7)]:
         d.shape("hero2", fish(x, y, s, right=True), shadow=False)
     bubbles(d, [(150, 46, 2.5), (156, 34, 3.5), (148, 24, 2)])
@@ -864,15 +865,7 @@ def pinkdolphin_amazon(d: Drawing):
     d.shape("dark", "M140 84 L162 68 L184 84Z")
     d.marks("dark", rrect(156, 86, 7, 7, 1))
     d.band("mid", "M-30 110 H230")
-    p = ((40, 140), (60, 92), (110, 70), (150, 110))
-    prof = lambda t: (2 + 17 * math.sin(math.pi * min(t, 0.85) / 0.85 * 0.9 + 0.1), 2 + 15 * math.sin(math.pi * min(t, 0.85) / 0.85 * 0.9 + 0.1))
-    d.shape("hero", fin(p, 0.45, 5, 8, 18))
-    d.shape("hero", spine(p, prof, t1=0.86), spot=True)
-    d.shape("hero2", spine(p, lambda t: (-5, prof(t)[1] - 2), t0=0.4, t1=0.86), shadow=False)
-    hx, hy = frame(p, 0.86)
-    d.shape("hero", circle(hx, hy, 15))
-    d.shape("hero", f"M{hx + 6} {hy + 8} C{hx + 10} {hy + 18} {hx + 14} {hy + 28} {hx + 18} {hy + 38} L{hx + 12} {hy + 40} C{hx + 6} {hy + 30} {hx} {hy + 20} {hx - 4} {hy + 12}Z")
-    d.marks("mark", circle(hx + 4, hy + 4, 1.8))
+    group(d, "translate(96 116) rotate(-30) translate(-112 -100)", lambda: boto(d, flipper=False))
     d.band("near", waves(138, 3, 30))
     for x, y, r in [(150, 132, 3), (160, 126, 2.4), (140, 124, 2.2), (44, 132, 2.4), (34, 126, 2)]:
         d.shape("light", drop(x, y, r), shadow=False)
@@ -1054,7 +1047,7 @@ MANTA_OUT = ("M100 50 C112 50 120 56 126 64 C146 64 166 72 180 90 C168 96 146 10
              "C88 138 78 130 72 118 C54 104 32 96 20 90 C34 72 54 64 74 64 C80 56 88 50 100 50Z")
 MANTA_BELLY = ("M100 62 C110 62 118 68 122 76 C138 78 154 84 164 92 C150 96 134 104 122 114 C116 124 108 130 100 130 "
                "C92 130 84 124 78 114 C66 104 50 96 36 92 C46 84 62 78 78 76 C82 68 90 62 100 62Z")
-MANTA_HORN = "M80 64 C76 56 76 46 80 36 C85 38 89 44 90 52 C91 57 90 61 88 64Z"
+MANTA_HORN = "M80 64 C74 56 72 46 76 38 C79 33 84 34 85 38 C83 42 82 46 84 50 C85 55 88 59 89 62Z"
 
 
 def manta_belly(d: Drawing):
@@ -1375,13 +1368,17 @@ def hammerhead_portrait(d: Drawing):
     bubbles(d, [(30, 70, 2.5), (24, 58, 3.4)])
 
 
+HH_SIL = ("M94 74 C90 100 92 130 97 160 L99 172 L90 196 L101 186 L110 194 L101 170 L103 160 C108 130 110 100 106 74Z "
+          "M93 98 L74 124 L96 112Z M107 98 L126 124 L104 112Z")
+
+
 def hammerhead_school(d: Drawing):
     deep_water(d)
     rays(d, ((30, 16), (110, 12), (160, 8)))
     for x, y, s, r, role in [(40, 50, 0.3, 30, "far2"), (150, 34, 0.26, 36, "far2"), (98, 58, 0.34, 32, "far2"),
                              (166, 90, 0.36, 28, "school"), (30, 108, 0.38, 34, "school"), (76, 118, 0.48, 30, "school"),
                              (134, 132, 0.52, 34, "school")]:
-        at(d, x, y, s, lambda role=role: hammerhead(d, body=role, detail=False), rot=r, ox=100, oy=110)
+        at(d, x, y, s, lambda role=role: d.shape(role, HH_SIL + HAMMER), rot=r, ox=100, oy=110)
     at(d, 56, 172, 0.36, lambda: diver(d), rot=-24)
     bubbles(d, [(36, 150, 2.2), (32, 140, 3), (38, 130, 2)])
 
@@ -1519,8 +1516,8 @@ MACAW = {"hero": "#D62D2D", "hero2": "#F6C329", "green": "#3F9A4E", "blue": "#2A
 CLAY = {**MACAW, "clay": "#D99A6C", "clay2": "#B9704A"}
 CAPY = {"hero": "#A6744B", "hero2": "#7E5234", "mark": "#2E2018", "light": "#FFFFFF", "bird": "#F2C230"}
 CAPY_WET = {**CAPY, "lily": "#5E9A4A", "lily2": "#3F7A34", "pop": "#F2A7C3"}
-ALPACA = {"hero": "#C8955F", "hero2": "#F4E7D0", "mark": "#3A2A20", "pop": "#E0457B", "pop2": "#F6C445"}
-ALPACA_T = {**ALPACA, "fur2": "#A67845", "stone": "#D8CFBE", "stone2": "#5A5048", "dark": "#3A2A20"}
+ALPACA = {"hero": "#C8955F", "hero2": "#E2BB86", "mark": "#3A2A20", "pop": "#E0457B", "pop2": "#F6C445"}
+ALPACA_T = {**ALPACA, "fur2": "#A67845", "stone": "#9C9384", "stone2": "#5A5048", "dark": "#3A2A20"}
 CONDOR = {"dark": "#1D1D22", "hero": "#A0675A", "hero2": "#6E3A36", "light": "#FFFFFF", "beak": "#E8DCC2", "mark": "#201414",
           "wing": "#E9E9EC"}
 TORT = {"hero": "#6B6152", "hero2": "#948A77", "mark": "#3A3229", "light": "#B9AF99"}
@@ -1530,7 +1527,7 @@ BOOBY = {"hero": "#7D5E45", "hero2": "#33B4D8", "light": "#FFFFFF", "head": "#E3
 IGUANA = {"hero": "#3E3D42", "hero2": "#B9473A", "green": "#6E9A4C", "mark": "#151518", "light": "#F4F1EA", "eye": "#C9B26A"}
 IGUANA_L = {**IGUANA, "hero": "#2C2B30", "lava": "#77706E", "lava2": "#5A5452", "crab": "#E5482C", "crab2": "#C23A22"}
 SEALION = {"hero": "#8B7763", "hero2": "#B8A48C", "mark": "#231D19", "light": "#FFFFFF", "flipper": "#5E4E40", "rock": "#6E6A66"}
-SEALION_B = {**SEALION, "wood": "#2F8C8C", "wood2": "#22605F"}
+SEALION_B = {**SEALION, "wood": "#5DB7A9", "wood2": "#2E7A70"}
 BOTO = {"hero": "#E99AAA", "hero2": "#F8D3DA", "mark": "#3A2228"}
 FROG_BLUE = {"hero": "#2F6FD3", "hero2": "#1F4CA0", "mark": "#0F1626", "light": "#FFFFFF"}
 FROG_RED = {"hero": "#D8312A", "hero2": "#2C5DB8", "mark": "#1A1012", "light": "#FFFFFF", "brom": "#4F9A55", "brom2": "#7CC06A",
@@ -1564,9 +1561,9 @@ SOUTH = [
             fixes={"far": ["deep", "dark"], "mid": ["far", "sky2"], "near": ["mid", "deep"]}),
     Concept("alpaca-portrait", "animal-alpaca", "Alpaca", alpaca_portrait, overrides=ALPACA,
             checks=[("hero", "sky"), ("hero", "far"), ("hero", "mid"), ("hero2", "sky")],
-            fixes={"far": ["mid", "near", "deep"], "mid": ["near", "deep"], "sky": ["sky2", "far"]}),
+            fixes={"far": ["mid", "near", "deep"], "mid": ["near", "deep"]}),
     Concept("alpaca-terraces", "animal-alpaca", "Andean terraces", alpaca_terraces, overrides=ALPACA_T,
-            checks=[("hero", "near"), ("hero", "sky"), ("hero", "far"), ("stone", "mid"), ("stone", "far"), ("mid", "far")],
+            checks=[("hero", "near"), ("hero", "sky"), ("hero", "far"), ("stone", "far"), ("mid", "far")],
             fixes={"near": ["deep", "mid", "#5E9C6A"], "mid": ["near", "deep"], "far": ["sky2", "mid"]}),
     Concept("condor-portrait", "animal-andean-condor", "Andean condor", condor_portrait, overrides=CONDOR,
             checks=[("hero", "sky"), ("hero", "far"), ("dark", "sky"), ("dark", "far")],

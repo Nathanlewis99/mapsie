@@ -247,8 +247,8 @@ def dashes(d: Drawing, p, role, w, dash, offset=0, cap="round"):
               f'stroke-dashoffset="{offset}" stroke-linecap="{cap}"/>')
 
 
-def branch(d: Drawing, path, w=14, role="bark", knots=()):
-    d.limb(role, path, w)
+def branch(d: Drawing, path, w=14, role="bark", knots=(), spot=False):
+    d.limb(role, path, w, spot=spot)
     for x, y in knots:
         d.stroke("bark2", f"M{x - 4} {y} q4 -3 8 0", 1.6, line=False)
 
@@ -309,9 +309,9 @@ TREEPY = {"hero": "#3FA34D", "hero2": "#C9E66B", "mark": "#173D1E", "light": "#F
 
 def treepython_coils(d: Drawing, spot=True):
     """The famous pose: saddle loops draped over a branch, head resting on the coils in the middle."""
-    branch(d, "M-30 120 C40 118 160 114 230 110", 18, knots=[(20, 119), (180, 112)])
+    branch(d, "M-30 120 C40 118 160 114 230 110", 18, knots=[(20, 119), (180, 112)], spot=spot)
     for p, off in [("M58 112 C48 152 92 156 88 112", 0), ("M116 112 C112 152 156 150 148 110", 6)]:
-        d.limb("hero", p, 16, spot=spot)
+        d.limb("hero", p, 16)
         dashes(d, p, "light", 2.4, "2 17", off)
     for cx, cy, rx, ry, w, off in [(102, 106, 56, 11, 17, 0), (102, 95, 40, 9, 16, 9)]:
         p = ellipse(cx, cy, rx, ry)
@@ -647,18 +647,18 @@ def tarantula_side(d: Drawing):
 
 def tarantula_front(d: Drawing):
     """Front view, legs arching out either side like a little bridge; feet on y=164."""
-    back = [[(86, 120), (46, 86), (24, 160)], [(86, 126), (52, 100), (38, 164)]]
-    front = [[(86, 132), (60, 112), (52, 166)], [(88, 138), (72, 130), (68, 168)]]
-    legs(d, back, 11, band="hero2", band_at=(0.04, 0.3))
-    d.shape("hero", tufty(100, 108, 32, 26, 24, 0.12))
+    back = [[(84, 112), (52, 74), (24, 94), (10, 150)], [(84, 120), (58, 90), (36, 108), (28, 158)]]
+    front = [[(86, 130), (64, 104), (48, 122), (46, 162)], [(88, 138), (76, 120), (64, 136), (64, 166)]]
+    legs(d, back, 9.5, band="hero2", band_at=(0.0, 0.32))
+    d.shape("hero", tufty(100, 106, 35, 29, 26, 0.12))
     if d.paper:
-        d.shape("fur", tufty(100, 104, 20, 14, 16, 0.14), shadow=False)
-    legs(d, front, 11, band="hero2", band_at=(0.04, 0.32))
-    d.shape("hero", tufty(100, 136, 24, 19, 20, 0.1))
-    legs(d, [[(94, 150), (90, 158), (90, 166)]], 7)
+        d.shape("fur", tufty(100, 102, 22, 16, 16, 0.14), shadow=False)
+    legs(d, front, 9.5, band="hero2", band_at=(0.0, 0.32))
+    d.shape("hero", tufty(100, 138, 26, 21, 20, 0.1))
+    legs(d, [[(94, 152), (90, 160), (90, 168)]], 7)
     if d.paper:
-        d.stroke("hero2", "M86 124 Q100 118 114 124", 2.2)
-    cute_eyes(d, 92, 108, 136, 5.2)
+        d.stroke("hero2", "M84 124 Q100 117 116 124", 2.2)
+    cute_eyes(d, 91, 109, 138, 5.6)
 
 
 def tarantula_desert(d: Drawing):
@@ -739,28 +739,24 @@ def redback_portrait(d: Drawing):
 def redback_web(d: Drawing):
     d.disc("glow", 150, 60, 22)
     d.band("far", hills(150, 8))
-    # timber fence
     for x in (-6, 34, 74, 114, 154, 194):
-        d.shape("fence", f"M{x} 200 L{x} 96 L{x + 18} 88 L{x + 36} 96 L{x + 36} 200Z" if False else rrect(x, 92, 36, 120, 3))
+        d.shape("fence", rrect(x, 92, 36, 120, 3), line=False)
         d.stroke("fence2", f"M{x + 12} 104 V200 M{x + 24} 100 V200", 1.4, line=False)
     d.shape("fence2", rrect(-30, 120, 260, 10, 2), line=False)
     d.band("ground", hills(176, 3))
     for x, y, a in [(-4, 196, -60), (10, 200, -80), (196, 196, -120), (184, 200, -100)]:
         d.shape("near", leaf(x, y, 40, 7, a), shadow=False, line=False)
-    # tangled web
     d.raw('<g opacity=".85">', "")
     d.stroke("light", "M40 92 L100 128 L160 92 M70 92 L100 128 L130 92 M100 92 L100 128 M40 92 L80 150 L100 128 L120 150 L160 92 "
                       "M60 110 L140 110 M50 132 L150 132 M80 150 L120 150 M100 128 L100 176 M80 150 L100 176 L120 150", 1.2)
     d.raw("</g>", "")
     # redback hanging upside down, red hourglass showing
-    def spider():
-        legs(d, [[(94, 120), (70, 104), (56, 84)], [(92, 124), (64, 122), (48, 112)], [(92, 128), (68, 140), (56, 156)], [(94, 132), (78, 156), (74, 176)]], 4)
-        ink(d, "hero", circle(100, 110, 20))
-        if d.paper:
-            d.raw('<ellipse cx="92" cy="101" rx="7" ry="4" transform="rotate(-35 92 101)" fill="#fff" opacity=".35"/>')
-        d.shape("pop", "M92 102 L108 102 L102 110 L108 118 L92 118 L98 110Z", shadow=False, spot=True)
-        ink(d, "hero", circle(100, 136, 9))
-    spider()
+    legs(d, [[(94, 120), (70, 104), (56, 84)], [(92, 124), (64, 122), (48, 112)], [(92, 128), (68, 140), (56, 156)], [(94, 132), (78, 156), (74, 176)]], 4)
+    ink(d, "hero", circle(100, 110, 20))
+    if d.paper:
+        d.raw('<ellipse cx="92" cy="101" rx="7" ry="4" transform="rotate(-35 92 101)" fill="#fff" opacity=".35"/>')
+    d.shape("pop", "M92 102 L108 102 L102 110 L108 118 L92 118 L98 110Z", shadow=False, spot=True)
+    ink(d, "hero", circle(100, 136, 9))
 
 
 # ================================================================ PEACOCK SPIDER
@@ -856,8 +852,6 @@ def web(d: Drawing, cx, cy, r, n=14, turns=7, w=1.3, role="silk"):
 
 def orb_spider(d: Drawing):
     legs(d, ORB_LEGS, 4.4, role="legs", band="knee", band_at=(0.0, 0.14), band2="knee")
-    for pts in ORB_LEGS:
-        pass
     legs(d, [[(96, 60), (92, 52), (90, 46)]], 4, role="legs")
     d.shape("hero", "M100 82 C114 82 118 98 118 116 C118 136 110 150 100 150 C90 150 82 136 82 116 C82 98 86 82 100 82Z", spot=True)
     d.marks("spots", "".join(circle(x, y, 2.6) for x, y in [(92, 98), (108, 98), (90, 114), (110, 114), (93, 130), (107, 130), (100, 140)]))
@@ -871,7 +865,7 @@ def orbweaver_portrait(d: Drawing):
 
 
 def orbweaver_forest(d: Drawing):
-    d.disc("glow", 100, 96, 46)
+    d.disc("glow", 100, 96, 46, line=False)
     d.band("far", hills(160, 8))
     d.limb("dark", "M22 210 L28 -10", 18)
     d.limb("dark", "M178 210 L172 -10", 16)
@@ -902,14 +896,13 @@ def scorp_tail(d: Drawing, pts, w0, w1, n_seg=6):
     body = tube(pts, lambda t: w0 + (w1 - w0) * t)
     d.shape("hero", body)
     fr = _frames(pts)
-    if True:
-        s = ""
-        for k in range(1, n_seg):
-            t = k / n_seg
-            x, y, dx, dy, _ = min(fr, key=lambda f: abs(f[4] - t))
-            hw = (w0 + (w1 - w0) * t) / 2
-            s += f"M{x + dy * hw:.1f} {y - dx * hw:.1f} L{x - dy * hw:.1f} {y + dx * hw:.1f} "
-        d.stroke("mark", s, 1.6)
+    s = ""
+    for k in range(1, n_seg):
+        t = k / n_seg
+        x, y, dx, dy, _ = min(fr, key=lambda f: abs(f[4] - t))
+        hw = (w0 + (w1 - w0) * t) / 2
+        s += f"M{x + dy * hw:.1f} {y - dx * hw:.1f} L{x - dy * hw:.1f} {y + dx * hw:.1f} "
+    d.stroke("mark", s, 1.6)
     x, y, a = at(pts, 1.0)
 
     def bulb():
@@ -933,20 +926,20 @@ def scorpion_top(d: Drawing):
 
 
 def scorpion_portrait(d: Drawing):
-    for x, y in [(36, 164), (164, 40), (40, 40)]:
+    for x, y in [(40, 168), (166, 166)]:
         d.shape("ground", f"M{x - 12} {y + 5} Q{x - 10} {y - 6} {x} {y - 7} Q{x + 10} {y - 6} {x + 12} {y + 5}Z", line=False)
-    group(d, "translate(100 100) scale(1.12) translate(-104 -96)", lambda: scorpion_top(d))
+    group(d, "translate(100 104) scale(1.02) translate(-106 -90)", lambda: scorpion_top(d))
 
 
 def scorpion_side(d: Drawing):
     """Side view facing left, standing on y=160, tail arched up over its back."""
-    legs(d, [[(96, 150), (88, 140), (80, 160)], [(104, 150), (100, 138), (96, 160)], [(112, 150), (116, 138), (114, 160)], [(120, 150), (128, 140), (132, 160)]], 4.5, cx=1000)
-    scorp_tail(d, [(134, 146), (154, 136), (162, 114), (154, 94), (136, 86), (122, 92)], 13, 9, 6)
-    d.shape("hero", "M74 146 C80 138 100 136 118 138 C130 140 138 144 140 150 C132 156 100 158 80 156 C74 154 72 150 74 146Z")
-    d.stroke("mark", "M92 140 V156 M104 139 V157 M116 140 V156 M128 142 V154", 1.6, line=False)
-    d.limb("hero", "M78 146 L64 138 L54 142", 6)
-    d.shape("hero", chela(52, 142, 192, 0.8), spot=True)
-    cute_eyes(d, 80, 87, 143, 2.6, small=False)
+    legs(d, [[(96, 150), (88, 140), (80, 160)], [(104, 150), (100, 138), (96, 160)], [(112, 150), (116, 138), (114, 160)], [(120, 150), (128, 140), (132, 160)]], 5, cx=1000)
+    scorp_tail(d, [(134, 146), (150, 134), (156, 114), (148, 98), (132, 94)], 14, 10, 5)
+    d.shape("hero", "M72 146 C78 136 100 134 118 136 C132 138 140 143 142 150 C134 157 100 159 80 157 C72 155 70 150 72 146Z")
+    d.stroke("mark", "M92 138 V157 M104 137 V158 M116 138 V157 M128 140 V155", 1.6, line=False)
+    d.limb("hero", "M78 146 L66 136 L58 140", 7)
+    d.shape("hero", chela(56, 140, 194, 0.85), spot=True)
+    cute_eyes(d, 80, 87, 143, 2.8, small=False)
 
 
 def scorpion_desert(d: Drawing):
@@ -956,7 +949,7 @@ def scorpion_desert(d: Drawing):
     d.band("mid", "M-30 150 Q50 126 110 146 T230 138")
     saguaro(d, 172, 150, 56, 0.8)
     d.band("ground", "M-30 172 Q60 150 120 166 T230 162")
-    group(d, "translate(104 136) scale(1.15) translate(-108 -150)", lambda: scorpion_side(d))
+    group(d, "translate(106 134) scale(1.22) translate(-106 -150)", lambda: scorpion_side(d))
 
 
 # ================================================================ concepts
@@ -987,9 +980,9 @@ CONCEPTS = [
     Concept("eyelashviper-heliconia", "animal-eyelash-viper", "Eyelash viper on a heliconia", eyelash_heliconia, overrides=EYELASH,
             checks=[("hero", "sky"), ("hero", "mid"), ("flower", "mid"), ("flower", "near")], fixes={"mid": ["near", "deep"], "near": ["deep", "mid"], "sky": ["sky2", "far"]}),
     Concept("tarantula-portrait", "animal-tarantula", "Tarantula", tarantula_portrait, overrides=TARANT,
-            checks=[("hero", "sky"), ("hero", "near"), ("hero2", "sky")], fixes={"sky": ["light", "sky2", "glow2"], "near": ["mid", "far"]}),
+            checks=[("hero", "sky"), ("hero", "near"), ("hero2", "sky")], fixes={"sky": ["mid", "far", "light", "sky2"], "near": ["mid", "far"]}),
     Concept("tarantula-desert", "animal-tarantula", "Tarantula at dusk", tarantula_desert, overrides={**TARANT, "rock": "#A89580", "rock2": "#8C7A66"},
-            checks=[("hero", "sky"), ("hero", "glow"), ("hero", "rock"), ("rock", "ground")], fixes={"sky": ["light", "sky2"], "ground": ["near", "mid", "deep"]}),
+            checks=[("hero", "sky"), ("hero", "glow"), ("hero", "rock"), ("rock", "ground")], fixes={"sky": ["mid", "far", "light"], "ground": ["near", "mid", "deep"]}),
     Concept("huntsman-portrait", "animal-huntsman-spider", "Huntsman spider", huntsman_portrait, overrides=HUNTS,
             checks=[("hero", "sky"), ("hero2", "sky"), ("gum", "sky")], fixes={"sky": ["light", "sky2", "far"]}),
     Concept("huntsman-gumtree", "animal-huntsman-spider", "Huntsman on a gum tree", huntsman_gumtree, overrides=HUNTS,
@@ -1007,7 +1000,7 @@ CONCEPTS = [
     Concept("orbweaver-forest", "animal-orb-weaver", "Golden orb-weaver's web", orbweaver_forest, overrides=ORB,
             checks=[("silk", "sky"), ("silk", "glow"), ("hero", "glow")], fixes={"glow": ["light", "glow2", "far", "mid"], "sky": ["sky2", "mid", "near"]}),
     Concept("scorpion-portrait", "animal-scorpion", "Scorpion", scorpion_portrait, overrides=SCORP,
-            checks=[("hero", "sky"), ("hero2", "sky")], fixes={"sky": ["far", "mid", "sky2"]}),
+            checks=[("hero", "sky")], fixes={"sky": ["far", "mid", "sky2"]}),
     Concept("scorpion-desert", "animal-scorpion", "Scorpion on the dunes", scorpion_desert, overrides=SCORP_CACTUS,
             checks=[("hero", "ground"), ("hero", "sky"), ("hero", "mid")], fixes={"ground": ["near", "deep", "light"], "mid": ["far", "near"]}),
 ]

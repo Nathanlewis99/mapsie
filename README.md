@@ -45,54 +45,49 @@ Open http://localhost:3000. With no keys set, checkout uses a built-in **test ch
 
 ## Deploying (Render)
 
-The repo includes a `Dockerfile` and a `render.yaml` blueprint.
+Production runs as three pieces (see `render.yaml`):
 
-1. In the Render dashboard: **New → Blueprint**, connect GitHub and pick this repo.
-2. Render reads `render.yaml` and creates the `mapsie` web service (2 GB, Frankfurt) with a 5 GB disk.
-   Leave the Stripe and Prodigi keys empty to start in test mode.
-3. Deploy. The site is at `https://mapsie.onrender.com` (or similar). Every push to `main` redeploys.
-4. Admin: `/admin`. Sign in with Google as an address listed in `ADMIN_EMAILS` (default `admin@mapsie.shop`),
-   then enter the 6-digit code from an authenticator app. The first visit shows a QR code to set it up.
+- **mapsie**: the website (`MAPSIE_ROLE=web`). Stateless, so it can autoscale.
+- **mapsie-worker**: a private service (`MAPSIE_ROLE=worker`) with a disk. It makes the print files, sends
+  orders to Prodigi after the cancellation window, refreshes Prodigi's prices daily and tidies old data.
+  Orders queue in the database, so a rush just makes the queue longer.
+- **mapsie-db**: Postgres, shared by both.
 
-### Accounts and Google sign-in
+Locally everything runs in one process (`MAPSIE_ROLE` unset = `all`) on a SQLite file, no Postgres needed.
+Every push to `main` redeploys both services. Admin: `/admin` (Google sign-in as an `ADMIN_EMAILS` address,
+then an authenticator code); it links to Costs & margins, Errors and Funnel.
 
-Customers sign in with Google to save designs (`/account`) and see their orders. To switch it on:
-
-1. Google Cloud Console → **APIs & Services → OAuth consent screen**: External, app name "Mapsie",
-   support email, authorised domain `mapsie.shop`, scopes `openid`, `email`, `profile`. Publish the app.
-2. **Credentials → Create credentials → OAuth client ID** → Web application. Authorised redirect URIs:
-   `https://mapsie.shop/api/auth/google/callback` (and `https://mapsie.onrender.com/api/auth/google/callback`
-   while testing, or `http://localhost:3000/api/auth/google/callback` for local development).
-3. Put the client ID and secret in Render as `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
-
-Sessions are signed with `SESSION_SECRET`. Data (users, saved designs, orders) is in SQLite at `$DATA_DIR/mapsie.db`.
-
-Going live later: add `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` and `PRODIGI_API_KEY` in the
-Environment tab. Point a Stripe webhook at `/api/webhooks/stripe` (event `checkout.session.completed`).
-To use your own domain, add it in Render under **Settings → Custom domains** and set `APP_URL` to it.
-
-Print renders on the 2 GB plan: A3 takes about a minute, A1 up to about five (in the background
-after payment). On a 4 GB plan, set `PRINT_MAX_PX=7680` and `PRINT_STRIP_PX=4000` for a sharper map layer on big prints.
-
-## Environment variables (`.env.local`)
+## Environment variables
 
 ```
-APP_URL=http://localhost:3000   # must be public in production: the printer downloads files from it
-STRIPE_SECRET_KEY=sk_test_...
+APP_URL=http://localhost:3000   # public in production: the printer downloads files from it
+SESSION_SECRET=...              # signs sign-in cookies and print/callback tokens (same on web and worker)
+DATABASE_URL=postgres://...     # optional: Postgres instead of the local SQLite file
+MAPSIE_ROLE=all                 # web | worker | all
+RENDER_WORKER_URL=http://mapsie-worker:10000   # web only: where print files live
+DATA_DIR=./data                 # SQLite file (if no DATABASE_URL) and print files
+STRIPE_SECRET_KEY=sk_test_...   # without it, checkout runs in test mode
 STRIPE_WEBHOOK_SECRET=whsec_...
-PRODIGI_API_KEY=...             # sandbox key from the Prodigi dashboard
+PRODIGI_API_KEY=...             # without it, print orders are only logged
 PRODIGI_ENV=sandbox             # or live
-PRINT_MAX_PX=7680               # largest map canvas the renderer draws (5120 on a 2 GB machine)
-PRINT_STRIP_PX=4000             # screenshot strip height (2000 on a 2 GB machine)
-DATA_DIR=./data                 # where orders, designs and print files are stored
-ADMIN_PASSWORD=...              # protects /admin
-OSRM_URL=https://router.project-osrm.org   # road routing (public demo server; fine for testing)
+ORDER_HOLD_MINUTES=60           # cancellation window before an order goes to print
+# Order emails: one of these (without either, emails are only logged)
+RESEND_API_KEY=re_...
+SMTP_HOST=smtp.gmail.com  SMTP_PORT=465  SMTP_USER=...  SMTP_PASS=...   # e.g. Google Workspace + app password
+EMAIL_FROM="Mapsie <orders@mapsie.shop>"
+ALERT_EMAIL=support@mapsie.shop # where failed-order alerts go
+PRINT_MAX_PX=5120               # largest map canvas the renderer draws (7680 on a 4 GB machine)
+PRINT_STRIP_PX=2000             # screenshot strip height (4000 on a 4 GB machine)
 ```
+
+## Tests
+
+`npm run check` (types, lint, unit tests) and `npm run test:e2e` (builds the site and runs browser tests
+of designing, ordering and cancelling, on desktop and phone). GitHub Actions runs both on every push.
 
 ## Before going live
 
-- Check the Prodigi SKUs in `src/lib/products.ts` against their catalogue, and compare real costs with our prices.
-- Move storage to Supabase (Postgres + object storage), and run the renderer as a background worker. Serverless functions are too short-lived for big renders.
+- Run "Check our print options against Prodigi's catalogue" from the admin page with the Prodigi key set.
 - Print files are always full size at 300 dpi. On the largest sizes the map layer underneath is drawn at up to `PRINT_MAX_PX` and gently upscaled (A1 ≈ 230 dpi for the map only). Text, stickers and markers stay at 300 dpi.
 - The public OSRM server is for light use only. Self-host it, or switch to a paid router, before launch. The same goes for Photon place search.
 

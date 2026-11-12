@@ -18,9 +18,10 @@ import {
   type OriginalStyle,
 } from "@/lib/originals";
 import { FONTS } from "@/lib/fonts";
-import { PRODUCTS, FRAMES, money, getRegion, REGIONS } from "@/lib/products";
+import { getRegion, REGIONS } from "@/lib/products";
+import PrintOptionsPicker from "@/components/PrintOptionsPicker";
 import { TEMPLATES } from "@/lib/templates";
-import type { ThemeColors, Layout, TravelMode, MarkerStyle, RouteStyle } from "@/lib/types";
+import type { ThemeColors, Layout, TravelMode, MarkerStyle, RouteStyle, TextStyle, TextCase, FontId } from "@/lib/types";
 
 export const Label = ({ children }: { children: React.ReactNode }) => (
   <div className="text-xs font-bold uppercase tracking-wider text-ink/50 mb-2">{children}</div>
@@ -736,8 +737,53 @@ export function StickersPanel() {
 }
 
 // ---------------------------------------------------------------- Text
+function FontPicker({ value, onChange }: { value: FontId; onChange: (f: FontId) => void }) {
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {FONTS.map((f) => (
+        <button
+          key={f.id}
+          onClick={() => onChange(f.id)}
+          className={`rounded-2xl border-2 px-3 py-2 text-lg leading-tight transition truncate ${value === f.id ? "border-coral bg-white" : "border-ink/10 bg-white hover:border-ink/30"}`}
+          style={{ fontFamily: f.css, fontWeight: f.bold }}
+        >
+          {f.name}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function TextFormat(p: {
+  size: number;
+  onSize: (v: number) => void;
+  spacing: number;
+  onSpacing: (v: number) => void;
+  textCase: TextCase;
+  onCase: (v: TextCase) => void;
+  italic: boolean;
+  onItalic: (v: boolean) => void;
+  maxSize: number;
+}) {
+  const btn = (on: boolean) => `rounded-full border-2 px-3 py-1 text-sm font-bold ${on ? "border-coral bg-white" : "border-ink/10 bg-white hover:border-ink/30"}`;
+  return (
+    <div className="mt-2">
+      <Slider label="Size" min={0.5} max={p.maxSize} step={0.05} value={p.size} onChange={p.onSize} />
+      <Slider label="Spacing" min={-0.2} max={1.5} step={0.05} value={p.spacing} onChange={p.onSpacing} />
+      <div className="flex flex-wrap gap-2 pt-1">
+        <button className={btn(p.textCase === "none")} onClick={() => p.onCase("none")}>Aa</button>
+        <button className={btn(p.textCase === "upper")} onClick={() => p.onCase("upper")}>AA</button>
+        <button className={btn(p.textCase === "lower")} onClick={() => p.onCase("lower")}>aa</button>
+        <button className={`${btn(p.italic)} italic`} onClick={() => p.onItalic(!p.italic)}>Italic</button>
+      </div>
+    </div>
+  );
+}
+
 export function TextPanel() {
   const { design, set } = useEditor();
+  const tx = design.text;
+  const setText = (patch: Partial<TextStyle>, key?: string) => set({ text: { ...useEditor.getState().design.text, ...patch } }, key);
   return (
     <div className="space-y-5">
       <div>
@@ -749,14 +795,51 @@ export function TextPanel() {
         <input value={design.subtitle} maxLength={60} onChange={(e) => set({ subtitle: e.target.value }, "subtitle")} placeholder="e.g. Spring 2026 · 4 countries · 1 big adventure" className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral" />
       </div>
       <div>
-        <Label>Font</Label>
-        <div className="grid grid-cols-2 gap-2">
-          {FONTS.map((f) => (
-            <button key={f.id} onClick={() => set({ font: f.id })} className={`rounded-2xl border-2 px-3 py-3 text-xl transition ${design.font === f.id ? "border-coral bg-white" : "border-ink/10 bg-white hover:border-ink/30"}`} style={{ fontFamily: f.css }}>
-              {f.name}
-            </button>
-          ))}
+        <Label>Title font</Label>
+        <FontPicker value={design.font} onChange={(f) => set({ font: f })} />
+        <TextFormat
+          size={tx.titleSize}
+          onSize={(v) => setText({ titleSize: v }, "title-size")}
+          spacing={tx.titleSpacing}
+          onSpacing={(v) => setText({ titleSpacing: v }, "title-spacing")}
+          textCase={tx.titleCase}
+          onCase={(v) => setText({ titleCase: v })}
+          italic={tx.titleItalic}
+          onItalic={(v) => setText({ titleItalic: v })}
+          maxSize={2.2}
+        />
+      </div>
+      <div>
+        <Label>Subtitle font</Label>
+        <FontPicker value={tx.subtitleFont} onChange={(f) => setText({ subtitleFont: f })} />
+        <TextFormat
+          size={tx.subtitleSize}
+          onSize={(v) => setText({ subtitleSize: v }, "subtitle-size")}
+          spacing={tx.subtitleSpacing}
+          onSpacing={(v) => setText({ subtitleSpacing: v }, "subtitle-spacing")}
+          textCase={tx.subtitleCase}
+          onCase={(v) => setText({ subtitleCase: v })}
+          italic={tx.subtitleItalic}
+          onItalic={(v) => setText({ subtitleItalic: v })}
+          maxSize={2.5}
+        />
+      </div>
+      <div>
+        <Label>Alignment</Label>
+        <Chips<TextStyle["align"]>
+          value={tx.align}
+          options={[{ id: "left", label: "⟸ Left" }, { id: "center", label: "Centre" }, { id: "right", label: "Right ⟹" }]}
+          onChange={(v) => setText({ align: v })}
+        />
+        <div className="mt-2">
+          <Toggle on={tx.showRoute} onChange={(v) => setText({ showRoute: v })} label="Show the list of stops under the title" />
         </div>
+        <p className="text-xs text-ink/50 mt-1">Tip: drag the title or subtitle on the poster to move them anywhere.</p>
+        {(tx.titleOffset || tx.subtitleOffset) && (
+          <button onClick={() => setText({ titleOffset: undefined, subtitleOffset: undefined })} className="mt-2 text-sm font-bold text-coral-dark">
+            ↺ Put the text back in place
+          </button>
+        )}
       </div>
       <div>
         <Label>Layout</Label>
@@ -783,35 +866,9 @@ export function SizePanel() {
         <Label>Orientation</Label>
         <Chips value={design.orientation} options={[{ id: "portrait", label: "▯ Portrait" }, { id: "landscape", label: "▭ Landscape" }]} onChange={(v) => set({ orientation: v })} />
       </div>
-      <div>
-        <Label>Print size</Label>
-        <div className="space-y-2">
-          {PRODUCTS.map((p) => (
-            <button key={p.id} onClick={() => set({ productId: p.id })} className={`flex w-full items-center justify-between rounded-2xl border-2 px-4 py-3 transition ${design.productId === p.id ? "border-coral bg-white" : "border-ink/10 bg-white hover:border-ink/30"}`}>
-              <span className="font-bold">{p.label}</span>
-              <span className="text-sm text-ink/50">{p.widthCm} × {p.heightCm} cm</span>
-              <span className="font-extrabold">{money(region, p.price[region])}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div>
-        <Label>Frame</Label>
-        <div className="grid grid-cols-4 gap-2">
-          {FRAMES.map((f) => {
-            const p = PRODUCTS.find((x) => x.id === design.productId)!;
-            return (
-              <button key={f.id} onClick={() => set({ frame: f.id })} className={`rounded-2xl border-2 p-2 text-center transition bg-white ${design.frame === f.id ? "border-coral" : "border-ink/10 hover:border-ink/30"}`}>
-                <div className="mx-auto w-9 h-11 rounded-sm bg-sand" style={{ boxShadow: f.id === "none" ? "inset 0 0 0 1px #0002" : `inset 0 0 0 5px ${f.color}` }} />
-                <div className="text-[11px] font-bold mt-1 leading-tight">{f.label}</div>
-                <div className="text-[11px] text-ink/50">{f.id === "none" ? "—" : `+${money(region, p.framePrice[region])}`}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <PrintOptionsPicker value={design} onChange={(patch) => set(patch)} region={region} />
       <p className="text-xs text-ink/50">
-        Museum-quality matte art paper. Free delivery to {getRegion(region).label}, or express.
+        Printed and shipped by our print partner in {getRegion(region).label}. Free delivery, or express.
       </p>
     </div>
   );

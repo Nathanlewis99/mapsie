@@ -1,3 +1,4 @@
+import { printToken } from "./printToken";
 import path from "path";
 import { promises as fs } from "fs";
 import type { Design } from "../types";
@@ -47,7 +48,7 @@ export async function renderDesign(design: Design, fileName: string, opts: Rende
     const page = await browser.newPage({ viewport: { width: cssW, height: stripCss }, deviceScaleFactor: scale });
     await page.addInitScript((max) => (window.__MAPSIE_GLMAX = max), glMax);
     const base = internalUrl();
-    await page.goto(`${base}/print/${design.id}`, { waitUntil: "networkidle", timeout: 300_000 });
+    await page.goto(`${base}/print/${design.id}?t=${printToken(design.id)}`, { waitUntil: "networkidle", timeout: 300_000 });
     // Poll on a timer: at print density each animation frame is slow.
     await page.waitForFunction(() => window.__MAPSIE_READY === true || !!window.__MAPSIE_ERROR, null, { timeout: 420_000, polling: 1000 });
     const failed = await page.evaluate(() => window.__MAPSIE_ERROR);

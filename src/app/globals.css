@@ -18,6 +18,11 @@
   --f-montserrat: "Montserrat Variable";
   --f-pacifico: "Pacifico";
   --f-bebas: "Bebas Neue";
+  --f-cormorant: "Cormorant Garamond Variable";
+  --f-josefin: "Josefin Sans Variable";
+  --f-abril: "Abril Fatface";
+  --f-courier: "Courier Prime";
+  --f-vibes: "Great Vibes";
 }
 
 body {
@@ -157,3 +162,4 @@ body {
 }
 
 .maplibregl-canvas { outline: none; }
+.mapsie-stop:has(.mapsie-stop-label.is-selected) { z-index: 10; }

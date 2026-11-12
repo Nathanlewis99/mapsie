@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { listOrders, getDesign } from "@/lib/server/db";
-import { getProduct, money, type RegionId } from "@/lib/products";
+import { getProduct, money, type RegionId, describeOptions } from "@/lib/products";
 import RetryButton from "./RetryButton";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +24,7 @@ export default async function Admin() {
         <div>
           <Link href="/" className="font-display text-2xl font-extrabold"><Logo /></Link>
           <h1 className="text-3xl font-extrabold mt-2">Orders</h1>
+          <a href="/api/admin/prodigi-check" className="text-sm font-bold text-coral-dark">Check our print options against Prodigi&apos;s catalogue →</a>
         </div>
         <div className="flex gap-3 text-sm font-bold">
           <span className="rounded-2xl bg-white px-4 py-2 shadow-sm">{paid.length} paid</span>
@@ -41,7 +42,7 @@ export default async function Admin() {
                 <td className="px-4 py-3 font-mono text-xs">{o.id}<div className="text-ink/40">{o.email}</div></td>
                 <td className="px-4 py-3 whitespace-nowrap">{new Date(o.createdAt).toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" })}</td>
                 <td className="px-4 py-3"><Link className="font-bold underline" href={`/d/${o.designId}`}>{d?.title ?? "?"}</Link><div className="text-ink/40">{d?.stops.length} stops</div></td>
-                <td className="px-4 py-3">{d ? `${getProduct(d.productId).label} ${d.orientation}${d.frame && d.frame !== "none" ? `, ${d.frame} frame` : ""}` : "?"}</td>
+                <td className="px-4 py-3">{d ? describeOptions(d) : "?"}</td>
                 <td className="px-4 py-3 font-bold">{money((o.region ?? "GB") as RegionId, o.total ?? 0)}</td>
                 <td className="px-4 py-3">{o.address ? `${o.address.name}, ${o.address.city} ${o.address.postcode}, ${o.address.country}` : "—"}</td>
                 <td className="px-4 py-3">

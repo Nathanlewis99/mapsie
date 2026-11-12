@@ -21,6 +21,8 @@ export interface MapHandlers {
   onLabelChange?: (stopId: string, patch: Partial<Stop>) => void;
   onMapClick?: (lng: number, lat: number) => void;
   onDropSticker?: (src: string, lng: number, lat: number) => void;
+  /** The title block or subtitle was dragged to a new spot (% of poster width). */
+  onTextMove?: (which: "title" | "subtitle", offset: [number, number]) => void;
 }
 
 interface Props {
@@ -36,6 +38,8 @@ interface Props {
   handlers?: MapHandlers;
   filterPrefix?: string; // id prefix of this poster's sticker filters
   onReady?: () => void;
+  /** Editor only: keep the framing fixed (no pan/zoom of the map itself). */
+  frozen?: boolean;
 }
 
 const ROUTE_SRC = "mapsie-route";
@@ -78,7 +82,7 @@ function markerSvg(style: Design["markers"]["style"], fill: string, stroke: stri
 }
 
 export default function MapView(props: Props) {
-  const { design, width, height, mapWidth, editable, print, selectedSticker, selectedLabel, fitRequest, handlers, onReady, filterPrefix = "mapsie" } = props;
+  const { design, width, height, mapWidth, editable, print, selectedSticker, selectedLabel, fitRequest, handlers, onReady, filterPrefix = "mapsie", frozen = false } = props;
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
   const stopMarkers = useRef<Marker[]>([]);
@@ -178,6 +182,19 @@ export default function MapView(props: Props) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // --- lock the framing: markers and labels stay editable, the map itself doesn't move
+  useEffect(
+    () =>
+      whenMap((m) => {
+        if (!editable) return;
+        const hs = [m.dragPan, m.scrollZoom, m.touchZoomRotate, m.doubleClickZoom, m.keyboard, m.boxZoom];
+        hs.forEach((x) => (frozen ? x.disable() : x.enable()));
+        if (!frozen) m.touchZoomRotate.disableRotation();
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [frozen],
+  );
 
   // --- restyle when the theme changes
   const themeKey = JSON.stringify(design.theme);
@@ -350,8 +367,18 @@ export default function MapView(props: Props) {
       const lx = el.offsetLeft + ox * u, ly = el.offsetTop + oy * u - el.offsetHeight / 2;
       const tx = Math.min(Math.max(cx, lx), lx + el.offsetWidth);
       const ty = Math.min(Math.max(cy, ly), ly + el.offsetHeight);
-      line.setAttribute("x1", String(cx));
-      line.setAttribute("y1", String(cy));
+      // Round markers (numbers, dots): start at the edge of the circle, not its centre.
+      let sx = cx, sy = cy;
+      const round = design.markers.style === "number" || design.markers.style === "dot";
+      const dist = Math.hypot(tx - cx, ty - cy);
+      if (round && dist > 0) {
+        const r = Math.min(stop.offsetWidth, stop.offsetHeight) / 2 + u * 0.35;
+        sx = cx + ((tx - cx) / dist) * r;
+        sy = cy + ((ty - cy) / dist) * r;
+        if (dist <= r) leader.style.display = "none";
+      }
+      line.setAttribute("x1", String(sx));
+      line.setAttribute("y1", String(sy));
       line.setAttribute("x2", String(tx));
       line.setAttribute("y2", String(ty));
     };
@@ -369,9 +396,11 @@ export default function MapView(props: Props) {
       e.preventDefault();
       el.setPointerCapture(e.pointerId);
       const x0 = e.clientX, y0 = e.clientY;
+      // The editor can zoom the whole poster with a CSS transform; undo that here.
+      const k = el.getBoundingClientRect().width / (el.offsetWidth || 1) || 1;
       let moved = false, ox = dx, oy = dy;
       const move = (ev: PointerEvent) => {
-        const mx = (ev.clientX - x0) / u, my = (ev.clientY - y0) / u;
+        const mx = (ev.clientX - x0) / u / k, my = (ev.clientY - y0) / u / k;
         if (!moved && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 3) return;
         moved = true;
         ox = Math.round((dx + mx) * 10) / 10;

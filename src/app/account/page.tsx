@@ -3,7 +3,7 @@ import Logo from "@/components/Logo";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/server/auth";
 import { getDesign, listOrdersForUser, listSavedDesigns } from "@/lib/server/db";
-import { getProduct, money, type RegionId } from "@/lib/products";
+import { getProduct, money, type RegionId, describeOptions } from "@/lib/products";
 import { normalizeDesign } from "@/lib/types";
 import SiteFooter from "@/components/SiteFooter";
 import DeleteDesignButton from "./DeleteDesignButton";
@@ -100,7 +100,7 @@ export default async function Account() {
                   <li key={o.id}>
                     <Link href={`/order/${o.id}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-5 py-4 hover:bg-cream/60">
                       <span className="font-extrabold flex-1 min-w-[10rem]">{d?.title ?? "Map print"}</span>
-                      <span className="text-sm text-ink/60">{d ? `${getProduct(d.productId).label}${d.frame !== "none" ? `, ${d.frame} frame` : ""}` : ""}</span>
+                      <span className="text-sm text-ink/60">{d ? describeOptions(d) : ""}</span>
                       <span className="text-sm text-ink/60">{date(o.createdAt)}</span>
                       <span className="text-sm font-bold">{money((o.region ?? "GB") as RegionId, o.total ?? 0)}</span>
                       <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${st.cls}`}>{st.label}</span>

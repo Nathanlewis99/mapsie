@@ -4,7 +4,8 @@ import Logo from "@/components/Logo";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import type { Design } from "@/lib/types";
-import { FRAMES, getProduct, getRegion, guessRegion, itemPrice, money, REGIONS, SHIPPING, type RegionId, type ShippingId } from "@/lib/products";
+import { describeOptions, getRegion, guessRegion, itemPrice, money, priceLines, REGIONS, SHIPPING, type PrintOptions, type RegionId, type ShippingId } from "@/lib/products";
+import PrintOptionsPicker from "@/components/PrintOptionsPicker";
 
 const FramedPoster = dynamic(() => import("@/components/FramedPoster"), { ssr: false });
 const WallPreview = dynamic(() => import("@/components/WallPreview"), { ssr: false });
@@ -17,9 +18,11 @@ function storedRegion(): RegionId {
   }
 }
 
-export default function Checkout({ design }: { design: Design }) {
-  const product = getProduct(design.productId);
-  const frame = FRAMES.find((f) => f.id === design.frame)!;
+export default function Checkout({ design: saved }: { design: Design }) {
+  // Size, frame and paper can still be changed here; the preview follows.
+  const [opts, setOpts] = useState<Required<PrintOptions>>({ productId: saved.productId, frame: saved.frame, paper: saved.paper, mount: saved.mount, glaze: saved.glaze });
+  const design = { ...saved, ...opts };
+  const [showOptions, setShowOptions] = useState(false);
   const [region, setRegion] = useState<RegionId>("GB");
   const [shipping, setShipping] = useState<ShippingId>("standard");
   const [view, setView] = useState<"print" | "wall">("wall");
@@ -33,13 +36,14 @@ export default function Checkout({ design }: { design: Design }) {
   }, []);
 
   const ship = SHIPPING.find((s) => s.id === shipping)!;
-  const item = itemPrice(design.productId, design.frame, region);
+  const item = itemPrice(design, region);
+  const lines = priceLines(design, region);
   const total = item + ship.price[region];
 
   const pay = async () => {
     setBusy(true);
     setErr("");
-    const r = await fetch("/api/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ designId: design.id, email, shipping, region }) });
+    const r = await fetch("/api/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ designId: saved.id, email, shipping, region, options: opts }) });
     const j = await r.json();
     if (!r.ok) return setErr(j.error ?? "Something went wrong"), setBusy(false);
     window.location.href = j.url;
@@ -61,25 +65,35 @@ export default function Checkout({ design }: { design: Design }) {
             ))}
           </div>
           {view === "wall" ? (
-            <WallPreview design={design} />
+            <WallPreview key={`${opts.productId}-${opts.frame}-${opts.mount}`} design={design} />
           ) : (
             <div className="grid place-items-center rounded-3xl bg-sand/70 p-8">
-              <FramedPoster design={design} width={Math.min(420, design.view.refWidth)} />
+              <FramedPoster key={`${opts.productId}-${opts.frame}-${opts.mount}`} design={design} width={Math.min(420, design.view.refWidth)} />
             </div>
           )}
         </div>
         <div className="space-y-6">
           <div>
             <h1 className="font-display text-4xl font-extrabold">Nearly yours!</h1>
-            <p className="text-ink/60 mt-2">Printed on thick museum-quality matte paper{design.frame !== "none" ? " and framed, ready to hang" : " and shipped in a sturdy tube"}.</p>
+            <p className="text-ink/60 mt-2">{design.frame !== "none" ? "Framed and ready to hang." : "Printed on thick art paper and shipped in a sturdy tube."}</p>
           </div>
           <div className="rounded-3xl bg-white p-5 shadow-sm space-y-1">
-            <div className="flex justify-between font-bold gap-4"><span className="truncate">{design.title}</span><span>{money(region, product.price[region])}</span></div>
-            <div className="text-sm text-ink/50">{product.label} · {design.orientation} · {design.stops.length} stops</div>
-            {design.frame !== "none" && (
-              <div className="flex justify-between font-bold pt-2"><span>{frame.label} frame</span><span>{money(region, product.framePrice[region])}</span></div>
-            )}
+            <div className="font-bold truncate">{design.title}</div>
+            <div className="text-sm text-ink/50">{describeOptions(design)} · {design.stops.length} stops</div>
+            <div className="pt-2 space-y-1">
+              {lines.map((l) => (
+                <div key={l.label} className="flex justify-between text-sm font-bold"><span>{l.label}</span><span>{money(region, l.amount)}</span></div>
+              ))}
+            </div>
+            <button onClick={() => setShowOptions((v) => !v)} className="pt-2 text-sm font-extrabold text-coral-dark">
+              {showOptions ? "Done ✓" : design.frame === "none" ? "🖼️ Add a frame, or change size or paper" : "Change size, frame or mount"}
+            </button>
           </div>
+          {showOptions && (
+            <div className="rounded-3xl bg-cream border border-ink/5 p-4">
+              <PrintOptionsPicker value={opts} onChange={(patch) => setOpts((o) => ({ ...o, ...patch }))} region={region} />
+            </div>
+          )}
           <div className="space-y-2">
             <div className="text-xs font-bold uppercase tracking-wider text-ink/50">Deliver to</div>
             <div className="flex flex-wrap gap-2">

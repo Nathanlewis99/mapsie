@@ -1,15 +1,15 @@
 import type { Address, Order } from "./db";
 import type { Design } from "../types";
-import { FRAMES, getProduct, SHIPPING } from "../products";
+import { prodigiItem, SHIPPING } from "../products";
 
 // Prodigi print-on-demand API (v4). Uses the sandbox unless PRODIGI_ENV=live.
 // Without PRODIGI_API_KEY we log the order instead of sending it.
 const BASE = process.env.PRODIGI_ENV === "live" ? "https://api.prodigi.com/v4.0" : "https://api.sandbox.prodigi.com/v4.0";
 
+export const prodigiBase = BASE;
+
 export async function submitPrintOrder(order: Order, design: Design, address: Address, assetUrl: string) {
-  const product = getProduct(design.productId);
-  const frame = FRAMES.find((f) => f.id === design.frame);
-  const framed = !!frame && frame.id !== "none";
+  const item = prodigiItem(design);
   const shipping = SHIPPING.find((s) => s.id === order.shipping) ?? SHIPPING[0];
   const body = {
     merchantReference: order.id,
@@ -28,10 +28,10 @@ export async function submitPrintOrder(order: Order, design: Design, address: Ad
     items: [
       {
         merchantReference: design.id,
-        sku: framed ? product.prodigiFramedSku : product.prodigiSku,
+        sku: item.sku,
         copies: 1,
         sizing: "fillPrintArea",
-        attributes: framed ? { color: frame.prodigiColor } : {},
+        attributes: item.attributes,
         assets: [{ printArea: "default", url: assetUrl }],
       },
     ],

@@ -3,6 +3,8 @@ import { useLayoutEffect, useRef, useState } from "react";
 import FramedPoster from "./FramedPoster";
 import type { Design } from "@/lib/types";
 import { getProduct } from "@/lib/products";
+import { ROOMS, type Room } from "@/lib/rooms";
+import { frameWidth } from "./FramedPoster";
 
 const WALLS = [
   { id: "linen", color: "#ebe5db", floor: "#b88b5e" },
@@ -16,11 +18,12 @@ export default function WallPreview({ design }: { design: Design }) {
   const box = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(0);
   const [wall, setWall] = useState(WALLS[0]);
+  const [room, setRoom] = useState<Room | null>(ROOMS[0] ?? null);
   useLayoutEffect(() => {
     const ro = new ResizeObserver(([e]) => setW(e.contentRect.width));
     if (box.current) ro.observe(box.current);
     return () => ro.disconnect();
-  }, []);
+  }, [room]);
 
   const p = getProduct(design.productId);
   const posterCm = design.orientation === "portrait" ? p.widthCm : p.heightCm;
@@ -35,6 +38,44 @@ export default function WallPreview({ design }: { design: Design }) {
   const floorH = 22 * pxPerCm;
   const boardW = 140 * pxPerCm;
   const boardH = 62 * pxPerCm;
+
+  const picker = (
+    <span className="flex gap-1.5 flex-wrap justify-end">
+      {ROOMS.map((r) => (
+        <button key={r.id} onClick={() => setRoom(r)} aria-label={r.label} title={r.label} className={`w-9 h-6 rounded-md border-2 bg-cover bg-center ${room?.id === r.id ? "border-coral" : "border-white"}`} style={{ backgroundImage: `url(${r.src})` }} />
+      ))}
+      {WALLS.map((x) => (
+        <button key={x.id} onClick={() => { setRoom(null); setWall(x); }} aria-label={`${x.id} wall`} className={`w-6 h-6 rounded-full border-2 ${!room && wall.id === x.id ? "border-coral" : "border-white"}`} style={{ background: x.color }} />
+      ))}
+    </span>
+  );
+
+  if (room) {
+    // True scale: the room photo shows `wallCm` of wall across its width.
+    const H2 = (w * room.height) / room.width;
+    const pxCm = w / room.wallCm;
+    let pw = posterCm * pxCm;
+    const fh = (pwx: number) => (pwx + frameWidth(design, pwx) * 2) * (posterHCm / posterCm);
+    if (room.maxHeight && fh(pw) > room.maxHeight * H2) pw *= (room.maxHeight * H2) / fh(pw);
+    pw = Math.round(pw);
+    return (
+      <div className="space-y-3">
+        <div ref={box} className="relative w-full overflow-hidden rounded-3xl bg-sand" style={{ height: H2 || 300 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={room.src} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+          {w > 0 && (
+            <div className="absolute" style={{ left: w * room.cx, top: H2 * room.cy, transform: "translate(-50%, -50%)" }}>
+              <FramedPoster key={`${pw}-${design.frame}-${design.mount}`} design={design} width={pw} />
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-between gap-3 text-xs font-bold text-ink/50">
+          <span>Shown to scale: {p.label}</span>
+          {picker}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
@@ -63,11 +104,7 @@ export default function WallPreview({ design }: { design: Design }) {
       </div>
       <div className="flex items-center justify-between text-xs font-bold text-ink/50">
         <span>Shown to scale: {p.label} on a {(wallWCm / 100).toFixed(1)} m wide wall</span>
-        <span className="flex gap-1.5">
-          {WALLS.map((x) => (
-            <button key={x.id} onClick={() => setWall(x)} aria-label={`${x.id} wall`} className={`w-6 h-6 rounded-full border-2 ${wall.id === x.id ? "border-coral" : "border-white"}`} style={{ background: x.color }} />
-          ))}
-        </span>
+        {picker}
       </div>
     </div>
   );

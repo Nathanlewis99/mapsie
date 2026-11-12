@@ -81,7 +81,10 @@ export type RouteStyle = "auto" | "solid" | "dashed" | "dotted";
 export type MarkerStyle = "number" | "dot" | "pin" | "heart";
 export type Layout = "band" | "border" | "overlay";
 export type Orientation = "portrait" | "landscape";
-export type FrameId = "none" | "black" | "white" | "oak";
+export type FrameId = "none" | "black" | "white" | "oak" | "brown" | "darkgrey" | "lightgrey" | "gold" | "silver";
+export type PaperId = "ema" | "hpr" | "hge" | "lpp";
+export type MountId = "none" | "white" | "offwhite" | "black";
+export type GlazeId = "perspex" | "glass" | "motheye";
 
 export interface Design {
   id: string;
@@ -92,6 +95,9 @@ export interface Design {
   productId: string;
   orientation: Orientation;
   frame: FrameId;
+  paper: PaperId; // unframed prints only; framed prints use the frame's standard paper
+  mount: MountId; // framed only
+  glaze: GlazeId; // framed only
   theme: Theme;
   // refWidth = poster width in CSS px when the view was saved. The print
   // renderer lays the poster out at this width and just raises the pixel
@@ -102,11 +108,45 @@ export interface Design {
   markers: { style: MarkerStyle; showDates: boolean; size: number; labelSize: number };
   visited: { show: boolean; opacity: number };
   stickers: Sticker[];
+  text: TextStyle;
   stickerStyle: ArtStyleId; // default style for new stickers
   originals: { style: OriginalStyle; palette: string }; // defaults for new Mapsie Originals
 }
 
-export type FontId = "playfair" | "caveat" | "montserrat" | "pacifico" | "bebas";
+export type TextCase = "none" | "upper" | "lower";
+
+/** How the title and subtitle look. `font` on the design is the title font. */
+export interface TextStyle {
+  titleSize: number; // multiplier, 1 = default
+  titleCase: TextCase;
+  titleSpacing: number; // letter spacing, % of poster width
+  titleItalic: boolean;
+  subtitleFont: FontId;
+  subtitleSize: number;
+  subtitleCase: TextCase;
+  subtitleSpacing: number;
+  subtitleItalic: boolean;
+  showRoute: boolean; // the "A · B · C" line under the subtitle
+  align: "center" | "left" | "right";
+  titleOffset?: [number, number]; // dragged position, % of poster width
+  subtitleOffset?: [number, number];
+}
+
+export const DEFAULT_TEXT: TextStyle = {
+  titleSize: 1,
+  titleCase: "none",
+  titleSpacing: 0,
+  titleItalic: false,
+  subtitleFont: "montserrat",
+  subtitleSize: 1,
+  subtitleCase: "upper",
+  subtitleSpacing: 0.5,
+  subtitleItalic: false,
+  showRoute: true,
+  align: "center",
+};
+
+export type FontId = "playfair" | "caveat" | "montserrat" | "pacifico" | "bebas" | "cormorant" | "josefin" | "abril" | "courier" | "vibes";
 
 /** Fill in fields added after a design was first saved. */
 export function normalizeDesign(d: Partial<Design> & Pick<Design, "id">): Design {
@@ -117,10 +157,14 @@ export function normalizeDesign(d: Partial<Design> & Pick<Design, "id">): Design
   return {
     ...x,
     frame: x.frame ?? "none",
+    paper: x.paper ?? "ema",
+    mount: x.mount ?? "none",
+    glaze: x.glaze ?? "perspex",
     theme: x.theme && { ...x.theme, hypso: x.theme.hypso ?? false, physical: x.theme.physical ?? false, details: { ...NO_DETAILS, ...(x.theme.details ?? {}) } },
     route: { show: r.show ?? true, style: r.style ?? "auto", curved: r.curved ?? true, width: r.width ?? 0.45, modeIcons: r.modeIcons ?? true },
     markers: { style: m.style ?? "number", showDates: m.showDates ?? false, size: m.size ?? 1, labelSize: m.labelSize ?? 1 },
     visited: { show: v.show ?? false, opacity: v.opacity ?? 0.35 },
+    text: { ...DEFAULT_TEXT, ...(x.text ?? {}) },
     stickerStyle: x.stickerStyle ?? "cartoon",
     originals: x.originals ?? { style: "papercut", palette: "auto" },
     // Older designs only stored a path; recover the artwork name from it.

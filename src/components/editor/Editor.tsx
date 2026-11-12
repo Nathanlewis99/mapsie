@@ -39,6 +39,14 @@ export default function Editor() {
   const [busy, setBusy] = useState<"" | "order" | "share" | "save">("");
   const [toast, setToast] = useState("");
   const [wall, setWall] = useState(false);
+  // "Lock framing": the map stays put and the poster itself can be zoomed and panned,
+  // so labels and stickers are easy to rearrange on a phone.
+  const [locked, setLocked] = useState(false);
+  const [zoom, setZoom] = useState({ k: 1, x: 0, y: 0 });
+  const zoomRef = useRef(zoom);
+  zoomRef.current = zoom;
+  const lockedRef = useRef(locked);
+  lockedRef.current = locked;
   const router = useRouter();
   const params = useSearchParams();
   const stage = useRef<HTMLDivElement>(null);
@@ -147,12 +155,87 @@ export default function Editor() {
     return () => window.removeEventListener("keydown", onKey);
   }, [selectedSticker, store]);
 
+  useEffect(() => {
+    const el = stage.current;
+    if (!el) return;
+    const clampK = (k: number) => Math.min(5, Math.max(1, k));
+    // Zoom about a point (client coords) so what's under the finger/cursor stays put.
+    const zoomAt = (k2: number, cx: number, cy: number) => {
+      const r = el.getBoundingClientRect();
+      const { k, x, y } = zoomRef.current;
+      const nk = clampK(k2);
+      const px = cx - r.left - r.width / 2, py = cy - r.top - r.height / 2;
+      const nx = nk === 1 ? 0 : px - ((px - x) * nk) / k;
+      const ny = nk === 1 ? 0 : py - ((py - y) * nk) / k;
+      setZoom({ k: nk, x: nx, y: ny });
+    };
+    const onWheel = (e: WheelEvent) => {
+      if (!lockedRef.current) return;
+      e.preventDefault();
+      e.stopPropagation();
+      zoomAt(zoomRef.current.k * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0025)), e.clientX, e.clientY);
+    };
+    const pts = new Map<number, { x: number; y: number }>();
+    let pinch: { d: number; k: number; mx: number; my: number; x: number; y: number } | null = null;
+    let pan: { sx: number; sy: number; k: number; x: number; y: number } | null = null;
+    const onDown = (e: PointerEvent) => {
+      if (!lockedRef.current) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 2) {
+        const [a, b] = [...pts.values()];
+        const { k, x, y } = zoomRef.current;
+        pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, k, mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2, x, y };
+        pan = null;
+        e.stopPropagation();
+      } else if (pts.size === 1) {
+        // One finger on empty map (not a pin, label or sticker) pans the zoomed poster.
+        const t = e.target as HTMLElement;
+        if (t.closest(".maplibregl-canvas") || t === el) pan = { sx: e.clientX, sy: e.clientY, ...zoomRef.current };
+      }
+    };
+    const onMove = (e: PointerEvent) => {
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinch && pts.size >= 2) {
+        const [a, b] = [...pts.values()];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+        const r = el.getBoundingClientRect();
+        const nk = clampK((pinch.k * d) / pinch.d);
+        const px = pinch.mx - r.left - r.width / 2, py = pinch.my - r.top - r.height / 2;
+        setZoom({ k: nk, x: px - ((px - pinch.x) * nk) / pinch.k + (mx - pinch.mx), y: py - ((py - pinch.y) * nk) / pinch.k + (my - pinch.my) });
+      } else if (pan && zoomRef.current.k > 1) {
+        setZoom({ k: pan.k, x: pan.x + e.clientX - pan.sx, y: pan.y + e.clientY - pan.sy });
+      }
+    };
+    const onUp = (e: PointerEvent) => {
+      pts.delete(e.pointerId);
+      if (pts.size < 2) pinch = null;
+      if (pts.size === 0) pan = null;
+    };
+    el.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    el.addEventListener("pointerdown", onDown, true);
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    return () => {
+      el.removeEventListener("wheel", onWheel, true);
+      el.removeEventListener("pointerdown", onDown, true);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+    };
+  }, []);
+  useEffect(() => {
+    if (!locked) setZoom({ k: 1, x: 0, y: 0 });
+  }, [locked]);
+
   const aspect = posterAspect(design.productId, design.orientation);
   const pad = box.w < 640 ? 24 : 56;
   const fitW = Math.min(box.w - pad, (box.h - pad) / aspect);
   const posterW = Math.floor(Math.max(180, fitW - frameWidth(design, fitW) * 2));
   const sel = design.stickers.find((s) => s.id === selectedSticker);
-  const price = itemPrice(design.productId, design.frame, region);
+  const price = itemPrice(design, region);
 
   const order = async () => {
     setBusy("order");
@@ -238,8 +321,12 @@ export default function Editor() {
         {/* poster stage */}
         <div ref={stage} className="relative h-[54dvh] lg:h-auto lg:flex-1 shrink-0 grid place-items-center bg-[radial-gradient(circle_at_30%_20%,#fff_0%,#f1e8da_70%)] overflow-hidden">
           {box.w > 0 && (
-            <div className={pickMode ? "[&_canvas]:!cursor-crosshair" : ""}>
+            <div
+              className={`${pickMode ? "[&_canvas]:!cursor-crosshair" : ""} ${locked ? "touch-none [&_canvas]:!cursor-default" : ""}`}
+              style={{ transform: `translate(${zoom.x}px, ${zoom.y}px) scale(${zoom.k})`, transformOrigin: "center", transition: "transform 60ms linear" }}
+            >
               <FramedPoster
+                frozen={locked}
                 key={`${design.productId}-${design.orientation}-${design.layout}-${design.frame}`}
                 design={design}
                 width={posterW}
@@ -255,6 +342,7 @@ export default function Editor() {
                   onStickerSelect: (id) => store.select(id),
                   onLabelSelect: (id) => store.selectLabel(id),
                   onLabelChange: (id, patch) => store.updateStop(id, patch),
+                  onTextMove: (which, o) => store.set({ text: { ...useEditor.getState().design.text, [which === "title" ? "titleOffset" : "subtitleOffset"]: o } }),
                   onDropSticker: (payload, lng, lat) => {
                     if (payload.startsWith("orig:")) {
                       const { style, palette } = design.originals;
@@ -280,6 +368,26 @@ export default function Editor() {
               />
             </div>
           )}
+
+          <div className="absolute right-3 bottom-3 z-20 flex flex-col items-end gap-2">
+            {locked && (
+              <div className="flex flex-col rounded-2xl bg-white shadow-lg overflow-hidden text-lg font-extrabold">
+                <button title="Zoom in" className="w-10 h-10 hover:bg-ink/5" onClick={() => setZoom((z) => ({ k: Math.min(5, z.k * 1.4), x: z.x * 1.4, y: z.y * 1.4 }))}>+</button>
+                <button title="Zoom out" className="w-10 h-10 hover:bg-ink/5 border-t border-ink/10" onClick={() => setZoom((z) => (z.k / 1.4 <= 1.01 ? { k: 1, x: 0, y: 0 } : { k: z.k / 1.4, x: z.x / 1.4, y: z.y / 1.4 }))}>−</button>
+                <button title="Fit the poster" className="w-10 h-10 hover:bg-ink/5 border-t border-ink/10 text-sm" onClick={() => setZoom({ k: 1, x: 0, y: 0 })}>⤢</button>
+              </div>
+            )}
+            <button
+              onClick={() => {
+                setLocked((v) => !v);
+                if (!locked) setToast("Framing locked. Pinch or use + to zoom in and rearrange labels and stickers.");
+              }}
+              title={locked ? "Unlock to move and zoom the map again" : "Lock the map's framing, then zoom in to edit"}
+              className={`rounded-full px-4 py-2.5 text-sm font-extrabold shadow-lg transition ${locked ? "bg-ink text-white" : "bg-white text-ink hover:bg-cream"}`}
+            >
+              {locked ? "🔒 Framing locked" : "🔓 Lock framing"}
+            </button>
+          </div>
 
           {roadsLoading > 0 && (
             <div className="absolute inset-0 z-10 grid place-items-center bg-cream/40 backdrop-blur-[1px] pointer-events-none" role="status" aria-live="polite">

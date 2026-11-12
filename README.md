@@ -18,7 +18,7 @@ Open http://localhost:3000. With no keys set, checkout uses a built-in **test ch
 - **Styling:** 6 presets, 9 editable colours, terrain shading, paper texture, place names, and highlighting of visited countries.
 - **Markers:** numbers, pins, hearts or dots, with optional dates.
 - **Decorations:** 93 stickers in 10 art styles (Illustrated, Watercolour, Vintage stamp, Fine line, Gold foil, Retro print, Die-cut sticker, Neon, Flat, Cartoon), plus your own photos and handwritten text notes. Resize and rotate them with handles on the map.
-- **Mapsie Originals:** 399 original activity designs (133 activities × 3 ideas) in papercut (up to 5 palettes) and line art (4 colourways). "Match map" picks the palette that suits the map style. Drawn as code in `design/activity-art/` (see its `AUTHORING.md`); `python3 design/activity-art/build.py --export` rebuilds them into the app.
+- **Mapsie Originals:** 1,043 original designs: 269 activities × 3 ideas plus 118 animals by region × 2 in papercut (up to 5 palettes) and line art (4 colourways). "Match map" picks the palette that suits the map style. Drawn as code in `design/activity-art/` (see its `AUTHORING.md`); `python3 design/activity-art/build.py --export` rebuilds them into the app.
 - **Sticker search:** results show every style of each match. Each map style suggests a matching sticker style (Vintage gets Vintage stamp, Midnight gets Gold foil, and so on).
 - **Undo/redo** (Ctrl+Z / Ctrl+Shift+Z), with autosave in the browser.
 - **Products:** A4 to A1, portrait or landscape, no frame or black/white/oak frames, priced in GBP, USD or AUD.

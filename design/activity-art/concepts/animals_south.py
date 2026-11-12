@@ -433,9 +433,10 @@ def capybara_wetland(d: Drawing):
     d.band("far", trees)
     d.band("mid", "M-30 108 H230")
     # mum swimming: head and back above the water
-    group(d, "translate(84 112) scale(.82) translate(-100 -110)", lambda: capybara(d))
-    group(d, "translate(150 132) scale(.42) translate(-100 -110)", lambda: capybara(d))
-    group(d, "translate(184 134) scale(.36) translate(-100 -110)", lambda: capybara(d))
+    clipped(d, "M-30 -30 H230 V136 H-30Z", lambda: (
+        group(d, "translate(84 112) scale(.82) translate(-100 -110)", lambda: capybara(d)),
+        group(d, "translate(150 132) scale(.42) translate(-100 -110)", lambda: capybara(d)),
+        group(d, "translate(184 134) scale(.36) translate(-100 -110)", lambda: capybara(d))))
     d.band("near", waves(134, 3, 30))
     d.stroke("light", "M30 128 q10 -5 20 0 M130 128 q8 -4 16 0 M166 128 q6 -4 12 0", 2.2)
     for x, y, rx in [(36, 158, 24), (150, 166, 28), (96, 186, 22)]:
@@ -528,6 +529,7 @@ def condor_portrait(d: Drawing):
     d.shape("hero2", "M64 92 C62 100 68 108 76 106 C76 100 72 94 64 92Z")
     d.shape("hero2", "M62 62 C58 52 62 44 70 44 C72 38 80 36 84 42 C88 38 96 40 96 46 C100 46 102 52 98 56 C88 58 74 60 62 62Z", spot=True)
     d.shape("beak", "M64 66 C52 64 40 68 36 78 C34 86 36 92 40 96 C40 90 42 86 48 86 L64 86Z")
+    d.stroke("mark", "M64 66 C52 64 40 68 36 78 C34 86 36 92 40 96 C40 90 42 86 48 86", 1.4, line=False)
     d.shape("hero2", "M58 64 L65 64 L65 86 L58 86Z", shadow=False)
     d.shape("hero", "M48 86 L65 86 L65 92 C58 94 52 92 48 88Z", shadow=False)
     d.shape("light", circle(82, 68, 4.6), shadow=False)
@@ -865,7 +867,7 @@ def pinkdolphin_amazon(d: Drawing):
     d.shape("dark", "M140 84 L162 68 L184 84Z")
     d.marks("dark", rrect(156, 86, 7, 7, 1))
     d.band("mid", "M-30 110 H230")
-    group(d, "translate(96 116) rotate(-30) translate(-112 -100)", lambda: boto(d, flipper=False))
+    clipped(d, "M-30 -30 H230 V140 H-30Z", lambda: group(d, "translate(96 116) rotate(-30) translate(-112 -100)", lambda: boto(d, flipper=False)))
     d.band("near", waves(138, 3, 30))
     for x, y, r in [(150, 132, 3), (160, 126, 2.4), (140, 124, 2.2), (44, 132, 2.4), (34, 126, 2)]:
         d.shape("light", drop(x, y, r), shadow=False)
@@ -1468,9 +1470,9 @@ def clownfish_face(d: Drawing):
                 d.stroke("mark", "M26 111 C30 100 44 97 54 100", 2.4, line=False)
             finn() if k == 1 else flip(d, finn)
         d.shape("hero", "M84 150 L76 174 L96 156Z M116 150 L124 174 L104 156Z")
-        d.shape("light", ellipse(100, 102, 44, 56), spot=True)
+        d.shape("light", ellipse(100, 102, 44, 56))
         d.stroke("mark", ellipse(100, 102, 44, 56), 2.4)
-        d.shape("hero", ellipse(100, 106, 30, 44))
+        d.shape("hero", ellipse(100, 106, 30, 44), spot=True)
         d.stroke("mark", ellipse(100, 106, 30, 44), 1.6, line=False)
         d.shape("hero", "M88 154 C94 162 106 162 112 154 C106 158 94 158 88 154Z", shadow=False)
         for x in (76, 124):

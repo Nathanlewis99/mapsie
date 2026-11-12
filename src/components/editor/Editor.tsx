@@ -11,7 +11,7 @@ import { reverseGeocode } from "@/lib/geo";
 import { itemPrice, money, posterAspect, REGIONS } from "@/lib/products";
 import { FONTS, fontBold, fontCss } from "@/lib/fonts";
 import { ART_STYLES, stickerSrc, type ArtStyleId } from "@/lib/stickers";
-import { PALETTE_NAMES, getOriginal, type OriginalStyle } from "@/lib/originals";
+import { PAINTED, PALETTE_NAMES, getOriginal, type OriginalStyle } from "@/lib/originals";
 import { normalizeDesign, type Design, type TextEffect } from "@/lib/types";
 import { TripPanel, StylePanel, StickersPanel, TextPanel, SizePanel } from "./Panels";
 import { track } from "@/lib/track";
@@ -631,6 +631,7 @@ export default function Editor() {
                   >
                     <option value="papercut" className="text-ink">Papercut</option>
                     <option value="line" className="text-ink">Line</option>
+                    {PAINTED.size > 0 && <option value="painted" className="text-ink">Painted</option>}
                   </select>
                   <select
                     title="Colours"
@@ -639,7 +640,7 @@ export default function Editor() {
                     className="bg-white/10 rounded-full px-2 py-1 outline-none"
                   >
                     <option value="auto" className="text-ink">Match map</option>
-                    {(getOriginal(sel.name)?.[sel.origStyle ?? "papercut"] ?? []).map((p) => (
+                    {(sel.origStyle === "painted" ? [] : (getOriginal(sel.name)?.[(sel.origStyle ?? "papercut") as "papercut" | "line"] ?? [])).map((p: string) => (
                       <option key={p} value={p} className="text-ink">{PALETTE_NAMES[sel.origStyle ?? "papercut"][p] ?? p}</option>
                     ))}
                   </select>

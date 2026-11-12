@@ -1,5 +1,9 @@
 import { rank } from "./search";
 import catalogue from "./originals.json";
+import paintedIds from "./painted.json";
+
+/** Concepts that have the realistic painted version (made by design/painted/generate.py). */
+export const PAINTED = new Set<string>(paintedIds as string[]);
 
 // Mapsie Originals: our own activity artwork, drawn in design/activity-art and
 // exported here by `python3 design/activity-art/build.py --export`.
@@ -7,7 +11,7 @@ import catalogue from "./originals.json";
 //   /stickers/originals/<id>/papercut-<palette>.svg
 //   /stickers/originals/<id>/line-<colourway>.svg
 
-export type OriginalStyle = "papercut" | "line";
+export type OriginalStyle = "papercut" | "line" | "painted";
 
 export interface OriginalDef {
   id: string;
@@ -28,6 +32,7 @@ export const ORIGINALS = catalogue as OriginalDef[];
 export const ORIGINAL_CATEGORIES = [...new Set(ORIGINALS.map((o) => o.category))];
 
 export const PALETTE_NAMES: Record<OriginalStyle, Record<string, string>> = {
+  painted: {},
   papercut: { golden: "Golden hour", coastal: "Coastal", meadow: "Meadow", blush: "Blush", dusk: "Dusk" },
   line: { classic: "Classic", forest: "Forest", ocean: "Ocean", night: "Night" },
 };
@@ -46,7 +51,7 @@ export const PALETTE_SWATCH: Record<string, [string, string, string]> = {
 };
 
 /** Which Originals palette suits each map style. */
-const MATCH: Record<string, Record<OriginalStyle, string>> = {
+const MATCH: Record<string, Record<"papercut" | "line", string>> = {
   vintage: { papercut: "golden", line: "classic" },
   minimal: { papercut: "coastal", line: "classic" },
   topo: { papercut: "meadow", line: "forest" },
@@ -61,7 +66,8 @@ const MATCH: Record<string, Record<OriginalStyle, string>> = {
   ink: { papercut: "coastal", line: "classic" },
 };
 
-export const matchedPalette = (presetId: string, style: OriginalStyle) => MATCH[presetId]?.[style] ?? (style === "papercut" ? "golden" : "classic");
+export const matchedPalette = (presetId: string, style: OriginalStyle) =>
+  style === "painted" ? "natural" : (MATCH[presetId]?.[style as "papercut" | "line"] ?? (style === "papercut" ? "golden" : "classic"));
 
 /** "auto" follows the map style. */
 export const resolvePalette = (palette: string, presetId: string, style: OriginalStyle) => (palette === "auto" ? matchedPalette(presetId, style) : palette);
@@ -70,6 +76,11 @@ export const getOriginal = (id: string) => ORIGINALS.find((o) => o.id === id);
 
 /** File for a concept; if the palette isn't available for it (it would clash), use the nearest one that is. */
 export function originalSrc(id: string, style: OriginalStyle, palette: string): string {
+  if (style === "painted") {
+    // Painted art is one natural-colour version; concepts not painted yet use papercut.
+    if (PAINTED.has(id)) return `/stickers/originals/${id}/painted.webp`;
+    return originalSrc(id, "papercut", "golden");
+  }
   const def = getOriginal(id);
   const have = def ? def[style] : [];
   const fallbackOrder = style === "papercut" ? ["golden", "coastal", "meadow", "blush", "dusk"] : ["classic", "forest", "ocean", "night"];

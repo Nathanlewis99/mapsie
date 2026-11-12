@@ -7,6 +7,7 @@ import { ART_STYLES, PACKS, STICKERS, getArtStyle, searchStickers, stickerSrc, s
 import StickerFilters, { filterId } from "@/components/StickerFilters";
 import {
   ORIGINALS,
+  PAINTED,
   ORIGINAL_CATEGORIES,
   PALETTE_NAMES,
   PALETTE_SWATCH,
@@ -788,16 +789,16 @@ function OriginalsPanel({ q }: { q: string }) {
 
       <div>
         <Label>Style</Label>
-        <div className="grid grid-cols-2 gap-2">
-          {(["papercut", "line"] as OriginalStyle[]).map((st) => (
+        <div className={`grid gap-2 ${PAINTED.size ? "grid-cols-3" : "grid-cols-2"}`}>
+          {((PAINTED.size ? ["papercut", "line", "painted"] : ["papercut", "line"]) as OriginalStyle[]).map((st) => (
             <button
               key={st}
               onClick={() => setOriginals({ style: st, palette: "auto" })}
               className={`rounded-2xl border-2 p-2 flex items-center gap-2 transition ${style === st ? "border-coral bg-white" : "border-transparent bg-white/60 hover:border-ink/15"}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={originalSrc("safari-giraffe", st, matchedPalette(preset, st))} alt="" className="w-12 h-12" />
-              <span className="font-extrabold text-sm">{st === "papercut" ? "Papercut" : "Line"}</span>
+              <img src={originalSrc(st === "painted" ? [...PAINTED][0] : "safari-giraffe", st, matchedPalette(preset, st))} alt="" className="w-12 h-12" />
+              <span className="font-extrabold text-sm">{st === "papercut" ? "Papercut" : st === "line" ? "Line" : "Painted"}</span>
             </button>
           ))}
         </div>

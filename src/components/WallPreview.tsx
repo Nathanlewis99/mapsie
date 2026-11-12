@@ -64,7 +64,14 @@ export default function WallPreview({ design }: { design: Design }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={room.src} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
           {w > 0 && (
-            <div className="absolute" style={{ left: w * room.cx, top: H2 * room.cy, transform: "translate(-50%, -50%)" }}>
+            <div
+              className="absolute"
+              style={
+                room.by !== undefined
+                  ? { left: w * room.cx, top: H2 * room.by, transform: "translate(-50%, -100%)" }
+                  : { left: w * room.cx, top: H2 * (room.cy ?? 0.4), transform: "translate(-50%, -50%)" }
+              }
+            >
               <FramedPoster key={`${pw}-${design.frame}-${design.mount}`} design={design} width={pw} />
             </div>
           )}

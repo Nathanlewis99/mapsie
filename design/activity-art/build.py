@@ -97,7 +97,7 @@ def export(mods: list[str]):
     catalogue = [{"id": it["id"], "activity": it["activity"], "title": it["title"],
                   "label": ACTIVITIES[it["activity"]]["label"], "category": ACTIVITIES[it["activity"]]["category"],
                   "keywords": ACTIVITIES[it["activity"]].get("keywords", ""),
-                  **({k: ACTIVITIES[it["activity"]][k] for k in ("lat", "lng", "group") if k in ACTIVITIES[it["activity"]]}),
+                  **({k: ACTIVITIES[it["activity"]][k] for k in ("lat", "lng", "group", "tags") if k in ACTIVITIES[it["activity"]]}),
                   "papercut": it["papercut"], "line": it["line"]} for it in items]
     catalogue.sort(key=lambda x: (x["category"], x["label"], x["id"]))
     (ROOT / "src" / "lib" / "originals.json").write_text(json.dumps(catalogue))

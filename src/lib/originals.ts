@@ -18,6 +18,7 @@ export interface OriginalDef {
   lat?: number; // landmarks: where it is
   lng?: number;
   group?: string; // landmarks: europe | asia | americas | africa_oceania
+  tags?: string; // extra search words, e.g. "snake", "spider"
   papercut: string[];
   line: string[];
 }
@@ -83,7 +84,7 @@ export function searchOriginals(q: string): OriginalDef[] {
   const words = q.toLowerCase().trim().split(/\s+/).filter(Boolean);
   if (!words.length) return ORIGINALS;
   return ORIGINALS.filter((o) => {
-    const hay = `${o.label} ${o.title} ${o.category} ${o.keywords ?? ""} ${o.activity.replace(/-/g, " ")}`.toLowerCase();
+    const hay = `${o.label} ${o.title} ${o.category} ${o.keywords ?? ""} ${o.tags ?? ""} ${o.activity.replace(/-/g, " ")}`.toLowerCase();
     return words.every((w) => hay.includes(w));
   });
 }

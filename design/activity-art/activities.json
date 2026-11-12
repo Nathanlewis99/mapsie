@@ -1751,7 +1751,8 @@
   "label": "Nile crocodile",
   "category": "Animals",
   "tier": 1,
-  "keywords": "Africa wildlife animal"
+  "keywords": "Africa wildlife animal",
+  "tags": "reptile"
  },
  {
   "id": "animal-sloth-bear",
@@ -1821,7 +1822,8 @@
   "label": "King cobra",
   "category": "Animals",
   "tier": 1,
-  "keywords": "Sri Lanka & India wildlife animal"
+  "keywords": "Sri Lanka & India wildlife animal",
+  "tags": "snake reptile"
  },
  {
   "id": "animal-orangutan",
@@ -1856,7 +1858,8 @@
   "label": "Komodo dragon",
   "category": "Animals",
   "tier": 1,
-  "keywords": "Asia wildlife animal"
+  "keywords": "Asia wildlife animal",
+  "tags": "lizard reptile"
  },
  {
   "id": "animal-hornbill",
@@ -1961,7 +1964,8 @@
   "label": "Alligator",
   "category": "Animals",
   "tier": 1,
-  "keywords": "North America wildlife animal"
+  "keywords": "North America wildlife animal",
+  "tags": "reptile"
  },
  {
   "id": "animal-manatee",
@@ -2129,14 +2133,16 @@
   "label": "Saltwater crocodile",
   "category": "Animals",
   "tier": 1,
-  "keywords": "Australia & Tasmania wildlife animal"
+  "keywords": "Australia & Tasmania wildlife animal",
+  "tags": "reptile"
  },
  {
   "id": "animal-frilled-lizard",
   "label": "Frilled lizard",
   "category": "Animals",
   "tier": 1,
-  "keywords": "Australia & Tasmania wildlife animal"
+  "keywords": "Australia & Tasmania wildlife animal",
+  "tags": "reptile"
  },
  {
   "id": "animal-cockatoo",
@@ -2213,7 +2219,8 @@
   "label": "Giant tortoise",
   "category": "Animals",
   "tier": 1,
-  "keywords": "South America & Galápagos wildlife animal"
+  "keywords": "South America & Galápagos wildlife animal",
+  "tags": "reptile"
  },
  {
   "id": "animal-blue-footed-booby",
@@ -2227,7 +2234,8 @@
   "label": "Marine iguana",
   "category": "Animals",
   "tier": 1,
-  "keywords": "South America & Galápagos wildlife animal"
+  "keywords": "South America & Galápagos wildlife animal",
+  "tags": "lizard reptile"
  },
  {
   "id": "animal-sea-lion",
@@ -2248,7 +2256,8 @@
   "label": "Poison dart frog",
   "category": "Animals",
   "tier": 1,
-  "keywords": "South America & Galápagos wildlife animal"
+  "keywords": "South America & Galápagos wildlife animal",
+  "tags": "amphibian"
  },
  {
   "id": "animal-toucan",
@@ -2998,5 +3007,181 @@
   "lat": -16.5004,
   "lng": -151.7415,
   "group": "africa_oceania"
+ },
+ {
+  "id": "animal-green-tree-python",
+  "label": "Green tree python",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "australia papua new guinea rainforest snake reptile"
+ },
+ {
+  "id": "animal-burmese-python",
+  "label": "Burmese python",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "asia southeast asia snake reptile"
+ },
+ {
+  "id": "animal-rattlesnake",
+  "label": "Rattlesnake",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "usa desert arizona mexico snake reptile"
+ },
+ {
+  "id": "animal-black-mamba",
+  "label": "Black mamba",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "africa savannah snake reptile"
+ },
+ {
+  "id": "animal-eyelash-viper",
+  "label": "Eyelash viper",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "costa rica central america rainforest snake reptile"
+ },
+ {
+  "id": "animal-tarantula",
+  "label": "Tarantula",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "mexico south america spider bug creepy crawly"
+ },
+ {
+  "id": "animal-huntsman-spider",
+  "label": "Huntsman spider",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "australia spider bug creepy crawly"
+ },
+ {
+  "id": "animal-redback-spider",
+  "label": "Redback spider",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "australia spider bug creepy crawly"
+ },
+ {
+  "id": "animal-peacock-spider",
+  "label": "Peacock spider",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "australia spider bug creepy crawly"
+ },
+ {
+  "id": "animal-orb-weaver",
+  "label": "Golden orb-weaver",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "australia asia spider web bug creepy crawly"
+ },
+ {
+  "id": "animal-scorpion",
+  "label": "Scorpion",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "desert africa middle east mexico"
+ },
+ {
+  "id": "animal-chameleon",
+  "label": "Chameleon",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "madagascar africa lizard reptile"
+ },
+ {
+  "id": "animal-gecko",
+  "label": "Gecko",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "tropical asia lizard reptile"
+ },
+ {
+  "id": "animal-green-iguana",
+  "label": "Green iguana",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "central america caribbean mexico lizard reptile"
+ },
+ {
+  "id": "animal-thorny-devil",
+  "label": "Thorny devil",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "australia outback lizard reptile"
+ },
+ {
+  "id": "animal-red-eyed-tree-frog",
+  "label": "Red-eyed tree frog",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "costa rica central america frog"
+ },
+ {
+  "id": "animal-axolotl",
+  "label": "Axolotl",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "mexico city xochimilco"
+ },
+ {
+  "id": "animal-praying-mantis",
+  "label": "Praying mantis",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "insect bug creepy crawly"
+ },
+ {
+  "id": "animal-blue-morpho",
+  "label": "Blue morpho butterfly",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "costa rica amazon butterfly bug creepy crawly"
+ },
+ {
+  "id": "animal-monarch-butterfly",
+  "label": "Monarch butterfly",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "mexico usa canada migration butterfly bug creepy crawly"
+ },
+ {
+  "id": "animal-rhinoceros-beetle",
+  "label": "Rhinoceros beetle",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "asia rainforest insect beetle bug creepy crawly"
+ },
+ {
+  "id": "animal-leafcutter-ants",
+  "label": "Leafcutter ants",
+  "category": "Animals",
+  "tier": 1,
+  "keywords": "Reptiles & creepy-crawlies wildlife animal",
+  "tags": "costa rica amazon ants insect bug creepy crawly"
  }
 ]

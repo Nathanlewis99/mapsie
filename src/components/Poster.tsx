@@ -30,13 +30,22 @@ export default function Poster({ design, width, editable = false, print, selecte
   const filterPrefix = `mf${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const c = design.theme.colors;
   const landscape = design.orientation === "landscape";
-  const bandH = design.layout === "overlay" ? 0 : u * (landscape ? 11 : 17);
+  const t = design.text ?? DEFAULT_TEXT;
+  const mapOnly = design.layout === "none";
+  const route = t.showRoute && !mapOnly ? design.stops.map((s) => s.name).join("  ·  ") : "";
+  // The title area grows to fit a big title, a subtitle and the list of stops.
+  const lines = (chars: number, fontPx: number, boxPx: number) => Math.max(1, Math.ceil((chars * fontPx * 0.55) / boxPx));
+  const titleFont = u * (design.font === "bebas" ? 8 : 6.2) * t.titleSize;
+  const needed =
+    u * 4 +
+    lines(design.title.length, titleFont, width * 0.86) * titleFont * 1.08 +
+    (design.subtitle ? u * 2.1 * t.subtitleSize * 1.3 + u : 0) +
+    (route ? Math.min(2, lines(route.length, u * 1.5, width * 0.78)) * u * 1.5 * 1.35 + u * 0.9 : 0);
+  const bandH = design.layout === "overlay" || mapOnly ? 0 : Math.max(u * (landscape ? 11 : 17), needed);
   const pad = design.layout === "border" ? u * 4.5 : 0;
   const mapW = width - pad * 2;
   const mapH = height - bandH - pad * (design.layout === "border" ? 1 : 0) - pad;
   const font = fontCss(design.font);
-  const t = design.text ?? DEFAULT_TEXT;
-  const route = t.showRoute ? design.stops.map((s) => s.name).join("  ·  ") : "";
   const tt = (c: TextCase) => (c === "upper" ? "uppercase" : c === "lower" ? "lowercase" : "none");
   const align = t.align;
   const items = align === "left" ? "flex-start" : align === "right" ? "flex-end" : "center";
@@ -88,8 +97,23 @@ export default function Poster({ design, width, editable = false, print, selecte
         {design.title}
       </div>
       {subtitle}
-      {route && !landscape && (
-        <div style={{ fontFamily: "var(--f-montserrat), sans-serif", fontSize: u * 1.5, color: c.ink, opacity: 0.55, marginTop: u * 0.9, maxWidth: "90%", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {route && (
+        <div
+          style={{
+            fontFamily: "var(--f-montserrat), sans-serif",
+            fontSize: u * 1.5,
+            lineHeight: 1.35,
+            color: c.ink,
+            opacity: 0.6,
+            marginTop: u * 0.9,
+            width: "max-content",
+            maxWidth: width * 0.8,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
           {route}
         </div>
       )}
@@ -132,7 +156,7 @@ export default function Poster({ design, width, editable = false, print, selecte
         {design.theme.details?.compass && <Compass u={u} ink={c.ink} accent={c.accent} paper={c.paper} />}
       </div>
 
-      {design.layout !== "overlay" ? (
+      {mapOnly ? null : design.layout !== "overlay" ? (
         <div
           className="absolute left-0 right-0 bottom-0 flex flex-col justify-center pointer-events-none"
           style={{ height: bandH + (design.layout === "border" ? pad * 0.4 : 0), alignItems: items, padding: `0 ${u * 6}px`, zIndex: 3 }}

@@ -22,6 +22,7 @@ import {
 import { FONTS } from "@/lib/fonts";
 import { getRegion, REGIONS } from "@/lib/products";
 import PrintOptionsPicker from "@/components/PrintOptionsPicker";
+import SafeImg from "@/components/SafeImg";
 import { crowding, MIN_STOP_SCALE, readability, recommendedProduct, sizeNote, smallestText, tidyCrowded } from "@/lib/legibility";
 import { getProduct } from "@/lib/products";
 import { TEMPLATES } from "@/lib/templates";
@@ -476,11 +477,8 @@ export function StopsCheck() {
 export function StickerThumb({ name, style, className = "" }: { name: string; style: ArtStyleId; className?: string }) {
   const art = getArtStyle(style);
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <SafeImg
       src={stickerSrc(name, style)}
-      alt=""
-      draggable={false}
       className={`w-full h-full pointer-events-none ${className}`}
       style={{ filter: art.finish !== "none" ? `url(#${filterId(PANEL_FILTERS, art.finish)})` : undefined, mixBlendMode: art.blend }}
     />
@@ -717,8 +715,7 @@ function OriginalsPanel() {
       className="rounded-2xl p-1.5 hover:scale-105 hover:-rotate-3 transition"
       style={{ background: style === "line" && resolved === "night" ? "#1F2A44" : "transparent" }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={originalSrc(o.id, style, resolved)} alt={o.title} loading="lazy" className="w-full aspect-square pointer-events-none" />
+      <SafeImg src={originalSrc(o.id, style, resolved)} className="w-full aspect-square pointer-events-none" />
       <div className="text-[11px] font-bold text-ink/60 leading-tight mt-0.5 truncate">{o.title}</div>
     </button>
   );
@@ -908,6 +905,15 @@ export function TextPanel() {
   return (
     <div className="space-y-5">
       <div>
+        <Label>Layout</Label>
+        <Chips<Layout>
+          value={design.layout}
+          options={[{ id: "band", label: "Title below" }, { id: "border", label: "Framed border" }, { id: "overlay", label: "Full bleed" }, { id: "none", label: "🗺️ Map only, no text" }]}
+          onChange={(v) => set({ layout: v })}
+        />
+        {design.layout === "none" && <p className="text-xs text-ink/60 font-semibold mt-2">The whole print is map. Pick another layout to bring the title back.</p>}
+      </div>
+      <div>
         <Label>Title</Label>
         <input value={design.title} maxLength={48} onChange={(e) => set({ title: e.target.value }, "title")} className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-bold outline-none focus:border-coral" />
       </div>
@@ -990,14 +996,6 @@ export function TextPanel() {
             ↺ Put the text back in place
           </button>
         )}
-      </div>
-      <div>
-        <Label>Layout</Label>
-        <Chips<Layout>
-          value={design.layout}
-          options={[{ id: "band", label: "Title below" }, { id: "border", label: "Framed border" }, { id: "overlay", label: "Full bleed" }]}
-          onChange={(v) => set({ layout: v })}
-        />
       </div>
     </div>
   );

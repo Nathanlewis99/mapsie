@@ -83,7 +83,7 @@ export const NO_DETAILS: MapDetails = { grid: false, tropics: false, currents: f
 
 export type RouteStyle = "auto" | "solid" | "dashed" | "dotted";
 export type MarkerStyle = "number" | "dot" | "pin" | "heart" | "sticker";
-export type Layout = "band" | "border" | "overlay";
+export type Layout = "band" | "border" | "overlay" | "none";
 export type Orientation = "portrait" | "landscape";
 export type FrameId = "none" | "black" | "white" | "oak" | "brown" | "darkgrey" | "lightgrey" | "gold" | "silver";
 export type PaperId = "ema" | "hpr" | "hge" | "lpp";

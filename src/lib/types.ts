@@ -45,6 +45,8 @@ export interface Sticker {
   text?: string;
   font?: FontId;
   color?: string;
+  /** Text only: bend the text along an arc, -100 (a "smile") to 100 (an arch). 0 = straight. */
+  curve?: number;
 }
 
 export interface ThemeColors {

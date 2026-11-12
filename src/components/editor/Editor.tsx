@@ -504,6 +504,20 @@ export default function Editor() {
                     </button>
                   </span>
                   <input type="color" value={sel.color ?? design.theme.colors.ink} onChange={(e) => store.updateSticker(sel.id, { color: e.target.value }, `color-${sel.id}`)} className="w-7 h-7 rounded-full bg-transparent border-0 p-0" />
+                  <label className="flex items-center gap-1.5 bg-white/10 rounded-full pl-2.5 pr-3 py-1 whitespace-nowrap" title="Curve the text">
+                    <span aria-hidden>{(sel.curve ?? 0) < 0 ? "◡" : "◠"}</span>
+                    <input
+                      type="range"
+                      min={-100}
+                      max={100}
+                      step={5}
+                      value={sel.curve ?? 0}
+                      onChange={(e) => store.updateSticker(sel.id, { curve: Number(e.target.value) || undefined }, `curve-${sel.id}`)}
+                      onDoubleClick={() => store.updateSticker(sel.id, { curve: undefined })}
+                      aria-label="Curve"
+                      className="w-20 accent-coral"
+                    />
+                  </label>
                   <span className="w-px h-5 bg-white/20 mx-1" />
                 </>
               )}

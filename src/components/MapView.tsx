@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl, { Map as MLMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { DEFAULT_TEXT, type Design, type Sticker, type Stop } from "@/lib/types";
+import { DEFAULT_TEXT, type Design, type FontId, type Sticker, type Stop } from "@/lib/types";
 import { buildStyle, loadBaseStyle } from "@/lib/themes";
 import { buildLegs, routeGeoJSON, stopsBounds, MODES } from "@/lib/geo";
 import { loadCountries, visitedCountries } from "@/lib/countries";
@@ -486,8 +486,9 @@ export default function MapView(props: Props) {
           if (st.kind === "text") {
             inner = document.createElement("div");
             inner.className = "mapsie-note";
-            inner.textContent = st.text || "Your note";
             inner.style.cssText = `font-family:${fontCss(st.font ?? "caveat")};font-weight:${fontBold(st.font ?? "caveat")};color:${st.color ?? design.theme.colors.ink};font-size:${px}px`;
+            if (st.curve) curvedText(inner, (st.text || "Your note").replace(/\s*\n\s*/g, " "), st.curve, st.font ?? "caveat");
+            else inner.textContent = st.text || "Your note";
           } else {
             node.style.width = `${px}px`;
             node.style.height = `${px}px`;
@@ -640,4 +641,74 @@ function detailIcon(id: string): ImageData | null {
   g.closePath();
   g.fill();
   return g.getImageData(0, 0, size, size);
+}
+
+/**
+ * Word-art style curved text: the text sits on an arc whose bend follows `curve`
+ * (100 = a half-circle arch, -100 = a half-circle smile). The SVG is sized in em,
+ * so resizing the sticker (which changes the font size) scales it with the text.
+ */
+function curvedText(host: HTMLElement, text: string, curve: number, font: FontId) {
+  const NS = "http://www.w3.org/2000/svg";
+  const fs = 100; // work in a 100-unit em, then size the SVG in em
+  // Canvas can't read CSS variables, so swap var(--f-x) for the real family name.
+  const root = getComputedStyle(document.documentElement);
+  const family = fontCss(font).replace(/var\((--[\w-]+)\)/g, (_, v) => root.getPropertyValue(v).trim() || "serif");
+  const spec = `${fontBold(font)} ${fs}px ${family}`;
+  const measure = () => {
+    const c = document.createElement("canvas").getContext("2d")!;
+    c.font = spec;
+    return Math.max(fs, c.measureText(text).width);
+  };
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("overflow", "visible");
+  svg.style.display = "block";
+  const path = document.createElementNS(NS, "path");
+  const id = `curve-${Math.random().toString(36).slice(2)}`;
+  path.setAttribute("id", id);
+  path.setAttribute("fill", "none");
+  const t = document.createElementNS(NS, "text");
+  t.setAttribute("text-anchor", "middle");
+  t.setAttribute("font-size", String(fs));
+  t.setAttribute("fill", "currentColor");
+  // the same soft white halo straight notes have
+  t.setAttribute("stroke", "rgba(255,255,255,0.8)");
+  t.setAttribute("stroke-width", String(fs * 0.08));
+  t.setAttribute("stroke-linejoin", "round");
+  t.setAttribute("paint-order", "stroke");
+  const tp = document.createElementNS(NS, "textPath");
+  tp.setAttribute("href", `#${id}`);
+  tp.setAttribute("startOffset", "50%");
+  tp.textContent = text;
+  t.appendChild(tp);
+  const defs = document.createElementNS(NS, "defs");
+  defs.appendChild(path);
+  svg.append(defs, t);
+  host.appendChild(svg);
+
+  const layout = () => {
+    const L = measure() * 1.04;
+    const theta = (Math.min(100, Math.abs(curve)) / 100) * Math.PI; // total angle of the arc
+    const R = L / theta;
+    const h = theta / 2;
+    const halfW = R * Math.sin(h);
+    const sag = R * (1 - Math.cos(h));
+    const up = curve > 0; // arch: middle highest
+    // Extend the path a little past the text so long words never fall off the ends.
+    const ext = Math.min(Math.PI - h, 0.35);
+    const a0 = -(h + ext), a1 = h + ext;
+    const pt = (a: number) => (up ? [R * Math.sin(a), R * (1 - Math.cos(a))] : [R * Math.sin(a), sag - R * (1 - Math.cos(a))]);
+    const [x0, y0] = pt(a0), [x1, y1] = pt(a1);
+    const large = a1 - a0 > Math.PI ? 1 : 0;
+    path.setAttribute("d", `M${x0} ${y0} A${R} ${R} 0 ${large} ${up ? 1 : 0} ${x1} ${y1}`);
+    const pad = fs * 0.15;
+    const top = -fs * 0.85 - pad, bottom = sag + fs * 0.3 + pad;
+    const left = -halfW - fs * 0.4, width = halfW * 2 + fs * 0.8;
+    svg.setAttribute("viewBox", `${left} ${top} ${width} ${bottom - top}`);
+    svg.style.width = `${width / fs}em`;
+    svg.style.height = `${(bottom - top) / fs}em`;
+  };
+  layout();
+  // Re-measure once the font has loaded (the first pass may use a fallback font's widths).
+  document.fonts?.load(spec).then(layout).catch(() => {});
 }

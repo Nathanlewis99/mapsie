@@ -800,7 +800,7 @@ def amman(d: Drawing):
     d.band("deep", hills(190, 3, 20), line=False)
 
 
-AMMAN = {"stone": "#E3CFA4", "stone2": "#B79C6A", "hill": "#C9AE80", "blue": "#3F7FB5", "blue2": "#2D6596", "gold": "#E1B04A",
+AMMAN = {"stone": "#D9A85E", "stone2": "#A87A38", "hill": "#8C6E4A", "blue": "#3F7FB5", "blue2": "#2D6596", "gold": "#E1B04A",
          "pole": "#8A8F96", "fl1": "#1E1E22", "fl2": "#FFFFFF", "fl3": "#2E8A4E", "fl4": "#D2412F", "far2": "#00000000", "mid2": "#00000022"}
 
 
@@ -1098,6 +1098,10 @@ def C(cid, act, title, fn, palettes=None, overrides=None, checks=(), fixes=None)
                    overrides=overrides or {}, checks=list(checks), fixes=fixes if fixes is not None else dict(SKY_FIX))
 
 
+def fx(**extra):
+    return {**SKY_FIX, **extra}
+
+
 CONCEPTS = [
     C("sky-dubai", "skyline-dubai", "Dubai", dubai, NO_SEA_GOLD, DUBAI,
       [("glass", "sky"), ("glass", "mid"), ("tw", "mid"), ("tw", "sky"), ("sail", "far"), ("steel", "mid"), ("far", "sky"), ("mid", "near")]),
@@ -1112,11 +1116,13 @@ CONCEPTS = [
     C("sky-cairo", "skyline-cairo", "Cairo", cairo, None, CAIRO,
       [("tower", "sky"), ("tower", "near"), ("sand", "sky"), ("sand", "glow"), ("far", "sky"), ("stone", "sky"), ("sail", "near")]),
     C("sky-marrakech", "skyline-marrakech", "Marrakech", marrakech, None, MARRAKECH,
-      [("stone", "sky"), ("stone", "far"), ("stone", "town"), ("town", "far"), ("leaf", "far"), ("far", "sky"), ("stone", "glow")]),
+      [("stone", "sky"), ("stone", "far"), ("stone", "town"), ("town", "far"), ("leaf", "far"), ("far", "sky"), ("stone", "glow")],
+      fx(far=["near", "mid", "deep"])),
     C("sky-casablanca", "skyline-casablanca", "Casablanca", casablanca, NO_SEA_GOLD, CASA,
-      [("stone", "sky"), ("stone", "near"), ("tw", "sky"), ("tw", "town"), ("town", "sky"), ("town", "far")]),
+      [("stone", "sky"), ("stone", "near"), ("tw", "sky"), ("tw", "town"), ("town", "far"), ("far", "sky")]),
     C("sky-cape-town", "skyline-cape-town", "Cape Town", cape_town, NO_SEA_GOLD, CAPE,
-      [("near", "sky"), ("light", "near"), ("deep", "near"), ("far", "mid"), ("tw", "far"), ("tw", "mid"), ("far", "water")]),
+      [("near", "sky"), ("light", "near"), ("deep", "near"), ("far", "mid"), ("tw", "far"), ("tw", "mid"), ("far", "water")],
+      fx(far=["sky2", "light"], deep=["dark", "mid"])),
     C("sky-johannesburg", "skyline-johannesburg", "Johannesburg", johannesburg, None, JOBURG,
       [("tw", "sky"), ("tw", "mid"), ("dark2", "mid"), ("dark2", "sky"), ("deck", "mid"), ("deck", "near"), ("far", "sky"), ("dump", "sky")]),
     C("sky-nairobi", "skyline-nairobi", "Nairobi", nairobi, None, NAIROBI,
@@ -1124,9 +1130,10 @@ CONCEPTS = [
     C("sky-lagos", "skyline-lagos", "Lagos", lagos, NO_SEA_GOLD, LAGOS,
       [("tw", "mid"), ("tw3", "mid"), ("glass", "mid"), ("tw3", "sky"), ("deck", "near"), ("danfo", "near"), ("far", "sky")]),
     C("sky-accra", "skyline-accra", "Accra", accra, NO_SEA_GOLD, ACCRA,
-      [("gate", "mid"), ("gate", "sky"), ("star", "sky"), ("tw", "mid"), ("light", "mid"), ("lred", "sky"), ("far", "sky")]),
+      [("gate", "mid"), ("star", "glow"), ("tw", "mid"), ("light", "mid"), ("lred", "sky"), ("lred", "mid"), ("far", "sky"), ("mid", "far")]),
     C("sky-amman", "skyline-amman", "Amman", amman, None, AMMAN,
-      [("stone", "mid"), ("stone", "sky"), ("blue", "mid"), ("hill", "mid"), ("far", "sky"), ("mid", "far"), ("deep", "stone")]),
+      [("stone", "mid"), ("stone", "sky"), ("blue", "mid"), ("stone", "hill"), ("far", "sky"), ("mid", "far")],
+      fx(mid=["near"])),
     C("sky-riyadh", "skyline-riyadh", "Riyadh", riyadh, None, RIYADH,
       [("glass", "sky"), ("glass", "mid"), ("tw", "sky"), ("tw", "mid"), ("gold", "sky"), ("mud", "ground"), ("mud", "mid"), ("far", "sky")]),
     C("sky-sydney", "skyline-sydney", "Sydney", sydney, NO_SEA_GOLD, SYDNEY,
@@ -1134,9 +1141,9 @@ CONCEPTS = [
     C("sky-melbourne", "skyline-melbourne", "Melbourne", melbourne, NO_SEA_GOLD, MELB,
       [("tw", "sky"), ("tw", "mid"), ("tw3", "mid"), ("spire", "mid"), ("ochre", "mid"), ("ochre", "near"), ("far", "sky")]),
     C("sky-brisbane", "skyline-brisbane", "Brisbane", brisbane, NO_SEA_GOLD, BRIS,
-      [("tw", "sky"), ("tw", "mid"), ("tw3", "mid"), ("sand", "mid"), ("steel", "sky"), ("steel", "mid"), ("wheel", "near"), ("far", "sky")]),
+      [("tw", "sky"), ("tw", "mid"), ("tw3", "mid"), ("sand", "mid"), ("sand", "sky"), ("steel", "sky"), ("steel", "mid"), ("wheel", "near"), ("far", "sky")]),
     C("sky-perth", "skyline-perth", "Perth", perth, NO_SEA_GOLD, PERTH,
       [("tw", "sky"), ("tw", "mid"), ("tw3", "mid"), ("glass", "mid"), ("copper", "mid"), ("deck", "near"), ("swan", "near"), ("far", "sky")]),
     C("sky-auckland", "skyline-auckland", "Auckland", auckland, NO_SEA_GOLD, AUCK,
-      [("sky1", "sky"), ("sky1", "mid"), ("tw", "mid"), ("light", "near"), ("far", "sky"), ("bridge", "sky"), ("mid", "near")]),
+      [("sky1", "sky"), ("tw", "mid"), ("light", "near"), ("far", "sky"), ("bridge", "sky"), ("mid", "near")]),
 ]

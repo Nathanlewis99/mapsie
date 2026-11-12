@@ -109,24 +109,26 @@ def car(d: Drawing):
 def convertible(d: Drawing):
     d.disc("glow", 100, 100, 62, line=False)
     d.band("far", hills(132, 8, 10))
-    palm(d, 160, 136, 0.9, "near", 8)
-    palm(d, 36, 138, 0.7, "near", -6)
+    palm(d, 166, 136, 0.9, "near", 8)
+    palm(d, 30, 138, 0.7, "near", -6)
     d.band("ground", "M-30 152 Q100 146 230 152")
-    # seats and windscreen poke above the open body
-    d.shape("dark", "M66 106 Q64 84 76 82 Q86 82 86 106Z")
-    d.shape("dark", "M92 106 Q90 86 101 84 Q110 84 110 106Z")
-    d.stroke("dark", "M116 100 L122 88", 3)
-    d.shape("dark", ellipse(122, 88, 3, 7), extra='transform="rotate(30 122 88)"')
-    d.shape("light", "M128 106 L136 80 H141 L136 106Z", spot=True)
-    body = ("M24 140 Q14 140 14 130 V112 Q14 100 26 98 L60 104 H150 Q178 104 186 116 V130 Q186 140 176 140Z")
+    # high-backed seats, steering wheel and raked windscreen above the open body
+    d.shape("pop", "M54 106 Q52 82 66 80 Q78 80 78 106Z", spot=True)
+    d.shape("pop", "M86 106 Q84 84 97 82 Q108 82 108 106Z", spot=True)
+    d.stroke("dark", "M112 104 L118 92", 3)
+    d.shape("dark", ellipse(118, 92, 2.6, 8), extra='transform="rotate(28 118 92)"')
+    d.shape("light", "M128 106 L118 78 H124 L138 106Z")
+    body = ("M24 140 Q12 140 12 128 V108 Q12 94 20 90 L34 102 Q38 106 48 106 H140 Q176 104 186 116 "
+            "V130 Q186 140 176 140Z")
     d.shape("hero", body)
-    d.shape("hero2", "M15 118 Q100 114 185 118 V124 Q100 120 15 124Z", shadow=False, spot=True)
-    d.stroke("dark", "M120 106 V134", 1.6)
-    d.shape("glow2", ellipse(182, 112, 3.5, 5), shadow=False)
-    d.shape("pop", rrect(14, 104, 5, 10, 2), shadow=False)
-    d.shape("light", rrect(170, 132, 20, 6, 3))
-    d.shape("light", rrect(10, 132, 18, 6, 3))
-    for x in (52, 150):
+    d.shape("hero2", "M13 116 Q60 112 100 118 Q150 114 185 120 V126 Q150 120 100 124 Q60 118 13 122Z", shadow=False, spot=True)
+    d.stroke("dark", "M114 108 V134", 1.6)
+    d.shape("dark", rrect(118, 112, 9, 3, 1.5), shadow=False)
+    d.shape("glow2", ellipse(183, 112, 3.5, 5), shadow=False)
+    d.shape("pop", "M12 98 L20 92 L22 100 L12 104Z", shadow=False)
+    d.shape("light", rrect(170, 132, 22, 6, 3))
+    d.shape("light", rrect(6, 132, 20, 6, 3))
+    for x in (50, 152):
         arch(d, x, 140, 19)
         d.shape("dark", circle(x, 141, 15))
         d.shape("light", circle(x, 141, 10), shadow=False)
@@ -218,21 +220,22 @@ def train(d: Drawing):
 @framed
 def plane(d: Drawing):
     d.disc("far", 100, 100, 70, line=False)
-    d.shape("light", cloud(18, 140, 1.3))
-    d.shape("light", cloud(132, 46, 1.0))
-    d.shape("light", cloud(140, 150, 0.9), shadow=False)
+    d.shape("light", cloud(14, 136, 1.3))
+    d.shape("light", cloud(130, 44, 1.0))
+    d.shape("light", cloud(138, 150, 0.9), shadow=False)
 
     def jet():
         # top-down airliner pointing up (nose at y=22), centre x=100
-        d.shape("light", "M100 116 L32 142 L32 152 L100 136 L168 152 L168 142Z")
-        d.shape("light", "M100 156 L76 170 V176 L100 170 L124 176 V170Z")
-        for x in (64, 136):
-            d.shape("hero2", rrect(x - 5, 124, 10, 20, 5), spot=True)
-        d.shape("light", "M100 20 C110 20 112 36 112 50 V160 C112 172 106 180 100 180 C94 180 88 172 88 160 V50 C88 36 90 20 100 20Z")
-        d.shape("hero", "M94 34 Q100 28 106 34 L106 40 Q100 37 94 40Z", shadow=False)
-        d.shape("hero", "M88 128 H112 V134 H88Z M30 145 L32 152 L46 149 L46 141Z M170 145 L168 152 L154 149 L154 141Z", shadow=False, spot=True)
-        d.shape("hero", "M96 168 L100 186 L104 168Z")
-    group(d, "rotate(42 100 100) translate(100 100) scale(.9) translate(-100 -100)", jet)
+        d.shape("light", "M100 92 L20 128 Q16 132 18 138 L100 120 L182 138 Q184 132 180 128Z")
+        d.shape("light", "M100 150 L68 166 V174 L100 166 L132 174 V166Z")
+        for x in (62, 138):
+            d.shape("hero2", rrect(x - 6, 104, 12, 24, 6), spot=True)
+        d.shape("light", "M100 20 C112 20 115 38 115 52 V156 C115 170 108 180 100 180 C92 180 85 170 85 156 V52 C85 38 88 20 100 20Z")
+        d.shape("hero", "M92 36 Q100 28 108 36 L108 42 Q100 39 92 42Z", shadow=False)
+        d.shape("hero", "M85 112 H115 V119 H85Z", shadow=False, spot=True)
+        d.shape("hero", "M18 133 L19 138 L32 135 L30 128Z M182 133 L181 138 L168 135 L170 128Z", shadow=False)
+        d.shape("hero", "M95 164 L100 186 L105 164Z")
+    group(d, "rotate(42 100 100) translate(100 100) scale(.86) translate(-100 -100)", jet)
 
 
 # ================================================================ BICYCLE
@@ -269,34 +272,33 @@ def bicycle(d: Drawing):
 def motorbike(d: Drawing):
     d.disc("glow", 100, 96, 64, line=False)
     d.band("far", hills(124, 8, 20))
-    d.band("ground", "M-30 150 Q100 144 230 150")
-    y = 132
-    # forks + handlebar
-    d.limb("dark", "M150 132 L132 78", 6)
-    d.stroke("dark", "M132 78 L120 70", 3.2)
-    d.marks("dark", circle(120, 70, 3))
-    # engine block + exhaust
-    d.shape("dark", "M82 104 H118 L122 130 H86Z")
-    d.stroke("light", "M88 112 H118 M89 118 H119 M90 124 H120", 1.4, line=False)
-    d.limb("light", "M90 132 Q70 140 34 132", 5)
-    # tank, seat, tail
-    d.shape("hero", "M40 98 Q38 90 52 90 H84 L80 104 H48Z")
-    d.shape("dark", "M44 92 Q52 82 84 86 L88 94 H48Z")
-    d.shape("hero", "M82 92 Q86 76 106 76 Q126 76 132 88 L126 104 H86Z", spot=True)
-    d.shape("light", "M92 84 Q102 79 116 81", shadow=False, line=False)
-    d.shape("hero2", "M94 92 H124", shadow=False, line=False)
-    d.stroke("hero2", "M92 94 Q108 98 126 92", 3, line=False)
-    # headlight
-    d.shape("dark", circle(140, 86, 9))
-    d.shape("glow2", circle(142, 86, 6), shadow=False)
+    d.band("ground", "M-30 158 Q100 152 230 158")
+    y = 136
+    # frame, forks, handlebar
+    d.limb("dark", "M50 136 L78 100 M78 100 L132 96 M100 128 L84 100", 5)
+    d.limb("dark", "M150 136 L130 80", 6)
+    d.stroke("dark", "M130 80 L118 72", 3.4)
+    d.marks("dark", circle(117, 72, 3.2))
+    # engine + exhaust
+    d.shape("dark", rrect(84, 104, 34, 30, 7))
+    d.stroke("light", "M88 112 H114 M88 118 H114 M88 124 H114", 1.6, line=False)
+    d.limb("light", "M96 134 Q72 142 34 130", 5.5)
     # mudguards
-    d.stroke("hero", "M130 124 A22 22 0 0 1 168 120", 4)
-    d.stroke("hero", "M28 118 A24 24 0 0 1 72 112", 4, line=False)
-    for x in (52, 150):
+    d.stroke("hero", "M26.5 127.4 A25 25 0 0 1 69.2 120", 5, shadow=True)
+    d.stroke("hero", "M130.8 120 A25 25 0 0 1 173.5 127.4", 5, shadow=True)
+    # seat + tank
+    d.shape("dark", "M42 96 Q44 86 56 86 H90 Q94 88 92 96 Q90 100 84 100 H48 Q42 100 42 96Z")
+    d.shape("hero", "M86 94 Q88 76 110 76 Q130 76 134 90 Q128 102 110 104 H92 Q86 102 86 94Z", spot=True)
+    d.stroke("light", "M96 84 Q106 79 120 81", 3, line=False)
+    d.shape("hero2", "M96 92 H124 L122 97 H98Z", shadow=False)
+    # headlight
+    d.shape("hero", circle(144, 90, 9))
+    d.shape("glow2", circle(146, 90, 6), shadow=False)
+    for x in (50, 150):
         d.shape("dark", circle(x, y, 20))
-        d.shape("light", circle(x, y, 12), shadow=False)
-        d.stroke("dark", f"M{x - 12} {y} H{x + 12} M{x} {y - 12} V{y + 12} M{x - 8.5} {y - 8.5} L{x + 8.5} {y + 8.5} M{x + 8.5} {y - 8.5} L{x - 8.5} {y + 8.5}", 1.2, line=False)
-        d.marks("dark", circle(x, y, 3.5))
+        d.shape("light", circle(x, y, 13), shadow=False)
+        d.stroke("dark", f"M{x - 13} {y} H{x + 13} M{x} {y - 13} V{y + 13} M{x - 9} {y - 9} L{x + 9} {y + 9} M{x + 9} {y - 9} L{x - 9} {y + 9}", 1.2, line=False)
+        d.marks("dark", circle(x, y, 4))
 
 
 # ================================================================ BUS
@@ -533,27 +535,28 @@ def burger(d: Drawing):
 @framed
 def chicken(d: Drawing):
     d.disc("glow", 100, 96, 66, line=False)
-    d.band("far", hills(140, 6, 10))
-    d.stroke("dark", "M-30 128 H230 M-30 144 H230", 3, line=False)
-    for x in (14, 186):
-        d.shape("ground", rrect(x - 4, 116, 8, 40, 2), shadow=False, line=False)
+    d.band("far", hills(146, 6, 10))
     # legs
-    d.limb("pop", "M88 140 V164 M108 140 V164", 4.5)
-    d.stroke("pop", "M80 166 H96 M100 166 H116 M88 164 L84 160 M108 164 L104 160", 3)
-    # tail feathers
-    d.shape("hero2", "M48 112 Q20 92 34 50 Q46 72 62 80 Q46 54 58 36 Q66 70 82 88Z")
-    # body (plump), head, wing
-    d.shape("hero", "M40 104 Q40 76 70 78 Q92 80 110 70 Q118 50 132 42 Q154 36 160 58 Q164 74 154 86 Q160 112 146 134 Q128 154 92 152 Q48 150 40 104Z")
-    d.shape("hero2", "M68 104 Q86 86 118 96 Q126 118 104 132 Q78 134 68 104Z", shadow=False, spot=True)
-    d.stroke("hero", "M86 110 Q98 106 110 112 M84 120 Q96 116 106 122", 2, line=False)
-    # comb, wattle, beak, eye
-    d.shape("pop", "M126 44 Q124 30 134 34 Q136 22 146 30 Q154 24 156 36 Q160 42 152 46Z", spot=True)
-    d.shape("pop", "M156 68 Q164 74 158 84 Q150 84 150 74Z", shadow=False, spot=True)
-    d.shape("glow2", "M158 56 L174 62 L158 68Z")
-    d.marks("dark", circle(144, 54, 3.4))
-    d.marks("light", circle(145, 53, 1))
-    d.band("ground", "M-30 160 Q100 152 230 160")
-    d.band("near", hills(182, 4, 10), line=False)
+    d.limb("pop", "M88 140 V166 M110 140 V166", 4.5)
+    d.stroke("pop", "M80 168 H96 M102 168 H118 M88 166 L84 162 M110 166 L106 162", 3)
+    # tail fan behind the body
+    d.shape("hero2", "M70 92 Q38 88 32 50 Q46 60 54 60 Q46 44 52 30 Q64 50 74 58 Q74 46 80 38 Q86 62 92 80Z")
+    # plump body and head
+    d.shape("hero", "M44 106 Q44 76 76 76 Q100 76 116 68 Q126 52 140 46 Q160 42 164 62 Q166 76 156 86 "
+                     "Q164 106 156 124 Q142 152 100 152 Q46 152 44 106Z")
+    # wing with scalloped tip
+    d.shape("hero2", "M64 100 Q84 84 120 94 Q132 112 118 128 Q110 134 100 132 Q104 126 96 124 Q96 132 86 130 "
+                      "Q88 122 80 122 Q74 118 64 100Z", shadow=False, spot=True)
+    d.stroke("hero", "M84 104 Q98 100 112 106", 2, line=False)
+    # comb, beak, wattle, eye
+    d.shape("pop", "M130 48 Q126 34 138 36 Q140 24 150 32 Q158 26 160 38 Q164 44 156 50Z", spot=True)
+    d.shape("glow2", "M162 58 L178 64 L162 70Z")
+    d.shape("pop", "M160 70 Q168 76 162 86 Q154 86 154 76Z", shadow=False, spot=True)
+    d.marks("dark", circle(148, 58, 3.6))
+    d.marks("light", circle(149.2, 56.8, 1.1))
+    d.band("ground", "M-30 168 Q100 160 230 168")
+    d.stroke("near", "M30 166 l-3 -8 M34 165 l1 -9 M38 166 l4 -7 M158 164 l-3 -8 M162 163 l1 -9 M166 164 l4 -7", 2.2, line=False)
+    d.band("near", hills(186, 4, 10), line=False)
 
 
 # ================================================================ COW

@@ -370,6 +370,9 @@ export function StylePanel() {
         <div className="mt-2">
           <Toggle on={design.markers.showDates} onChange={(v) => set({ markers: { ...design.markers, showDates: v } })} label="📅 Show dates under stop names" />
         </div>
+        <Slider label="Marker size" min={0.5} max={2.2} step={0.05} value={design.markers.size} onChange={(v) => set({ markers: { ...design.markers, size: v } }, "marker-size")} />
+        <Slider label="Label size" min={0.5} max={2.5} step={0.05} value={design.markers.labelSize} onChange={(v) => set({ markers: { ...design.markers, labelSize: v } }, "label-size")} />
+        <p className="text-xs text-ink/50">Tip: tap a place name on the map to resize it or drag it somewhere else. Drag the pin to move the stop itself.</p>
       </div>
 
       <div>

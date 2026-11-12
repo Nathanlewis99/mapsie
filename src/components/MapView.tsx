@@ -17,6 +17,8 @@ export interface MapHandlers {
   onStickerMove?: (id: string, lng: number, lat: number) => void;
   onStickerChange?: (id: string, patch: Partial<Sticker>) => void;
   onStickerSelect?: (id: string | null) => void;
+  onLabelSelect?: (stopId: string | null) => void;
+  onLabelChange?: (stopId: string, patch: Partial<Stop>) => void;
   onMapClick?: (lng: number, lat: number) => void;
   onDropSticker?: (src: string, lng: number, lat: number) => void;
 }
@@ -29,6 +31,7 @@ interface Props {
   editable: boolean;
   print?: boolean;
   selectedSticker?: string | null;
+  selectedLabel?: string | null;
   fitRequest?: number;
   handlers?: MapHandlers;
   filterPrefix?: string; // id prefix of this poster's sticker filters
@@ -75,7 +78,7 @@ function markerSvg(style: Design["markers"]["style"], fill: string, stroke: stri
 }
 
 export default function MapView(props: Props) {
-  const { design, width, height, mapWidth, editable, print, selectedSticker, fitRequest, handlers, onReady, filterPrefix = "mapsie" } = props;
+  const { design, width, height, mapWidth, editable, print, selectedSticker, selectedLabel, fitRequest, handlers, onReady, filterPrefix = "mapsie" } = props;
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
   const stopMarkers = useRef<Marker[]>([]);
@@ -147,6 +150,7 @@ export default function MapView(props: Props) {
       });
       m.on("click", (e) => {
         h.current?.onStickerSelect?.(null);
+        h.current?.onLabelSelect?.(null);
         h.current?.onMapClick?.(e.lngLat.lng, e.lngLat.lat);
       });
       if (onReady) {
@@ -274,7 +278,7 @@ export default function MapView(props: Props) {
   }, [visitedKey]);
 
   // --- stop markers (HTML, so they can use any font and stay crisp in print)
-  const stopsKey = JSON.stringify([design.stops.map(({ path: _p, ...s }) => s), design.markers, design.theme.colors, design.font, width, editable]); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const stopsKey = JSON.stringify([design.stops.map(({ path: _p, ...s }) => s), design.markers, design.theme.colors, design.font, width, editable, selectedLabel]); // eslint-disable-line @typescript-eslint/no-unused-vars
   useEffect(
     () =>
       whenMap((mm) => {
@@ -284,7 +288,8 @@ export default function MapView(props: Props) {
         stopMarkers.current = design.stops.map((s: Stop, i) => {
           const node = document.createElement("div");
           node.className = `mapsie-stop is-${style}`;
-          node.style.setProperty("--u", `${u}px`);
+          node.style.setProperty("--u", `${u * design.markers.size}px`);
+          if (editable) node.title = "Drag to move this stop";
           const icon =
             style === "number"
               ? `<div class="mapsie-stop-dot" style="background:${c.accent};color:${c.paper};border-color:${c.paper}">${i + 1}</div>`
@@ -296,6 +301,8 @@ export default function MapView(props: Props) {
             ? `<div class="mapsie-stop-label" style="color:${c.ink};background:${c.paper};font-family:${fontCss(design.font)}">${esc(s.name)}${date}</div>`
             : "";
           node.innerHTML = icon + label;
+          const labelEl = node.querySelector<HTMLElement>(".mapsie-stop-label");
+          if (labelEl) setupLabel(labelEl, s);
           const mk = new maplibregl.Marker({ element: node, draggable: editable, anchor: style === "pin" ? "bottom" : "center" })
             .setLngLat([s.lng, s.lat])
             .addTo(mm);
@@ -309,6 +316,100 @@ export default function MapView(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [stopsKey],
   );
+
+  /**
+   * A stop's label: its own size and offset from the pin. In the editor it can be
+   * selected, dragged (without moving the stop) and resized from its corner.
+   */
+  function setupLabel(el: HTMLElement, s: Stop) {
+    const scale = design.markers.labelSize * (s.labelScale ?? 1);
+    const [dx, dy] = s.labelOffset ?? [0, 0];
+    el.style.setProperty("--u", `${u * scale}px`);
+    // A thin leader line back to the pin when the label has been moved away from it.
+    const stop = el.parentElement!;
+    const leader = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    leader.setAttribute("class", "mapsie-leader");
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("stroke", design.theme.colors.ink);
+    line.setAttribute("stroke-width", String(Math.max(1, u * 0.18)));
+    line.setAttribute("stroke-linecap", "round");
+    leader.appendChild(line);
+    stop.insertBefore(leader, stop.firstChild);
+    const place = (ox: number, oy: number) => {
+      el.style.transform = `translate(${ox * u}px, calc(-50% + ${oy * u}px))`;
+      const far = Math.hypot(ox, oy) > 4;
+      leader.style.display = far ? "block" : "none";
+      if (!far) return;
+      // From the pin centre to the nearest point of the label (measured unrotated).
+      const cx = stop.offsetWidth / 2, cy = stop.offsetHeight / 2;
+      const lx = el.offsetLeft + ox * u, ly = el.offsetTop + oy * u - el.offsetHeight / 2;
+      const tx = Math.min(Math.max(cx, lx), lx + el.offsetWidth);
+      const ty = Math.min(Math.max(cy, ly), ly + el.offsetHeight);
+      line.setAttribute("x1", String(cx));
+      line.setAttribute("y1", String(cy));
+      line.setAttribute("x2", String(tx));
+      line.setAttribute("y2", String(ty));
+    };
+    requestAnimationFrame(() => place(dx, dy));
+    if (!editable) return;
+    el.classList.add("is-editable");
+    el.title = "Drag to move the label · corner handle to resize";
+    const selected = s.id === selectedLabel;
+    if (selected) el.classList.add("is-selected");
+    // Keep the map and the stop's own drag out of it.
+    for (const ev of ["mousedown", "touchstart", "click", "dblclick"]) el.addEventListener(ev, (e) => e.stopPropagation(), { passive: true });
+
+    el.addEventListener("pointerdown", (e) => {
+      if ((e.target as HTMLElement).classList.contains("mapsie-handle")) return;
+      e.preventDefault();
+      el.setPointerCapture(e.pointerId);
+      const x0 = e.clientX, y0 = e.clientY;
+      let moved = false, ox = dx, oy = dy;
+      const move = (ev: PointerEvent) => {
+        const mx = (ev.clientX - x0) / u, my = (ev.clientY - y0) / u;
+        if (!moved && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 3) return;
+        moved = true;
+        ox = Math.round((dx + mx) * 10) / 10;
+        oy = Math.round((dy + my) * 10) / 10;
+        place(ox, oy);
+      };
+      const up = () => {
+        el.removeEventListener("pointermove", move);
+        el.removeEventListener("pointerup", up);
+        if (moved) h.current?.onLabelChange?.(s.id, { labelOffset: [ox, oy] });
+        h.current?.onLabelSelect?.(s.id);
+      };
+      el.addEventListener("pointermove", move);
+      el.addEventListener("pointerup", up);
+    });
+
+    if (!selected) return;
+    const handle = document.createElement("div");
+    handle.className = "mapsie-handle is-resize";
+    handle.title = "Drag to resize";
+    el.appendChild(handle);
+    handle.addEventListener("pointerdown", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      handle.setPointerCapture(e.pointerId);
+      const r = el.getBoundingClientRect();
+      const x0 = r.left, y0 = r.top + r.height / 2;
+      const d0 = Math.hypot(e.clientX - x0, e.clientY - y0) || 1;
+      const base = s.labelScale ?? 1;
+      let next = base;
+      const move = (ev: PointerEvent) => {
+        next = Math.max(0.4, Math.min(4, base * (Math.hypot(ev.clientX - x0, ev.clientY - y0) / d0)));
+        el.style.setProperty("--u", `${u * design.markers.labelSize * next}px`);
+      };
+      const up = () => {
+        handle.removeEventListener("pointermove", move);
+        handle.removeEventListener("pointerup", up);
+        h.current?.onLabelChange?.(s.id, { labelScale: Math.round(next * 100) / 100 });
+      };
+      handle.addEventListener("pointermove", move);
+      handle.addEventListener("pointerup", up);
+    });
+  }
 
   // --- stickers, photos and text notes, pinned to a place on the map
   const stickersKey = JSON.stringify([design.stickers, selectedSticker, width, editable, design.theme.colors.land, design.theme.presetId]);

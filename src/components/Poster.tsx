@@ -15,13 +15,14 @@ interface Props {
   editable?: boolean;
   print?: boolean;
   selectedSticker?: string | null;
+  selectedLabel?: string | null;
   fitRequest?: number;
   handlers?: MapHandlers;
   onReady?: () => void;
 }
 
 /** Everything is sized relative to the poster width, so it scales to any print size. */
-export default function Poster({ design, width, editable = false, print, selectedSticker, fitRequest, handlers, onReady }: Props) {
+export default function Poster({ design, width, editable = false, print, selectedSticker, selectedLabel, fitRequest, handlers, onReady }: Props) {
   const height = Math.round(width * posterAspect(design.productId, design.orientation));
   const u = width / 100;
   // Each poster gets its own filter ids, since thumbnails may show different themes.
@@ -78,6 +79,7 @@ export default function Poster({ design, width, editable = false, print, selecte
           editable={editable}
           print={print}
           selectedSticker={selectedSticker}
+          selectedLabel={selectedLabel}
           fitRequest={fitRequest}
           handlers={handlers}
           onReady={onReady}

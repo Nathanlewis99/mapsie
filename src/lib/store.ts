@@ -43,6 +43,8 @@ interface EditorState {
   future: Snapshot[];
   lastCommit: { key: string; at: number };
   selectedSticker: string | null;
+  /** Stop whose label is selected on the map. */
+  selectedLabel: string | null;
   fitRequest: number; // bump to ask the map to frame all stops
   roadsLoading: number;
 
@@ -63,6 +65,7 @@ interface EditorState {
   updateSticker: (id: string, patch: Partial<Sticker>, key?: string) => void;
   removeSticker: (id: string) => void;
   select: (id: string | null) => void;
+  selectLabel: (stopId: string | null) => void;
   requestFit: () => void;
   undo: () => void;
   redo: () => void;
@@ -106,6 +109,7 @@ export const useEditor = create<EditorState>()(
         future: [],
         lastCommit: { key: "", at: 0 },
         selectedSticker: null,
+        selectedLabel: null,
         fitRequest: 0,
         roadsLoading: 0,
 
@@ -171,7 +175,8 @@ export const useEditor = create<EditorState>()(
           commit((d) => ({ ...d, stickers: d.stickers.filter((x) => x.id !== id) }), "edit", {
             selectedSticker: get().selectedSticker === id ? null : get().selectedSticker,
           }),
-        select: (id) => set({ selectedSticker: id }),
+        select: (id) => set(id ? { selectedSticker: id, selectedLabel: null } : { selectedSticker: null }),
+        selectLabel: (stopId) => set(stopId ? { selectedLabel: stopId, selectedSticker: null } : { selectedLabel: null }),
         requestFit: () => set((s) => ({ fitRequest: s.fitRequest + 1 })),
 
         undo: () => {

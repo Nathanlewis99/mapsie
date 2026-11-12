@@ -56,6 +56,13 @@ body {
   box-shadow: 0 calc(var(--u) * 0.15) calc(var(--u) * 0.5) rgb(0 0 0 / 0.15);
 }
 
+.mapsie-stop { cursor: grab; position: relative; }
+.mapsie-leader { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; pointer-events: none; opacity: 0.55; }
+.mapsie-stop:active { cursor: grabbing; }
+.mapsie-stop-label.is-editable { cursor: move; touch-action: none; user-select: none; }
+.mapsie-stop-label.is-editable:hover { outline: 1.5px dashed rgb(255 107 74 / 0.6); outline-offset: 3px; }
+.mapsie-stop-label.is-selected { outline: 2px dashed var(--color-coral); outline-offset: 4px; }
+.mapsie-stop-label .mapsie-handle.is-resize { right: -16px; bottom: -16px; }
 .mapsie-stop.is-dot { width: calc(var(--u) * 1.8); height: calc(var(--u) * 1.8); }
 .mapsie-stop.is-pin { width: calc(var(--u) * 3); height: calc(var(--u) * 4); }
 .mapsie-stop.is-heart { width: calc(var(--u) * 3.4); height: calc(var(--u) * 3.1); }

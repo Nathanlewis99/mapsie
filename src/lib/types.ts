@@ -20,6 +20,10 @@ export interface Stop {
   // Road geometry for car/bus legs, fetched once and stored so prints never re-fetch.
   path?: LngLat[];
   pathFor?: string; // which leg the path was fetched for, so moved stops refetch
+  /** Where the label sits relative to its default spot, in % of poster width. */
+  labelOffset?: [number, number];
+  /** Size of this stop's label relative to the design's label size. */
+  labelScale?: number;
 }
 
 export interface Sticker {
@@ -81,7 +85,7 @@ export interface Design {
   view: { center: LngLat; zoom: number; bearing: number; refWidth: number };
   stops: Stop[];
   route: { show: boolean; style: RouteStyle; curved: boolean; width: number; modeIcons: boolean };
-  markers: { style: MarkerStyle; showDates: boolean };
+  markers: { style: MarkerStyle; showDates: boolean; size: number; labelSize: number };
   visited: { show: boolean; opacity: number };
   stickers: Sticker[];
   stickerStyle: ArtStyleId; // default style for new stickers
@@ -100,7 +104,7 @@ export function normalizeDesign(d: Partial<Design> & Pick<Design, "id">): Design
     ...x,
     frame: x.frame ?? "none",
     route: { show: r.show ?? true, style: r.style ?? "auto", curved: r.curved ?? true, width: r.width ?? 0.45, modeIcons: r.modeIcons ?? true },
-    markers: { style: m.style ?? "number", showDates: m.showDates ?? false },
+    markers: { style: m.style ?? "number", showDates: m.showDates ?? false, size: m.size ?? 1, labelSize: m.labelSize ?? 1 },
     visited: { show: v.show ?? false, opacity: v.opacity ?? 0.35 },
     stickerStyle: x.stickerStyle ?? "cartoon",
     originals: x.originals ?? { style: "papercut", palette: "auto" },

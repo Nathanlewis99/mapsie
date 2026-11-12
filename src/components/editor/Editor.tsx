@@ -31,7 +31,8 @@ async function saveSnapshot(design: Design): Promise<string> {
 
 export default function Editor() {
   const store = useEditor();
-  const { design, selectedSticker, fitRequest, region, past, future, savedId, dirty, roadsLoading } = store;
+  const { design, selectedSticker, selectedLabel, fitRequest, region, past, future, savedId, dirty, roadsLoading } = store;
+  const labelStop = design.stops.find((s) => s.id === selectedLabel);
   const [me, setMe] = useState<{ user: { email: string; name: string | null; picture: string | null } | null; googleEnabled: boolean } | null>(null);
   const [tab, setTab] = useState<Tab>("trip");
   const [pickMode, setPickMode] = useState(false);
@@ -137,6 +138,7 @@ export default function Editor() {
       if (selectedSticker && (e.key === "Delete" || e.key === "Backspace")) store.removeSticker(selectedSticker);
       if (e.key === "Escape") {
         store.select(null);
+        store.selectLabel(null);
         setPickMode(false);
         setWall(false);
       }
@@ -243,6 +245,7 @@ export default function Editor() {
                 width={posterW}
                 editable
                 selectedSticker={selectedSticker}
+                selectedLabel={selectedLabel}
                 fitRequest={fitRequest}
                 handlers={{
                   onView: (view) => store.setView(view),
@@ -250,6 +253,8 @@ export default function Editor() {
                   onStickerMove: (id, lng, lat) => store.updateSticker(id, { lng, lat }),
                   onStickerChange: (id, patch) => store.updateSticker(id, patch),
                   onStickerSelect: (id) => store.select(id),
+                  onLabelSelect: (id) => store.selectLabel(id),
+                  onLabelChange: (id, patch) => store.updateStop(id, patch),
                   onDropSticker: (payload, lng, lat) => {
                     if (payload.startsWith("orig:")) {
                       const { style, palette } = design.originals;
@@ -282,6 +287,18 @@ export default function Editor() {
                 <span className="w-5 h-5 rounded-full border-2 border-coral/30 border-t-coral animate-spin" aria-hidden />
                 🚗 Plotting the roads ({roadsLoading} {roadsLoading === 1 ? "drive" : "drives"})…
               </div>
+            </div>
+          )}
+
+          {labelStop && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full bg-ink text-white px-2 py-1.5 shadow-xl text-sm font-bold max-w-[96%] overflow-x-auto">
+              <span className="px-2 opacity-60 whitespace-nowrap">“{labelStop.name}”</span>
+              <button title="Smaller" className="px-3 py-1 rounded-full hover:bg-white/15" onClick={() => store.updateStop(labelStop.id, { labelScale: Math.max(0.4, (labelStop.labelScale ?? 1) / 1.15) }, `lsize-${labelStop.id}`)}>A−</button>
+              <button title="Bigger" className="px-3 py-1 rounded-full hover:bg-white/15 text-base" onClick={() => store.updateStop(labelStop.id, { labelScale: Math.min(4, (labelStop.labelScale ?? 1) * 1.15) }, `lsize-${labelStop.id}`)}>A+</button>
+              <span className="w-px h-5 bg-white/20 mx-1" />
+              <button title="Put the label back next to its pin" className="px-3 py-1 rounded-full hover:bg-white/15 whitespace-nowrap" onClick={() => store.updateStop(labelStop.id, { labelOffset: undefined, labelScale: undefined })}>↺ Reset</button>
+              <button title="Hide this label" className="px-3 py-1 rounded-full hover:bg-white/15 whitespace-nowrap" onClick={() => { store.updateStop(labelStop.id, { showLabel: false }); store.selectLabel(null); }}>Hide</button>
+              <button className="px-3 py-1 rounded-full hover:bg-white/15 opacity-70" onClick={() => store.selectLabel(null)}>Done</button>
             </div>
           )}
 

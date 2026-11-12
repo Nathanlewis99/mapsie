@@ -569,6 +569,10 @@ def cow(d: Drawing):
     d.disc("far", 100, 92, 66, line=False)
     d.band("mid", hills(136, 8, -10))
     d.band("near", "M-30 156 Q100 146 230 156")
+    group(d, "translate(-8 0)", lambda: cow_body(d))
+
+
+def cow_body(d: Drawing):
     # back legs
     d.limb("light", "M54 124 V158 M140 124 V158", 11)
     # tail
@@ -659,30 +663,35 @@ def compass_brass(d: Drawing):
 
 
 # ================================================================ COMPASS: 16-point rose on old paper
-def fleur(cx, top):
-    """Fleur-de-lis pointing up, tip at (cx, top), ~20 tall."""
-    t = top
-    return (f"M{cx} {t} Q{cx + 6} {t + 7} {cx + 2} {t + 16} Q{cx + 8} {t + 9} {cx + 12} {t + 10} Q{cx + 12} {t + 16} {cx + 4} {t + 19} "
-            f"H{cx - 4} Q{cx - 12} {t + 16} {cx - 12} {t + 10} Q{cx - 8} {t + 9} {cx - 2} {t + 16} Q{cx - 6} {t + 7} {cx} {t}Z")
+def fleur(cx, t):
+    """Fleur-de-lis pointing up, tip at (cx, t), ~44 tall."""
+    centre = f"M{cx} {t} C{cx + 10} {t + 10} {cx + 8} {t + 24} {cx} {t + 32} C{cx - 8} {t + 24} {cx - 10} {t + 10} {cx} {t}Z "
+    right = (f"M{cx + 3} {t + 32} C{cx + 6} {t + 18} {cx + 18} {t + 10} {cx + 24} {t + 16} C{cx + 28} {t + 21} {cx + 24} {t + 28} "
+             f"{cx + 18} {t + 26} C{cx + 21} {t + 22} {cx + 18} {t + 18} {cx + 14} {t + 21} C{cx + 10} {t + 24} {cx + 9} {t + 29} {cx + 9} {t + 34}Z ")
+    left = (f"M{cx - 3} {t + 32} C{cx - 6} {t + 18} {cx - 18} {t + 10} {cx - 24} {t + 16} C{cx - 28} {t + 21} {cx - 24} {t + 28} "
+            f"{cx - 18} {t + 26} C{cx - 21} {t + 22} {cx - 18} {t + 18} {cx - 14} {t + 21} C{cx - 10} {t + 24} {cx - 9} {t + 29} {cx - 9} {t + 34}Z ")
+    band = f"M{cx - 13} {t + 31} H{cx + 13} V{t + 37} H{cx - 13}Z "
+    foot = f"M{cx - 8} {t + 37} H{cx + 8} L{cx} {t + 46}Z"
+    return centre + right + left + band + foot
 
 
 @framed
 def compass_rose(d: Drawing):
     d.band("ground", "M-30 -30 H230", line=False)
     d.stroke("mark", "M-30 60 Q40 50 100 64 T230 60 M-30 150 Q50 140 110 152 T230 146", 1.4, line=False)
-    d.stroke("mark", circle(100, 104, 62), 2)
-    d.stroke("mark", circle(100, 104, 56), 1.2)
-    cx, cy = 100, 104
+    cx, cy = 100, 112
+    d.stroke("mark", circle(cx, cy, 58), 2)
+    d.stroke("mark", circle(cx, cy, 52), 1.2)
     # 8 small points (by-points)
     for deg in range(0, 360, 45):
         a = deg + 22.5
-        tx, ty = pol(cx, cy, 44, a)
+        tx, ty = pol(cx, cy, 40, a)
         lx, ly = pol(cx, cy, 10, a - 22.5)
         rx, ry = pol(cx, cy, 10, a + 22.5)
         d.shape("near", f"M{tx:.1f} {ty:.1f} L{lx:.1f} {ly:.1f} L{cx} {cy} L{rx:.1f} {ry:.1f}Z", shadow=False)
     # 4 intercardinal + 4 cardinal points, two-tone halves
-    for deg, R, w, a1, a2 in [(45, 46, 11, "hero2", "hero"), (135, 46, 11, "hero2", "hero"), (225, 46, 11, "hero2", "hero"), (315, 46, 11, "hero2", "hero"),
-                               (0, 62, 13, "light", "dark"), (90, 62, 13, "light", "dark"), (180, 62, 13, "light", "dark"), (270, 62, 13, "light", "dark")]:
+    for deg, R, w, a1, a2 in [(45, 42, 10, "hero2", "hero"), (135, 42, 10, "hero2", "hero"), (225, 42, 10, "hero2", "hero"), (315, 42, 10, "hero2", "hero"),
+                               (0, 50, 12, "light", "dark"), (90, 60, 12, "light", "dark"), (180, 60, 12, "light", "dark"), (270, 60, 12, "light", "dark")]:
         tx, ty = pol(cx, cy, R, deg)
         lx, ly = pol(cx, cy, w, deg - 45)
         rx, ry = pol(cx, cy, w, deg + 45)
@@ -690,7 +699,7 @@ def compass_rose(d: Drawing):
         d.shape(a2, f"M{tx:.1f} {ty:.1f} L{rx:.1f} {ry:.1f} L{cx} {cy}Z", shadow=False, spot=deg % 90 == 0)
     d.shape("pop", circle(cx, cy, 7), spot=True)
     d.marks("ground", circle(cx, cy, 2.6))
-    d.shape("pop", fleur(100, 18), spot=True)
+    d.shape("pop", fleur(100, 14), spot=True)
 
 
 # ================================================================ COMPASS: baseplate hiking compass
@@ -752,7 +761,7 @@ CONCEPTS = [
             checks=[("hero", "glow"), ("hero", "sky"), ("hero2", "hero"), ("light", "hero"), ("hero", "ground")],
             fixes={"glow": ["far", "sky2", "mid"], "hero2": ["light", "glow2", "pop"], "hero": ["pop", "deep"]}),
     Concept("basic-suitcase", "basic-suitcase", "Suitcase", suitcase, overrides={"hero": "#B5651D", "hero2": "#D98E4A", "dark": "#4A2E1A"},
-            checks=[("hero", "glow"), ("pop", "hero")], fixes={"glow": ["far", "sky2", "mid", "light"]}),
+            checks=[("hero", "glow"), ("pop", "hero")], fixes={"glow": ["far", "sky2", "mid", "light"], "pop": ["#2E86AB", "glow2"]}),
     Concept("basic-backpack", "basic-backpack", "Backpack", backpack,
             checks=[("hero", "glow"), ("hero2", "hero"), ("hero2", "glow")],
             fixes={"glow": ["far", "sky2", "mid"], "hero2": ["glow2", "pop", "light"]}),

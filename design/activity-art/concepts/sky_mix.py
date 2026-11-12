@@ -111,7 +111,6 @@ def hobart(d: Drawing):
     d.disc("glow", 158, 50, 12)
     # kunanyi / Mount Wellington, with the dolerite Organ Pipes and the summit mast
     d.band("mid", "M-30 116 Q-6 98 16 78 Q34 54 58 45 Q80 38 104 40 Q126 43 142 58 Q164 80 188 92 Q208 100 230 104")
-    d.stroke("near", " ".join(f"M{x} {46 + abs(x - 76) * .16:.1f} v{9 + (x * 7) % 6}" for x in range(52, 100, 4)), 1.6, line=False)
     d.stroke("dark", "M100 41 V22 M97 28 H103", 1.6)
     d.band("near", "M-30 124 Q20 112 60 118 Q110 108 150 116 Q190 110 230 118")
     # the small city: low blocks and the round Wrest Point tower
@@ -566,9 +565,9 @@ def pirogue(d: Drawing, x, y, s=1.0, body="pir", stripe="hero2", spot=True):
 
 def baobab(d: Drawing, x, base, s=1.0, role="deep"):
     def draw():
-        d.shape(role, "M-10 0 Q-8 -14 -7 -24 L-18 -34 L-16 -37 L-6 -29 L-5 -40 L-1 -40 L0 -30 L8 -40 L11 -38 L5 -27 L16 -33 L17 -30 "
-                      "L6 -23 Q8 -12 11 0Z")
-        d.shape(role, ellipse(-18, -37, 5, 2.6) + " " + ellipse(-3, -41, 5, 2.6) + " " + ellipse(10, -40, 5, 2.6) + " " + ellipse(17, -32, 4.4, 2.4), shadow=False)
+        d.limb(role, "M-6 -22 L-16 -32 M-2 -24 L-6 -36 M3 -24 L8 -36 M6 -22 L17 -30", 3, shadow=False)
+        d.shape(role, "M-24 -32 Q-20 -40 -8 -39 Q0 -44 10 -40 Q22 -40 24 -32 Q12 -35 0 -34 Q-12 -35 -24 -32Z")
+        d.shape(role, "M-12 0 Q-9 -10 -9 -18 Q-9 -24 -6 -25 Q0 -27 6 -25 Q9 -24 9 -18 Q9 -10 12 0Z")
     group(d, f"translate({x} {base}) scale({s})", draw)
 
 

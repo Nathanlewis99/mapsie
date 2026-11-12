@@ -34,6 +34,8 @@ export interface Room {
 // Add an entry once its image is in /public/rooms/.
 const AVAILABLE: Room[] = [
   { id: "bedroom-sage", label: "Sage bedroom", src: "/rooms/bedroom-sage.jpg", width: 2000, height: 1116, cx: 0.5075, by: 0.56, wallCm: 309, maxHeight: 0.55 },
+  //  office:  the 140 cm desk spans x 533–1467 (934 px), top at y 782; poster hangs above the lamp head (y ~540).
+  { id: "office-terracotta", label: "Home office", src: "/rooms/office-terracotta.jpg", width: 2000, height: 1116, cx: 0.5, by: 0.47, wallCm: 300, maxHeight: 0.44 },
   { id: "living-oak", label: "Living room", src: "/rooms/living-oak.jpg", width: 2000, height: 1116, cx: 0.5, by: 0.58, wallCm: 361, maxHeight: 0.56 },
 ];
 

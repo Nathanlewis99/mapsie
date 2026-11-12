@@ -2,11 +2,11 @@
 import { useEffect, useRef } from "react";
 import maplibregl, { Map as MLMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import type { Design, Sticker, Stop } from "@/lib/types";
+import { DEFAULT_TEXT, type Design, type Sticker, type Stop } from "@/lib/types";
 import { buildStyle, loadBaseStyle } from "@/lib/themes";
 import { buildLegs, routeGeoJSON, stopsBounds, MODES } from "@/lib/geo";
 import { loadCountries, visitedCountries } from "@/lib/countries";
-import { fontCss } from "@/lib/fonts";
+import { fontBold, fontCss } from "@/lib/fonts";
 import { getArtStyle, stickerSrc } from "@/lib/stickers";
 import { originalSrc, resolvePalette } from "@/lib/originals";
 import { filterId } from "./StickerFilters";
@@ -301,13 +301,15 @@ export default function MapView(props: Props) {
   }, [visitedKey]);
 
   // --- stop markers (HTML, so they can use any font and stay crisp in print)
-  const stopsKey = JSON.stringify([design.stops.map(({ path: _p, ...s }) => s), design.markers, design.theme.colors, design.theme.presetId, design.font, width, editable, selectedLabel]); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const stopsKey = JSON.stringify([design.stops.map(({ path: _p, ...s }) => s), design.markers, design.theme.colors, design.theme.presetId, design.font, design.text, width, editable, selectedLabel]); // eslint-disable-line @typescript-eslint/no-unused-vars
   useEffect(
     () =>
       whenMap((mm) => {
         stopMarkers.current.forEach((mk) => mk.remove());
         const c = design.theme.colors;
         const style = design.markers.style;
+        const tx = design.text ?? DEFAULT_TEXT;
+        const labelFont = tx.labelFont === "title" || !tx.labelFont ? design.font : tx.labelFont;
         stopMarkers.current = design.stops.map((s: Stop, i) => {
           const node = document.createElement("div");
           node.className = `mapsie-stop is-${style === "sticker" && !s.marker ? "pin" : style}`;
@@ -330,7 +332,7 @@ export default function MapView(props: Props) {
                   : `<div class="mapsie-stop-icon">${markerSvg(style === "sticker" ? "pin" : style, c.accent, c.paper)}</div>`;
           const date = design.markers.showDates && s.date ? `<small>${esc(s.date)}</small>` : "";
           const label = s.showLabel
-            ? `<div class="mapsie-stop-label" style="color:${c.ink};background:${c.paper};font-family:${fontCss(design.font)}">${esc(s.name)}${date}</div>`
+            ? `<div class="mapsie-stop-label" style="color:${c.ink};background:${c.paper};font-family:${fontCss(labelFont)};font-weight:${fontBold(labelFont)};text-transform:${tx.labelCase === "upper" ? "uppercase" : tx.labelCase === "lower" ? "lowercase" : "none"};${tx.labelItalic ? "font-style:italic;" : ""}">${esc(s.name)}${date}</div>`
             : "";
           node.innerHTML = icon + label;
           const labelEl = node.querySelector<HTMLElement>(".mapsie-stop-label");

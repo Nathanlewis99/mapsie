@@ -15,6 +15,8 @@ import {
   resolvePalette,
   searchOriginals,
   type OriginalDef,
+  LANDMARK_REGIONS,
+  landmarksNear,
   type OriginalStyle,
 } from "@/lib/originals";
 import { FONTS } from "@/lib/fonts";
@@ -699,6 +701,26 @@ function OriginalsPanel() {
   const animalOrder = (a: [string, OriginalDef[]], b: [string, OriginalDef[]]) =>
     a[1][0].category === "Animals" && b[1][0].category === "Animals" ? regionOf(a[1][0]).localeCompare(regionOf(b[1][0])) : 0;
 
+  const origTile = (o: OriginalDef) => (
+    <button
+      key={o.id}
+      title={o.title}
+      draggable
+      onDragStart={(e) => e.dataTransfer.setData(stickerDragType, `orig:${o.id}`)}
+      onClick={() => place(o.id)}
+      className="rounded-2xl p-1.5 hover:scale-105 hover:-rotate-3 transition"
+      style={{ background: style === "line" && resolved === "night" ? "#1F2A44" : "transparent" }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={originalSrc(o.id, style, resolved)} alt={o.title} loading="lazy" className="w-full aspect-square pointer-events-none" />
+      <div className="text-[11px] font-bold text-ink/60 leading-tight mt-0.5 truncate">{o.title}</div>
+    </button>
+  );
+  const near = q ? [] : landmarksNear(design.stops);
+  const landmarkGroups = Object.entries(LANDMARK_REGIONS)
+    .map(([g, name]) => [name, results.filter((o) => o.category === "Landmarks" && o.group === g)] as const)
+    .filter(([, list]) => list.length);
+
   return (
     <div className="space-y-5">
       <div className="rounded-2xl bg-sand/60 p-3 text-sm text-ink/70">
@@ -757,7 +779,24 @@ function OriginalsPanel() {
       </div>
 
       {results.length === 0 && <div className="text-sm text-ink/50">Nothing matches “{q}” yet. Try the activity, like “boat” or “mountain”.</div>}
-      {categories.map((cat) => (
+      {near.length > 0 && (
+        <div>
+          <Label>📍 Landmarks on your trip</Label>
+          <div className="grid grid-cols-3 gap-2">{near.map(origTile)}</div>
+        </div>
+      )}
+      {landmarkGroups.length > 0 && (
+        <div>
+          <Label>Landmarks</Label>
+          {landmarkGroups.map(([name, list]) => (
+            <div key={name}>
+              <div className="text-xs font-extrabold text-coral mt-3 mb-1">{name}</div>
+              <div className="grid grid-cols-3 gap-2">{list.map(origTile)}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      {categories.filter((c) => c !== "Landmarks").map((cat) => (
         <div key={cat}>
           <Label>{cat}</Label>
           <div className="space-y-3">
@@ -770,23 +809,7 @@ function OriginalsPanel() {
                     <div className="text-xs font-extrabold text-coral mt-4 mb-1">{regionOf((prevAnimal.current = list[0]))}</div>
                   )}
                   <div className="text-sm font-extrabold mb-1">{list[0].label}</div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {list.map((o) => (
-                      <button
-                        key={o.id}
-                        title={o.title}
-                        draggable
-                        onDragStart={(e) => e.dataTransfer.setData(stickerDragType, `orig:${o.id}`)}
-                        onClick={() => place(o.id)}
-                        className="rounded-2xl p-1.5 hover:scale-105 hover:-rotate-3 transition"
-                        style={{ background: style === "line" && resolved === "night" ? "#1F2A44" : "transparent" }}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={originalSrc(o.id, style, resolved)} alt={o.title} loading="lazy" className="w-full aspect-square pointer-events-none" />
-                        <div className="text-[11px] font-bold text-ink/60 leading-tight mt-0.5 truncate">{o.title}</div>
-                      </button>
-                    ))}
-                  </div>
+                  <div className="grid grid-cols-3 gap-2">{list.map(origTile)}</div>
                 </div>
               ))}
           </div>
@@ -915,6 +938,35 @@ export function TextPanel() {
           onItalic={(v) => setText({ subtitleItalic: v })}
           maxSize={2.5}
         />
+      </div>
+      <div>
+        <Label>Place name font</Label>
+        <p className="text-xs text-ink/50 -mt-1 mb-2">The stop names on the map.</p>
+        <button
+          onClick={() => setText({ labelFont: "title" })}
+          className={`w-full mb-2 rounded-2xl border-2 px-3 py-2 text-sm font-bold ${tx.labelFont === "title" ? "border-coral bg-white" : "border-ink/10 bg-white hover:border-ink/30"}`}
+        >
+          Same as the title
+        </button>
+        <FontPicker value={tx.labelFont === "title" ? ("" as FontId) : tx.labelFont} onChange={(f) => setText({ labelFont: f })} />
+        <div className="flex flex-wrap gap-2 pt-2">
+          {(["none", "upper", "lower"] as TextCase[]).map((c) => (
+            <button
+              key={c}
+              onClick={() => setText({ labelCase: c })}
+              className={`rounded-full border-2 px-3 py-1 text-sm font-bold ${tx.labelCase === c ? "border-coral bg-white" : "border-ink/10 bg-white hover:border-ink/30"}`}
+            >
+              {c === "none" ? "Aa" : c === "upper" ? "AA" : "aa"}
+            </button>
+          ))}
+          <button
+            onClick={() => setText({ labelItalic: !tx.labelItalic })}
+            className={`rounded-full border-2 px-3 py-1 text-sm font-bold italic ${tx.labelItalic ? "border-coral bg-white" : "border-ink/10 bg-white hover:border-ink/30"}`}
+          >
+            Italic
+          </button>
+        </div>
+        <p className="text-xs text-ink/50 mt-2">Size: the Label size slider in Style, or tap a name on the map.</p>
       </div>
       <div>
         <Label>Alignment</Label>

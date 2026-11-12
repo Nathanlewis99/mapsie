@@ -15,6 +15,9 @@ export interface OriginalDef {
   label: string; // the activity, e.g. "Safari"
   category: string;
   keywords?: string; // e.g. the region for animals: "Africa wildlife animal"
+  lat?: number; // landmarks: where it is
+  lng?: number;
+  group?: string; // landmarks: europe | asia | americas | africa_oceania
   papercut: string[];
   line: string[];
 }
@@ -83,4 +86,25 @@ export function searchOriginals(q: string): OriginalDef[] {
     const hay = `${o.label} ${o.title} ${o.category} ${o.keywords ?? ""} ${o.activity.replace(/-/g, " ")}`.toLowerCase();
     return words.every((w) => hay.includes(w));
   });
+}
+
+export const LANDMARK_REGIONS: Record<string, string> = {
+  europe: "Europe",
+  asia: "Asia & the Middle East",
+  americas: "The Americas",
+  africa_oceania: "Africa & Oceania",
+};
+
+/** Landmarks within `km` of any of these points, nearest first. */
+export function landmarksNear(points: { lng: number; lat: number }[], km = 150): OriginalDef[] {
+  const R = 6371, rad = Math.PI / 180;
+  const dist = (a: { lng: number; lat: number }, b: { lng: number; lat: number }) => {
+    const h = Math.sin(((b.lat - a.lat) * rad) / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(((b.lng - a.lng) * rad) / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  };
+  return ORIGINALS.filter((o) => o.lat !== undefined && o.lng !== undefined)
+    .map((o) => ({ o, d: Math.min(...points.map((p) => dist(p, { lng: o.lng!, lat: o.lat! }))) }))
+    .filter((x) => x.d <= km)
+    .sort((a, b) => a.d - b.d)
+    .map((x) => x.o);
 }

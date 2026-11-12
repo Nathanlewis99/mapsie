@@ -131,6 +131,9 @@ export interface TextStyle {
   subtitleSpacing: number;
   subtitleItalic: boolean;
   showRoute: boolean; // the "A · B · C" line under the subtitle
+  labelFont: FontId | "title"; // place names on the map; "title" follows the title font
+  labelCase: TextCase;
+  labelItalic: boolean;
   align: "center" | "left" | "right";
   titleOffset?: [number, number]; // dragged position, % of poster width
   subtitleOffset?: [number, number];
@@ -147,6 +150,9 @@ export const DEFAULT_TEXT: TextStyle = {
   subtitleSpacing: 0.5,
   subtitleItalic: false,
   showRoute: true,
+  labelFont: "title",
+  labelCase: "none",
+  labelItalic: false,
   align: "center",
 };
 

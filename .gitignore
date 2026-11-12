@@ -44,3 +44,5 @@ next-env.d.ts
 .e2e-data
 test-results
 playwright-report
+dev.log
+shots/

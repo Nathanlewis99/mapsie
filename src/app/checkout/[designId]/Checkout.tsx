@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Logo from "@/components/Logo";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import type { Design } from "@/lib/types";
@@ -47,7 +48,7 @@ export default function Checkout({ design }: { design: Design }) {
   return (
     <div className="min-h-dvh">
       <header className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-        <Link href="/" className="font-display text-2xl font-extrabold">Mapsie<span className="text-coral">.</span></Link>
+        <Link href="/" className="font-display text-2xl font-extrabold"><Logo /></Link>
         <Link href="/create" className="text-sm font-bold text-ink/60 hover:text-ink">← Back to editing</Link>
       </header>
       <main className="max-w-6xl mx-auto px-6 pb-16 grid lg:grid-cols-[1.3fr_1fr] gap-10 items-start">

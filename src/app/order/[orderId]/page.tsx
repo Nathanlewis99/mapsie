@@ -1,5 +1,6 @@
 "use client";
 import { use, useEffect, useState } from "react";
+import Logo from "@/components/Logo";
 import Link from "next/link";
 
 interface Status {
@@ -37,7 +38,7 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
 
   return (
     <main className="max-w-xl mx-auto px-6 py-14 space-y-8">
-      <Link href="/" className="font-display text-2xl font-extrabold">Mapsie<span className="text-coral">.</span></Link>
+      <Link href="/" className="font-display text-2xl font-extrabold"><Logo /></Link>
       <div>
         <h1 className="font-display text-4xl font-extrabold">Thank you! 🎉</h1>
         <p className="text-ink/60 mt-2">Order <b>{orderId}</b>. We&apos;ll email you when it ships.</p>

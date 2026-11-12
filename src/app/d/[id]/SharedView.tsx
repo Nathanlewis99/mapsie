@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import dynamic from "next/dynamic";
 import type { Design } from "@/lib/types";
 
@@ -9,7 +10,7 @@ export default function SharedView({ design }: { design: Design }) {
   return (
     <div className="min-h-dvh">
       <header className="max-w-5xl mx-auto px-6 py-5 flex justify-between items-center">
-        <Link href="/" className="font-display text-2xl font-extrabold">Mapsie<span className="text-coral">.</span></Link>
+        <Link href="/" className="font-display text-2xl font-extrabold"><Logo /></Link>
       </header>
       <main className="max-w-5xl mx-auto px-6 pb-16 grid md:grid-cols-[1fr_1fr] gap-10 items-center">
         <div className="grid place-items-center rounded-3xl bg-sand/70 p-6 sm:p-10">

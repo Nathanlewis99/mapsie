@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Logo from "@/components/Logo";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import FramedPoster, { frameWidth } from "@/components/FramedPoster";
@@ -182,7 +183,7 @@ export default function Editor() {
     <div className="h-dvh flex flex-col">
       <header className="flex items-center justify-between gap-2 px-3 sm:px-5 py-2.5 border-b border-ink/5 bg-cream">
         <Link href="/" className="font-display text-xl sm:text-2xl font-extrabold tracking-tight shrink-0">
-          Mapsie<span className="text-coral">.</span>
+          <Logo />
         </Link>
         <div className="flex items-center gap-0.5 sm:gap-1">
           <button title="Undo (Ctrl+Z)" className={iconBtn} disabled={!past.length} onClick={store.undo}>↶</button>

@@ -1,8 +1,11 @@
 "use client";
 import Link from "next/link";
+import Logo from "@/components/Logo";
+import AccountLink from "@/components/AccountLink";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { SAMPLE } from "@/lib/sample";
+import SiteFooter from "@/components/SiteFooter";
 import { guessRegion, money, PRODUCTS, REGIONS, type RegionId } from "@/lib/products";
 
 const Poster = dynamic(() => import("@/components/Poster"), { ssr: false });
@@ -30,8 +33,11 @@ export default function Home() {
   return (
     <div className="min-h-dvh overflow-x-hidden">
       <header className="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
-        <span className="font-display text-3xl font-extrabold">Mapsie<span className="text-coral">.</span></span>
-        <Link href="/create" className="rounded-full bg-ink text-white px-5 py-2.5 font-extrabold hover:bg-ink/85">Start designing</Link>
+        <span className="font-display text-3xl font-extrabold"><Logo /></span>
+        <div className="flex items-center gap-5">
+          <AccountLink />
+          <Link href="/create" className="rounded-full bg-ink text-white px-5 py-2.5 font-extrabold hover:bg-ink/85">Start designing</Link>
+        </div>
       </header>
 
       <main>
@@ -92,10 +98,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="max-w-6xl mx-auto px-6 py-10 text-xs text-ink/40 flex flex-wrap gap-x-6 gap-y-2 justify-between">
-        <span>© {new Date().getFullYear()} Mapsie</span>
-        <span>Map data © OpenStreetMap contributors · Tiles by OpenFreeMap · Stickers: Twemoji (CC-BY 4.0)</span>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

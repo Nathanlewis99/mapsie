@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import { listOrders, getDesign } from "@/lib/server/db";
 import { getProduct, money, type RegionId } from "@/lib/products";
 import RetryButton from "./RetryButton";
@@ -21,7 +22,7 @@ export default async function Admin() {
     <main className="max-w-6xl mx-auto px-6 py-10 space-y-6">
       <div className="flex items-end justify-between">
         <div>
-          <Link href="/" className="font-display text-2xl font-extrabold">Mapsie<span className="text-coral">.</span></Link>
+          <Link href="/" className="font-display text-2xl font-extrabold"><Logo /></Link>
           <h1 className="text-3xl font-extrabold mt-2">Orders</h1>
         </div>
         <div className="flex gap-3 text-sm font-bold">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/server/auth";
 import { getDesign, listOrdersForUser, listSavedDesigns } from "@/lib/server/db";
@@ -29,7 +30,7 @@ export default async function Account() {
   return (
     <div className="min-h-dvh flex flex-col">
       <header className="max-w-5xl w-full mx-auto px-4 sm:px-6 py-5 flex justify-between items-center gap-4">
-        <Link href="/" className="font-display text-3xl font-extrabold">Mapsie<span className="text-coral">.</span></Link>
+        <Link href="/" className="font-display text-3xl font-extrabold"><Logo /></Link>
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {user.picture && <img src={user.picture} alt="" referrerPolicy="no-referrer" className="w-9 h-9 rounded-full" />}

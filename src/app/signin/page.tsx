@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import { redirect } from "next/navigation";
 import GoogleButton from "@/components/GoogleButton";
 import { currentUser, googleConfigured, safeNext } from "@/lib/server/auth";
@@ -20,7 +21,7 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<{
   return (
     <main className="min-h-dvh grid place-items-center px-4 py-12">
       <div className="w-full max-w-sm space-y-6">
-        <Link href="/" className="font-display text-3xl font-extrabold block text-center">Mapsie<span className="text-coral">.</span></Link>
+        <Link href="/" className="font-display text-3xl font-extrabold block text-center"><Logo /></Link>
         <div className="rounded-3xl bg-white p-7 shadow-sm space-y-5">
           <div>
             <h1 className="font-display text-3xl font-extrabold">Sign in</h1>

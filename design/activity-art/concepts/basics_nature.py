@@ -446,11 +446,11 @@ def desert_dunes(d: Drawing):
     d.disc("glow2", 136, 66, 18, shadow=False, line=False)
     # back dune
     d.band("dune1", "M-30 118 Q20 104 60 108 Q100 92 140 104 Q180 114 230 106")
-    d.shape("dune2", "M60 108 Q100 92 140 104 Q180 114 230 106 V130 Q150 110 60 108Z", shadow=False, line=False)
+    d.shape("dune2", "M60 108 Q100 92 140 104 Q180 114 230 106 V130 Q150 110 60 108Z", shadow=False, spot=True)
     # middle dune
     d.band("dune3", "M-30 140 Q30 120 80 132 Q120 140 170 126 Q200 118 230 124")
     d.shape("dune4", "M170 126 Q200 118 230 124 V170 Q180 150 170 126Z M-30 140 Q30 120 80 132 Q40 140 -30 170Z",
-            shadow=False, line=False)
+            shadow=False)
     # front dune
     d.band("dune1", "M-30 176 Q40 146 100 152 Q150 158 230 150")
     d.shape("dune2", "M100 152 Q150 158 230 150 V210 H170 Q170 176 100 152Z", shadow=False, spot=True)
@@ -525,8 +525,7 @@ def waterfall(d: Drawing):
     d.stroke("water2", "M84 60 V128 M112 60 V120", 1.6, line=True)
     # plunge pool and spray
     d.band("water", "M-30 160 Q100 150 230 160")
-    for x, y, r in [(60, 150, 16), (84, 146, 18), (108, 148, 18), (132, 146, 16), (148, 152, 12), (50, 156, 10)]:
-        d.shape("light", circle(x, y, r), shadow=x == 84)
+    d.shape("light", scallop(100, 150, 50, 11, 0.18, ry=17))
     d.stroke("water2", "M30 176 H60 M130 182 H170 M80 190 H110", 2.2)
     d.band("rock2", "M-30 190 Q30 180 60 196 L60 210 H-30Z", line=False)
 
@@ -614,11 +613,8 @@ def rolling_hills(d: Drawing):
     mid = "M-30 132 Q40 92 110 114 Q160 94 230 108 V230 H-30Z"
     d.shape("mid", mid)
 
-    def patches():
-        d.shape("ground", "M30 100 L70 104 L60 126 L14 128Z M120 108 L160 98 L176 116 L132 126Z", shadow=False, line=False)
-        d.shape("near", "M70 104 L110 114 L104 132 L60 126Z M176 104 L230 108 L230 124 L176 116Z", shadow=False, line=False)
-        d.stroke("deep", "M30 100 L14 128 M70 104 L60 126 M110 114 L104 134 M160 98 L176 116 L174 128", 1.8, line=False)
-    clipped(d, mid, patches)
+    clipped(d, mid, lambda: d.stroke("far", "M-30 140 Q40 104 110 124 M-30 152 Q50 116 120 136 M110 122 Q160 104 230 118 "
+                                            "M116 134 Q170 116 230 128", 2.4, line=False))
     for x, y, r in [(70, 102, 7), (160, 96, 6)]:
         d.limb("dark", f"M{x} {y} V{y + 8}", 2.2, shadow=False)
         d.shape("deep", scallop(x, y, r, 8, 0.12))
@@ -687,7 +683,7 @@ def big_cloud(x, y, s):
 
 def clouds(d: Drawing):
     d.disc("glow", 138, 70, 26)
-    d.shape("cloud", big_cloud(126, 64, 0.42))
+    d.shape("cloud", big_cloud(106, 68, 0.42))
     d.shape("cloud", big_cloud(44, 140, 0.92), spot=True)
     d.shape("cloud2", f"M44 140 C30 140 26 132 30 126 C60 134 140 134 172 124 C178 132 172 140 160 140Z", shadow=False, line=False)
     d.shape("cloud", big_cloud(12, 178, 0.4))
@@ -710,7 +706,7 @@ CONCEPTS = [
     Concept("basic-mountain", "basic-mountain", "Mountain", mountain,
             checks=[("mid", "sky"), ("mid", "far"), ("deep", "mid")], fixes={"far": ["sky2", "light"]}),
     Concept("basic-snowy-peak", "basic-snowy-peak", "Snowy peak", snowy_peak, overrides={"snow2": "#D6E2EC"},
-            checks=[("light", "sky"), ("mid", "far"), ("deep", "light")], fixes={"sky": ["sky2", "far", "mid"], "far": ["mid", "near"]}),
+            checks=[("light", "sky"), ("mid", "far"), ("deep", "light")], fixes={"sky": ["sky2", "far", "mid"], "far": ["near", "deep", "sky2"]}),
     Concept("basic-beach", "basic-beach", "Beach", beach, NO_GOLD,
             checks=[("hero", "sky"), ("hero", "far"), ("ground", "mid"), ("pop", "ground")], fixes={"hero": ["pop", "hero2"], "pop": ["hero", "deep"]}),
     Concept("basic-lake", "basic-lake", "Lake", lake, NO_GOLD, overrides=LAKE,
@@ -745,6 +741,6 @@ CONCEPTS = [
             overrides=NIGHT, checks=[("far", "sky"), ("near", "far")], fixes={"far": ["mid", "near"], "near": ["deep", "mid"]}),
     Concept("basic-sunshine", "basic-sunshine", "Sunshine", sunshine, overrides=SUN,
             checks=[("sun", "sky"), ("ray", "sky"), ("light", "sky")], fixes={"sky": ["sky2", "far", "mid"]}),
-    Concept("basic-clouds", "basic-clouds", "Clouds", clouds, overrides=CLOUDS,
-            checks=[("cloud", "sky"), ("glow", "sky")], fixes={"sky": ["far", "mid"], "glow": ["glow2", "hero2"]}),
+    Concept("basic-clouds", "basic-clouds", "Clouds", clouds, ["golden", "coastal", "blush", "dusk"], overrides=CLOUDS,
+            checks=[("cloud", "sky")], fixes={"sky": ["far", "mid"]}),
 ]

@@ -357,13 +357,13 @@ def muscat(d: Drawing):
     d.band("light", skyline(144, [(-30, 40, 6), (6, 10, 14), (18, 12, 10), (32, 8, 16), (42, 14, 8), (74, 12, 12), (88, 10, 18), (100, 12, 10),
                                   (114, 10, 14), (126, 14, 8), (142, 12, 12), (156, 10, 18), (168, 12, 10), (182, 12, 14), (196, 40, 6)]))
     # Sultan Qaboos Grand Mosque: main minaret and golden dome
-    minaret(d, 40, 134, 46, 6, "stone", "stone2", "gold", rings=3)
-    d.shape("stone", rrect(52, 124, 34, 16, 1))
-    d.shape("gold", dome(69, 125, 14, 20), spot=True)
-    d.stroke("gold2", "M58 116 Q69 112 80 116 M60 110 Q69 106 78 110", 1, line=False)
-    d.stroke("gold", "M69 105 V97", 1.4)
-    d.marks("stone2", " ".join(pointed_arch(55 + i * 7, 130, 4, 8) for i in range(4)))
-    minaret(d, 92, 134, 96, 3.6, "stone", "stone2", "gold", rings=1)
+    minaret(d, 48, 134, 48, 6, "stone", "stone2", "gold", rings=3)
+    d.shape("stone", rrect(58, 124, 32, 16, 1))
+    d.shape("gold", dome(74, 125, 13, 19), spot=True)
+    d.stroke("gold2", "M63 116 Q74 112 85 116 M65 110 Q74 106 83 110", 1, line=False)
+    d.stroke("gold", "M74 106 V98", 1.4)
+    d.marks("stone2", " ".join(pointed_arch(61 + i * 7, 130, 4, 8) for i in range(4)))
+    minaret(d, 96, 134, 96, 3.6, "stone", "stone2", "gold", rings=1)
     # Al Mirani fort on its rock above the harbour
     d.shape("rock", "M128 146 L132 128 Q140 120 152 122 L162 130 L168 146Z")
     d.shape("fort", "M136 128 V110 H150 V128Z")
@@ -578,8 +578,8 @@ def jacaranda(d: Drawing, x, base, s=1.0):
 def johannesburg(d: Drawing):
     d.disc("glow", 152, 60, 16)
     # a golden mine dump on the edge of town
-    d.shape("dump", "M-30 150 L-30 120 L-6 114 L34 116 L54 150Z")
-    d.stroke("dump2", "M-6 120 H32 M-10 128 H38", 1.2, line=False)
+    d.shape("dump", "M-4 150 L18 128 Q20 126 24 126 H46 Q50 126 52 128 L72 150Z")
+    d.stroke("dump2", "M14 134 H56 M8 141 H62", 1.2, line=False)
     d.band("far", skyline(150, [(40, 8, 38), (98, 8, 46), (108, 6, 34), (140, 8, 54, 0, 6), (150, 7, 40), (160, 9, 46), (172, 8, 30), (182, 10, 22)]), line=False)
     d.band("mid", skyline(150, [(36, 10, 24), (60, 8, 30), (94, 10, 34), (132, 9, 28), (146, 10, 36), (164, 10, 24), (176, 12, 16)]))
     # Carlton Centre: the tall dark slab
@@ -644,9 +644,9 @@ def nairobi(d: Drawing):
     d.stroke("kicc2", "M81 59 V52", 1.2)
     # the national park in front
     d.band("ground", "M-30 132 Q100 128 230 132")
-    acacia(d, -100, 52, .78)
-    group(d, "translate(104 64) scale(.62)", lambda: d.shape("dark", GIRAFFE))
-    group(d, "translate(150 98) scale(.42)", lambda: d.shape("dark", GIRAFFE))
+    acacia(d, 60, 40, .7)
+    group(d, "translate(-10 64) scale(.62)", lambda: d.shape("dark", GIRAFFE))
+    group(d, "translate(118 104) scale(.36)", lambda: d.shape("dark", GIRAFFE))
     d.stroke("dark", "M20 168 l2 -6 M24 168 l0 -7 M28 168 l-2 -6 M176 160 l2 -6 M180 160 l0 -7", 1.2)
     d.band("near", hills(180, 5, 10))
     d.band("deep", hills(192, 3, 30), line=False)
@@ -800,12 +800,15 @@ def amman(d: Drawing):
         d.shape("stone", rrect(x - 1.5, 63, 9, 4, 1), shadow=False)
     d.shape("stone", poly((19, 63), (19, 57), (42, 57), (42, 63)))
     d.shape("stone", poly((56, 98), (56, 86), (60, 82), (62, 98)))
-    # the Roman Theatre carved into the hill
-    d.shape("stone", "M24 140 Q100 122 176 140 L162 172 Q100 160 38 172Z")
-    d.stroke("stone2", " ".join(f"M{24 + i * 3.1:.1f} {140 + i * 6.4:.1f} Q100 {122 + i * 7.2:.1f} {176 - i * 3.1:.1f} {140 + i * 6.4:.1f}" for i in range(1, 5)), 1.3)
-    d.marks("stone2", poly((96, 128), (104, 128), (106, 170), (94, 170)))
-    d.shape("stone", rrect(40, 170, 120, 8, 1))
-    d.marks("stone2", " ".join(rrect(46 + i * 10, 172, 3, 6, .5) for i in range(11)))
+    # the Roman Theatre: a horseshoe of stone tiers seen from the Citadel
+    cx, base = 100, 178
+    ring = lambda rx, ry: f"M{cx - rx} {base} A{rx} {ry} 0 0 1 {cx + rx} {base}"
+    d.shape("stone", ring(64, 38) + " H{0} A22 12 0 0 0 {1} {2}Z".format(cx + 22, cx - 22, base))
+    d.stroke("stone2", " ".join(ring(22 + 42 * t, 12 + 26 * t) for t in (.25, .5, .75)), 1.3)
+    d.stroke("stone2", " ".join(f"M{cx + 22 * math.cos(a):.1f} {base - 12 * math.sin(a):.1f} L{cx + 64 * math.cos(a):.1f} {base - 38 * math.sin(a):.1f}"
+                                for a in [math.pi * k / 6 for k in range(1, 6)]), 1.1, line=False)
+    d.shape("stone", rrect(68, 172, 64, 8, 1))
+    d.marks("stone2", " ".join(rrect(72 + i * 7, 174, 2.6, 6, .5) for i in range(9)))
     d.band("deep", hills(190, 3, 20), line=False)
 
 
@@ -917,7 +920,7 @@ def sydney(d: Drawing):
     d.band("mid", skyline(128, [(56, 10, 20), (68, 9, 28), (80, 10, 36), (92, 8, 24), (110, 9, 32), (122, 10, 24), (136, 10, 16), (150, 10, 10)]))
     arch_bridge(d, 40, 46, deck_y=110, crown=84, bearing=128)
     d.band("near", waves(128, 1.4, 18))
-    group(d, "translate(98 66) scale(.52)", lambda: opera_house(d))
+    group(d, "translate(90 66) scale(.52)", lambda: opera_house(d))
     # a harbour ferry
     d.shape("ferry", "M36 160 H72 L68 167 H40Z")
     d.shape("light", rrect(42, 151, 24, 9, 2))
@@ -943,8 +946,8 @@ def melbourne(d: Drawing):
     d.marks("pop", rrect(94, 58, 14, 3, 0))
     # Australia 108 and its golden starburst
     d.shape("tw3", "M112 138 V36 Q118 26 124 28 L126 138Z")
-    d.shape("gold", "M124 66 L131 70 L124 74 Z M112 66 L108 70 L112 74Z", shadow=False)
-    d.shape("gold", rrect(111, 66, 15, 8, 2), shadow=False)
+    d.shape("gold", "M112 64 H125 Q134 66 134 69 Q134 72 125 74 H112Z", spot=True)
+    d.stroke("gold2", "M124 66 L132 69 M124 72 L132 69", .9, line=False)
     d.shape("tw4", "M121 30 Q123 28 124 28 L126 138 H121Z", shadow=False, line=False)
     # Arts Centre spire
     d.stroke("spire2", "M154 54 V30", 1.4)
@@ -970,7 +973,7 @@ def melbourne(d: Drawing):
     d.band("deep", waves(186, 2.4, 30), line=False)
 
 
-MELB = {"tw": "#6C7D90", "tw2": "#53637A", "tw3": "#7D8896", "tw4": "#606B79", "gold": "#E4B44C", "spire": "#F4F1EA", "spire2": "#B8B2A6",
+MELB = {"tw": "#6C7D90", "tw2": "#53637A", "tw3": "#7D8896", "tw4": "#606B79", "gold": "#E4B44C", "gold2": "#B68A2C", "spire": "#F4F1EA", "spire2": "#B8B2A6",
         "ochre": "#E3A64A", "ochre2": "#B67A2A", "copper": "#5E9E86", "hull": "#C8553D"}
 
 

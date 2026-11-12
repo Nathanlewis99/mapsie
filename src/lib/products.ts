@@ -52,16 +52,48 @@ export const PRODUCTS: Product[] = [
   { id: "a4", label: "A4", widthCm: 21, heightCm: 29.7, price: { GB: 34, US: 45, AU: 65 }, framePrice: { GB: 25, US: 35, AU: 49 }, sizeCode: "A4" },
   { id: "a3", label: "A3", widthCm: 29.7, heightCm: 42, price: { GB: 44, US: 59, AU: 85 }, framePrice: { GB: 35, US: 45, AU: 65 }, sizeCode: "A3" },
   { id: "a2", label: "A2", widthCm: 42, heightCm: 59.4, price: { GB: 59, US: 79, AU: 115 }, framePrice: { GB: 55, US: 69, AU: 99 }, sizeCode: "A2" },
-  { id: "50x70", label: "50 × 70 cm", widthCm: 50, heightCm: 70, price: { GB: 69, US: 89, AU: 129 }, framePrice: { GB: 65, US: 79, AU: 115 }, sizeCode: "50X70" },
+  { id: "50x70", label: "50 × 70 cm", widthCm: 50, heightCm: 70, price: { GB: 69, US: 89, AU: 129 }, framePrice: { GB: 65, US: 79, AU: 115 }, sizeCode: "20X28" },
   { id: "a1", label: "A1", widthCm: 59.4, heightCm: 84.1, price: { GB: 84, US: 109, AU: 159 }, framePrice: { GB: 80, US: 99, AU: 145 }, sizeCode: "A1" },
 ];
 
 /** Prodigi's papers for unframed prints. `extra` is the uplift on the print price. */
-export const PAPERS: { id: PaperId; label: string; detail: string; code: string; extra: number }[] = [
-  { id: "ema", label: "Matte art", detail: "Enhanced Matte Art, 200gsm. Smooth, no glare, rich colour.", code: "FAP", extra: 0 },
-  { id: "hpr", label: "Cotton rag", detail: "Hahnemühle Photo Rag, 308gsm. Soft velvety matte, 100% cotton, museum grade.", code: "HPR", extra: 0.35 },
-  { id: "hge", label: "Textured etching", detail: "Hahnemühle German Etching, 310gsm. A fine paper texture, like an art print.", code: "HGE", extra: 0.35 },
-  { id: "lpp", label: "Lustre photo", detail: "Lustre photo paper, 240gsm. A gentle satin sheen and punchy colour.", code: "LPP", extra: 0.1 },
+export const PAPERS: { id: PaperId; label: string; detail: string; bestFor: string; spec: string; code: string; extra: number }[] = [
+  {
+    id: "ema",
+    label: "Matte art",
+    spec: "Enhanced Matte Art · 200gsm · matte",
+    detail: "A smooth, bright white art paper with a flat, glare-free finish. Colours are rich and the map's fine lines stay crisp, and it looks good from any angle.",
+    bestFor: "Most maps. Our standard and the paper used in our frames.",
+    code: "FAP",
+    extra: 0,
+  },
+  {
+    id: "hpr",
+    label: "Cotton rag",
+    spec: "Hahnemühle Photo Rag · 308gsm · 100% cotton · matte",
+    detail: "A thick, museum-grade paper made from cotton by Hahnemühle, a German mill since 1584. It has a soft, velvety surface, deep blacks and is acid-free, so it won't yellow for generations.",
+    bestFor: "Heirloom gifts and a gallery feel.",
+    code: "HPR",
+    extra: 0.35,
+  },
+  {
+    id: "hge",
+    label: "Textured etching",
+    spec: "Hahnemühle German Etching · 310gsm · textured matte",
+    detail: "A heavyweight fine art paper with a gentle, visible texture, like a traditional etching or engraving. It gives vintage and hand-drawn styles real character.",
+    bestFor: "Vintage, Explorer and Nautical styles.",
+    code: "HGE",
+    extra: 0.35,
+  },
+  {
+    id: "lpp",
+    label: "Lustre photo",
+    spec: "Lustre photo paper · 240gsm · satin",
+    detail: "A photographic paper with a soft satin sheen between matte and gloss. Colours are punchy and the surface is tough, but it can catch the light opposite a window.",
+    bestFor: "Bold, colourful styles and maps with photos.",
+    code: "PAP",
+    extra: 0.1,
+  },
 ];
 
 export const FRAMES: { id: FrameId; label: string; color: string; finish?: string; prodigiColor?: string }[] = [
@@ -78,17 +110,16 @@ export const FRAMES: { id: FrameId; label: string; color: string; finish?: strin
 
 export const MOUNTS: { id: MountId; label: string; color: string; prodigi?: string }[] = [
   { id: "none", label: "No mount", color: "transparent" },
-  { id: "white", label: "Snow white", color: "#fbfbf9", prodigi: "Snow white" },
-  { id: "offwhite", label: "Off-white", color: "#f1ebdd", prodigi: "Off-white" },
-  { id: "black", label: "Black", color: "#1d1d1d", prodigi: "Black" },
+  { id: "white", label: "White mount", color: "#fbfbf9", prodigi: "Snow white" },
 ];
+// Prodigi's price sheets list Snow white mounts for the A-size classic frames.
 const MOUNT_EXTRA = 0.2; // of the frame price
 
 export const GLAZES: { id: GlazeId; label: string; detail: string; extra: number; prodigi: string }[] = [
-  { id: "perspex", label: "Perspex", detail: "Light and shatterproof. Our standard.", extra: 0, prodigi: "Perspex" },
-  { id: "glass", label: "Float glass", detail: "Crystal clear glass.", extra: 0.2, prodigi: "Float glass" },
-  { id: "motheye", label: "Anti-reflective", detail: "Moth-eye glazing: almost no reflections, great opposite windows.", extra: 0.6, prodigi: "Motheye" },
+  { id: "perspex", label: "Perspex", detail: "Light, clear and shatterproof, so it's safe to post and to hang.", extra: 0, prodigi: "Perspex" },
 ];
+// Prodigi only offers float glass and anti-reflective (moth-eye) glazing on inch-sized
+// frames, not A sizes, so every A-size frame uses Perspex.
 
 export interface PrintOptions {
   productId: string;
@@ -111,7 +142,7 @@ export function priceLines(o: PrintOptions, region: RegionId) {
     const f = FRAMES.find((x) => x.id === o.frame)!;
     const fp = p.framePrice[region];
     lines.push({ label: `${f.label} frame`, amount: fp });
-    if (o.mount && o.mount !== "none") lines.push({ label: `${MOUNTS.find((m) => m.id === o.mount)!.label} mount`, amount: Math.round(fp * MOUNT_EXTRA) });
+    if (o.mount && o.mount !== "none") lines.push({ label: MOUNTS.find((m) => m.id === o.mount)?.label ?? "Mount", amount: Math.round(fp * MOUNT_EXTRA) });
     const g = GLAZES.find((x) => x.id === (o.glaze ?? "perspex")) ?? GLAZES[0];
     if (g.extra) lines.push({ label: `${g.label} glazing`, amount: Math.round(fp * g.extra) });
   }
@@ -146,8 +177,8 @@ export function describeOptions(o: PrintOptions & { orientation?: string }) {
   if (o.frame === "none") parts.push(`${(PAPERS.find((x) => x.id === (o.paper ?? "ema")) ?? PAPERS[0]).label.toLowerCase()} paper`);
   else {
     parts.push(`${FRAMES.find((f) => f.id === o.frame)!.label.toLowerCase()} frame`);
-    if (o.mount && o.mount !== "none") parts.push(`${MOUNTS.find((m) => m.id === o.mount)!.label.toLowerCase()} mount`);
-    if (o.glaze && o.glaze !== "perspex") parts.push(GLAZES.find((g) => g.id === o.glaze)!.label.toLowerCase());
+    if (o.mount && o.mount !== "none") parts.push((MOUNTS.find((m) => m.id === o.mount)?.label ?? "mount").toLowerCase());
+    if (o.glaze && o.glaze !== "perspex") parts.push(GLAZES.find((g) => g.id === o.glaze)?.label.toLowerCase() ?? "");
   }
   return parts.join(", ");
 }

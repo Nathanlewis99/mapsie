@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   if (!/^\d{6}$/.test((code ?? "").replace(/\s/g, "")) || !checkTotp(user.totpSecret, user.email, code)) {
     return NextResponse.json({ error: "That code didn't match. Check your authenticator app and try again." }, { status: 400 });
   }
-  if (!user.totpEnabled) setTotp(user.id, user.totpSecret, true);
+  if (!user.totpEnabled) await setTotp(user.id, user.totpSecret, true);
   await startSession({ ...user, totpEnabled: true }, Math.floor(Date.now() / 1000));
   return NextResponse.json({ ok: true, next: safeNext(next ?? "/admin") });
 }

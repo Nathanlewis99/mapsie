@@ -59,7 +59,11 @@ export default function PrintOptionsPicker({
             </button>
           ))}
         </div>
-        {framed && <p className="text-xs text-ink/50 mt-2">Classic wooden frame, ready to hang. Printed on Enhanced Matte Art paper.</p>}
+        {framed && (
+          <p className="text-xs text-ink/50 mt-2">
+            Classic wooden frame with clear Perspex, ready to hang. Framed prints use our Matte art paper ({PAPERS[0].spec}): {PAPERS[0].detail.split(".")[0].toLowerCase()}.
+          </p>
+        )}
       </div>
 
       {framed ? (
@@ -81,7 +85,7 @@ export default function PrintOptionsPicker({
             </div>
             {value.mount !== "none" && <p className="text-xs text-ink/50 mt-2">A card border inside the frame. Your map is printed a little smaller to sit in the window.</p>}
           </div>
-          <div>
+          {GLAZES.length > 1 && <div>
             <Heading>Glazing</Heading>
             <div className="space-y-2">
               {GLAZES.map((g) => (
@@ -94,7 +98,7 @@ export default function PrintOptionsPicker({
                 </button>
               ))}
             </div>
-          </div>
+          </div>}
         </>
       ) : (
         <div>
@@ -104,7 +108,15 @@ export default function PrintOptionsPicker({
               <button key={x.id} onClick={() => onChange({ paper: x.id })} className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left ${card(value.paper === x.id)}`}>
                 <span>
                   <span className="font-bold block">{x.label}</span>
-                  <span className="text-xs text-ink/50">{x.detail}</span>
+                  <span className="text-[11px] font-bold text-ink/45 block">{x.spec}</span>
+                  {value.paper === x.id ? (
+                    <>
+                      <span className="text-xs text-ink/70 block mt-1">{x.detail}</span>
+                      <span className="text-xs font-bold text-sea block mt-1">Best for: {x.bestFor}</span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-ink/50 block">{x.bestFor}</span>
+                  )}
                 </span>
                 <span className="font-extrabold text-sm shrink-0">{x.extra ? `+${money(region, Math.round(p.price[region] * x.extra))}` : "Included"}</span>
               </button>

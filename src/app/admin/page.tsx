@@ -10,7 +10,10 @@ const STATUS: Record<string, string> = {
   pending_payment: "bg-ink/10 text-ink/60",
   paid: "bg-sea/20 text-sea",
   rendering: "bg-amber-100 text-amber-700",
+  ready: "bg-amber-100 text-amber-700",
   submitted: "bg-emerald-100 text-emerald-700",
+  shipped: "bg-emerald-200 text-emerald-800",
+  cancelled: "bg-ink/10 text-ink/50",
   failed: "bg-coral/20 text-coral-dark",
 };
 
@@ -24,7 +27,10 @@ export default async function Admin() {
         <div>
           <Link href="/" className="font-display text-2xl font-extrabold"><Logo /></Link>
           <h1 className="text-3xl font-extrabold mt-2">Orders</h1>
-          <a href="/api/admin/prodigi-check" className="text-sm font-bold text-coral-dark">Check our print options against Prodigi&apos;s catalogue →</a>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/admin/costs" className="text-sm font-bold text-coral-dark">Costs &amp; margins →</Link>
+            <a href="/api/admin/prodigi-check" className="text-sm font-bold text-coral-dark">Check our print options against Prodigi&apos;s catalogue →</a>
+          </div>
         </div>
         <div className="flex gap-3 text-sm font-bold">
           <span className="rounded-2xl bg-white px-4 py-2 shadow-sm">{paid.length} paid</span>

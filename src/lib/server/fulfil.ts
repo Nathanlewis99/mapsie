@@ -1,4 +1,4 @@
-import { getDesign, getOrder, updateOrder, type Address, type Order } from "./db";
+import { claimOrder, getDesign, getOrder, listOrdersByStatus, updateOrder, type Address, type Order } from "./db";
 import { normalizeDesign } from "../types";
 import { renderDesign, FALLBACK } from "./render";
 import { publicUrl } from "./urls";
@@ -10,13 +10,17 @@ export const HOLD_MINUTES = Number(process.env.ORDER_HOLD_MINUTES ?? 60);
 export const canCancel = (o: Order) =>
   ["paid", "rendering", "ready"].includes(o.status) && !!o.holdUntil && new Date(o.holdUntil).getTime() > Date.now();
 
+/** "web" serves the site only, "worker" renders and sends orders, "all" does both (one server). */
+export const ROLE = (process.env.MAPSIE_ROLE ?? "all") as "web" | "worker" | "all";
+
 /**
- * After payment: make the print file straight away, then hold the order until
- * the cancellation window ends. The scheduler (scheduler.ts) sends it to print.
+ * After payment: record it and queue the order. A worker (this server, or the
+ * separate render worker when the site runs on several servers) makes the
+ * print file, then holds the order until the cancellation window ends.
  */
 export async function fulfilOrder(orderId: string, address: Address, extra: Partial<Order> = {}) {
   const now = new Date();
-  const order = await updateOrder(orderId, {
+  await updateOrder(orderId, {
     status: "paid",
     address,
     error: undefined,
@@ -24,11 +28,30 @@ export async function fulfilOrder(orderId: string, address: Address, extra: Part
     holdUntil: new Date(now.getTime() + HOLD_MINUTES * 60_000).toISOString(),
     ...extra,
   });
+  if (ROLE !== "web") void processPaidOrders();
+}
+
+let rendering = false;
+/** Render every paid order, one at a time (rendering a big print is memory hungry). */
+export async function processPaidOrders() {
+  if (rendering) return;
+  rendering = true;
+  try {
+    for (const o of await listOrdersByStatus("paid")) {
+      const claimed = await claimOrder(o.id, "paid", "rendering");
+      if (claimed) await renderOrder(claimed);
+    }
+  } finally {
+    rendering = false;
+  }
+}
+
+async function renderOrder(order: Order) {
+  const orderId = order.id;
   try {
     const raw = await getDesign(order.designId);
     if (!raw) throw new Error("design missing");
     const design = normalizeDesign(raw);
-    await updateOrder(orderId, { status: "rendering" });
     let r;
     try {
       r = await renderDesign(design, `${order.id}.png`);

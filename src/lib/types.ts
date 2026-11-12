@@ -26,6 +26,8 @@ export interface Stop {
   labelScale?: number;
   /** Size of this stop's marker relative to the design's marker size. */
   markerScale?: number;
+  /** With the "sticker" marker style: the sticker drawn for this stop. */
+  marker?: { kind: "sticker" | "original"; name: string; art?: ArtStyleId; origStyle?: OriginalStyle; palette?: string };
 }
 
 export interface Sticker {
@@ -80,7 +82,7 @@ export interface MapDetails {
 export const NO_DETAILS: MapDetails = { grid: false, tropics: false, currents: false, lanes: false, compass: false };
 
 export type RouteStyle = "auto" | "solid" | "dashed" | "dotted";
-export type MarkerStyle = "number" | "dot" | "pin" | "heart";
+export type MarkerStyle = "number" | "dot" | "pin" | "heart" | "sticker";
 export type Layout = "band" | "border" | "overlay";
 export type Orientation = "portrait" | "landscape";
 export type FrameId = "none" | "black" | "white" | "oak" | "brown" | "darkgrey" | "lightgrey" | "gold" | "silver";
@@ -160,8 +162,9 @@ export function normalizeDesign(d: Partial<Design> & Pick<Design, "id">): Design
     ...x,
     frame: x.frame ?? "none",
     paper: x.paper ?? "ema",
-    mount: x.mount ?? "none",
-    glaze: x.glaze ?? "perspex",
+    // Options Prodigi doesn't sell at A sizes fall back to the nearest one it does.
+    mount: x.mount && x.mount !== "none" ? "white" : "none",
+    glaze: "perspex",
     theme: x.theme && { ...x.theme, hypso: x.theme.hypso ?? false, physical: x.theme.physical ?? false, details: { ...NO_DETAILS, ...(x.theme.details ?? {}) } },
     route: { show: r.show ?? true, style: r.style ?? "auto", curved: r.curved ?? true, width: r.width ?? 0.45, modeIcons: r.modeIcons ?? true },
     markers: { style: m.style ?? "number", showDates: m.showDates ?? false, size: m.size ?? 1, labelSize: m.labelSize ?? 1 },

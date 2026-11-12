@@ -12,3 +12,12 @@ export function printTokenValid(designId: string, token: string | undefined) {
   const b = Buffer.from(token);
   return a.length === b.length && timingSafeEqual(a, b);
 }
+
+/** A token for Prodigi's status callbacks about one of our orders. */
+export const callbackToken = (orderId: string) => createHmac("sha256", secret()).update(`prodigi:${orderId}`).digest("base64url");
+export function callbackTokenValid(orderId: string, token: string | null) {
+  if (!token) return false;
+  const a = Buffer.from(callbackToken(orderId));
+  const b = Buffer.from(token);
+  return a.length === b.length && timingSafeEqual(a, b);
+}

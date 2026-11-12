@@ -10,7 +10,7 @@ import type { Design } from "@/lib/types";
  */
 async function flattenSvgStickers() {
   const dpr = window.devicePixelRatio || 1;
-  const imgs = [...document.querySelectorAll<HTMLImageElement>(".mapsie-sticker img")].filter(
+  const imgs = [...document.querySelectorAll<HTMLImageElement>(".mapsie-sticker img, img.mapsie-stop-sticker")].filter(
     (i) => /\.svg($|\?)/.test(i.src) && !i.style.filter,
   );
   await Promise.all(

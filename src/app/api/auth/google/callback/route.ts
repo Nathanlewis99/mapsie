@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     const tokens = await google().validateAuthorizationCode(code, verifier);
     const claims = decodeIdToken(tokens.idToken()) as { sub: string; email?: string; email_verified?: boolean; name?: string; picture?: string };
     if (!claims.email || !claims.email_verified) return fail("unverified");
-    const user = upsertGoogleUser({ sub: claims.sub, email: claims.email, name: claims.name, picture: claims.picture });
+    const user = await upsertGoogleUser({ sub: claims.sub, email: claims.email, name: claims.name, picture: claims.picture });
     await startSession(user);
     // Admins finish signing in with their authenticator app.
     const dest = isAdminEmail(user.email) && next.startsWith("/admin") ? "/admin/2fa?next=" + encodeURIComponent(next) : next;

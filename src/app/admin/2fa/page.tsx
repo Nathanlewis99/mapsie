@@ -18,7 +18,7 @@ export default async function TwoFactorPage({ searchParams }: { searchParams: Pr
   let secret: string | null = null;
   if (!user.totpEnabled) {
     secret = user.totpSecret ?? newTotpSecret();
-    if (!user.totpSecret) setTotp(user.id, secret, false);
+    if (!user.totpSecret) await setTotp(user.id, secret, false);
     qr = await QRCode.toDataURL(totpUri(secret, user.email), { margin: 1, width: 220 });
   }
 

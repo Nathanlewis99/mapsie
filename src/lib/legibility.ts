@@ -31,7 +31,7 @@ const labelScale = (d: Design, s: Stop) => d.markers.labelSize * (s.labelScale ?
 
 /** Marker radius in % of poster width. */
 function markerRadius(d: Design, s: Stop) {
-  const base = { number: 1.5, dot: 0.9, pin: 1.5, heart: 1.6 }[d.markers.style] ?? 1.5;
+  const base = { number: 1.5, dot: 0.9, pin: 1.5, heart: 1.6, sticker: 3 }[d.markers.style] ?? 1.5;
   return base * markerScale(d, s);
 }
 

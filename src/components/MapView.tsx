@@ -301,7 +301,7 @@ export default function MapView(props: Props) {
   }, [visitedKey]);
 
   // --- stop markers (HTML, so they can use any font and stay crisp in print)
-  const stopsKey = JSON.stringify([design.stops.map(({ path: _p, ...s }) => s), design.markers, design.theme.colors, design.font, width, editable, selectedLabel]); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const stopsKey = JSON.stringify([design.stops.map(({ path: _p, ...s }) => s), design.markers, design.theme.colors, design.theme.presetId, design.font, width, editable, selectedLabel]); // eslint-disable-line @typescript-eslint/no-unused-vars
   useEffect(
     () =>
       whenMap((mm) => {
@@ -310,7 +310,7 @@ export default function MapView(props: Props) {
         const style = design.markers.style;
         stopMarkers.current = design.stops.map((s: Stop, i) => {
           const node = document.createElement("div");
-          node.className = `mapsie-stop is-${style}`;
+          node.className = `mapsie-stop is-${style === "sticker" && !s.marker ? "pin" : style}`;
           node.style.setProperty("--u", `${u * design.markers.size * (s.markerScale ?? 1)}px`);
           if (editable) {
             node.title = "Drag to move this stop · tap to resize it";
@@ -325,7 +325,9 @@ export default function MapView(props: Props) {
               ? `<div class="mapsie-stop-dot" style="background:${c.accent};color:${c.paper};border-color:${c.paper}">${design.markers.size * (s.markerScale ?? 1) > TINY_PIN ? i + 1 : ""}</div>`
               : style === "dot"
                 ? `<div class="mapsie-stop-dot" style="background:${c.accent};border-color:${c.paper}"></div>`
-                : `<div class="mapsie-stop-icon">${markerSvg(style, c.accent, c.paper)}</div>`;
+                : style === "sticker" && s.marker
+                  ? stopStickerHtml(s.marker)
+                  : `<div class="mapsie-stop-icon">${markerSvg(style === "sticker" ? "pin" : style, c.accent, c.paper)}</div>`;
           const date = design.markers.showDates && s.date ? `<small>${esc(s.date)}</small>` : "";
           const label = s.showLabel
             ? `<div class="mapsie-stop-label" style="color:${c.ink};background:${c.paper};font-family:${fontCss(design.font)}">${esc(s.name)}${date}</div>`
@@ -333,7 +335,7 @@ export default function MapView(props: Props) {
           node.innerHTML = icon + label;
           const labelEl = node.querySelector<HTMLElement>(".mapsie-stop-label");
           if (labelEl) setupLabel(labelEl, s);
-          const mk = new maplibregl.Marker({ element: node, draggable: editable, anchor: style === "pin" ? "bottom" : "center" })
+          const mk = new maplibregl.Marker({ element: node, draggable: editable, anchor: style === "pin" || (style === "sticker" && !s.marker) ? "bottom" : "center" })
             .setLngLat([s.lng, s.lat])
             .addTo(mm);
           mk.on("dragend", () => {
@@ -346,6 +348,17 @@ export default function MapView(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [stopsKey],
   );
+
+  /** A sticker or Mapsie Original used as a stop's marker. */
+  function stopStickerHtml(m: NonNullable<Stop["marker"]>) {
+    const src =
+      m.kind === "original"
+        ? originalSrc(m.name, m.origStyle ?? "papercut", resolvePalette(m.palette ?? "auto", design.theme.presetId, m.origStyle ?? "papercut"))
+        : stickerSrc(m.name, m.art);
+    const art = m.kind === "sticker" ? getArtStyle(m.art) : null;
+    const filter = art && art.finish !== "none" ? `filter:url(#${filterId(filterPrefix, art.finish)});` : "";
+    return `<img class="mapsie-stop-sticker" src="${src}" alt="" draggable="false" style="${filter}${art?.blend ? `mix-blend-mode:${art.blend};` : ""}">`;
+  }
 
   /**
    * A stop's label: its own size and offset from the pin. In the editor it can be
@@ -526,7 +539,7 @@ export default function MapView(props: Props) {
         let rotation = st.rotation;
         const move = (ev: PointerEvent) => {
           if (mode === "size") {
-            size = Math.max(2, Math.min(60, (st.size * Math.hypot(ev.clientX - cx, ev.clientY - cy)) / d0));
+            size = Math.max(0.8, Math.min(60, (st.size * Math.hypot(ev.clientX - cx, ev.clientY - cy)) / d0));
             const px = size * (widthRef.current / 100);
             if (st.kind === "text") inner.style.fontSize = `${px}px`;
             else {

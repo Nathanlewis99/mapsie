@@ -16,6 +16,7 @@ const STATUS: Record<string, { label: string; cls: string }> = {
   rendering: { label: "Preparing print", cls: "bg-amber-100 text-amber-800" },
   ready: { label: "Final check", cls: "bg-amber-100 text-amber-800" },
   submitted: { label: "Sent to print", cls: "bg-emerald-100 text-emerald-800" },
+  shipped: { label: "Shipped", cls: "bg-emerald-100 text-emerald-800" },
   cancelled: { label: "Cancelled", cls: "bg-ink/10 text-ink/60" },
   failed: { label: "Delayed: we're on it", cls: "bg-coral/15 text-coral-dark" },
 };
@@ -24,7 +25,7 @@ const date = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "
 export default async function Account() {
   const user = await currentUser();
   if (!user) redirect("/signin?next=/account");
-  const designs = listSavedDesigns(user.id);
+  const designs = await listSavedDesigns(user.id);
   const orders = await Promise.all(
     (await listOrdersForUser(user)).map(async (o) => ({ o, d: await getDesign(o.designId).then((x) => (x ? normalizeDesign(x) : null)) })),
   );

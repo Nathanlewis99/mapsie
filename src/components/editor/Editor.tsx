@@ -7,7 +7,7 @@ import FramedPoster, { frameWidth } from "@/components/FramedPoster";
 import WallPreview from "@/components/WallPreview";
 import { useEditor } from "@/lib/store";
 import { reverseGeocode } from "@/lib/geo";
-import { itemPrice, money, posterAspect } from "@/lib/products";
+import { itemPrice, money, posterAspect, REGIONS } from "@/lib/products";
 import { FONTS } from "@/lib/fonts";
 import { ART_STYLES, stickerSrc, type ArtStyleId } from "@/lib/stickers";
 import { PALETTE_NAMES, getOriginal, type OriginalStyle } from "@/lib/originals";
@@ -295,6 +295,17 @@ export default function Editor() {
           >
             New
           </button>
+          <select
+            value={region}
+            onChange={(e) => store.setRegion(e.target.value as typeof region)}
+            title="Where should we ship it? Prices and printing are local to each country."
+            aria-label="Ship to"
+            className="ml-1 rounded-full bg-white border border-ink/10 px-2 py-2 text-sm font-bold cursor-pointer"
+          >
+            {REGIONS.map((r) => (
+              <option key={r.id} value={r.id}>{r.flag} {r.id === "GB" ? "UK" : r.id}</option>
+            ))}
+          </select>
           <button onClick={order} disabled={!!busy || design.stops.length === 0} className="ml-1 rounded-full bg-coral px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-extrabold text-white shadow-lg shadow-coral/30 hover:bg-coral-dark disabled:opacity-40 transition whitespace-nowrap">
             {busy === "order" ? "Saving…" : <>Order<span className="hidden sm:inline"> print</span> · {money(region, price)}</>}
           </button>
@@ -401,7 +412,10 @@ export default function Editor() {
           {labelStop && (
             <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full bg-ink text-white px-2 py-1.5 shadow-xl text-sm font-bold max-w-[96%] overflow-x-auto">
               <span className="px-2 opacity-60 whitespace-nowrap max-w-32 truncate">“{labelStop.name}”</span>
-              <span className="text-[11px] uppercase tracking-wider opacity-50 pl-1">Pin</span>
+              {design.markers.style === "sticker" && (
+                <button className="px-3 py-1 rounded-full bg-coral hover:bg-coral-dark whitespace-nowrap" onClick={() => setTab("stickers")}>🎨 {labelStop.marker ? "Change sticker" : "Choose sticker"}</button>
+              )}
+              <span className="text-[11px] uppercase tracking-wider opacity-50 pl-1">{design.markers.style === "sticker" ? "Size" : "Pin"}</span>
               <button title="Smaller pin" className="px-2.5 py-1 rounded-full hover:bg-white/15" onClick={() => store.updateStop(labelStop.id, { markerScale: Math.max(0.25, (labelStop.markerScale ?? 1) / 1.2) }, `msize-${labelStop.id}`)}>−</button>
               <button title="Bigger pin" className="px-2.5 py-1 rounded-full hover:bg-white/15" onClick={() => store.updateStop(labelStop.id, { markerScale: Math.min(3, (labelStop.markerScale ?? 1) * 1.2) }, `msize-${labelStop.id}`)}>+</button>
               <span className="w-px h-5 bg-white/20 mx-1" />

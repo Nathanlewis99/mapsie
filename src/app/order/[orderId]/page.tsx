@@ -13,17 +13,19 @@ interface Status {
   holdUntil?: string;
   canCancel?: boolean;
   refunded?: boolean;
+  shipments?: { carrier?: string; trackingNumber?: string; trackingUrl?: string }[];
 }
 
 const STEPS = [
   { key: "paid", label: "Payment received" },
   { key: "rendering", label: "Preparing your high-resolution print file" },
   { key: "ready", label: "Final check: you can still cancel" },
-  { key: "submitted", label: "Sent to our print studio" },
+  { key: "submitted", label: "Being printed" },
+  { key: "shipped", label: "On its way" },
 ];
-const RANK: Record<string, number> = { pending_payment: 0, paid: 1, rendering: 2, ready: 3, submitted: 4 };
+const RANK: Record<string, number> = { pending_payment: 0, paid: 1, rendering: 2, ready: 3, submitted: 4, shipped: 5 };
 const time = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-const FINAL = ["submitted", "failed", "cancelled"];
+const FINAL = ["shipped", "failed", "cancelled"];
 
 export default function OrderPage({ params }: { params: Promise<{ orderId: string }> }) {
   const { orderId } = use(params);
@@ -43,6 +45,7 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
         if (FINAL.includes(j.status)) return;
         // Quick while the print file is being made, relaxed during the hold.
         if (j.status === "ready") delay = 20_000;
+        if (j.status === "submitted") delay = 120_000; // printing takes a day or two
       }
       t = setTimeout(poll, delay);
     };
@@ -91,7 +94,7 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
         <ol className="space-y-3">
           {STEPS.map((s, i) => {
             const rank = o ? RANK[o.status] ?? 0 : 0;
-            const done = rank > i + 1 || (s.key === "submitted" && o?.status === "submitted");
+            const done = rank > i + 1 || (s.key === "shipped" && o?.status === "shipped");
             const active = !done && rank === i + 1;
             const label = s.key === "ready" && o?.holdUntil ? `Final check: goes to print at ${time(o.holdUntil)}` : s.label;
             return (
@@ -104,6 +107,24 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
             );
           })}
         </ol>
+      )}
+
+      {!!o?.shipments?.length && (
+        <div className="rounded-2xl bg-sea/10 p-4 space-y-1">
+          <div className="font-extrabold">📦 Your print is on its way</div>
+          {o.shipments.map((sh, i) => (
+            <div key={i} className="text-sm">
+              {sh.carrier ?? "Courier"}
+              {sh.trackingNumber && <> · {sh.trackingNumber}</>}
+              {sh.trackingUrl && (
+                <>
+                  {" · "}
+                  <a href={sh.trackingUrl} target="_blank" rel="noreferrer" className="font-bold text-coral-dark underline">Track it</a>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
       )}
 
       {o?.canCancel && o.holdUntil && (

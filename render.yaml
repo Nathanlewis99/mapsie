@@ -1,44 +1,88 @@
-# Render blueprint: in the Render dashboard choose New > Blueprint and pick this repo.
-services:
-  - type: web
-    name: mapsie
-    runtime: docker
-    plan: standard          # 2 GB RAM: the print renderer runs a headless browser
-    region: frankfurt       # closest Render region to the UK
-    branch: main
-    autoDeploy: true        # every push to main redeploys
-    healthCheckPath: /
-    disk:
-      name: mapsie-data     # orders, saved designs and print files
-      mountPath: /var/data
-      sizeGB: 5
+# Render blueprint. Three pieces:
+#   mapsie        - the website. Stateless, so it autoscales: more copies start
+#                   automatically when traffic rises (needs a Render Professional workspace).
+#   mapsie-worker - makes the high-resolution print files and sends orders to
+#                   the printer. One copy with a disk; orders queue in the database,
+#                   so a rush simply makes the queue longer, nothing is lost.
+#   mapsie-db     - Postgres, shared by all of the above.
+databases:
+  - name: mapsie-db
+    plan: basic-256mb
+    region: frankfurt
+    postgresMajorVersion: "16"
+
+envVarGroups:
+  - name: mapsie-shared
     envVars:
-      - key: DATA_DIR
-        value: /var/data
-      - key: SESSION_SECRET   # signs sign-in cookies
+      - key: SESSION_SECRET   # signs sign-in cookies and print-page tokens
         generateValue: true
       - key: ADMIN_EMAILS     # Google accounts that can open /admin (plus an authenticator code)
         value: admin@mapsie.shop
       - key: APP_URL
         value: https://mapsie.shop
-      # Google sign-in: OAuth client from Google Cloud Console (see README).
+      - key: ORDER_HOLD_MINUTES
+        value: "60"
+      - key: PRODIGI_ENV
+        value: sandbox
+
+services:
+  - type: web
+    name: mapsie
+    runtime: docker
+    plan: starter            # no rendering here, so a small instance is plenty
+    region: frankfurt
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /api/health
+    scaling:
+      minInstances: 1
+      maxInstances: 5
+      targetCPUPercent: 70
+      targetMemoryPercent: 80
+    envVars:
+      - fromGroup: mapsie-shared
+      - key: MAPSIE_ROLE
+        value: web
+      - key: DATABASE_URL
+        fromDatabase: { name: mapsie-db, property: connectionString }
+      - key: RENDER_WORKER_URL  # print files are fetched from the worker over the private network
+        fromService: { name: mapsie-worker, type: web, property: hostport }
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
-      - key: PRODIGI_ENV
-        value: sandbox
-      # Print render settings sized for the 2 GB "standard" plan: the map layer of
-      # A2 and larger prints is drawn at up to 5120 px (A1 map ≈ 155 dpi; text,
-      # stickers and markers stay 300 dpi). On a 4 GB plan use 7680 and 4000.
-      - key: PRINT_MAX_PX
-        value: "5120"
-      - key: PRINT_STRIP_PX
-        value: "2000"
-      # Leave these empty to run in test mode (test checkout, print orders only logged).
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
       - key: PRODIGI_API_KEY
+        sync: false
+
+  - type: web
+    name: mapsie-worker
+    runtime: docker
+    plan: standard           # 2 GB: the renderer runs a headless browser ("pro", 4 GB, for full-detail A1)
+    region: frankfurt
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /api/health
+    disk:
+      name: mapsie-data      # print files (and, before Postgres, the old SQLite database)
+      mountPath: /var/data
+      sizeGB: 10
+    envVars:
+      - fromGroup: mapsie-shared
+      - key: MAPSIE_ROLE
+        value: worker
+      - key: DATA_DIR
+        value: /var/data
+      - key: DATABASE_URL
+        fromDatabase: { name: mapsie-db, property: connectionString }
+      - key: PRINT_MAX_PX
+        value: "5120"
+      - key: PRINT_STRIP_PX
+        value: "2000"
+      - key: PRODIGI_API_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY # refunds on cancellation
         sync: false

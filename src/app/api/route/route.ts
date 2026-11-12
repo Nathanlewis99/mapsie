@@ -50,7 +50,7 @@ export async function POST(req: Request) {
   }
   const points = (pts as LngLat[]).map(round);
   const keys = points.slice(1).map((p, i) => legKey(points[i], p));
-  const cached = keys.map((k) => getCachedRoute(k) as Leg | undefined);
+  const cached = (await Promise.all(keys.map((k) => getCachedRoute(k)))) as (Leg | undefined)[];
   if (cached.every((c) => c !== undefined)) return NextResponse.json({ legs: cached });
 
   try {
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
         legs.push(cached[i] !== undefined ? cached[i]! : ((await serial(() => osrm([points[i], points[i + 1]])))?.[0] ?? null));
       }
     }
-    legs.forEach((leg, i) => putCachedRoute(keys[i], leg));
+    await Promise.all(legs.map((leg, i) => putCachedRoute(keys[i], leg)));
     return NextResponse.json({ legs });
   } catch {
     return NextResponse.json({ error: "routing failed" }, { status: 502 });

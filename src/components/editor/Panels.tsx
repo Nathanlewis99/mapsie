@@ -374,9 +374,12 @@ export function StylePanel() {
         <Label>Stop markers</Label>
         <Chips<MarkerStyle>
           value={design.markers.style}
-          options={[{ id: "number", label: "① Numbers" }, { id: "pin", label: "📍 Pins" }, { id: "heart", label: "♥ Hearts" }, { id: "dot", label: "• Dots" }]}
+          options={[{ id: "number", label: "① Numbers" }, { id: "pin", label: "📍 Pins" }, { id: "heart", label: "♥ Hearts" }, { id: "dot", label: "• Dots" }, { id: "sticker", label: "🦘 Stickers" }]}
           onChange={(v) => set({ markers: { ...design.markers, style: v } })}
         />
+        {design.markers.style === "sticker" && (
+          <p className="text-xs text-ink/60 font-semibold mt-2">Tap a stop on the map, then choose its sticker in the Stickers tab. Stops without one show a pin.</p>
+        )}
         <div className="mt-2">
           <Toggle on={design.markers.showDates} onChange={(v) => set({ markers: { ...design.markers, showDates: v } })} label="📅 Show dates under stop names" />
         </div>
@@ -508,6 +511,12 @@ function SuggestionCard() {
   );
 }
 
+/** With sticker stop markers: the selected stop, whose marker the next sticker tap sets. */
+function useMarkerTarget() {
+  const { design, selectedLabel } = useEditor();
+  return design.markers.style === "sticker" && selectedLabel ? design.stops.find((s) => s.id === selectedLabel) : undefined;
+}
+
 function EmojiStickers() {
   const { design, addSticker, setStickerStyle } = useEditor();
   const at = useDropPoint();
@@ -520,8 +529,12 @@ function EmojiStickers() {
   const placed = design.stickers.filter((s) => s.kind === "sticker");
   const mixed = placed.some((s) => s.art !== style);
 
+  const target = useMarkerTarget();
+  const { updateStop } = useEditor();
   const place = (name: string, art: ArtStyleId = style) =>
-    addSticker({ kind: "sticker", name, art, src: stickerSrc(name, art), ...at(), size: 9, rotation: 0 });
+    target
+      ? updateStop(target.id, { marker: { kind: "sticker", name, art } })
+      : addSticker({ kind: "sticker", name, art, src: stickerSrc(name, art), ...at(), size: 9, rotation: 0 });
 
   const tile = (name: string, art: ArtStyleId, title?: string) => (
     <button
@@ -674,7 +687,12 @@ function OriginalsPanel() {
   const presetName = PRESETS.find((p) => p.id === preset)?.name ?? "your";
   const placed = design.stickers.filter((s) => s.kind === "original").length;
 
-  const place = (id: string) => addSticker({ kind: "original", name: id, origStyle: style, palette, src: "", ...at(), size: 15, rotation: 0 });
+  const target = useMarkerTarget();
+  const { updateStop } = useEditor();
+  const place = (id: string) =>
+    target
+      ? updateStop(target.id, { marker: { kind: "original", name: id, origStyle: style, palette } })
+      : addSticker({ kind: "original", name: id, origStyle: style, palette, src: "", ...at(), size: 15, rotation: 0 });
   // Animals are listed by region (the catalogue is sorted by label, so sort by region first).
   const regionOf = (o?: OriginalDef) => (o?.keywords ?? "").replace(/ wildlife animal$/, "");
   const prevAnimal = { current: null as OriginalDef | null };
@@ -780,8 +798,24 @@ function OriginalsPanel() {
 
 export function StickersPanel() {
   const [collection, setCollection] = useState<"originals" | "emoji">("originals");
+  const target = useMarkerTarget();
+  const { design, selectLabel, updateStop } = useEditor();
+  const stickerMarkers = design.markers.style === "sticker";
   return (
     <div className="space-y-5">
+      {target ? (
+        <div className="rounded-2xl bg-coral text-white p-3 text-sm font-bold flex items-center gap-2">
+          <span className="flex-1">📍 Tap a sticker to use it as the marker for “{target.name}”</span>
+          {target.marker && (
+            <button onClick={() => updateStop(target.id, { marker: undefined })} className="rounded-full bg-white/20 px-3 py-1 text-xs">Use a pin</button>
+          )}
+          <button onClick={() => selectLabel(null)} className="rounded-full bg-white/20 px-3 py-1 text-xs">Done</button>
+        </div>
+      ) : stickerMarkers ? (
+        <div className="rounded-2xl bg-sand/70 p-3 text-xs font-bold text-ink/60">
+          Sticker markers are on: tap a stop on the map, then pick its sticker here. Stickers added without a stop selected go on the map as usual.
+        </div>
+      ) : null}
       <div className="grid grid-cols-2 gap-1 rounded-full bg-sand/70 p-1">
         {([["originals", "✨ Mapsie Originals"], ["emoji", "😀 Emoji stickers"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setCollection(id)} className={`rounded-full py-2 text-sm font-extrabold transition ${collection === id ? "bg-white shadow-sm" : "text-ink/50"}`}>

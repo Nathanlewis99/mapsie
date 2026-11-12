@@ -4,6 +4,7 @@ import { decodeIdToken } from "arctic";
 import { google, isAdminEmail, safeNext, startSession } from "@/lib/server/auth";
 import { upsertGoogleUser } from "@/lib/server/db";
 import { publicUrl } from "@/lib/server/urls";
+import { logError } from "@/lib/server/log";
 
 // Step 2 of Google sign-in: Google sends the browser back here with a code.
 export async function GET(req: Request) {
@@ -29,7 +30,7 @@ export async function GET(req: Request) {
     const dest = isAdminEmail(user.email) && next.startsWith("/admin") ? "/admin/2fa?next=" + encodeURIComponent(next) : next;
     return NextResponse.redirect(`${publicUrl()}${dest}`);
   } catch (e) {
-    console.error("[auth] google callback failed", e);
+    void logError("auth.google", e);
     return fail("failed");
   }
 }

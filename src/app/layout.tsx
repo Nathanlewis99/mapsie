@@ -12,6 +12,8 @@ import "@fontsource/courier-prime";
 import "@fontsource/courier-prime/700.css";
 import "@fontsource/great-vibes";
 import "./globals.css";
+import ErrorReporter from "@/components/ErrorReporter";
+import Analytics from "@/components/Analytics";
 
 export const metadata: Metadata = {
   title: "Mapsie — turn your trip into a print",
@@ -21,7 +23,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <ErrorReporter />
+        <Analytics />
+        {children}
+      </body>
     </html>
   );
 }

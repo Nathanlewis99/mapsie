@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getOrder, updateOrder } from "@/lib/server/db";
 import { canCancel } from "@/lib/server/fulfil";
+import { logError } from "@/lib/server/log";
 
 /** Customer cancels within the hold window: full refund, never sent to print. */
 export async function POST(_: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -16,7 +17,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
       await new Stripe(process.env.STRIPE_SECRET_KEY).refunds.create({ payment_intent: o.stripePaymentIntent });
       refunded = true;
     } catch (e) {
-      console.error("[cancel] refund failed", e);
+      void logError("order.refund", e, { orderId: id });
       return NextResponse.json({ error: "We couldn't process the refund automatically. Please email us and we'll sort it." }, { status: 502 });
     }
   }

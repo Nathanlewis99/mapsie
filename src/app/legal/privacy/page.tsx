@@ -19,7 +19,7 @@ export default function PrivacyPage() {
       <Summary>
         <ul>
           <li>We only collect what we need to let you design maps and to make and deliver your prints.</li>
-          <li>We don&apos;t sell your information, and we don&apos;t use analytics, advertising or tracking cookies.</li>
+          <li>We don&apos;t sell your information, and we don&apos;t use analytics, advertising or tracking cookies. We count visits anonymously, without cookies.</li>
           <li>
             We share your details only with the services that help us run {COMPANY.brand}: hosting, payments, printing and
             delivery, sign-in, and maps.
@@ -94,6 +94,17 @@ export default function PrivacyPage() {
             Like any website, our servers receive your IP address and basic information about your browser when you visit. Our
             hosting provider keeps short-term technical logs to run the service securely. We don&apos;t use this information
             to identify you or track you across the web.
+          </p>
+        </Sub>
+        <Sub title="Anonymous usage statistics">
+          <p>
+            We count anonymous steps people take on the site (for example &quot;opened the designer&quot;, &quot;reached
+            checkout&quot;, &quot;paid&quot;), with the website that sent them, the first page they landed on and whether they
+            used a phone or a computer. Each visit gets a random number that lives only in the open page and isn&apos;t stored
+            on your device or linked to your name, email or IP address. We use this, in our legitimate interest in running and
+            improving the shop, to see where the site is confusing. Browsers sending Global Privacy Control or Do Not Track
+            signals aren&apos;t counted. When you place an order we note the visit&apos;s random number on the order so we can
+            count it as &quot;paid&quot;, and nothing more.
           </p>
         </Sub>
         <p>
@@ -214,6 +225,8 @@ export default function PrivacyPage() {
             ],
             ["Emails and support messages", "2 years after the matter is resolved"],
             ["Server technical logs", "Up to 30 days, kept by our hosting provider"],
+            ["Anonymous usage statistics", "About 13 months, then deleted automatically"],
+            ["Error reports (what went wrong, on which page, browser type)", "Until the problem is fixed, and at most 12 months"],
             ["Sign-in cookie", <>Up to {SESSION_DAYS} days, or until you sign out (see our <In href="/legal/cookies">Cookie policy</In>)</>],
           ]}
         />

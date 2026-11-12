@@ -7,6 +7,7 @@ import type { Design } from "@/lib/types";
 import { describeOptions, getRegion, guessRegion, itemPrice, money, priceLines, REGIONS, SHIPPING, type PrintOptions, type RegionId, type ShippingId } from "@/lib/products";
 import PrintOptionsPicker from "@/components/PrintOptionsPicker";
 import { sizeNote } from "@/lib/legibility";
+import { track, visitId } from "@/lib/track";
 
 const FramedPoster = dynamic(() => import("@/components/FramedPoster"), { ssr: false });
 const WallPreview = dynamic(() => import("@/components/WallPreview"), { ssr: false });
@@ -31,6 +32,7 @@ export default function Checkout({ design: saved }: { design: Design }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   useEffect(() => setRegion(storedRegion()), []);
+  useEffect(() => track("checkout_view"), []);
   // Signed-in customers: fill in their email.
   useEffect(() => {
     fetch("/api/auth/me").then((r) => r.json()).then((j) => j.user?.email && setEmail((e) => e || j.user.email)).catch(() => {});
@@ -42,9 +44,10 @@ export default function Checkout({ design: saved }: { design: Design }) {
   const total = item + ship.price[region];
 
   const pay = async () => {
+    track("pay_click", { region, framed: opts.frame !== "none", size: opts.productId });
     setBusy(true);
     setErr("");
-    const r = await fetch("/api/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ designId: saved.id, email, shipping, region, options: opts }) });
+    const r = await fetch("/api/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ designId: saved.id, email, shipping, region, options: opts, visitId: visitId() }) });
     const j = await r.json();
     if (!r.ok) return setErr(j.error ?? "Something went wrong"), setBusy(false);
     window.location.href = j.url;
@@ -122,6 +125,7 @@ export default function Checkout({ design: saved }: { design: Design }) {
           <button onClick={pay} disabled={busy} className="w-full rounded-full bg-coral py-4 text-lg font-extrabold text-white shadow-lg shadow-coral/30 hover:bg-coral-dark disabled:opacity-50">
             {busy ? "One moment…" : `Pay ${money(region, total)}`}
           </button>
+          <p className="text-xs text-center text-ink/50 font-bold">Got a discount code? You can add it on the next page.</p>
           <p className="text-xs text-center text-ink/40">Secure payment by Stripe · Printed locally in {getRegion(region).label} · Made to order</p>
         </div>
       </main>

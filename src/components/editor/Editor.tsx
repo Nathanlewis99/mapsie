@@ -13,6 +13,7 @@ import { ART_STYLES, stickerSrc, type ArtStyleId } from "@/lib/stickers";
 import { PALETTE_NAMES, getOriginal, type OriginalStyle } from "@/lib/originals";
 import { normalizeDesign, type Design } from "@/lib/types";
 import { TripPanel, StylePanel, StickersPanel, TextPanel, SizePanel } from "./Panels";
+import { track } from "@/lib/track";
 
 const TABS = [
   { id: "trip", label: "Trip", icon: "🧭" },
@@ -80,6 +81,7 @@ export default function Editor() {
       });
       if (!r.ok) throw new Error();
       st.setSaved((await r.json()).id);
+      track("saved_design");
       setToast("Saved to your account ✓");
     } catch {
       setToast("Couldn't save, please try again.");
@@ -230,6 +232,26 @@ export default function Editor() {
     if (!locked) setZoom({ k: 1, x: 0, y: 0 });
   }, [locked]);
 
+  // Funnel analytics (anonymous): opened the editor, added a stop, made it their own.
+  const firstLook = useRef<string | null>(null);
+  const stopCount = useRef<number | null>(null);
+  useEffect(() => track("editor_open"), []);
+  useEffect(() => {
+    if (stopCount.current !== null && design.stops.length > stopCount.current) track("stop_added");
+    stopCount.current = design.stops.length;
+  }, [design.stops.length]);
+  const lookKey = JSON.stringify([design.theme, design.text, design.title, design.subtitle, design.stickers.length, design.markers, design.font]);
+  useEffect(() => {
+    if (firstLook.current !== null && firstLook.current !== lookKey) track("customised");
+    firstLook.current = lookKey;
+  }, [lookKey]);
+  useEffect(() => {
+    if (wall) track("wall_preview");
+  }, [wall]);
+  useEffect(() => {
+    if (locked) track("lock_framing");
+  }, [locked]);
+
   const aspect = posterAspect(design.productId, design.orientation);
   const pad = box.w < 640 ? 24 : 56;
   const fitW = Math.min(box.w - pad, (box.h - pad) / aspect);
@@ -238,6 +260,7 @@ export default function Editor() {
   const price = itemPrice(design, region);
 
   const order = async () => {
+    track("order_click");
     setBusy("order");
     try {
       const id = await saveSnapshot(design);
@@ -255,6 +278,7 @@ export default function Editor() {
       const url = `${location.origin}/d/${id}`;
       if (navigator.share && matchMedia("(pointer: coarse)").matches) await navigator.share({ title: design.title, url }).catch(() => {});
       else await navigator.clipboard.writeText(url).catch(() => {});
+      track("shared");
       setToast("Link copied! Anyone with it can see your map.");
     } catch {
       setToast("Couldn't create a link, please try again.");

@@ -7,7 +7,7 @@ import { normalizeDesign } from "@/lib/types";
 import { currentUser } from "@/lib/server/auth";
 
 export async function POST(req: Request) {
-  const body = (await req.json()) as { designId: string; email: string; shipping: ShippingId; region: RegionId; options?: Partial<PrintOptions> };
+  const body = (await req.json()) as { designId: string; email: string; shipping: ShippingId; region: RegionId; options?: Partial<PrintOptions>; visitId?: string };
   const raw = await getDesign(body.designId);
   if (!raw) return NextResponse.json({ error: "Design not found" }, { status: 404 });
   if (!/^\S+@\S+\.\S+$/.test(body.email ?? "")) return NextResponse.json({ error: "Please enter a valid email" }, { status: 400 });
@@ -41,6 +41,7 @@ export async function POST(req: Request) {
     currency: region.currency,
     total: item + ship.price[region.id],
     status: "pending_payment",
+    visitId: typeof body.visitId === "string" && /^[a-z0-9]{8,40}$/.test(body.visitId) ? body.visitId : undefined,
     createdAt: new Date().toISOString(),
   };
   await saveOrder(order);
@@ -55,6 +56,8 @@ export async function POST(req: Request) {
   const cents = (n: number) => Math.round(n * 100);
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
+    // Discount codes are created in the Stripe dashboard (Products > Coupons > promotion codes).
+    allow_promotion_codes: true,
     customer_email: body.email,
     line_items: [
       {

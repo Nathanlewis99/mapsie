@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getOrder, updateOrder } from "@/lib/server/db";
 import { getProdigiOrder } from "@/lib/server/prodigi";
 import { callbackTokenValid } from "@/lib/server/printToken";
+import { logError } from "@/lib/server/log";
 
 // Prodigi calls this when one of our orders changes (in production, shipped, etc.).
 // The URL carries a signed token per order, and we re-read the order from
@@ -13,7 +14,7 @@ export async function POST(req: Request) {
   const order = await getOrder(orderId);
   if (!order?.printProviderOrderId) return NextResponse.json({ ok: true });
   const p = await getProdigiOrder(order.printProviderOrderId).catch((e) => {
-    console.error("[prodigi-callback]", e);
+    void logError("prodigi.callback", e, { orderId });
     return null;
   });
   if (!p) return NextResponse.json({ ok: true });

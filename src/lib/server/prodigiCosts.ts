@@ -81,6 +81,8 @@ export async function refreshCosts(): Promise<CostTable> {
       handle(buf);
     }
   }
+  const prev = await getCosts();
+  if (prev) await noteCostChanges(prev.value, table);
   await putKv(KV_KEY, table);
   return table;
 }
@@ -121,4 +123,40 @@ export function marginTable(costs: CostTable, region: RegionId): { product: stri
       return { label, price, cost, fee, margin: cost === null ? null : price - cost - fee, vat: region === "GB" ? price / 6 : 0 };
     }),
   }));
+}
+
+export interface CostChange {
+  region: RegionId;
+  sku: string;
+  from: number;
+  to: number;
+  currency: string;
+  at: string;
+}
+const ALERTS_KEY = "prodigi-cost-changes";
+
+/**
+ * Prodigi doesn't publish promotions through its API, but its prices do show
+ * them: when a product gets cheaper by 10% or more we record it, so the admin
+ * page can suggest running a discount of our own. Price rises are recorded too.
+ */
+async function noteCostChanges(prev: CostTable, next: CostTable) {
+  const changes: CostChange[] = [];
+  const at = new Date().toISOString();
+  for (const region of Object.keys(next) as RegionId[]) {
+    for (const [sku, c] of Object.entries(next[region])) {
+      const old = prev[region]?.[sku];
+      if (!old || !old.product) continue;
+      const ratio = c.product / old.product;
+      if (ratio <= 0.9 || ratio >= 1.1) changes.push({ region, sku, from: old.product, to: c.product, currency: c.currency, at });
+    }
+  }
+  if (!changes.length) return;
+  const existing = (await getKv<CostChange[]>(ALERTS_KEY))?.value ?? [];
+  await putKv(ALERTS_KEY, [...changes, ...existing].slice(0, 200));
+  console.log(`[costs] ${changes.length} Prodigi price changes recorded`);
+}
+
+export async function getCostChanges() {
+  return (await getKv<CostChange[]>(ALERTS_KEY))?.value ?? [];
 }

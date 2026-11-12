@@ -49,6 +49,8 @@ export interface Order {
   cancelledAt?: string;
   refunded?: boolean;
   error?: string;
+  /** Anonymous analytics visit that placed the order (for the funnel). */
+  visitId?: string;
   createdAt: string;
 }
 
@@ -129,6 +131,28 @@ const SCHEMA = `
     json TEXT NOT NULL,
     created_at TEXT NOT NULL
   );
+  -- Errors from the server and from customers' browsers, grouped by fingerprint.
+  CREATE TABLE IF NOT EXISTS errors (
+    fingerprint TEXT PRIMARY KEY,
+    source TEXT NOT NULL,
+    scope TEXT NOT NULL,
+    message TEXT NOT NULL,
+    stack TEXT,
+    context TEXT,
+    count INTEGER NOT NULL DEFAULT 1,
+    first_seen TEXT NOT NULL,
+    last_seen TEXT NOT NULL,
+    resolved INTEGER NOT NULL DEFAULT 0
+  );
+  -- Anonymous product analytics: one row per funnel step per visit. No personal data.
+  CREATE TABLE IF NOT EXISTS events (
+    id TEXT PRIMARY KEY,
+    visit_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    props TEXT,
+    at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS events_name_at ON events(name, at);
   -- Small key/value store for settings and cached figures (e.g. Prodigi costs).
   CREATE TABLE IF NOT EXISTS kv (
     key TEXT PRIMARY KEY,
@@ -410,4 +434,57 @@ export async function listOrdersDueForPrint(nowIso: string): Promise<Order[]> {
 /** Delete design snapshots older than the cutoff that no order uses. Returns how many. */
 export async function deleteUnorderedDesigns(beforeIso: string): Promise<number> {
   return run("DELETE FROM designs WHERE created_at < ? AND id NOT IN (SELECT design_id FROM orders WHERE design_id IS NOT NULL)", [beforeIso]);
+}
+
+// ---------------------------------------------------------------- errors
+export interface ErrorRow {
+  fingerprint: string; source: string; scope: string; message: string; stack: string | null;
+  context: string | null; count: number; firstSeen: string; lastSeen: string; resolved: boolean;
+}
+export async function recordError(e: { fingerprint: string; source: string; scope: string; message: string; stack?: string; context?: unknown }) {
+  const t = now();
+  await run(
+    `INSERT INTO errors (fingerprint, source, scope, message, stack, context, count, first_seen, last_seen, resolved) VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, 0)
+     ON CONFLICT (fingerprint) DO UPDATE SET count = errors.count + 1, last_seen = excluded.last_seen, context = excluded.context, stack = excluded.stack, resolved = 0`,
+    [e.fingerprint, e.source, e.scope, e.message.slice(0, 1000), e.stack?.slice(0, 4000) ?? null, e.context ? JSON.stringify(e.context).slice(0, 4000) : null, t, t],
+  );
+}
+export async function listErrors(includeResolved = false): Promise<ErrorRow[]> {
+  const rows = await all(`SELECT * FROM errors ${includeResolved ? "" : "WHERE resolved = 0"} ORDER BY last_seen DESC LIMIT 200`);
+  return rows.map((r) => ({
+    fingerprint: String(r.fingerprint), source: String(r.source), scope: String(r.scope), message: String(r.message),
+    stack: (r.stack as string) ?? null, context: (r.context as string) ?? null, count: Number(r.count),
+    firstSeen: String(r.first_seen), lastSeen: String(r.last_seen), resolved: !!Number(r.resolved),
+  }));
+}
+export async function resolveError(fingerprint: string) {
+  await run("UPDATE errors SET resolved = 1 WHERE fingerprint = ?", [fingerprint]);
+}
+
+// ---------------------------------------------------------------- analytics
+export async function recordEvent(visitId: string, name: string, props?: Record<string, unknown>) {
+  await run("INSERT INTO events (id, visit_id, name, props, at) VALUES (?, ?, ?, ?, ?)", [nanoid(14), visitId, name, props ? JSON.stringify(props) : null, now()]);
+}
+/** For each event name since a time: how many distinct visits did it. */
+export async function eventCounts(sinceIso: string): Promise<Record<string, number>> {
+  const rows = await all("SELECT name, count(DISTINCT visit_id) AS n FROM events WHERE at >= ? GROUP BY name", [sinceIso]);
+  return Object.fromEntries(rows.map((r) => [String(r.name), Number(r.n)]));
+}
+/** Visits since a time with the steps each reached, plus the props of its first event. */
+export async function visitSteps(sinceIso: string): Promise<{ visitId: string; steps: string[]; props: Record<string, unknown> }[]> {
+  const rows = await all("SELECT visit_id, name, props FROM events WHERE at >= ? ORDER BY at", [sinceIso]);
+  const map = new Map<string, { steps: Set<string>; props: Record<string, unknown> }>();
+  for (const r of rows) {
+    const id = String(r.visit_id);
+    let v = map.get(id);
+    if (!v) map.set(id, (v = { steps: new Set(), props: r.props ? JSON.parse(String(r.props)) : {} }));
+    v.steps.add(String(r.name));
+  }
+  return [...map.entries()].map(([visitId, v]) => ({ visitId, steps: [...v.steps], props: v.props }));
+}
+export async function deleteOldEvents(beforeIso: string) {
+  return run("DELETE FROM events WHERE at < ?", [beforeIso]);
+}
+export async function deleteOldErrors(beforeIso: string) {
+  return run("DELETE FROM errors WHERE last_seen < ?", [beforeIso]);
 }

@@ -49,8 +49,8 @@ export interface Product {
 }
 
 export const PRODUCTS: Product[] = [
-  { id: "a4", label: "A4", widthCm: 21, heightCm: 29.7, price: { GB: 34, US: 45, AU: 65 }, framePrice: { GB: 25, US: 35, AU: 49 }, sizeCode: "A4" },
-  { id: "a3", label: "A3", widthCm: 29.7, heightCm: 42, price: { GB: 44, US: 59, AU: 85 }, framePrice: { GB: 35, US: 45, AU: 65 }, sizeCode: "A3" },
+  { id: "a4", label: "A4", widthCm: 21, heightCm: 29.7, price: { GB: 34, US: 45, AU: 65 }, framePrice: { GB: 25, US: 55, AU: 49 }, sizeCode: "A4" },
+  { id: "a3", label: "A3", widthCm: 29.7, heightCm: 42, price: { GB: 44, US: 59, AU: 85 }, framePrice: { GB: 35, US: 59, AU: 65 }, sizeCode: "A3" },
   { id: "a2", label: "A2", widthCm: 42, heightCm: 59.4, price: { GB: 59, US: 79, AU: 115 }, framePrice: { GB: 55, US: 69, AU: 99 }, sizeCode: "A2" },
   { id: "50x70", label: "50 × 70 cm", widthCm: 50, heightCm: 70, price: { GB: 69, US: 89, AU: 129 }, framePrice: { GB: 65, US: 79, AU: 115 }, sizeCode: "20X28" },
   { id: "a1", label: "A1", widthCm: 59.4, heightCm: 84.1, price: { GB: 84, US: 109, AU: 159 }, framePrice: { GB: 80, US: 99, AU: 145 }, sizeCode: "A1" },

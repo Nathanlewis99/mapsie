@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
-import { getCosts, marginTable } from "@/lib/server/prodigiCosts";
+import { getCostChanges, getCosts, marginTable } from "@/lib/server/prodigiCosts";
 import { REGIONS, getRegion, type RegionId } from "@/lib/products";
 import RefreshButton from "./RefreshButton";
 
@@ -15,6 +15,8 @@ export default async function Costs({ searchParams }: { searchParams: Promise<{ 
   const sym = getRegion(region).symbol;
   const costs = await getCosts();
   const table = costs ? marginTable(costs.value, region) : [];
+  const recent = (await getCostChanges()).filter((c) => Date.now() - new Date(c.at).getTime() < 30 * 86400_000);
+  const drops = recent.filter((c) => c.to < c.from);
   return (
     <main className="max-w-6xl mx-auto px-6 py-10 space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -29,6 +31,21 @@ export default async function Costs({ searchParams }: { searchParams: Promise<{ 
         </div>
         <RefreshButton />
       </div>
+      {recent.length > 0 && (
+        <div className={`rounded-2xl p-4 text-sm ${drops.length ? "bg-sea/10" : "bg-amber-100"}`}>
+          <div className="font-extrabold">
+            {drops.length ? `🎉 Prodigi cut ${drops.length} prices in the last 30 days: a good moment for a discount code.` : "Prodigi changed some prices in the last 30 days."}
+          </div>
+          <ul className="mt-1 text-xs text-ink/70">
+            {recent.slice(0, 12).map((c, i) => (
+              <li key={i}>
+                {c.region} {c.sku}: {c.from.toFixed(2)} → {c.to.toFixed(2)} {c.currency} ({new Date(c.at).toLocaleDateString("en-GB")})
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-ink/60 mt-1">Make codes in Stripe: Products → Coupons → add a promotion code. Customers enter them on the payment page.</p>
+        </div>
+      )}
       <div className="flex flex-wrap gap-2 text-sm font-bold">
         {REGIONS.map((r) => (
           <Link key={r.id} href={`?region=${r.id}${vat ? "&vat=1" : ""}`} className={`rounded-full px-4 py-1.5 border-2 ${r.id === region ? "border-coral bg-white" : "border-ink/10"}`}>

@@ -21,6 +21,7 @@ export default function CookiesPage() {
           <li>We use one sign-in cookie (plus a few short-lived ones while you sign in), and only if you sign in.</li>
           <li>Your browser&apos;s local storage autosaves the map you&apos;re designing, so you don&apos;t lose your work.</li>
           <li>We don&apos;t use analytics, advertising or social media cookies, so there&apos;s no cookie banner to click through.</li>
+          <li>We count visits anonymously without storing anything on your device (see below).</li>
         </ul>
       </Summary>
 
@@ -72,9 +73,15 @@ export default function CookiesPage() {
           technology. We don&apos;t build profiles of what you do on the site.
         </p>
         <p>
-          If we ever want to add anything that isn&apos;t strictly necessary (for example, analytics to understand how people
-          use the designer), we&apos;ll update this page and our <In href="/legal/privacy">Privacy Policy</In> first, and ask
-          for your consent before setting it.
+          To see which parts of the site work and where people get stuck, we count anonymous steps such as &quot;opened the
+          designer&quot; and &quot;reached checkout&quot;. This uses a random number that exists only while the page is open: it
+          isn&apos;t stored in a cookie or anywhere else on your device, it isn&apos;t linked to your name, email or IP address,
+          and it&apos;s gone when you close or reload the page. If your browser sends a Global Privacy Control or Do Not Track
+          signal, we don&apos;t count your visit at all. See our <In href="/legal/privacy">Privacy Policy</In>.
+        </p>
+        <p>
+          If we ever want to add anything that isn&apos;t strictly necessary, we&apos;ll update this page and our Privacy Policy
+          first, and ask for your consent before setting it.
         </p>
       </Section>
 

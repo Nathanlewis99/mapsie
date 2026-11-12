@@ -7,3 +7,15 @@ export async function register() {
     startScheduler();
   }
 }
+
+// Any uncaught error while handling a request or rendering a page.
+export async function onRequestError(
+  err: unknown,
+  request: { path: string; method: string },
+  context: { routerKind: string; routePath: string; routeType: string },
+) {
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    const { logError } = await import("./lib/server/log");
+    await logError(`request.${context.routeType}`, err, { path: request.path, method: request.method, route: context.routePath });
+  }
+}

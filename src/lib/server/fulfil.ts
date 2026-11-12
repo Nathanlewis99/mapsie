@@ -1,8 +1,9 @@
-import { claimOrder, getDesign, getOrder, listOrdersByStatus, updateOrder, type Address, type Order } from "./db";
+import { claimOrder, getDesign, getOrder, listOrdersByStatus, recordEvent, updateOrder, type Address, type Order } from "./db";
 import { normalizeDesign } from "../types";
 import { renderDesign, FALLBACK } from "./render";
 import { publicUrl } from "./urls";
 import { submitPrintOrder } from "./prodigi";
+import { logError } from "./log";
 
 /** Minutes after payment during which the customer can cancel. */
 export const HOLD_MINUTES = Number(process.env.ORDER_HOLD_MINUTES ?? 60);
@@ -28,6 +29,8 @@ export async function fulfilOrder(orderId: string, address: Address, extra: Part
     holdUntil: new Date(now.getTime() + HOLD_MINUTES * 60_000).toISOString(),
     ...extra,
   });
+  const paid = await getOrder(orderId);
+  if (paid?.visitId) await recordEvent(paid.visitId, "paid", { total: paid.total, currency: paid.currency }).catch(() => {});
   if (ROLE !== "web") void processPaidOrders();
 }
 
@@ -69,7 +72,7 @@ async function renderOrder(order: Order) {
     });
     if (HOLD_MINUTES <= 0) await sendToPrint(orderId);
   } catch (e) {
-    console.error("[fulfil]", e);
+    await logError("order.render", e, { orderId });
     await updateOrder(orderId, { status: "failed", error: String(e) });
   }
 }
@@ -86,7 +89,7 @@ export async function sendToPrint(orderId: string) {
     const sent = await submitPrintOrder(order, normalizeDesign(raw), order.address, assetUrl);
     await updateOrder(orderId, { status: "submitted", printProviderOrderId: sent.id, error: undefined });
   } catch (e) {
-    console.error("[print]", e);
+    await logError("order.print", e, { orderId });
     await updateOrder(orderId, { status: "failed", error: String(e) });
   }
 }

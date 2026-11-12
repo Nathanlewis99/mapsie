@@ -3,6 +3,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { COMPANY } from "@/lib/company";
+import { track } from "@/lib/track";
 
 interface Status {
   status: string;
@@ -58,7 +59,10 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
     setCancelErr("");
     const r = await fetch(`/api/orders/${orderId}/cancel`, { method: "POST" });
     const j = await r.json();
-    if (r.ok) setO((x) => (x ? { ...x, status: "cancelled", refunded: j.refunded, canCancel: false } : x));
+    if (r.ok) {
+      track("order_cancelled");
+      setO((x) => (x ? { ...x, status: "cancelled", refunded: j.refunded, canCancel: false } : x));
+    }
     else setCancelErr(j.error ?? "Couldn't cancel. Please email us.");
     setBusy(false);
     setConfirming(false);

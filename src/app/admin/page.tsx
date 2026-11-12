@@ -29,6 +29,8 @@ export default async function Admin() {
           <h1 className="text-3xl font-extrabold mt-2">Orders</h1>
           <div className="flex flex-wrap gap-4">
             <Link href="/admin/costs" className="text-sm font-bold text-coral-dark">Costs &amp; margins →</Link>
+            <Link href="/admin/errors" className="text-sm font-bold text-coral-dark">Errors →</Link>
+            <Link href="/admin/funnel" className="text-sm font-bold text-coral-dark">Funnel →</Link>
             <a href="/api/admin/prodigi-check" className="text-sm font-bold text-coral-dark">Check our print options against Prodigi&apos;s catalogue →</a>
           </div>
         </div>

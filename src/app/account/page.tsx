@@ -64,20 +64,23 @@ export default async function Account() {
                 const d = normalizeDesign(s.design);
                 const c = d.theme.colors;
                 return (
-                  <li key={s.id} className="rounded-3xl bg-white shadow-sm overflow-hidden flex flex-col">
-                    <Link href={`/create?saved=${s.id}`} className="block h-28 relative overflow-hidden" style={{ background: c.land }} aria-label={`Open ${s.title}`}>
+                  <li key={s.id} className="group relative rounded-3xl bg-white shadow-sm overflow-hidden flex flex-col transition hover:shadow-lg hover:-translate-y-0.5 focus-within:ring-2 focus-within:ring-coral">
+                    <div className="h-28 relative overflow-hidden" style={{ background: c.land }}>
                       <span className="absolute -right-6 -bottom-8 w-32 h-24 rounded-full" style={{ background: c.water }} />
                       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 90" preserveAspectRatio="none" aria-hidden>
                         <path d="M14 70 Q 70 10 120 40 T 186 22" fill="none" stroke={c.accent} strokeWidth="3" strokeDasharray="6 5" strokeLinecap="round" />
                       </svg>
                       <span className="absolute left-3 bottom-2 font-display font-extrabold text-lg" style={{ color: c.ink }}>{s.title}</span>
-                    </Link>
+                    </div>
                     <div className="p-4 flex-1 flex flex-col gap-2">
                       <p className="text-sm text-ink/60 line-clamp-2">{d.stops.map((x) => x.name).join(" → ") || "No stops yet"}</p>
                       <div className="mt-auto flex items-center justify-between text-sm">
                         <span className="text-ink/40">Edited {date(s.updatedAt)}</span>
-                        <span className="flex gap-3">
-                          <Link href={`/create?saved=${s.id}`} className="font-extrabold text-coral">Open</Link>
+                        <span className="flex items-center gap-1">
+                          {/* The whole card opens the map: this link's hit area covers it. */}
+                          <Link href={`/create?saved=${s.id}`} className="font-extrabold text-coral px-2 outline-none after:absolute after:inset-0 after:content-['']" aria-label={`Open ${s.title}`}>
+                            Open
+                          </Link>
                           <DeleteDesignButton id={s.id} title={s.title} />
                         </span>
                       </div>

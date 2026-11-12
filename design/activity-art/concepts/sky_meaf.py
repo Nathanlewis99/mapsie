@@ -1142,7 +1142,7 @@ CONCEPTS = [
     C("sky-lagos", "skyline-lagos", "Lagos", lagos, NO_SEA_GOLD, LAGOS,
       [("tw", "mid"), ("tw3", "mid"), ("glass", "mid"), ("tw3", "sky"), ("deck", "near"), ("danfo", "near"), ("far", "sky"), ("cap", "near"), ("shore", "near")]),
     C("sky-accra", "skyline-accra", "Accra", accra, NO_SEA_GOLD, ACCRA,
-      [("gate", "mid"), ("star", "glow"), ("tw", "mid"), ("light", "mid"), ("lred", "sky"), ("lred", "mid"), ("far", "sky"), ("mid", "far")],
+      [("gate", "mid"), ("star", "glow"), ("tw", "mid"), ("light", "mid"), ("lred", "sky"), ("lred", "mid"), ("mid", "far")],
       fx(mid=["near"])),
     C("sky-amman", "skyline-amman", "Amman", amman, None, AMMAN,
       [("stone", "mid"), ("stone", "sky"), ("blue", "mid"), ("stone", "hill"), ("far", "sky"), ("mid", "far")],

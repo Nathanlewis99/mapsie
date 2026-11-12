@@ -118,7 +118,19 @@ export const useEditor = create<EditorState>()(
         setColors: (patch) =>
           commit((d) => ({ ...d, theme: { ...d.theme, presetId: "custom", colors: { ...d.theme.colors, ...patch } } }), "colors"),
         // Panning/zooming isn't an undo step.
-        setView: (view) => set((s) => ({ design: { ...s.design, view } })),
+        // Re-framing the map is a change worth saving, but the map also reports its view
+        // on load and when the editor resizes; compare the framing independent of width.
+        setView: (view) =>
+          set((s) => {
+            const a = s.design.view;
+            const z = (v: Design["view"]) => v.zoom - Math.log2(v.refWidth || 1);
+            const moved =
+              Math.abs(a.center[0] - view.center[0]) > 1e-5 ||
+              Math.abs(a.center[1] - view.center[1]) > 1e-5 ||
+              Math.abs(z(a) - z(view)) > 1e-3 ||
+              Math.abs(a.bearing - view.bearing) > 0.01;
+            return { design: { ...s.design, view }, ...(moved ? { dirty: true } : {}) };
+          }),
 
         addStop: (stop) => get().addStops([stop]),
         addStops: (list) => {
@@ -183,13 +195,13 @@ export const useEditor = create<EditorState>()(
           const { past, future, design } = get();
           const prev = past[past.length - 1];
           if (!prev) return;
-          set({ design: { ...prev, view: design.view }, past: past.slice(0, -1), future: [snap(design), ...future], lastCommit: { key: "", at: 0 } });
+          set({ design: { ...prev, view: design.view }, past: past.slice(0, -1), future: [snap(design), ...future], lastCommit: { key: "", at: 0 }, dirty: true });
         },
         redo: () => {
           const { past, future, design } = get();
           const next = future[0];
           if (!next) return;
-          set({ design: { ...next, view: design.view }, past: [...past, snap(design)], future: future.slice(1), lastCommit: { key: "", at: 0 } });
+          set({ design: { ...next, view: design.view }, past: [...past, snap(design)], future: future.slice(1), lastCommit: { key: "", at: 0 }, dirty: true });
         },
 
         reset: () => commit(() => newDesign(), "edit", { selectedSticker: null, savedId: null }),

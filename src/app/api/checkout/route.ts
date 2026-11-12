@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   };
   await saveOrder(order);
 
-  const base = process.env.APP_URL ?? new URL(req.url).origin;
+  const base = process.env.APP_URL ?? process.env.RENDER_EXTERNAL_URL ?? new URL(req.url).origin;
   if (!process.env.STRIPE_SECRET_KEY) {
     // No Stripe keys yet: use the built-in test checkout.
     return NextResponse.json({ url: `${base}/checkout/test/${order.id}` });

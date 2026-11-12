@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+data
+design/activity-art/out
+design/activity-art/**/__pycache__
+*.log
+.env*

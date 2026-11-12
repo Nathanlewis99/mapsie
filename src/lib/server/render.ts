@@ -3,6 +3,7 @@ import { promises as fs } from "fs";
 import type { Design } from "../types";
 import { posterAspect, printPixels, PRINT_DPI } from "../products";
 import { rendersDir } from "./db";
+import { internalUrl } from "./urls";
 
 // How it works: a headless browser lays the poster out at the same CSS width the
 // customer designed at, with the pixel density raised to hit 300 dpi.
@@ -15,26 +16,40 @@ import { rendersDir } from "./db";
 //  2. A single screenshot taller than ~8192 px wraps around. So we capture the
 //     poster in horizontal strips and stitch them together.
 const GL_MAX = Number(process.env.PRINT_MAX_PX ?? 7680);
-const STRIP_PX = 4000;
+const STRIP_PX = Number(process.env.PRINT_STRIP_PX ?? 4000); // smaller strips use less memory
 
-export async function renderDesign(design: Design, fileName: string) {
+export interface RenderOptions {
+  glMax?: number; // largest map canvas, px
+  stripPx?: number; // screenshot strip height, device px
+}
+
+/** Lighter settings for a retry after a failed render (low-memory machines). */
+export const FALLBACK: RenderOptions = { glMax: Math.min(GL_MAX, 4096), stripPx: Math.min(STRIP_PX, 1200) };
+
+export async function renderDesign(design: Design, fileName: string, opts: RenderOptions = {}) {
+  const glMax = opts.glMax ?? GL_MAX;
+  const stripPx = opts.stripPx ?? STRIP_PX;
   const { chromium } = await import("playwright");
   const sharp = (await import("sharp")).default;
   const target = printPixels(design.productId, design.orientation);
   const cssW = design.view.refWidth;
   const cssH = Math.round(cssW * posterAspect(design.productId, design.orientation));
   const scale = target.width / cssW;
-  const stripCss = Math.max(1, Math.floor(STRIP_PX / scale));
+  const stripCss = Math.max(1, Math.floor(stripPx / scale));
 
-  const browser = await chromium.launch({ args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
+  // --disable-dev-shm-usage: containers often have a tiny /dev/shm, which makes
+  // large screenshots crawl or crash. Use normal temp space instead.
+  const browser = await chromium.launch({
+    args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--disable-dev-shm-usage"],
+  });
   try {
     // The viewport is only one strip tall; the poster's size doesn't depend on it.
     const page = await browser.newPage({ viewport: { width: cssW, height: stripCss }, deviceScaleFactor: scale });
-    await page.addInitScript((max) => (window.__MAPSIE_GLMAX = max), GL_MAX);
-    const base = process.env.APP_URL ?? "http://localhost:3000";
-    await page.goto(`${base}/print/${design.id}`, { waitUntil: "networkidle", timeout: 180_000 });
+    await page.addInitScript((max) => (window.__MAPSIE_GLMAX = max), glMax);
+    const base = internalUrl();
+    await page.goto(`${base}/print/${design.id}`, { waitUntil: "networkidle", timeout: 300_000 });
     // Poll on a timer: at print density each animation frame is slow.
-    await page.waitForFunction(() => window.__MAPSIE_READY === true || !!window.__MAPSIE_ERROR, null, { timeout: 240_000, polling: 1000 });
+    await page.waitForFunction(() => window.__MAPSIE_READY === true || !!window.__MAPSIE_ERROR, null, { timeout: 420_000, polling: 1000 });
     const failed = await page.evaluate(() => window.__MAPSIE_ERROR);
     if (failed) throw new Error(`Map failed to render: ${failed}`);
 
@@ -48,7 +63,7 @@ export async function renderDesign(design: Design, fileName: string) {
         el.style.transform = `translateY(${-offset}px)`;
         return new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       }, y);
-      const shot = await page.screenshot({ type: "png", timeout: 120_000 });
+      const shot = await page.screenshot({ type: "png", timeout: 300_000 });
       const top = Math.round(y * scale);
       const h = Math.min((await sharp(shot).metadata()).height!, height - top);
       if (h <= 0) break;
@@ -62,7 +77,7 @@ export async function renderDesign(design: Design, fileName: string) {
       .png({ compressionLevel: 6 })
       .toFile(out);
 
-    const mapDpi = Math.round(Math.min(1, GL_MAX / Math.max(width, height)) * PRINT_DPI);
+    const mapDpi = Math.round(Math.min(1, glMax / Math.max(width, height)) * PRINT_DPI);
     const stat = await fs.stat(out);
     return { file: fileName, width, height, dpi: PRINT_DPI, mapDpi, bytes: stat.size };
   } finally {

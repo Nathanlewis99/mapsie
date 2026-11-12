@@ -5,7 +5,8 @@ import type { ShippingId, RegionId } from "../products";
 
 // MVP storage: JSON files on disk. Swap for Supabase/Postgres + object storage
 // before deploying (Vercel's disk is not persistent).
-const ROOT = path.join(process.cwd(), "data");
+// DATA_DIR points at a persistent disk in production (see render.yaml).
+const ROOT = process.env.DATA_DIR ?? path.join(process.cwd(), "data");
 const dir = async (name: string) => {
   const d = path.join(ROOT, name);
   await fs.mkdir(d, { recursive: true });

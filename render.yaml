@@ -1,0 +1,35 @@
+# Render blueprint: in the Render dashboard choose New > Blueprint and pick this repo.
+services:
+  - type: web
+    name: mapsie
+    runtime: docker
+    plan: standard          # 2 GB RAM: the print renderer runs a headless browser
+    region: frankfurt       # closest Render region to the UK
+    branch: main
+    autoDeploy: true        # every push to main redeploys
+    healthCheckPath: /
+    disk:
+      name: mapsie-data     # orders, saved designs and print files
+      mountPath: /var/data
+      sizeGB: 5
+    envVars:
+      - key: DATA_DIR
+        value: /var/data
+      - key: ADMIN_PASSWORD   # for /admin (user name can be anything)
+        generateValue: true
+      - key: PRODIGI_ENV
+        value: sandbox
+      # Print render settings sized for the 2 GB "standard" plan: the map layer of
+      # A2 and larger prints is drawn at up to 5120 px (A1 map ≈ 155 dpi; text,
+      # stickers and markers stay 300 dpi). On a 4 GB plan use 7680 and 4000.
+      - key: PRINT_MAX_PX
+        value: "5120"
+      - key: PRINT_STRIP_PX
+        value: "2000"
+      # Leave these empty to run in test mode (test checkout, print orders only logged).
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: PRODIGI_API_KEY
+        sync: false

@@ -459,6 +459,9 @@ def horseshoe_bend(d: Drawing):
     if d.paper:
         d.limb("c3", path, 20)
     d.limb("river", path, 11, spot=True)
+    # the far rim hides where the river comes from
+    d.shape("c2", "M-30 46 H230 V56 Q100 60 -30 56Z")
+    d.stroke("c3", "M-30 52 Q100 55 230 52", 1.4, line=False)
     d.stroke("river2", smooth([(44, 92), (40, 118), (54, 146), (84, 162)]) + " " + smooth([(158, 96), (160, 122), (146, 146), (118, 160)]), 1.4, line=False)
     # the butte: its banded wall facing us, then the rounded top
     butte = [(76, 56), (60, 74), (52, 104), (60, 136), (100, 154), (140, 136), (148, 104), (140, 74), (124, 56)]

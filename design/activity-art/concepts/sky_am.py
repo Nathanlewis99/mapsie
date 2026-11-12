@@ -403,6 +403,8 @@ def rio(d: Drawing):
     d.marks("pop", rrect(134, 89, 5, 4, 1))
     # city along the shore
     d.shape("town", blocks(W + 6, [(8, 12), (10, 18), (8, 10), (12, 16), (10, 12), (8, 20), (10, 14), (8, 9)], 30), line=False)
+    d.marks("rock2", " ".join(rrect(x, y, 2, 2, .4) for x, y in [(33, W - 3), (41, W - 9), (43, W - 3), (51, W - 1), (59, W - 7), (61, W - 1),
+                                                                 (71, W - 3), (79, W - 11), (81, W - 5), (89, W - 3), (99, W - 6)]) if d.paper else "")
     water(d, W + 4, deep=False)
     # Copacabana beach with palms
     d.band("sand", "M-30 176 Q60 160 230 172")
@@ -727,10 +729,10 @@ def washington(d: Drawing):
     water(d, W, front, [(76, 168, 14), (110, 174, 16)])
     # cherry blossoms at the water's edge
     d.band("grass", "M-30 184 Q100 176 230 184")
-    d.limb("trunk", "M26 188 Q28 176 20 166 M24 178 L36 168 M174 188 Q172 176 180 166 M176 178 L164 168", 3)
-    for cx, cy, r in [(10, 160, 13), (24, 152, 13), (38, 160, 11), (22, 166, 10), (190, 160, 13), (176, 152, 13), (162, 160, 11), (178, 166, 10)]:
-        d.shape("blossom", circle(cx, cy, r), spot=True, shadow=cy == 152)
-    d.marks("blossom2", " ".join(circle(x, y, 1.8) for x, y in [(16, 150), (28, 158), (8, 164), (36, 156), (184, 150), (172, 158), (192, 164), (164, 156)]))
+    d.limb("trunk", "M46 186 Q46 176 40 168 M45 178 L54 170 M154 186 Q154 176 160 168 M155 178 L146 170", 3)
+    for cx, cy, r in [(32, 166, 11), (44, 158, 12), (56, 166, 10), (42, 170, 9), (168, 166, 11), (156, 158, 12), (144, 166, 10), (158, 170, 9)]:
+        d.shape("blossom", circle(cx, cy, r), spot=True, shadow=cy == 158)
+    d.marks("blossom2", " ".join(circle(x, y, 1.7) for x, y in [(38, 156), (50, 162), (32, 170), (56, 170), (162, 156), (150, 162), (168, 170), (144, 170)]))
 
 
 # ================================================================ NASHVILLE
@@ -901,8 +903,8 @@ def mexico_city(d: Drawing):
     d.band("near", f"M-30 {W} H230")
     d.band("road", f"M-30 {W + 12} H230")
     d.stroke("light", " ".join(f"M{x} {W + 20} h12" for x in range(4, 200, 26)), 2)
-    d.limb("trunk", f"M24 {W + 22} L22 {W - 2} M176 {W + 22} L178 {W - 2}", 3)
-    for cx, cy, r in [(12, W - 4, 11), (26, W - 12, 12), (38, W - 2, 10), (22, W + 2, 9), (188, W - 4, 11), (174, W - 12, 12), (162, W - 2, 10), (178, W + 2, 9)]:
+    d.limb("trunk", f"M40 {W + 22} L38 {W - 2} M160 {W + 22} L162 {W - 2}", 3)
+    for cx, cy, r in [(28, W - 4, 11), (40, W - 12, 12), (52, W - 4, 10), (38, W + 2, 9), (172, W - 4, 11), (160, W - 12, 12), (148, W - 4, 10), (162, W + 2, 9)]:
         d.shape("jac", circle(cx, cy, r), spot=True, shadow=cy == W - 12)
     d.band("deep", hills(W + 30, 2), line=False)
 
@@ -945,8 +947,6 @@ def havana(d: Drawing):
     d.band("wall", f"M-30 {W - 12} H230")
     d.band("wall2", f"M-30 {W - 4} H230", line=False)
     d.band("sea", f"M-30 {W + 2} H230")
-    d.shape("light", "M140 156 Q142 146 148 147 Q150 138 157 142 Q162 134 167 141 Q174 140 173 148 Q178 150 176 156Z")
-    d.marks("light", circle(150, 136, 1.6) + " " + circle(164, 131, 1.4) + " " + circle(174, 138, 1.2))
     d.band("sea2", waves(W + 24, 2, 24), line=False)
     d.stroke("light", "M40 170 h20 M100 176 h16 M150 184 h22", 2)
     # vintage car on the Malecon

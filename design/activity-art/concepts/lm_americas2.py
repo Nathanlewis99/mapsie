@@ -125,10 +125,10 @@ def teotihuacan(d: Drawing):
         d.shape("stone2", poly((100 + wt / 2 - 12, yt), (100 + wt / 2, yt), (100 + wb / 2, yb), (100 + wb / 2 - 14, yb)), shadow=False, line=False)
         d.stroke("stone3", " ".join(f"M{100 - wb / 2 + 4 + k * (wb - wt) / 8:.1f} {yb - 4 - k * (yb - yt) / 4:.1f} H{100 + wb / 2 - 4 - k * (wb - wt) / 8:.1f}"
                                     for k in range(3)), 0.9, line=False)
-        d.shape("ledge", rrect(100 - wt / 2 - 1, yt - 2, wt + 2, 3, 1), shadow=False)
+        d.shape("ledge", rrect(100 - wt / 2 - 1, yt - 2, wt + 2, 3, 1), shadow=False, line=False)
     d.shape("stone2", poly((91, 166), (95, 84), (105, 84), (109, 166)))
     d.stroke("stone3", " ".join(f"M{91.5 + i * .27:.1f} {162 - i * 5:.1f} H{108.5 - i * .27:.1f}" for i in range(16)), 1.1, line=False)
-    d.shape("ledge", " ".join(rrect(92 + k, y, 16 - 2 * k, 3, 1) for k, y in [(0, 138), (1, 114), (2, 96)]), shadow=False)
+    d.shape("ledge", " ".join(rrect(92 + k, y, 16 - 2 * k, 3, 1) for k, y in [(0, 138), (1, 114), (2, 96)]), shadow=False, line=False)
     # Avenue of the Dead running towards us, platforms along it
     d.shape("dry2", "M84 168 H116 L136 210 H64Z", spot=True)
     d.shape("stone", poly((26, 186), (32, 174), (52, 174), (56, 186)) + " " + poly((144, 186), (148, 174), (168, 174), (174, 186)))
@@ -451,16 +451,13 @@ BEND = {"c1": "#ECB27A", "c2": "#D6874F", "c3": "#B2613B", "c4": "#80402B", "c5"
 def horseshoe_bend(d: Drawing):
     d.disc("glow", 152, 36, 13)
     d.band("haze", "M-30 52 L30 51 L36 44 H56 L62 50 L140 50 L146 42 H168 L174 50 L230 52")
-    # the far rim, banded
-    d.band("c2", "M-30 58 H230")
-    d.stroke("c3", "M-30 63 H230", 1.6, line=False)
-    d.band("c1", "M-30 68 H230", line=False)
+    d.band("c1", "M-30 58 H230", line=False)
     d.stroke("c2", "M-30 86 Q20 80 40 90 M170 90 Q190 80 230 86 M-30 126 Q0 120 20 132 M200 130 Q210 120 230 124", 1.6, line=False)
     # the river makes an omega loop round the butte, the neck far away at the top
-    loop = [(70, 56), (48, 74), (36, 106), (46, 144), (100, 168), (154, 144), (164, 106), (152, 74), (130, 56)]
+    loop = [(74, 48), (54, 70), (38, 104), (46, 144), (100, 168), (154, 144), (162, 104), (146, 70), (126, 48)]
     path = smooth(loop)
-    d.limb("c4", path, 26, shadow=False)
-    d.limb("c3", path, 20)
+    if d.paper:
+        d.limb("c3", path, 20)
     d.limb("river", path, 11, spot=True)
     d.stroke("river2", smooth([(44, 92), (40, 118), (54, 146), (84, 162)]) + " " + smooth([(158, 96), (160, 122), (146, 146), (118, 160)]), 1.4, line=False)
     # the butte: its banded wall facing us, then the rounded top
@@ -470,6 +467,8 @@ def horseshoe_bend(d: Drawing):
              " " + smooth([(146, 96), (140, 124), (120, 140)]), 1.4, line=False)
     top = [(80, 56), (66, 74), (62, 100), (72, 124), (100, 134), (128, 124), (138, 100), (134, 74), (120, 56)]
     d.shape("c1", smooth(top) + " Z", shadow=False)
+    if not d.paper:
+        d.stroke("dark", smooth([(60, 116), (74, 140), (100, 148), (126, 140), (140, 116)]), 1.6)
     d.shape("c2", smooth([(70, 92), (76, 114), (100, 124), (124, 114), (130, 92)]) + " Q100 102 70 92Z", shadow=False, line=False)
     # the overlook we stand on
     d.shape("c4", "M-30 200 V170 Q10 168 40 178 Q62 186 78 200Z M230 200 V164 Q190 166 160 180 Q144 188 136 200Z")

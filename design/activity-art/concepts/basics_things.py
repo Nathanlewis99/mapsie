@@ -82,7 +82,7 @@ def road(d: Drawing, y=150):
 # ================================================================ CAR
 @framed
 def car(d: Drawing):
-    d.disc("glow", 100, 96, 66)
+    d.disc("glow", 100, 96, 66, line=False)
     d.shape("light", cloud(28, 62, 0.8), shadow=False)
     road(d, 152)
     body = ("M38 144 Q28 144 28 132 V122 Q28 106 46 104 L60 102 Q68 66 100 64 Q132 64 142 100 L156 104 "
@@ -107,7 +107,7 @@ def car(d: Drawing):
 # ================================================================ CONVERTIBLE
 @framed
 def convertible(d: Drawing):
-    d.disc("glow", 100, 100, 62)
+    d.disc("glow", 100, 100, 62, line=False)
     d.band("far", hills(132, 8, 10))
     palm(d, 160, 136, 0.9, "near", 8)
     palm(d, 36, 138, 0.7, "near", -6)
@@ -186,7 +186,7 @@ def speedboat(d: Drawing):
 # ================================================================ TRAIN
 @framed
 def train(d: Drawing):
-    d.disc("glow", 100, 100, 66)
+    d.disc("glow", 100, 100, 66, line=False)
     d.shape("light", cloud(116, 40, 1.0))
     d.shape("light", cloud(150, 26, 0.7))
     d.band("far", hills(140, 8, 10))
@@ -238,7 +238,7 @@ def plane(d: Drawing):
 # ================================================================ BICYCLE
 @framed
 def bicycle(d: Drawing):
-    d.disc("glow", 100, 96, 62)
+    d.disc("glow", 100, 96, 62, line=False)
     d.band("far", hills(130, 8, -10))
     d.band("ground", "M-30 156 Q100 150 230 156")
     rear, front, y = (54, 132), (146, 132), 132
@@ -267,7 +267,7 @@ def bicycle(d: Drawing):
 # ================================================================ MOTORBIKE
 @framed
 def motorbike(d: Drawing):
-    d.disc("glow", 100, 96, 64)
+    d.disc("glow", 100, 96, 64, line=False)
     d.band("far", hills(124, 8, 20))
     d.band("ground", "M-30 150 Q100 144 230 150")
     y = 132
@@ -302,7 +302,7 @@ def motorbike(d: Drawing):
 # ================================================================ BUS
 @framed
 def bus(d: Drawing):
-    d.disc("glow", 100, 96, 66)
+    d.disc("glow", 100, 96, 66, line=False)
     d.shape("light", cloud(130, 40, 0.8), shadow=False)
     road(d, 150)
     body = "M30 140 Q22 140 22 132 V66 Q22 54 36 54 H158 Q174 54 178 70 L182 132 Q182 140 174 140Z"
@@ -312,8 +312,7 @@ def bus(d: Drawing):
     for x in range(30, 130, 26):
         d.shape("light", rrect(x, 64, 20, 30, 4), shadow=False)
     d.shape("light", rrect(134, 64, 22, 64, 4), shadow=False)
-    d.stroke("hero", "M145 64 V128", 1.6, line=False)
-    d.stroke("dark", "M145 64 V128", 1.4, line=True) if False else None
+    d.stroke("hero", "M145 64 V128", 1.6)
     d.shape("light", "M162 64 H170 Q176 64 177 72 L179 94 H162Z", shadow=False)
     d.shape("glow2", ellipse(179, 124, 3, 5), shadow=False)
     d.shape("pop", rrect(22, 100, 4, 10, 2), shadow=False)
@@ -327,7 +326,7 @@ def bus(d: Drawing):
 # ================================================================ SUITCASE
 @framed
 def suitcase(d: Drawing):
-    d.disc("glow", 100, 100, 70)
+    d.disc("glow", 100, 100, 70, line=False)
     d.shape("dark", "M80 52 Q80 38 92 38 H108 Q120 38 120 52 V58 H112 V50 Q112 46 108 46 H92 Q88 46 88 50 V58 H80Z")
     d.shape("hero", rrect(36, 56, 128, 98, 12))
     d.shape("hero2", rrect(36, 56, 128, 14, 7), shadow=False)
@@ -352,18 +351,17 @@ def suitcase(d: Drawing):
 # ================================================================ BACKPACK
 @framed
 def backpack(d: Drawing):
-    d.disc("glow", 100, 100, 70)
+    d.disc("glow", 100, 100, 70, line=False)
     # rolled mat on top
-    d.shape("hero2", rrect(50, 30, 100, 22, 11), spot=True)
-    d.stroke("dark", "M66 30 V52 M134 30 V52", 2.6)
-    d.stroke("dark", ellipse(146, 41, 3.5, 8), 1.4, line=False)
+    d.shape("hero2", rrect(50, 26, 100, 22, 11), spot=True)
+    d.stroke("dark", "M66 26 V48 M134 26 V48", 2.6)
+    d.stroke("dark", ellipse(146, 37, 3.5, 8), 1.4, line=False)
     # side straps / pockets
     d.shape("hero2", rrect(32, 96, 18, 50, 7))
     d.shape("hero2", rrect(150, 96, 18, 50, 7))
     d.shape("hero", "M46 70 Q46 52 66 50 H134 Q154 52 154 70 V156 Q154 166 144 166 H56 Q46 166 46 156Z")
     # lid
     d.shape("hero", "M44 72 Q44 48 70 46 H130 Q156 48 156 72 Q156 84 146 86 H54 Q44 84 44 72Z")
-    d.shape("dark", "M44 72 Q44 48 70 46 H130 Q156 48 156 72", shadow=False, line=False, extra='opacity="0"')
     d.stroke("dark", "M86 86 V104 M114 86 V104", 3.2)
     d.shape("dark", rrect(81, 100, 10, 8, 2), shadow=False)
     d.shape("dark", rrect(109, 100, 10, 8, 2), shadow=False)
@@ -371,13 +369,12 @@ def backpack(d: Drawing):
     d.shape("hero2", "M62 118 Q62 112 70 112 H130 Q138 112 138 118 V150 Q138 158 130 158 H70 Q62 158 62 150Z", spot=True)
     d.stroke("dark", "M66 122 Q100 128 134 122", 1.8)
     d.marks("dark", rrect(97, 124, 6, 8, 2))
-    d.stroke("dark", "M100 46 V40 M92 40 Q100 30 108 40", 3)
 
 
 # ================================================================ CAMERA
 @framed
 def camera(d: Drawing):
-    d.disc("glow", 100, 100, 70)
+    d.disc("glow", 100, 100, 70, line=False)
     d.stroke("dark", "M32 86 Q20 150 70 160 M168 86 Q180 150 130 160", 3.2, shadow=True)
     d.shape("dark", rrect(76, 48, 40, 20, 5))
     d.shape("dark", rrect(126, 54, 18, 12, 3))
@@ -415,7 +412,7 @@ def tent(d: Drawing):
 # ================================================================ COCKTAIL
 @framed
 def cocktail(d: Drawing):
-    d.disc("glow", 100, 100, 70)
+    d.disc("glow", 100, 100, 70, line=False)
     # umbrella + straw behind glass rim
     d.stroke("dark", "M112 70 L136 34", 2.6)
     d.shape("pop", "M116 26 Q138 18 156 40 L136 34Z", spot=True)
@@ -437,7 +434,7 @@ def cocktail(d: Drawing):
 # ================================================================ BEER
 @framed
 def beer(d: Drawing):
-    d.disc("glow", 100, 100, 70)
+    d.disc("glow", 100, 100, 70, line=False)
     # handle
     d.limb("light", "M140 80 H150 Q166 80 166 96 V114 Q166 130 150 130 H140", 9)
     d.shape("light", "M50 64 H140 L136 160 Q136 166 130 166 H60 Q54 166 54 160Z")
@@ -464,7 +461,7 @@ def wine_glass(d: Drawing, x, y, s=1.0, rot=0, wine="pop"):
 
 @framed
 def wine(d: Drawing):
-    d.disc("glow", 100, 100, 70)
+    d.disc("glow", 100, 100, 70, line=False)
     # bottle
     d.shape("hero", "M66 34 H80 V60 Q94 70 94 92 V160 Q94 166 88 166 H58 Q52 166 52 160 V92 Q52 70 66 60Z")
     d.shape("pop", rrect(64, 28, 18, 10, 2), spot=True)
@@ -478,7 +475,7 @@ def wine(d: Drawing):
 # ================================================================ COFFEE
 @framed
 def coffee(d: Drawing):
-    d.disc("glow", 100, 100, 70)
+    d.disc("glow", 100, 100, 70, line=False)
     steam(d, [84, 100, 116], 66, 30)
     d.shape("hero2", ellipse(100, 150, 64, 14))
     d.shape("dark", ellipse(100, 146, 34, 6), shadow=False, line=False)
@@ -518,7 +515,7 @@ def noodles(d: Drawing):
 # ================================================================ BURGER
 @framed
 def burger(d: Drawing):
-    d.disc("glow", 100, 100, 72)
+    d.disc("glow", 100, 100, 72, line=False)
     d.shape("hero2", "M34 140 H166 Q166 162 146 162 H54 Q34 162 34 140Z")
     d.shape("mark", rrect(30, 118, 140, 22, 11))
     d.shape("pop", "M30 112 Q40 124 52 114 Q64 126 76 114 Q88 126 100 114 Q112 126 124 114 Q136 126 148 114 Q160 126 170 112 V118 H30Z")
@@ -529,13 +526,13 @@ def burger(d: Drawing):
     d.shape("hero2", "M30 100 Q30 44 100 44 Q170 44 170 100 Q170 106 164 106 H36 Q30 106 30 100Z")
     d.stroke("light", "M52 72 Q60 58 76 54", 4, line=False)
     for x, y, r in [(70, 66, -20), (92, 58, 0), (116, 60, 15), (136, 70, 30), (84, 80, -10), (110, 78, 10), (128, 88, 25), (58, 88, -30)]:
-        d.marks("light", ellipse(x, y, 3.4, 1.8).replace("Z", "Z") if False else f"M{x-3.4} {y} a3.4 1.8 {r} 1 0 6.8 0 a3.4 1.8 {r} 1 0 -6.8 0Z")
+        d.marks("light", f"M{x-3.4} {y} a3.4 1.8 {r} 1 0 6.8 0 a3.4 1.8 {r} 1 0 -6.8 0Z")
 
 
 # ================================================================ CHICKEN
 @framed
 def chicken(d: Drawing):
-    d.disc("glow", 100, 96, 66)
+    d.disc("glow", 100, 96, 66, line=False)
     d.band("far", hills(140, 6, 10))
     d.stroke("dark", "M-30 128 H230 M-30 144 H230", 3, line=False)
     for x in (14, 186):
@@ -596,7 +593,7 @@ def cow(d: Drawing):
 # ================================================================ DOG
 @framed
 def dog(d: Drawing):
-    d.disc("glow", 100, 100, 70)
+    d.disc("glow", 100, 100, 70, line=False)
     d.band("ground", "M-30 168 Q100 162 230 168")
     # tail
     d.limb("hero", "M134 150 Q160 140 160 112", 8)
@@ -692,12 +689,11 @@ def compass_rose(d: Drawing):
 # ================================================================ COMPASS: baseplate hiking compass
 @framed
 def compass_baseplate(d: Drawing):
-    d.disc("glow", 100, 100, 72)
+    d.disc("glow", 100, 100, 72, line=False)
     d.stroke("far", "M20 150 Q60 120 100 140 T180 128 M30 166 Q70 140 110 156 T190 146 M14 70 Q40 56 64 70", 2, line=False)
 
     def plate():
         d.shape("light", "M76 18 H124 Q134 18 134 28 V172 Q134 184 122 184 H78 Q66 184 66 172 V28 Q66 18 76 18Z")
-        d.shape("sky2", "M76 18 H124 Q134 18 134 28 V172 Q134 184 122 184 H78 Q66 184 66 172 V28 Q66 18 76 18Z", shadow=False, line=False, extra='opacity=".0"')
         d.shape("pop", "M100 26 L110 48 H90Z", shadow=False, spot=True)
         d.stroke("dark", "M100 50 V70", 2.4)
         d.stroke("dark", "M70 34 H76 M70 44 H74 M70 54 H76 M70 64 H74 M70 74 H76 M124 34 H130 M126 44 H130 M124 54 H130 M126 64 H130 M124 74 H130", 1.4)
@@ -715,7 +711,7 @@ def compass_baseplate(d: Drawing):
         d.shape("dark", "M100 124 L106 126 L100 152Z M100 124 L94 122 L100 152Z", shadow=False)
         d.marks("hero", circle(100, 124, 3.4))
         d.marks("dark", circle(100, 174, 4))
-    group(d, "rotate(-24 100 100) translate(100 100) scale(.95) translate(-100 -100)", plate)
+    group(d, "rotate(-24 100 100) translate(100 100) scale(.84) translate(-100 -100)", plate)
 
 
 # ================================================================ concepts

@@ -791,7 +791,7 @@ def prague(d: Drawing):
     layer(d, "far", [F("M-30 170 V112 Q20 96 60 104 Q90 112 120 118 V170Z"),
                      *towers([(120, 12, 106, "g"), (184, 12, 110, "r")])], line=False)
     layer(d, "near", towers([(98, 12, 112, "g"), (110, 10, 118, "r"), (178, 16, 116, "g"), (132, 12, 116, "d")]), lw=2)
-    hill = F("M-30 170 V122 Q-8 112 6 110 H90 Q104 116 112 132 V170Z")
+    hill = F("M-30 170 V122 Q-8 112 6 110 H84 Q96 118 104 140 V170Z")
     castle = F(rect(4, 100, 42, 14))
     front = [hill, castle, F(poly((4, 100), (6, 96), (44, 96), (46, 100))), *st_vitus(42, 112), *tyn(160, 146),
              F(rect(108, 138, 70, 16))]
@@ -884,7 +884,7 @@ def parliament_hu(x, base, w=98):
 
 def chain_bridge(x0, x1, deck, top):
     def pylon(px):
-        return [FE(rect(px - 8, top, 16, 160 - top) + " " + arch(px - 4.5, deck - 18, 9, 18) + " " + rect(px - 4.5, deck + 4, 9, 20)),
+        return [FE(rect(px - 8, top, 16, deck + 6 - top) + " " + arch(px - 4.5, deck - 18, 9, 18)), F(rect(px - 9, deck + 6, 18, 14)),
                 F(rect(px - 9, top - 3, 18, 4))]
     xa, xb = x0 + 14, x1 - 14
     mid = (xa + xb) / 2
@@ -905,7 +905,7 @@ def budapest(d: Drawing):
     layer(d, "deep", front)
     lights(d, [(x, 128, 2, 5) for x in range(92, 186, 6) if not 124 < x < 150] + [(x, 138, 2, 4) for x in range(92, 186, 6)])
     water(d, y0, front, glints=((20, 10), (110, 16), (160, 12)))
-    layer(d, "deep", chain_bridge(-4, 70, 132, 100), lw=2.6)
+    layer(d, "deep", chain_bridge(8, 80, 132, 102), lw=2.6)
 
 
 # ================================================================ EDINBURGH
@@ -1152,18 +1152,18 @@ def parthenon(x, base, w=64):
 
 
 def athens(d: Drawing):
-    d.disc("glow", 60, 58, 14)
-    d.shape("light", cloud(110, 34, .7), line=False)
+    d.disc("glow", 108, 52, 13)
+    d.shape("light", cloud(16, 62, .7), line=False)
     lyc = [F("M100 170 V128 Q130 112 146 82 Q152 72 158 82 Q172 110 200 124 L230 130 V170Z"),
            F(rect(148, 72, 10, 8)), F(tri(153, 72.5, 11, 5)), F(rect(155, 66, 3, 7)), S("M156.5 66 V61 M154.5 63 H158.5", 1)]
     layer(d, "far", lyc, line=False)
     layer(d, "near", towers([(-6, 18, 126, "r"), (100, 14, 128, "r"), (116, 12, 124, "r"), (182, 16, 124, "r")]), lw=2)
-    rock = F("M-30 170 V138 Q-4 132 6 122 L14 108 Q18 104 26 104 H100 Q108 104 112 110 L120 124 Q130 136 150 142 V170Z")
+    rock = F("M-30 170 V142 Q-4 138 6 130 L14 120 Q18 116 26 116 H100 Q108 116 112 122 L120 134 Q130 140 150 144 V170Z")
     zeus = [F(rect(140, 132, 46, 4)), *[F(rect(142 + i * 7, 112, 4, 20)) for i in range(6)],
             F(rect(141, 109, 34, 4)), F(rect(176, 118, 4, 14))]
-    front = [rock, *parthenon(30, 104), *zeus, F(rect(-30, 146, 260, 10))]
+    front = [rock, *parthenon(32, 116, 60), *zeus, F(rect(-30, 146, 260, 10))]
     layer(d, "deep", front)
-    ink(d, "near", "M30 120 L42 128 M76 112 L90 120 M100 114 L108 126", 1.4, line=False)
+    ink(d, "near", "M24 128 L36 136 M76 124 L90 132 M100 124 L108 136", 1.4, line=False)
     blocks = [F(rect(x, y, w, 170 - y)) for x, y, w in [(-10, 150, 22), (14, 152, 18), (34, 148, 20), (56, 152, 18), (76, 146, 22),
                                                          (100, 150, 20), (122, 148, 18), (142, 152, 22), (166, 148, 18), (186, 152, 20)]]
     layer(d, "mid", blocks, line=False)

@@ -1,6 +1,18 @@
 "use client";
 import Poster from "./Poster";
 import { FRAMES, MOUNTS, getProduct, posterAspect } from "@/lib/products";
+import type { PaperId } from "@/lib/types";
+
+/** How strongly each paper's texture shows (a little less in the editor than on the wall). */
+const PAPER_OPACITY: Record<PaperId, number> = { ema: 0.22, hpr: 0.4, hge: 0.55, lpp: 0.6 };
+
+/** How the ink sits on each paper: matte papers are a little softer, lustre a little richer. */
+const INK: Record<PaperId, string> = {
+  ema: "saturate(0.94) contrast(0.96)",
+  hpr: "saturate(0.88) contrast(0.93) brightness(0.99)",
+  hge: "saturate(0.88) contrast(0.92) brightness(0.99)",
+  lpp: "saturate(1.03) contrast(1.02)",
+};
 import type { CSSProperties, ComponentProps } from "react";
 
 type D = { frame: string; mount?: string; productId: string; orientation: "portrait" | "landscape" };
@@ -64,6 +76,8 @@ export default function FramedPoster(props: ComponentProps<typeof Poster> & { sh
   const scaled = !editable && Math.abs(width - ref) > 1;
   const h = width * posterAspect(design.productId, design.orientation);
   const unit = width / 100;
+  // Framed prints are always on Matte art (Prodigi's A-size frames use it).
+  const paper: PaperId = framed ? "ema" : (design.paper ?? "ema");
 
   const wallShadow = realistic
     ? // light from the left: a tight contact shadow plus a soft one falling down and right
@@ -78,8 +92,8 @@ export default function FramedPoster(props: ComponentProps<typeof Poster> & { sh
         height: h,
         overflow: "hidden",
         position: "relative",
-        // printed ink is a little softer and less saturated than a screen
-        filter: realistic ? "saturate(0.9) contrast(0.94) brightness(0.98)" : undefined,
+        // printed ink is a little softer than a screen, and differs by paper
+        filter: realistic ? `${INK[paper]} brightness(0.98)` : INK[paper],
       }}
     >
       {scaled ? (
@@ -89,7 +103,8 @@ export default function FramedPoster(props: ComponentProps<typeof Poster> & { sh
       ) : (
         <Poster {...rest} />
       )}
-      {realistic && <div aria-hidden className="mapsie-print-paper absolute inset-0 pointer-events-none" />}
+      {/* the paper itself: its tooth, texture or sheen (never part of the print file) */}
+      <div aria-hidden className={`mapsie-paper-look paper-${paper}`} style={{ opacity: PAPER_OPACITY[paper] * (realistic ? 1 : 0.7) }} />
     </div>
   );
 

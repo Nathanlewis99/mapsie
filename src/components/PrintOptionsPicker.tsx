@@ -21,6 +21,8 @@ export default function PrintOptionsPicker({
   const p = getProduct(value.productId);
   const framed = value.frame !== "none";
   const fp = p.framePrice[region];
+  // Prodigi's A-size frames only use Matte art.
+  const shownPaper = framed ? "ema" : value.paper;
   return (
     <div className="space-y-5">
       {showSizes && (
@@ -66,7 +68,35 @@ export default function PrintOptionsPicker({
         )}
       </div>
 
-      {framed ? (
+        <div>
+          <Heading>Paper</Heading>
+          {framed && <p className="text-xs text-ink/50 -mt-1 mb-2">Framed prints come on Matte art. Choose “No frame” to pick another paper.</p>}
+          <div className="space-y-2">
+            {PAPERS.map((x) => (
+              <button
+                key={x.id}
+                onClick={() => onChange({ paper: x.id })}
+                disabled={framed && x.id !== "ema"}
+                className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left disabled:opacity-40 disabled:cursor-not-allowed ${card(shownPaper === x.id)}`}
+              >
+                <span>
+                  <span className="font-bold block">{x.label}</span>
+                  <span className="text-[11px] font-bold text-ink/45 block">{x.spec}</span>
+                  {shownPaper === x.id ? (
+                    <>
+                      <span className="text-xs text-ink/70 block mt-1">{x.detail}</span>
+                      <span className="text-xs font-bold text-sea block mt-1">Best for: {x.bestFor}</span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-ink/50 block">{x.bestFor}</span>
+                  )}
+                </span>
+                <span className="font-extrabold text-sm shrink-0">{x.extra ? `+${money(region, Math.round(p.price[region] * x.extra))}` : "Included"}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      {framed && (
         <>
           <div>
             <Heading>Mount</Heading>
@@ -100,29 +130,6 @@ export default function PrintOptionsPicker({
             </div>
           </div>}
         </>
-      ) : (
-        <div>
-          <Heading>Paper</Heading>
-          <div className="space-y-2">
-            {PAPERS.map((x) => (
-              <button key={x.id} onClick={() => onChange({ paper: x.id })} className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left ${card(value.paper === x.id)}`}>
-                <span>
-                  <span className="font-bold block">{x.label}</span>
-                  <span className="text-[11px] font-bold text-ink/45 block">{x.spec}</span>
-                  {value.paper === x.id ? (
-                    <>
-                      <span className="text-xs text-ink/70 block mt-1">{x.detail}</span>
-                      <span className="text-xs font-bold text-sea block mt-1">Best for: {x.bestFor}</span>
-                    </>
-                  ) : (
-                    <span className="text-xs text-ink/50 block">{x.bestFor}</span>
-                  )}
-                </span>
-                <span className="font-extrabold text-sm shrink-0">{x.extra ? `+${money(region, Math.round(p.price[region] * x.extra))}` : "Included"}</span>
-              </button>
-            ))}
-          </div>
-        </div>
       )}
     </div>
   );

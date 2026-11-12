@@ -180,9 +180,28 @@ body {
 .maplibregl-canvas { outline: none; }
 .mapsie-stop:has(.mapsie-stop-label.is-selected) { z-index: 10; }
 
-/* "On the wall": a printed sheet has a faint paper tooth and isn't perfectly even */
-.mapsie-print-paper {
+/* How each Prodigi paper looks: drawn over the poster in previews and on the wall
+   (never in the print file itself). */
+.mapsie-paper-look { position: absolute; inset: 0; pointer-events: none; }
+.paper-ema {
   mix-blend-mode: multiply;
-  opacity: 0.35;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.47  0 0 0 0 0.42  0 0 0 0.35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.48  0 0 0 0 0.45  0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.paper-hpr {
+  mix-blend-mode: multiply;
+  background-color: rgb(250 244 232 / 0.55);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.55  0 0 0 0 0.5  0 0 0 0 0.42  0 0 0 0.45 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.paper-hge {
+  mix-blend-mode: multiply;
+  background-color: rgb(250 246 236 / 0.4);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.09' numOctaves='3' seed='4' stitchTiles='stitch'/><feDiffuseLighting lighting-color='white' surfaceScale='2.2'><feDistantLight azimuth='225' elevation='55'/></feDiffuseLighting></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 120px 120px;
+}
+.paper-lpp {
+  mix-blend-mode: soft-light;
+  background-image:
+    linear-gradient(120deg, rgb(255 255 255 / 0.35) 0%, rgb(255 255 255 / 0) 35%, rgb(255 255 255 / 0) 60%, rgb(255 255 255 / 0.18) 75%, rgb(255 255 255 / 0) 90%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='1' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.6  0 0 0 0 0.6  0 0 0 0 0.6  0 0 0 0.35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 100% 100%, 120px 120px;
 }

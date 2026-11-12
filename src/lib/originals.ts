@@ -1,3 +1,4 @@
+import { rank } from "./search";
 import catalogue from "./originals.json";
 
 // Mapsie Originals: our own activity artwork, drawn in design/activity-art and
@@ -80,13 +81,14 @@ export function originalSrc(id: string, style: OriginalStyle, palette: string): 
   return `/stickers/originals/${id}/${style}-${pick}.svg`;
 }
 
+/** Concepts matching a search, most relevant first (see lib/search.ts). */
 export function searchOriginals(q: string): OriginalDef[] {
-  const words = q.toLowerCase().trim().split(/\s+/).filter(Boolean);
-  if (!words.length) return ORIGINALS;
-  return ORIGINALS.filter((o) => {
-    const hay = `${o.label} ${o.title} ${o.category} ${o.keywords ?? ""} ${o.tags ?? ""} ${o.activity.replace(/-/g, " ")}`.toLowerCase();
-    return words.every((w) => hay.includes(w));
-  });
+  if (!q.trim()) return ORIGINALS;
+  return rank(ORIGINALS, q, (o) => ({
+    name: o.title,
+    tags: `${o.label} ${o.tags ?? ""}`,
+    extra: `${o.category} ${o.keywords ?? ""} ${o.activity.replace(/-/g, " ")}`,
+  }));
 }
 
 export const LANDMARK_REGIONS: Record<string, string> = {

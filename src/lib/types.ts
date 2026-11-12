@@ -77,7 +77,11 @@ export interface MapDetails {
   currents: boolean; // major ocean currents
   lanes: boolean; // shipping lanes
   compass: boolean; // compass rose
+  compassStyle?: CompassStyle;
+  compassCorner?: "br" | "bl" | "tr" | "tl";
 }
+
+export type CompassStyle = "classic" | "nautical" | "minimal" | "vintage";
 
 export const NO_DETAILS: MapDetails = { grid: false, tropics: false, currents: false, lanes: false, compass: false };
 

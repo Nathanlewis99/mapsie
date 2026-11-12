@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import { useId } from "react";
 import StickerFilters from "./StickerFilters";
-import { DEFAULT_TEXT, type Design, type TextCase } from "@/lib/types";
+import { DEFAULT_TEXT, type CompassStyle, type Design, type TextCase } from "@/lib/types";
 import { posterAspect } from "@/lib/products";
 import { fontBold, fontCss } from "@/lib/fonts";
 import type { MapHandlers } from "./MapView";
@@ -153,7 +153,9 @@ export default function Poster({ design, width, editable = false, print, selecte
           frozen={frozen}
           filterPrefix={filterPrefix}
         />
-        {design.theme.details?.compass && <Compass u={u} ink={c.ink} accent={c.accent} paper={c.paper} />}
+        {design.theme.details?.compass && (
+          <Compass u={u} ink={c.ink} accent={c.accent} paper={c.paper} variant={design.theme.details.compassStyle} corner={design.theme.details.compassCorner} />
+        )}
       </div>
 
       {mapOnly ? null : design.layout !== "overlay" ? (
@@ -180,24 +182,87 @@ export default function Poster({ design, width, editable = false, print, selecte
   );
 }
 
-/** A classic compass rose for the corner of the map. */
-function Compass({ u, ink, accent, paper }: { u: number; ink: string; accent: string; paper: string }) {
-  const long = (a: number, fill: string) => <path d="M0 -44 L7 0 L0 0 Z M0 -44 L-7 0 L0 0 Z" fill={fill} transform={`rotate(${a})`} />;
+/** Compass roses for the corner of the map, in a few styles. */
+export function Compass({ u, ink, accent, paper, variant = "classic", corner = "br", size = 11, inline = false }: {
+  u: number; ink: string; accent: string; paper: string; variant?: CompassStyle; corner?: "br" | "bl" | "tr" | "tl"; size?: number; inline?: boolean;
+}) {
+  const pos = inline
+    ? { width: "100%", height: "100%" }
+    : { [corner[1] === "r" ? "right" : "left"]: u * 3, [corner[0] === "b" ? "bottom" : "top"]: u * 3, width: u * size, height: u * size };
+  const serif = { fontFamily: "var(--f-playfair), serif" };
+  const N = (y: number, fs = 13) => <text y={y} textAnchor="middle" fontSize={fs} fontWeight="700" fill={ink} style={serif}>N</text>;
+  const half = (a: number, len: number, w: number, fill: string, op = 1) => (
+    <path key={`${a}-${len}`} d={`M0 ${-len} L${w} 0 L0 0 Z`} fill={fill} fillOpacity={op} transform={`rotate(${a})`} />
+  );
+  const star = (a: number, len: number, w: number, dark: string, light: string) => (
+    <g key={`s${a}-${len}`}>
+      {half(a, len, w, dark)}
+      <path d={`M0 ${-len} L${-w} 0 L0 0 Z`} fill={light} transform={`rotate(${a})`} />
+    </g>
+  );
+  let body: React.ReactNode;
+  if (variant === "minimal") {
+    body = (
+      <>
+        <path d="M0 -40 L11 22 L0 12 L-11 22 Z" fill={ink} />
+        <path d="M0 -40 L0 12 L-11 22 Z" fill={accent} />
+        {N(-46, 15)}
+      </>
+    );
+  } else if (variant === "nautical") {
+    // 32-point mariner's rose with a fleur-de-lis north.
+    body = (
+      <>
+        <circle r="40" fill={paper} fillOpacity="0.6" stroke={ink} strokeWidth="1.2" />
+        <circle r="36" fill="none" stroke={ink} strokeOpacity="0.5" strokeWidth="0.6" />
+        {Array.from({ length: 32 }, (_, i) => i * 11.25).filter((a) => a % 45 !== 0).map((a) => half(a, a % 22.5 === 0 ? 30 : 22, 2.6, ink, 0.45))}
+        {[45, 135, 225, 315].map((a) => star(a, 32, 5, ink, paper))}
+        {[90, 180, 270].map((a) => star(a, 40, 6.5, ink, accent))}
+        {star(0, 40, 6.5, accent, paper)}
+        <path d="M0 -58 C-3 -52 -8 -51 -9 -47 C-5 -48 -2 -47 0 -44 C2 -47 5 -48 9 -47 C8 -51 3 -52 0 -58 Z M-6 -44 H6" fill={accent} stroke={accent} strokeWidth="1.2" />
+        <circle r="3.5" fill={accent} stroke={paper} strokeWidth="1" />
+      </>
+    );
+  } else if (variant === "vintage") {
+    body = (
+      <>
+        <circle r="44" fill={paper} fillOpacity="0.7" stroke={ink} strokeWidth="1.4" />
+        <circle r="39" fill="none" stroke={ink} strokeWidth="0.6" />
+        {Array.from({ length: 72 }, (_, i) => i * 5).map((a) => (
+          <line key={a} y1={-39} y2={a % 30 === 0 ? -33 : -36} stroke={ink} strokeWidth={a % 30 === 0 ? 1 : 0.5} transform={`rotate(${a})`} />
+        ))}
+        {[30, 60, 120, 150, 210, 240, 300, 330].map((a) => (
+          <text key={a} transform={`rotate(${a}) translate(0 -27)`} textAnchor="middle" fontSize="5" fill={ink} fillOpacity="0.7" style={serif}>{a}</text>
+        ))}
+        {[45, 135, 225, 315].map((a) => star(a, 22, 4, ink, paper))}
+        {[0, 90, 180, 270].map((a) => star(a, 31, 5.5, a === 0 ? accent : ink, paper))}
+        <circle r="4" fill={paper} stroke={ink} strokeWidth="1" />
+        {[["N", 0], ["E", 90], ["S", 180], ["W", 270]].map(([l, a]) => (
+          <text key={l} transform={`rotate(${a}) translate(0 -48) rotate(${-Number(a)})`} textAnchor="middle" dominantBaseline="middle" fontSize="9" fontWeight="700" fill={l === "N" ? accent : ink} style={serif}>{l}</text>
+        ))}
+      </>
+    );
+  } else {
+    const long = (a: number, fill: string) => <path d="M0 -44 L7 0 L0 0 Z M0 -44 L-7 0 L0 0 Z" fill={fill} transform={`rotate(${a})`} />;
+    body = (
+      <>
+        <circle r="33" fill={paper} fillOpacity="0.55" stroke={ink} strokeOpacity="0.6" strokeWidth="1" />
+        <circle r="29" fill="none" stroke={ink} strokeOpacity="0.4" strokeWidth="0.6" strokeDasharray="1.5 2.2" />
+        {[45, 135, 225, 315].map((a) => <path key={a} d="M0 -28 L4.5 0 L-4.5 0 Z" fill={ink} fillOpacity="0.55" transform={`rotate(${a})`} />)}
+        {[0, 90, 180, 270].map((a) => (
+          <g key={a}>
+            {long(a, a === 0 ? accent : ink)}
+            <path d="M0 -44 L7 0 L0 0 Z" fill={paper} fillOpacity="0.45" transform={`rotate(${a})`} />
+          </g>
+        ))}
+        <circle r="3" fill={paper} stroke={ink} strokeWidth="1" />
+        {N(-48)}
+      </>
+    );
+  }
   return (
-    <svg viewBox="-60 -62 120 120" className="absolute pointer-events-none" style={{ right: u * 3, bottom: u * 3, width: u * 11, height: u * 11 }}>
-      <circle r="33" fill={paper} fillOpacity="0.55" stroke={ink} strokeOpacity="0.6" strokeWidth="1" />
-      <circle r="29" fill="none" stroke={ink} strokeOpacity="0.4" strokeWidth="0.6" strokeDasharray="1.5 2.2" />
-      {[45, 135, 225, 315].map((a) => (
-        <path key={a} d="M0 -28 L4.5 0 L-4.5 0 Z" fill={ink} fillOpacity="0.55" transform={`rotate(${a})`} />
-      ))}
-      {[0, 90, 180, 270].map((a) => (
-        <g key={a}>
-          {long(a, a === 0 ? accent : ink)}
-          <path d="M0 -44 L7 0 L0 0 Z" fill={paper} fillOpacity="0.45" transform={`rotate(${a})`} />
-        </g>
-      ))}
-      <circle r="3" fill={paper} stroke={ink} strokeWidth="1" />
-      <text y="-48" textAnchor="middle" fontSize="13" fontWeight="700" fill={ink} style={{ fontFamily: "var(--f-playfair), serif" }}>N</text>
+    <svg viewBox="-60 -62 120 120" className={inline ? "" : "absolute pointer-events-none"} style={pos}>
+      {body}
     </svg>
   );
 }

@@ -22,11 +22,13 @@ import {
 import { FONTS } from "@/lib/fonts";
 import { getRegion, REGIONS } from "@/lib/products";
 import PrintOptionsPicker from "@/components/PrintOptionsPicker";
+import { Compass } from "@/components/Poster";
+import { trackSearch } from "@/lib/track";
 import SafeImg from "@/components/SafeImg";
 import { crowding, MIN_STOP_SCALE, readability, recommendedProduct, sizeNote, smallestText, tidyCrowded } from "@/lib/legibility";
 import { getProduct } from "@/lib/products";
 import { TEMPLATES } from "@/lib/templates";
-import type { ThemeColors, Layout, TravelMode, MarkerStyle, RouteStyle, TextStyle, TextCase, FontId } from "@/lib/types";
+import type { CompassStyle, ThemeColors, Layout, TravelMode, MarkerStyle, RouteStyle, TextStyle, TextCase, FontId } from "@/lib/types";
 
 export const Label = ({ children }: { children: React.ReactNode }) => (
   <div className="text-xs font-bold uppercase tracking-wider text-ink/50 mb-2">{children}</div>
@@ -410,6 +412,36 @@ export function StylePanel() {
         <Toggle on={t.details.grid} onChange={(v) => setTheme({ details: { ...t.details, grid: v } })} label="🌐 Latitude & longitude grid" />
         <Toggle on={t.details.tropics} onChange={(v) => setTheme({ details: { ...t.details, tropics: v } })} label="☀️ Equator & tropics" />
         <Toggle on={t.details.compass} onChange={(v) => setTheme({ details: { ...t.details, compass: v } })} label="🧭 Compass rose" />
+        {t.details.compass && (
+          <div className="pb-2">
+            <div className="grid grid-cols-4 gap-2">
+              {(["classic", "nautical", "minimal", "vintage"] as CompassStyle[]).map((v) => (
+                <button
+                  key={v}
+                  title={v}
+                  onClick={() => setTheme({ details: { ...t.details, compassStyle: v } })}
+                  className={`rounded-xl border-2 p-1 ${(t.details.compassStyle ?? "classic") === v ? "border-coral" : "border-ink/10"}`}
+                  style={{ background: t.colors.land }}
+                >
+                  <div className="aspect-square"><Compass inline u={1} ink={t.colors.ink} accent={t.colors.accent} paper={t.colors.paper} variant={v} /></div>
+                  <div className="text-[10px] font-bold capitalize">{v}</div>
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-1 mt-2 text-xs font-bold">
+              {([["tl", "↖"], ["tr", "↗"], ["bl", "↙"], ["br", "↘"]] as const).map(([c, icon]) => (
+                <button
+                  key={c}
+                  onClick={() => setTheme({ details: { ...t.details, compassCorner: c } })}
+                  className={`rounded-full border-2 px-2.5 py-0.5 ${(t.details.compassCorner ?? "br") === c ? "border-coral bg-white" : "border-ink/10"}`}
+                >
+                  {icon}
+                </button>
+              ))}
+              <span className="self-center text-ink/50 ml-1">corner</span>
+            </div>
+          </div>
+        )}
         <Toggle on={t.labels} onChange={(v) => setTheme({ labels: v })} label="🔤 Place names" />
         <Toggle on={t.texture} onChange={(v) => setTheme({ texture: v })} label="📜 Aged paper texture" />
       </div>
@@ -517,10 +549,9 @@ function useMarkerTarget() {
   return design.markers.style === "sticker" && selectedLabel ? design.stops.find((s) => s.id === selectedLabel) : undefined;
 }
 
-function EmojiStickers() {
+function EmojiStickers({ q }: { q: string }) {
   const { design, addSticker, setStickerStyle } = useEditor();
   const at = useDropPoint();
-  const [q, setQ] = useState("");
   const [showAllStyles, setShowAllStyles] = useState(false);
   const style = design.stickerStyle;
   const suggested = suggestedStyleFor(design.theme.presetId);
@@ -556,6 +587,7 @@ function EmojiStickers() {
     <div className="space-y-5">
       <StickerFilters prefix={PANEL_FILTERS} colors={design.theme.colors} />
 
+      {!q && (
       <div>
         <Label>Sticker style</Label>
         <div className="grid grid-cols-3 gap-2">
@@ -585,18 +617,9 @@ function EmojiStickers() {
           </button>
         )}
       </div>
+      )}
 
-      <SuggestionCard />
-
-      <div className="relative">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="🔍 Search stickers: turtle, temple, surf…"
-          className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral"
-        />
-        {q && <button onClick={() => setQ("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/40 font-bold px-2">✕</button>}
-      </div>
+      {!q && <SuggestionCard />}
 
       {q ? (
         <div className="space-y-4">
@@ -678,10 +701,9 @@ function landmarkPoint(id: string, fallback: () => { lng: number; lat: number })
   return o?.lat !== undefined && o.lng !== undefined ? { lng: o.lng, lat: o.lat } : fallback();
 }
 
-function OriginalsPanel() {
+function OriginalsPanel({ q }: { q: string }) {
   const { design, addSticker, setOriginals } = useEditor();
   const at = useDropPoint();
-  const [q, setQ] = useState("");
   const { style, palette } = design.originals;
   const preset = design.theme.presetId;
   const matched = matchedPalette(preset, style);
@@ -731,6 +753,7 @@ function OriginalsPanel() {
 
   return (
     <div className="space-y-5">
+      {!q && (<>
       <div className="rounded-2xl bg-sand/60 p-3 text-sm text-ink/70">
         Our own artwork, drawn for Mapsie. {ORIGINALS.length} designs across {new Set(ORIGINALS.map((o) => o.activity)).size} activities. Tap to add, or drag onto the map.
       </div>
@@ -776,23 +799,19 @@ function OriginalsPanel() {
 
       <ExtrasRow />
 
-      <div className="relative">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="🔍 Search: safari, diving, ramen, skiing…"
-          className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral"
-        />
-        {q && <button onClick={() => setQ("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/40 font-bold px-2">✕</button>}
-      </div>
+      </>)}
 
-      {results.length === 0 && <div className="text-sm text-ink/50">Nothing matches “{q}” yet. Try the activity, like “boat” or “mountain”.</div>}
+      {results.length === 0 && <div className="text-sm text-ink/50">No Mapsie Originals match “{q}” yet. Try the Emoji stickers, or a simpler word like “boat” or “mountain”.</div>}
       {near.length > 0 && (
         <div>
           <Label>📍 On your trip</Label>
           <div className="grid grid-cols-3 gap-2">{near.map(origTile)}</div>
         </div>
       )}
+      {q ? (
+        <div className="grid grid-cols-3 gap-2">{results.map(origTile)}</div>
+      ) : (
+        <>
       {placeSections.map(({ cat, groups }) => (
         <div key={cat}>
           <Label>{cat}</Label>
@@ -823,12 +842,23 @@ function OriginalsPanel() {
           </div>
         </div>
       ))}
+        </>
+      )}
     </div>
   );
 }
 
 export function StickersPanel() {
   const [collection, setCollection] = useState<"originals" | "emoji">("originals");
+  const [q, setQ] = useState("");
+  const counts = q.trim() ? { originals: searchOriginals(q).length, emoji: searchStickers(q).length } : null;
+  // Note what people look for (anonymously), once they pause typing.
+  useEffect(() => {
+    if (!counts) return;
+    const t = setTimeout(() => trackSearch(q, counts.originals + counts.emoji), 1200);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q]);
   const target = useMarkerTarget();
   const { design, selectLabel, updateStop } = useEditor();
   const stickerMarkers = design.markers.style === "sticker";
@@ -847,14 +877,25 @@ export function StickersPanel() {
           Sticker markers are on: tap a stop on the map, then pick its sticker here. Stickers added without a stop selected go on the map as usual.
         </div>
       ) : null}
+      <div className="relative sticky top-0 z-10">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => e.key === "Escape" && setQ("")}
+          placeholder="🔍 Search stickers: car, beach, temple, snake…"
+          className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral shadow-sm"
+        />
+        {q && <button onClick={() => setQ("")} aria-label="Clear search" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/40 font-bold px-2">✕</button>}
+      </div>
       <div className="grid grid-cols-2 gap-1 rounded-full bg-sand/70 p-1">
         {([["originals", "✨ Mapsie Originals"], ["emoji", "😀 Emoji stickers"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setCollection(id)} className={`rounded-full py-2 text-sm font-extrabold transition ${collection === id ? "bg-white shadow-sm" : "text-ink/50"}`}>
             {label}
+            {counts && <span className="ml-1 text-ink/40">· {counts[id]}</span>}
           </button>
         ))}
       </div>
-      {collection === "originals" ? <OriginalsPanel /> : (<><ExtrasRow /><EmojiStickers /></>)}
+      {collection === "originals" ? <OriginalsPanel q={q} /> : (<>{!q && <ExtrasRow />}<EmojiStickers q={q} /></>)}
     </div>
   );
 }

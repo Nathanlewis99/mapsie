@@ -99,7 +99,7 @@ export default function PrivacyPage() {
         <Sub title="Anonymous usage statistics">
           <p>
             We count anonymous steps people take on the site (for example &quot;opened the designer&quot;, &quot;reached
-            checkout&quot;, &quot;paid&quot;), with the website that sent them, the first page they landed on and whether they
+            checkout&quot;, &quot;paid&quot;) and the words typed into the sticker search, with the website that sent them, the first page they landed on and whether they
             used a phone or a computer. Each visit gets a random number that lives only in the open page and isn&apos;t stored
             on your device or linked to your name, email or IP address. We use this, in our legitimate interest in running and
             improving the shop, to see where the site is confusing. Browsers sending Global Privacy Control or Do Not Track

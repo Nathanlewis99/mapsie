@@ -44,3 +44,13 @@ export function trackVisit() {
     device: matchMedia("(pointer: coarse)").matches ? "mobile" : "desktop",
   });
 }
+
+/** A sticker search (sent after the user pauses typing). Not deduplicated: we want every term. */
+export function trackSearch(q: string, results: number) {
+  const v = visitId();
+  const term = q.trim().toLowerCase().slice(0, 60);
+  if (!v || term.length < 2) return;
+  const body = JSON.stringify({ v, name: "search", props: { q: term, results } });
+  if (!navigator.sendBeacon?.("/api/events", new Blob([body], { type: "application/json" })))
+    fetch("/api/events", { method: "POST", body, headers: { "content-type": "application/json" }, keepalive: true }).catch(() => {});
+}

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
-import { visitSteps } from "@/lib/server/db";
+import { topSearches, visitSteps } from "@/lib/server/db";
 import { EXTRA_EVENTS, FUNNEL } from "@/lib/funnel";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +23,7 @@ export default async function Funnel({ searchParams }: { searchParams: Promise<{
     const s = String(v.props.source ?? "unknown");
     bySource.set(s, [...(bySource.get(s) ?? []), v]);
   }
+  const searches = await topSearches(new Date(Date.now() - days * 86400_000).toISOString());
   const sources = [...bySource.entries()].sort((a, b) => b[1].length - a[1].length).slice(0, 12);
   const link = (q: Record<string, string | number>) => `?${new URLSearchParams({ days: String(days), ...(device ? { device } : {}), ...Object.fromEntries(Object.entries(q).map(([k, v]) => [k, String(v)])) })}`;
 
@@ -109,6 +110,21 @@ export default async function Funnel({ searchParams }: { searchParams: Promise<{
             <b>{reached(e)}</b> <span className="text-ink/60">{e.replace(/_/g, " ")}</span>
           </span>
         ))}
+      </div>
+      <div className="rounded-2xl bg-white shadow-sm p-5">
+        <div className="font-extrabold mb-1">Top sticker searches</div>
+        <p className="text-xs text-ink/50 mb-3">What people look for in the Stickers tab. Searches that found nothing (red) are ideas for new artwork.</p>
+        {searches.length === 0 ? (
+          <p className="text-sm text-ink/50">No searches in this period yet.</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {searches.map((s) => (
+              <span key={s.q} className={`rounded-full px-3 py-1 text-sm font-bold ${s.empty === s.n ? "bg-coral/15 text-coral-dark" : "bg-sand/70"}`}>
+                {s.q} <span className="text-ink/50">×{s.n}</span>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
       <p className="text-xs text-ink/50">Tag links with ?utm_source=instagram&amp;utm_campaign=launch to see them as their own source.</p>
     </main>

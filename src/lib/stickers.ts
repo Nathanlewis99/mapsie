@@ -1,3 +1,4 @@
+import { rank } from "./search";
 import catalog from "./sticker-catalog.json";
 import availability from "./sticker-availability.json";
 
@@ -85,14 +86,6 @@ export function stickerSrc(name: string, style: ArtStyleId | undefined): string 
 export const nameFromSrc = (src: string) => /\/stickers\/(?:[a-z]+\/)?([a-z0-9-]+)\.svg$/.exec(src)?.[1];
 
 export function searchStickers(q: string): StickerDef[] {
-  const words = q.toLowerCase().trim().split(/\s+/).filter(Boolean);
-  if (!words.length) return [];
-  return STICKERS.map((s) => {
-    const hay = `${s.label} ${s.name} ${s.keywords} ${s.pack}`.toLowerCase();
-    const score = words.reduce((acc, w) => acc + (s.label.toLowerCase().startsWith(w) ? 3 : hay.includes(w) ? 1 : -99), 0);
-    return { s, score };
-  })
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .map((x) => x.s);
+  if (!q.trim()) return [];
+  return rank(STICKERS, q, (s) => ({ name: `${s.label} ${s.name.replace(/-/g, " ")}`, tags: s.keywords, extra: s.pack }));
 }

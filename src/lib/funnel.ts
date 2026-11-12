@@ -12,5 +12,5 @@ export const FUNNEL = [
 
 export type FunnelStep = (typeof FUNNEL)[number]["id"];
 /** Other events worth counting. */
-export const EXTRA_EVENTS = ["saved_design", "shared", "signed_in", "order_cancelled", "wall_preview", "lock_framing"] as const;
+export const EXTRA_EVENTS = ["search", "saved_design", "shared", "signed_in", "order_cancelled", "wall_preview", "lock_framing"] as const;
 export type TrackEvent = FunnelStep | (typeof EXTRA_EVENTS)[number];

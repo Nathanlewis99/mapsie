@@ -490,3 +490,17 @@ export async function deleteOldEvents(beforeIso: string) {
 export async function deleteOldErrors(beforeIso: string) {
   return run("DELETE FROM errors WHERE last_seen < ?", [beforeIso]);
 }
+/** Most searched terms since a time, with how often they found nothing. */
+export async function topSearches(sinceIso: string, limit = 50): Promise<{ q: string; n: number; empty: number }[]> {
+  const rows = await all("SELECT props FROM events WHERE name = 'search' AND at >= ?", [sinceIso]);
+  const map = new Map<string, { n: number; empty: number }>();
+  for (const r of rows) {
+    const p = JSON.parse(String(r.props ?? "{}")) as { q?: string; results?: string };
+    if (!p.q) continue;
+    const e = map.get(p.q) ?? { n: 0, empty: 0 };
+    e.n++;
+    if (Number(p.results) === 0) e.empty++;
+    map.set(p.q, e);
+  }
+  return [...map.entries()].map(([q, e]) => ({ q, ...e })).sort((a, b) => b.n - a.n).slice(0, limit);
+}

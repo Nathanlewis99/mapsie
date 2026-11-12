@@ -48,6 +48,12 @@ const MATCH: Record<string, Record<OriginalStyle, string>> = {
   tropical: { papercut: "coastal", line: "ocean" },
   midnight: { papercut: "dusk", line: "night" },
   blush: { papercut: "blush", line: "classic" },
+  terrain: { papercut: "meadow", line: "forest" },
+  atlas: { papercut: "golden", line: "classic" },
+  nautical: { papercut: "coastal", line: "ocean" },
+  explorer: { papercut: "golden", line: "forest" },
+  blueprint: { papercut: "dusk", line: "night" },
+  ink: { papercut: "coastal", line: "classic" },
 };
 
 export const matchedPalette = (presetId: string, style: OriginalStyle) => MATCH[presetId]?.[style] ?? (style === "papercut" ? "golden" : "classic");

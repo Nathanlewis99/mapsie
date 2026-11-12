@@ -61,7 +61,21 @@ export interface Theme {
   labels: boolean;
   relief: boolean; // hillshade terrain
   texture: boolean; // paper grain overlay
+  hypso: boolean; // colour land by height (green lowlands to snowy peaks)
+  physical: boolean; // classic atlas shaded-relief base
+  details: MapDetails;
 }
+
+/** Cartographic extras that can be switched on and off. */
+export interface MapDetails {
+  grid: boolean; // lines of latitude and longitude
+  tropics: boolean; // equator, tropics and polar circles
+  currents: boolean; // major ocean currents
+  lanes: boolean; // shipping lanes
+  compass: boolean; // compass rose
+}
+
+export const NO_DETAILS: MapDetails = { grid: false, tropics: false, currents: false, lanes: false, compass: false };
 
 export type RouteStyle = "auto" | "solid" | "dashed" | "dotted";
 export type MarkerStyle = "number" | "dot" | "pin" | "heart";
@@ -103,6 +117,7 @@ export function normalizeDesign(d: Partial<Design> & Pick<Design, "id">): Design
   return {
     ...x,
     frame: x.frame ?? "none",
+    theme: x.theme && { ...x.theme, hypso: x.theme.hypso ?? false, physical: x.theme.physical ?? false, details: { ...NO_DETAILS, ...(x.theme.details ?? {}) } },
     route: { show: r.show ?? true, style: r.style ?? "auto", curved: r.curved ?? true, width: r.width ?? 0.45, modeIcons: r.modeIcons ?? true },
     markers: { style: m.style ?? "number", showDates: m.showDates ?? false, size: m.size ?? 1, labelSize: m.labelSize ?? 1 },
     visited: { show: v.show ?? false, opacity: v.opacity ?? 0.35 },

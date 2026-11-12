@@ -85,6 +85,7 @@ export default function Poster({ design, width, editable = false, print, selecte
           onReady={onReady}
           filterPrefix={filterPrefix}
         />
+        {design.theme.details?.compass && <Compass u={u} ink={c.ink} accent={c.accent} paper={c.paper} />}
       </div>
 
       {design.layout !== "overlay" ? (
@@ -103,5 +104,27 @@ export default function Poster({ design, width, editable = false, print, selecte
       {design.theme.texture && <div className="mapsie-paper pointer-events-none absolute inset-0" />}
 
     </div>
+  );
+}
+
+/** A classic compass rose for the corner of the map. */
+function Compass({ u, ink, accent, paper }: { u: number; ink: string; accent: string; paper: string }) {
+  const long = (a: number, fill: string) => <path d="M0 -44 L7 0 L0 0 Z M0 -44 L-7 0 L0 0 Z" fill={fill} transform={`rotate(${a})`} />;
+  return (
+    <svg viewBox="-60 -62 120 120" className="absolute pointer-events-none" style={{ right: u * 3, bottom: u * 3, width: u * 11, height: u * 11 }}>
+      <circle r="33" fill={paper} fillOpacity="0.55" stroke={ink} strokeOpacity="0.6" strokeWidth="1" />
+      <circle r="29" fill="none" stroke={ink} strokeOpacity="0.4" strokeWidth="0.6" strokeDasharray="1.5 2.2" />
+      {[45, 135, 225, 315].map((a) => (
+        <path key={a} d="M0 -28 L4.5 0 L-4.5 0 Z" fill={ink} fillOpacity="0.55" transform={`rotate(${a})`} />
+      ))}
+      {[0, 90, 180, 270].map((a) => (
+        <g key={a}>
+          {long(a, a === 0 ? accent : ink)}
+          <path d="M0 -44 L7 0 L0 0 Z" fill={paper} fillOpacity="0.45" transform={`rotate(${a})`} />
+        </g>
+      ))}
+      <circle r="3" fill={paper} stroke={ink} strokeWidth="1" />
+      <text y="-48" textAnchor="middle" fontSize="13" fontWeight="700" fill={ink} style={{ fontFamily: "var(--f-playfair), serif" }}>N</text>
+    </svg>
   );
 }

@@ -335,12 +335,19 @@ export function StylePanel() {
               onClick={() => set({ theme: { ...themeFromPreset(p), labels: t.labels } })}
               className={`rounded-2xl p-1.5 border-2 transition ${t.presetId === p.id ? "border-coral" : "border-transparent hover:border-ink/15"}`}
             >
-              <div className="h-14 rounded-xl relative overflow-hidden" style={{ background: p.colors.land }}>
+              <div
+                className="h-14 rounded-xl relative overflow-hidden"
+                style={{ background: p.hypso ? `linear-gradient(160deg, #f4f1ea 0%, #c9a07a 28%, #e3dfa2 55%, #a8c98f 80%)` : p.physical ? `linear-gradient(150deg, #d9c99b, #b7cf9a 45%, #e8e4c9)` : p.colors.land }}
+              >
+                {p.details?.grid && (
+                  <div className="absolute inset-0 opacity-40" style={{ backgroundImage: `linear-gradient(${p.colors.borders} 1px, transparent 1px), linear-gradient(90deg, ${p.colors.borders} 1px, transparent 1px)`, backgroundSize: "14px 14px" }} />
+                )}
                 <div className="absolute -right-3 -bottom-4 w-16 h-12 rounded-full" style={{ background: p.colors.water }} />
                 <div className="absolute left-2 top-3 w-10 h-5 rounded-full opacity-80" style={{ background: p.colors.park }} />
                 <svg className="absolute inset-0" viewBox="0 0 60 40"><path d="M6 32 Q 25 4 52 14" fill="none" stroke={p.colors.accent} strokeWidth="2.5" strokeDasharray="4 3" strokeLinecap="round" /></svg>
               </div>
               <div className="text-xs font-bold mt-1">{p.name}</div>
+              {p.tag && <div className="text-[10px] font-bold text-ink/45 -mt-0.5">{p.tag}</div>}
             </button>
           ))}
         </div>
@@ -382,6 +389,17 @@ export function StylePanel() {
           <Slider label="Highlight" min={0.1} max={0.8} step={0.05} value={design.visited.opacity} onChange={(v) => set({ visited: { ...design.visited, opacity: v } }, "visited-opacity")} />
         )}
         <Toggle on={t.relief} onChange={(v) => setTheme({ relief: v })} label="⛰️ Terrain shading" />
+        <Toggle on={t.hypso} onChange={(v) => setTheme({ hypso: v })} label="🏔️ Colour land by height" />
+        <Toggle on={t.physical} onChange={(v) => setTheme({ physical: v })} label="🗺️ Classic atlas relief" />
+      </div>
+
+      <div>
+        <Label>Map extras</Label>
+        <Toggle on={t.details.currents} onChange={(v) => setTheme({ details: { ...t.details, currents: v } })} label="🌊 Ocean currents" />
+        <Toggle on={t.details.lanes} onChange={(v) => setTheme({ details: { ...t.details, lanes: v } })} label="🚢 Shipping lanes" />
+        <Toggle on={t.details.grid} onChange={(v) => setTheme({ details: { ...t.details, grid: v } })} label="🌐 Latitude & longitude grid" />
+        <Toggle on={t.details.tropics} onChange={(v) => setTheme({ details: { ...t.details, tropics: v } })} label="☀️ Equator & tropics" />
+        <Toggle on={t.details.compass} onChange={(v) => setTheme({ details: { ...t.details, compass: v } })} label="🧭 Compass rose" />
         <Toggle on={t.labels} onChange={(v) => setTheme({ labels: v })} label="🔤 Place names" />
         <Toggle on={t.texture} onChange={(v) => setTheme({ texture: v })} label="📜 Aged paper texture" />
       </div>

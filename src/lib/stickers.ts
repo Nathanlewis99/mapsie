@@ -47,6 +47,12 @@ export const SUGGESTED_STYLE: Record<string, ArtStyleId> = {
   tropical: "sticker",
   midnight: "gold",
   blush: "watercolour",
+  terrain: "illustrated",
+  atlas: "illustrated",
+  nautical: "stamp",
+  explorer: "stamp",
+  blueprint: "line",
+  ink: "line",
   custom: "illustrated",
 };
 export const suggestedStyleFor = (presetId: string): ArtStyleId => SUGGESTED_STYLE[presetId] ?? "illustrated";

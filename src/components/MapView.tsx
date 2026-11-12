@@ -136,6 +136,11 @@ export default function MapView(props: Props) {
           if (/webgl/i.test(msg)) window.__MAPSIE_ERROR = msg;
         });
       }
+      // Icons used by the map details (current arrows, ships), drawn on demand.
+      m.on("styleimagemissing", (e) => {
+        const img = detailIcon(e.id);
+        if (img && !m.hasImage(e.id)) m.addImage(e.id, img, { sdf: true, pixelRatio: 2 });
+      });
       if (editable) m.touchZoomRotate.disableRotation();
       map.current = m;
 
@@ -546,4 +551,39 @@ export default function MapView(props: Props) {
       }}
     />
   );
+}
+
+/** Small single-colour icons (tinted by the style) for current arrows and shipping lanes. */
+function detailIcon(id: string): ImageData | null {
+  if (id !== "mapsie-arrow" && id !== "mapsie-ship") return null;
+  const size = 48;
+  const cv = document.createElement("canvas");
+  cv.width = cv.height = size;
+  const g = cv.getContext("2d")!;
+  g.fillStyle = "#000";
+  g.beginPath();
+  if (id === "mapsie-arrow") {
+    // A chevron pointing along the line (to the right).
+    g.moveTo(14, 10);
+    g.lineTo(38, 24);
+    g.lineTo(14, 38);
+    g.lineTo(20, 24);
+  } else {
+    // A little ship: hull and sail.
+    g.moveTo(6, 30);
+    g.lineTo(42, 30);
+    g.lineTo(35, 39);
+    g.lineTo(13, 39);
+    g.closePath();
+    g.moveTo(24, 6);
+    g.lineTo(24, 27);
+    g.lineTo(37, 27);
+    g.closePath();
+    g.moveTo(22, 11);
+    g.lineTo(22, 27);
+    g.lineTo(12, 27);
+  }
+  g.closePath();
+  g.fill();
+  return g.getImageData(0, 0, size, size);
 }

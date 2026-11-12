@@ -674,6 +674,12 @@ function Swatch({ name }: { name: string }) {
   );
 }
 
+/** Landmarks go where they really are; anything else where the user is looking. */
+function landmarkPoint(id: string, fallback: () => { lng: number; lat: number }) {
+  const o = ORIGINALS.find((x) => x.id === id);
+  return o?.lat !== undefined && o.lng !== undefined ? { lng: o.lng, lat: o.lat } : fallback();
+}
+
 function OriginalsPanel() {
   const { design, addSticker, setOriginals } = useEditor();
   const at = useDropPoint();
@@ -694,7 +700,7 @@ function OriginalsPanel() {
   const place = (id: string) =>
     target
       ? updateStop(target.id, { marker: { kind: "original", name: id, origStyle: style, palette } })
-      : addSticker({ kind: "original", name: id, origStyle: style, palette, src: "", ...at(), size: 15, rotation: 0 });
+      : addSticker({ kind: "original", name: id, origStyle: style, palette, src: "", ...landmarkPoint(id, at), size: 15, rotation: 0 });
   // Animals are listed by region (the catalogue is sorted by label, so sort by region first).
   const regionOf = (o?: OriginalDef) => (o?.keywords ?? "").replace(/ wildlife animal$/, "");
   const prevAnimal = { current: null as OriginalDef | null };

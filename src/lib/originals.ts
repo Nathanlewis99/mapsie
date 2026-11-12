@@ -96,7 +96,7 @@ export const LANDMARK_REGIONS: Record<string, string> = {
 };
 
 /** Landmarks within `km` of any of these points, nearest first. */
-export function landmarksNear(points: { lng: number; lat: number }[], km = 150): OriginalDef[] {
+export function landmarksNear(points: { lng: number; lat: number }[], km = 200): OriginalDef[] {
   const R = 6371, rad = Math.PI / 180;
   const dist = (a: { lng: number; lat: number }, b: { lng: number; lat: number }) => {
     const h = Math.sin(((b.lat - a.lat) * rad) / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(((b.lng - a.lng) * rad) / 2) ** 2;

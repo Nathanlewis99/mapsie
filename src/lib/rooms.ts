@@ -36,7 +36,9 @@ const AVAILABLE: Room[] = [
   { id: "bedroom-sage", label: "Sage bedroom", src: "/rooms/bedroom-sage.jpg", width: 2000, height: 1116, cx: 0.5075, by: 0.56, wallCm: 309, maxHeight: 0.55 },
   //  office:  the 140 cm desk spans x 533–1467 (934 px), top at y 782; poster hangs above the lamp head (y ~540).
   { id: "office-terracotta", label: "Home office", src: "/rooms/office-terracotta.jpg", width: 2000, height: 1116, cx: 0.5, by: 0.47, wallCm: 300, maxHeight: 0.44 },
+  //  hallway: the 120 cm console spans x 687–1315 (628 px), top at y 697; poster ~25 cm above it.
+  { id: "hallway-console", label: "Hallway", src: "/rooms/hallway-console.jpg", width: 2000, height: 1116, cx: 0.5, by: 0.507, wallCm: 382, maxHeight: 0.5 },
   { id: "living-oak", label: "Living room", src: "/rooms/living-oak.jpg", width: 2000, height: 1116, cx: 0.5, by: 0.58, wallCm: 361, maxHeight: 0.56 },
 ];
 
-export const ROOMS: Room[] = AVAILABLE.filter((r) => ROOM_FILES.includes(r.src));
+export const ROOMS: Room[] = ROOM_FILES.map((src) => AVAILABLE.find((r) => r.src === src)).filter((r): r is Room => !!r);

@@ -1,47 +1,141 @@
 "use client";
 import Poster from "./Poster";
-import { FRAMES, MOUNTS, posterAspect } from "@/lib/products";
-import type { ComponentProps } from "react";
+import { FRAMES, MOUNTS, getProduct, posterAspect } from "@/lib/products";
+import type { CSSProperties, ComponentProps } from "react";
 
-const mountWidth = (design: { frame: string; mount?: string }, width: number) => (design.frame !== "none" && design.mount && design.mount !== "none" ? width * 0.09 : 0);
+type D = { frame: string; mount?: string; productId: string; orientation: "portrait" | "landscape" };
+
+/** Poster width in real centimetres, so the frame and mount are drawn at true scale. */
+const posterCm = (d: D) => {
+  const p = getProduct(d.productId);
+  return d.orientation === "portrait" ? p.widthCm : p.heightCm;
+};
+/** Classic frames are about 2 cm wide; the mount border about 5 cm. */
+const mouldingWidth = (d: D, width: number) => (d.frame !== "none" ? Math.max(5, (width * 2.1) / posterCm(d)) : 0);
+const mountWidth = (d: D, width: number) => (d.frame !== "none" && d.mount && d.mount !== "none" ? (width * 5) / posterCm(d) : 0);
 /** Everything drawn outside the poster on each side: frame moulding plus any mount. */
-export const frameWidth = (design: { frame: string; mount?: string }, width: number) => (design.frame !== "none" ? Math.max(4, width * 0.035) : 0) + mountWidth(design, width);
+export const frameWidth = (d: D, width: number) => mouldingWidth(d, width) + mountWidth(d, width);
+
+const WOOD = new Set(["oak", "brown"]);
+
+/** One mitred side of the frame, shaded as if lit from the top left. */
+function Side({ side, fw, base, wood }: { side: "top" | "bottom" | "left" | "right"; fw: number; base: string; wood: boolean }) {
+  const clip = {
+    top: `polygon(0 0, 100% 0, calc(100% - ${fw}px) ${fw}px, ${fw}px ${fw}px)`,
+    bottom: `polygon(${fw}px calc(100% - ${fw}px), calc(100% - ${fw}px) calc(100% - ${fw}px), 100% 100%, 0 100%)`,
+    left: `polygon(0 0, ${fw}px ${fw}px, ${fw}px calc(100% - ${fw}px), 0 100%)`,
+    right: `polygon(100% 0, 100% 100%, calc(100% - ${fw}px) calc(100% - ${fw}px), calc(100% - ${fw}px) ${fw}px)`,
+  }[side];
+  const across = side === "top" ? "to bottom" : side === "bottom" ? "to top" : side === "left" ? "to right" : "to left";
+  const along = side === "top" || side === "bottom" ? "to right" : "to bottom";
+  // light: top brightest, left next, right darker, bottom darkest
+  const light = { top: 0.22, left: 0.1, right: -0.12, bottom: -0.22 }[side];
+  const tone = light >= 0 ? `rgba(255,255,255,${light})` : `rgba(0,0,0,${-light})`;
+  const layers = [
+    // the rounded profile of the moulding: a highlight ridge near the outer edge, darker towards the glass
+    `linear-gradient(${across}, rgba(0,0,0,0.22) 0%, rgba(255,255,255,0.18) 18%, rgba(255,255,255,0.06) 45%, rgba(0,0,0,0.08) 80%, rgba(0,0,0,0.35) 100%)`,
+    `linear-gradient(${tone}, ${tone})`,
+    ...(wood
+      ? [`repeating-linear-gradient(${along}, rgba(0,0,0,0.05) 0 1px, transparent 1px 3px, rgba(255,255,255,0.04) 3px 4px, transparent 4px 7px)`]
+      : []),
+    base,
+  ];
+  return <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ clipPath: clip, background: layers.join(", ") }} />;
+}
 
 /**
- * The poster with its chosen frame drawn around it (frame sits outside `width`).
+ * The poster with its chosen frame drawn around it (the frame sits outside `width`).
+ * Frames are drawn as real moulding at true scale: mitred corners, light from the
+ * top left, wood grain, the artwork recessed behind Perspex. `realistic` adds the
+ * look of an actual print in a room (paper tone, soft light, a wall shadow), for
+ * the "On the wall" view.
  * Read-only previews are laid out at the design's own width and scaled, so a
  * thumbnail shows exactly what the print will.
  */
-export default function FramedPoster(props: ComponentProps<typeof Poster> & { shadow?: boolean }) {
-  const { shadow = true, ...rest } = props;
+export default function FramedPoster(props: ComponentProps<typeof Poster> & { shadow?: boolean; realistic?: boolean }) {
+  const { shadow = true, realistic = false, ...rest } = props;
   const { design, width, editable } = props;
   const frame = FRAMES.find((f) => f.id === design.frame);
+  const framed = !!frame && frame.id !== "none";
+  const fw = mouldingWidth(design, width);
   const mw = mountWidth(design, width);
-  const fw = frameWidth(design, width) - mw;
   const mount = MOUNTS.find((m) => m.id === design.mount);
   const ref = design.view.refWidth;
   const scaled = !editable && Math.abs(width - ref) > 1;
   const h = width * posterAspect(design.productId, design.orientation);
+  const unit = width / 100;
 
-  return (
+  const wallShadow = realistic
+    ? // light from the left: a tight contact shadow plus a soft one falling down and right
+      `${unit * 0.4}px ${unit * 0.6}px ${unit * 0.8}px rgba(0,0,0,0.28), ${unit * 2.2}px ${unit * 3.4}px ${unit * 5}px -${unit * 0.8}px rgba(0,0,0,0.3)`
+    : "0 30px 60px -15px rgba(31,36,48,0.4), 0 6px 12px -4px rgba(31,36,48,0.2)";
+
+  const art = (
     <div
       style={{
-        padding: fw,
-        background: frame?.finish ?? frame?.color,
-        boxShadow: shadow ? "0 30px 60px -15px rgba(31,36,48,0.4), 0 6px 12px -4px rgba(31,36,48,0.2)" : undefined,
-        borderRadius: fw ? 2 : 0,
+        lineHeight: 0,
+        width,
+        height: h,
+        overflow: "hidden",
+        position: "relative",
+        // printed ink is a little softer and less saturated than a screen
+        filter: realistic ? "saturate(0.9) contrast(0.94) brightness(0.98)" : undefined,
       }}
     >
-      <div style={{ padding: mw, background: mount?.color, boxShadow: mw ? "inset 0 0 6px rgba(0,0,0,0.35)" : undefined, lineHeight: 0 }}>
-      <div style={{ boxShadow: fw ? (mw ? "0 0 0 1px rgba(0,0,0,0.12), inset 0 0 3px rgba(0,0,0,0.25)" : "inset 0 0 6px rgba(0,0,0,0.35)") : undefined, lineHeight: 0, width, height: h, overflow: "hidden", position: "relative" }}>
-        {scaled ? (
-          <div style={{ transform: `scale(${width / ref})`, transformOrigin: "top left", width: ref }}>
-            <Poster {...rest} width={ref} />
+      {scaled ? (
+        <div style={{ transform: `scale(${width / ref})`, transformOrigin: "top left", width: ref }}>
+          <Poster {...rest} width={ref} />
+        </div>
+      ) : (
+        <Poster {...rest} />
+      )}
+      {realistic && <div aria-hidden className="mapsie-print-paper absolute inset-0 pointer-events-none" />}
+    </div>
+  );
+
+  // Unframed: a sheet of paper, slightly lifted off the wall.
+  if (!framed) {
+    return (
+      <div style={{ position: "relative", boxShadow: shadow ? wallShadow : undefined, lineHeight: 0 }}>
+        {art}
+        {realistic && <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(100deg, rgba(255,250,240,0.10), transparent 45%, rgba(0,0,0,0.08))" }} />}
+      </div>
+    );
+  }
+
+  const base = frame.finish ?? frame.color;
+  const recess: CSSProperties = {
+    // the frame's inner lip casts a shadow onto whatever sits behind the glass
+    boxShadow: `inset ${unit * 0.25}px ${unit * 0.35}px ${unit * 0.6}px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(0,0,0,0.25)`,
+  };
+
+  return (
+    <div style={{ position: "relative", padding: fw, boxShadow: shadow ? wallShadow : undefined, lineHeight: 0 }}>
+      {(["top", "bottom", "left", "right"] as const).map((s) => (
+        <Side key={s} side={s} fw={fw} base={base} wood={WOOD.has(frame.id)} />
+      ))}
+      <div style={{ position: "relative" }}>
+        {mw > 0 ? (
+          <div style={{ padding: mw, background: mount?.color, position: "relative" }}>
+            {/* the bevelled cut edge of the mount around the window */}
+            <div style={{ position: "relative", boxShadow: `0 0 0 ${Math.max(1, unit * 0.35)}px rgba(255,255,255,0.9), 0 0 0 ${Math.max(1.5, unit * 0.5)}px rgba(0,0,0,0.12)` }}>{art}</div>
           </div>
         ) : (
-          <Poster {...rest} />
+          art
         )}
-      </div>
+        <div aria-hidden className="absolute inset-0 pointer-events-none" style={recess} />
+        {/* glazing: a faint reflection across the Perspex */}
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(115deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.05) 22%, transparent 38%, transparent 58%, rgba(255,255,255,0.07) 64%, transparent 76%)",
+          }}
+        />
+        {realistic && (
+          <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(100deg, rgba(255,250,240,0.08), transparent 45%, rgba(0,0,0,0.08))" }} />
+        )}
       </div>
     </div>
   );

@@ -72,7 +72,7 @@ export default function WallPreview({ design }: { design: Design }) {
                   : { left: w * room.cx, top: H2 * (room.cy ?? 0.4), transform: "translate(-50%, -50%)" }
               }
             >
-              <FramedPoster key={`${pw}-${design.frame}-${design.mount}`} design={design} width={pw} />
+              <FramedPoster realistic key={`${pw}-${design.frame}-${design.mount}`} design={design} width={pw} />
             </div>
           )}
         </div>
@@ -104,7 +104,7 @@ export default function WallPreview({ design }: { design: Design }) {
             <div className="absolute rounded-t-full" style={{ width: 9 * pxPerCm, height: 22 * pxPerCm, left: w * 0.5 - boardW * 0.38, bottom: floorH + boardH, background: "#e8dccb", boxShadow: "inset -4px 0 6px #0002" }} />
             {/* poster: centred about 40 cm above the sideboard */}
             <div className="absolute" style={{ left: w * 0.5, bottom: floorH + boardH + 25 * pxPerCm, transform: "translateX(-50%)" }}>
-              <FramedPoster key={`${posterW}-${design.frame}`} design={design} width={posterW} />
+              <FramedPoster realistic key={`${posterW}-${design.frame}-${design.mount}`} design={design} width={posterW} />
             </div>
           </>
         )}

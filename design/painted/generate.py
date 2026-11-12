@@ -4,6 +4,8 @@
     python3 design/painted/generate.py lm-taj-reflection  # specific concept ids
     python3 design/painted/generate.py --all              # everything not yet done
     python3 design/painted/generate.py --sheet            # contact sheet of what exists
+    python3 design/painted/generate.py --prompts --pilot  # no API: prompts to paste into the Gemini app
+    python3 design/painted/generate.py --import <folder>  # no API: cut saved Gemini images into stickers
     python3 design/painted/generate.py --index            # after review: switch the style on in the app
 
 Each concept is painted from its title and activity with one fixed style brief
@@ -108,6 +110,30 @@ def sheet():
         s.paste(im, ((i % cols) * cell + 10, (i // cols) * (cell + 20) + 10), im)
     p = Path("/tmp/painted-sheet.png"); s.save(p); print(p, len(files))
 
+def prompts(ids):
+    """Prompts to paste into the Gemini app by hand, one per sticker, with the file name to save each as."""
+    by = {c["id"]: c for c in CATALOGUE}
+    out = ["# Painted sticker prompts (Gemini app, Nano Banana)", "",
+           "Paste each prompt into a new Gemini chat, download the image, and save it as the file name shown",
+           "(any of .png / .jpg / .webp). Put them all in design/painted/inbox/ and push, or upload them to the chat.", ""]
+    for i in ids:
+        out += [f"## {by[i]['title']}  →  save as `{i}.png`", "", "```", prompt_for(by[i]).replace(chr(10) + chr(10), " "), "```", ""]
+    dest = Path(__file__).parent / "PROMPTS.md"
+    dest.write_text("\n".join(out)); print(dest)
+
+def import_dir(folder):
+    """Turn hand-made images (named <concept id>.png/.jpg/.webp) into stickers. The circle cut also
+    removes the Gemini app's corner watermark."""
+    ids = {c["id"] for c in CATALOGUE}
+    for f in sorted(Path(folder).iterdir()):
+        if f.stem in ids and f.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp"):
+            dest = OUT / f.stem / "painted.webp"
+            im = Image.open(f).convert("RGB"); w, h = im.size; side = min(w, h)
+            buf = io.BytesIO(); im.crop(((w - side) // 2, (h - side) // 2, (w + side) // 2, (h + side) // 2)).save(buf, "PNG")
+            to_sticker(buf.getvalue()).save(dest, "WEBP", quality=88, method=6); print("imported", f.stem)
+        else:
+            print("skipped (name isn't a sticker id)", f.name)
+
 def index():
     """List painted concepts in src/lib/painted.json, which turns the style on in the app.
     Run this only once the art has been reviewed."""
@@ -119,6 +145,8 @@ if __name__ == "__main__":
     args = sys.argv[1:]
     if "--sheet" in args: sheet(); sys.exit()
     if "--index" in args: index(); sys.exit()
+    if "--import" in args: import_dir(args[args.index("--import") + 1]); sys.exit()
+    if "--prompts" in args: prompts(pilot_ids() if "--pilot" in args else [a for a in args if not a.startswith("--")]); sys.exit()
     ids = pilot_ids() if "--pilot" in args else [c["id"] for c in CATALOGUE] if "--all" in args else [a for a in args if not a.startswith("--")]
     by = {c["id"]: c for c in CATALOGUE}
     for n, i in enumerate(ids, 1):

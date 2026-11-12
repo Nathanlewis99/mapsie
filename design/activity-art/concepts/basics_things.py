@@ -112,6 +112,10 @@ def convertible(d: Drawing):
     palm(d, 166, 136, 0.9, "near", 8)
     palm(d, 30, 138, 0.7, "near", -6)
     d.band("ground", "M-30 152 Q100 146 230 152")
+    group(d, "translate(100 141) scale(.86) translate(-99 -141)", lambda: convertible_car(d))
+
+
+def convertible_car(d: Drawing):
     # high-backed seats, steering wheel and raked windscreen above the open body
     d.shape("pop", "M54 106 Q52 82 66 80 Q78 80 78 106Z", spot=True)
     d.shape("pop", "M86 106 Q84 84 97 82 Q108 82 108 106Z", spot=True)
@@ -539,28 +543,31 @@ def burger(d: Drawing):
 @framed
 def chicken(d: Drawing):
     d.disc("glow", 100, 96, 66, line=False)
-    d.band("far", hills(146, 6, 10))
+    d.band("far", hills(148, 6, 10))
     # legs
-    d.limb("pop", "M88 140 V166 M110 140 V166", 4.5)
-    d.stroke("pop", "M80 168 H96 M102 168 H118 M88 166 L84 162 M110 166 L106 162", 3)
-    # tail fan behind the body
-    d.shape("hero2", "M70 92 Q38 88 32 50 Q46 60 54 60 Q46 44 52 30 Q64 50 74 58 Q74 46 80 38 Q86 62 92 80Z")
-    # plump body and head
-    d.shape("hero", "M44 106 Q44 76 76 76 Q100 76 116 68 Q126 52 140 46 Q160 42 164 62 Q166 76 156 86 "
-                     "Q164 106 156 124 Q142 152 100 152 Q46 152 44 106Z")
+    d.limb("pop", "M86 142 V168 M108 142 V168", 4.5)
+    d.stroke("pop", "M78 170 H94 M100 170 H116 M86 168 L82 164 M108 168 L104 164", 3)
+    # tail: three rounded feathers fanning up behind the body
+    for rot in (-34, -10, 14):
+        d.shape("hero2", ellipse(52, 70, 11, 30), extra=f'transform="rotate({rot} 62 100)"')
+    # neck + head
+    d.shape("hero", "M108 84 Q124 74 126 58 Q130 42 146 42 Q162 44 162 60 Q162 74 152 84 Q150 104 136 112Z")
+    # plump body
+    d.shape("hero", ellipse(92, 114, 54, 38), extra='transform="rotate(-8 92 114)"')
+    d.shape("light", "M126 120 Q142 112 146 92 Q150 112 140 128Z", shadow=False, line=False, extra='opacity=".25"')
     # wing with scalloped tip
-    d.shape("hero2", "M64 100 Q84 84 120 94 Q132 112 118 128 Q110 134 100 132 Q104 126 96 124 Q96 132 86 130 "
-                      "Q88 122 80 122 Q74 118 64 100Z", shadow=False, spot=True)
-    d.stroke("hero", "M84 104 Q98 100 112 106", 2, line=False)
+    d.shape("hero2", "M60 104 Q80 88 116 98 Q128 114 114 130 Q106 136 96 132 Q100 126 92 124 Q92 132 82 130 "
+                      "Q84 122 76 122 Q68 118 60 104Z", shadow=False, spot=True)
+    d.stroke("hero", "M80 106 Q94 102 108 108", 2, line=False)
     # comb, beak, wattle, eye
-    d.shape("pop", "M130 48 Q126 34 138 36 Q140 24 150 32 Q158 26 160 38 Q164 44 156 50Z", spot=True)
-    d.shape("glow2", "M162 58 L178 64 L162 70Z")
-    d.shape("pop", "M160 70 Q168 76 162 86 Q154 86 154 76Z", shadow=False, spot=True)
-    d.marks("dark", circle(148, 58, 3.6))
-    d.marks("light", circle(149.2, 56.8, 1.1))
-    d.band("ground", "M-30 168 Q100 160 230 168")
-    d.stroke("near", "M30 166 l-3 -8 M34 165 l1 -9 M38 166 l4 -7 M158 164 l-3 -8 M162 163 l1 -9 M166 164 l4 -7", 2.2, line=False)
-    d.band("near", hills(186, 4, 10), line=False)
+    d.shape("pop", "M134 46 Q130 32 141 33 Q143 22 152 29 Q160 24 162 36 Q166 42 158 48Z", spot=True)
+    d.shape("glow2", "M160 54 L176 60 L160 66Z")
+    d.shape("pop", "M158 66 Q166 72 160 82 Q152 82 152 72Z", shadow=False, spot=True)
+    d.marks("dark", circle(147, 55, 3.6))
+    d.marks("light", circle(148.2, 53.8, 1.1))
+    d.band("ground", "M-30 170 Q100 162 230 170")
+    d.stroke("near", "M30 168 l-3 -8 M34 167 l1 -9 M38 168 l4 -7 M158 166 l-3 -8 M162 165 l1 -9 M166 166 l4 -7", 2.2, line=False)
+    d.band("near", hills(188, 4, 10), line=False)
 
 
 # ================================================================ COW
@@ -727,7 +734,7 @@ def compass_baseplate(d: Drawing):
         d.shape("dark", "M100 124 L106 126 L100 152Z M100 124 L94 122 L100 152Z", shadow=False)
         d.marks("hero", circle(100, 124, 3.4))
         d.marks("dark", circle(100, 174, 4))
-    group(d, "rotate(-24 100 100) translate(100 100) scale(.84) translate(-100 -100)", plate)
+    group(d, "rotate(-24 100 100) translate(100 102) scale(.8) translate(-100 -100)", plate)
 
 
 # ================================================================ concepts

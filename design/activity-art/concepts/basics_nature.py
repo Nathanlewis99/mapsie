@@ -148,12 +148,12 @@ def palm(d: Drawing, x0, y0, x1, y1, s=1.0, bend=14, nuts=True, spot=False):
     back = [(-150, 40, 22), (-30, 40, 22), (160, 30, 30), (20, 30, 30)]
     front = [(-175, 50, 30), (-125, 44, 10), (-80, 36, -4), (-50, 46, 10), (-5, 50, 30)]
     for a, L, dr in back:
-        d.shape("frond2", frond(x1, y1, a, L * s, dr * s, 0.3))
+        d.shape("frond2", frond(x1, y1, a, L * s, dr * s, 0.42))
     if nuts:
         for nx, ny in [(-5, 5), (4, 6), (0, 1)]:
             d.shape("nut", circle(x1 + nx * s, y1 + ny * s, 4.2 * s))
     for a, L, dr in front:
-        d.shape("frond", frond(x1, y1, a, L * s, dr * s, 0.3), spot=spot)
+        d.shape("frond", frond(x1, y1, a, L * s, dr * s, 0.42), spot=spot)
         d.stroke("frond2", frond_rib(x1, y1, a, L * s * 0.92, dr * s), 1.4 * s, line=False)
 
 
@@ -161,34 +161,38 @@ PALM = {"trunk": "#B5875A", "trunk2": "#8A6040", "frond": "#3E9A5A", "frond2": "
 
 
 # ================================================================ TREE
+GREEN = {"leaf": "#5E9C5A", "leaf2": "#3F7A4A", "leaf3": "#86BE6E", "bark": "#6B4A33"}
+PINES = {"pineA": "#8DBF97", "pineB": "#4E8A5E", "pineC": "#2F6447", "bark": "#5A3E2B"}
+
 def tree(d: Drawing):
     d.disc("glow", 156, 50, 15)
     d.band("far", hills(156, 8))
     d.band("mid", "M-30 166 Q100 154 230 166")
-    d.shape("dark", "M88 172 C92 150 92 132 84 114 L80 100 L88 98 L96 116 L100 92 L108 94 L106 118 L116 100 L122 104 "
+    d.shape("bark", "M88 172 C92 150 92 132 84 114 L80 104 L88 102 L96 116 L100 96 L108 98 L106 118 L116 104 L122 108 "
                     "L110 126 C108 144 108 156 114 172Z")
-    d.shape("deep", scallop(100, 82, 58, 13, 0.1, ry=50))
-    d.shape("near", scallop(96, 74, 50, 12, 0.11, ry=42), spot=True)
-    d.shape("mid", scallop(78, 60, 18, 8, 0.12), shadow=False, line=False)
-    d.shape("mid", scallop(110, 52, 13, 7, 0.12), shadow=False, line=False)
+    d.shape("leaf2", scallop(100, 86, 58, 13, 0.1, ry=50))
+    d.shape("leaf", scallop(96, 78, 50, 12, 0.11, ry=42), spot=True)
+    d.shape("leaf3", scallop(76, 64, 16, 8, 0.12), shadow=False, line=False)
+    d.shape("leaf3", scallop(108, 56, 11, 7, 0.12), shadow=False, line=False)
     grass(d, 40, 160, 170, 9, "near")
     d.band("near", hills(186, 3, 20), line=False)
 
 
 # ================================================================ PINE FOREST
 def pine_forest(d: Drawing):
-    d.disc("glow", 58, 56, 17)
+    d.disc("glow", 52, 50, 15)
     d.band("far", "M-30 112 Q40 92 100 102 T230 96")
     for x in range(-4, 214, 16):
-        pine(d, x, 128 + (x * 3) % 6, 46 + (x * 7) % 12, "mid", shadow=False, line=False)
-    d.band("mid", "M-30 128 H230", shadow=False, line=False)
-    for x, h in [(10, 84), (44, 92), (156, 96), (190, 82)]:
-        d.limb("dark", f"M{x} 166 V150", 4, shadow=False)
-        pine(d, x, 156, h, "near")
-    d.limb("dark", "M100 176 V160", 7)
-    pine(d, 70, 172, 104, "deep")
-    pine(d, 134, 172, 112, "deep")
-    pine(d, 100, 176, 150, "deep", spot=True)
+        pine(d, x, 128 + (x * 3) % 6, 46 + (x * 7) % 12, "pineA", shadow=False, line=False)
+    d.band("pineA", "M-30 126 H230", shadow=False, line=False)
+    for x, h in [(14, 84), (46, 96), (154, 100), (188, 86)]:
+        d.limb("bark", f"M{x} 166 V150", 4, shadow=False)
+        pine(d, x, 156, h, "pineB")
+    for x, h in [(72, 104), (128, 108)]:
+        d.limb("bark", f"M{x} 178 V164", 5, shadow=False)
+        pine(d, x, 172, h, "pineB")
+    d.limb("bark", "M100 180 V164", 7)
+    pine(d, 100, 176, 140, "pineC", spot=True)
     d.band("ground", hills(176, 4))
     d.band("deep", hills(190, 3, 20), line=False)
 
@@ -253,13 +257,13 @@ def beach(d: Drawing):
                          f"{r * 0.18} {-r * 0.3} 0 0 Q{r * 0.25} {-r * 0.12} {r * 0.5} 0Z", shadow=False, spot=True)
         d.shape("dark", circle(0, -r * 0.68, 3), shadow=False)
     group(d, "translate(108 92) rotate(-12)", parasol)
-    d.shape("hero2", "M60 176 L146 176 L150 190 L56 190Z", line=False)
     d.shape("pop", star5(40, 156, 10, 4.4, -80))
     d.marks("hero2", circle(40, 156, 1.4))
 
 
 # ================================================================ LAKE
 LAKE = {"water": "#6FB7D6", "water2": "#DDF1F8", "pine": "#3E6E52"}
+LAKE_PINES = [(-4, 26), (8, 34), (20, 24), (30, 30), (152, 24), (164, 36), (176, 28), (188, 40), (200, 30)]
 
 
 def lake(d: Drawing):
@@ -268,27 +272,24 @@ def lake(d: Drawing):
     d.shape("far", mtn)
     d.shape("light", "M80 46 L92 60 L86 59 L80 65 L73 58 L68 61Z", shadow=False)
     d.shape("light", "M142 70 L150 79 L145 78 L141 82 L136 77 L133 79Z", shadow=False)
-    for x in range(-6, 212, 11):
-        h = 20 + (x * 7) % 14
-        pine(d, x, 114, h, "pine", shadow=False, line=x % 33 == 5)
+    for x, h in LAKE_PINES:
+        pine(d, x, 114, h, "pine", shadow=False, line=h > 30)
     d.band("water", "M-30 112 H230")
     # reflections
     d.raw('<g opacity=".35">', "")
     group(d, "translate(0 224) scale(1 -1)", lambda: d.shape("far", mtn, shadow=False, line=False))
     d.raw("</g>", "")
-    d.raw('<g opacity=".45">', "")
-    for x in range(-6, 212, 11):
-        h = 20 + (x * 7) % 14
+    d.raw('<g opacity=".3">', "")
+    for x, h in LAKE_PINES:
         group(d, "translate(0 226) scale(1 -1)", lambda x=x, h=h: pine(d, x, 114, h * 0.8, "pine", shadow=False, line=False))
     d.raw("</g>", "")
     d.stroke("water2", "M24 138 H64 M120 134 H170 M60 156 H104 M136 168 H176 M20 178 H50", 2.4)
     # little rowing boat
     d.shape("hero", "M80 150 H124 C120 160 112 162 100 162 C90 162 84 160 80 150Z", spot=True)
-    d.stroke("dark", "M88 152 L74 164 M114 152 L128 164", 2)
 
 
 # ================================================================ FIELD
-FIELD = {"wheat": "#F0C75E", "wheat2": "#BE8630", "stalk": "#C8902F", "tree": "#4F8A55"}
+FIELD = {"ear": "#F8DC85", "wheat": "#F0C75E", "wheat2": "#BE8630", "stalk": "#C8902F", "tree": "#4F8A55"}
 
 
 def wheat_ear(d: Drawing, x, y, h, rot, spot=False):
@@ -298,11 +299,11 @@ def wheat_ear(d: Drawing, x, y, h, rot, spot=False):
         for i in range(6):
             yy = -h * 0.6 - i * h * 0.075
             for k in (-1, 1):
-                d.shape("wheat", ellipse(k * 3.6, yy, 3, 6), extra=f'transform="rotate({k * 28} {k * 3.6} {yy:.1f})"',
-                        shadow=False, spot=spot)
+                d.shape("ear", ellipse(k * 3.6, yy, 3, 6), extra=f'transform="rotate({k * 28} {k * 3.6} {yy:.1f})"',
+                        shadow=i == 0, spot=spot)
                 awns += f"M{k * 5} {yy - 4:.1f} l{k * 6} {-12} "
         top = -h * 0.6 - 6 * h * 0.075
-        d.shape("wheat", ellipse(0, top - 2, 2.8, 6), shadow=False, spot=spot)
+        d.shape("ear", ellipse(0, top - 2, 2.8, 6), shadow=False, spot=spot)
         awns += f"M0 {top - 6:.1f} l0 -12"
         d.stroke("stalk", awns, 1.1)
     group(d, f"translate({x} {y}) rotate({rot})", draw)
@@ -423,14 +424,14 @@ def forest_path(d: Drawing):
     d.band("mid", "M-30 112 H230")
     d.shape("ground", "M95 104 H105 C110 124 128 146 168 210 H40 C70 160 90 124 95 104Z", spot=True)
     for x, y, r in [(72, 84, 20), (128, 84, 20)]:
-        d.limb("dark", f"M{x} {y} V{y + 34}", 4, shadow=False)
-        d.shape("near", scallop(x, y, r, 9, 0.12))
+        d.limb("bark", f"M{x} {y} V{y + 34}", 4, shadow=False)
+        d.shape("leaf3", scallop(x, y, r, 9, 0.12))
     for x, w in [(38, 12), (162, 12)]:
-        d.limb("dark", f"M{x} 210 V40", w)
-    d.shape("deep", scallop(6, 42, 58, 13, 0.1, ry=50))
-    d.shape("deep", scallop(196, 40, 58, 13, 0.1, ry=50))
-    d.shape("near", scallop(40, 18, 30, 9, 0.12), shadow=False, line=False)
-    d.shape("near", scallop(162, 16, 30, 9, 0.12), shadow=False, line=False)
+        d.limb("bark", f"M{x} 210 V40", w)
+    d.shape("leaf2", scallop(6, 42, 58, 13, 0.1, ry=50))
+    d.shape("leaf2", scallop(196, 40, 58, 13, 0.1, ry=50))
+    d.shape("leaf", scallop(40, 18, 30, 9, 0.12), shadow=False, line=False)
+    d.shape("leaf", scallop(162, 16, 30, 9, 0.12), shadow=False, line=False)
     grass(d, -4, 52, 184, 12, "deep")
     grass(d, 150, 210, 184, 12, "deep")
     d.band("deep", "M-30 184 H60 L52 210 H-30Z", shadow=False, line=False)
@@ -690,11 +691,12 @@ def clouds(d: Drawing):
 NO_GOLD = ["coastal", "meadow", "blush", "dusk"]
 
 CONCEPTS = [
-    Concept("basic-tree", "basic-tree", "Tree", tree,
-            checks=[("near", "sky"), ("deep", "sky"), ("dark", "mid"), ("deep", "far")],
-            fixes={"far": ["mid", "sky2"]}),
-    Concept("basic-pine-forest", "basic-pine-forest", "Pine forest", pine_forest,
-            checks=[("deep", "near"), ("near", "mid"), ("mid", "sky"), ("deep", "sky")]),
+    Concept("basic-tree", "basic-tree", "Tree", tree, overrides=GREEN,
+            checks=[("leaf", "sky"), ("leaf2", "sky"), ("bark", "mid"), ("leaf2", "far"), ("leaf", "glow")],
+            fixes={"far": ["mid", "sky2"], "glow": ["glow2", "hero2"]}),
+    Concept("basic-pine-forest", "basic-pine-forest", "Pine forest", pine_forest, overrides=PINES,
+            checks=[("pineC", "pineB"), ("pineB", "pineA"), ("pineA", "far"), ("pineC", "sky"), ("pineC", "ground")],
+            fixes={"far": ["sky2", "mid"]}),
     Concept("basic-palm-tree", "basic-palm-tree", "Palm tree", palm_tree, overrides=PALM,
             checks=[("frond", "sky"), ("frond", "glow"), ("trunk", "far"), ("trunk", "ground")],
             fixes={"glow": ["glow2", "pop", "hero2"]}),
@@ -714,8 +716,9 @@ CONCEPTS = [
             checks=[("mid", "sky"), ("mid", "far"), ("light", "mid")], fixes={"far": ["sky2", "light"]}),
     Concept("basic-river", "basic-river", "River", river, overrides=RIVER,
             checks=[("water", "near"), ("water", "mid"), ("deep", "near")], fixes={"near": ["mid", "far"]}),
-    Concept("basic-forest-path", "basic-forest-path", "Forest path", forest_path,
-            checks=[("ground", "mid"), ("deep", "sky"), ("near", "glow")], fixes={"mid": ["near", "deep"]}),
+    Concept("basic-forest-path", "basic-forest-path", "Forest path", forest_path, overrides=GREEN,
+            checks=[("ground", "mid"), ("leaf2", "sky"), ("leaf3", "glow"), ("leaf3", "far")],
+            fixes={"mid": ["near", "deep"], "glow": ["glow2", "light"], "far": ["mid", "near"]}),
     Concept("basic-desert-dunes", "basic-desert-dunes", "Desert dunes", desert_dunes, overrides=DUNE,
             checks=[("dune1", "sky"), ("glow", "dune1")], fixes={"sky": ["sky2", "far"], "glow": ["glow2", "pop", "hero"]}),
     Concept("basic-island", "basic-island", "Island", island, NO_GOLD, overrides=PALM,

@@ -111,8 +111,7 @@ def hobart(d: Drawing):
     d.disc("glow", 158, 50, 12)
     # kunanyi / Mount Wellington, with the dolerite Organ Pipes and the summit mast
     d.band("mid", "M-30 116 Q-6 98 16 78 Q34 54 58 45 Q80 38 104 40 Q126 43 142 58 Q164 80 188 92 Q208 100 230 104")
-    d.shape("near", "M50 54 Q70 44 96 44 L98 58 L92 62 L86 58 L80 64 L74 60 L68 66 L62 61 L56 66 L50 62Z", shadow=False, line=False)
-    d.stroke("mid", "M56 52 V62 M62 50 V60 M68 48 V63 M74 47 V58 M80 46 V61 M86 45 V56 M92 45 V59", 1.6, line=False)
+    d.stroke("near", " ".join(f"M{x} {46 + abs(x - 76) * .16:.1f} v{9 + (x * 7) % 6}" for x in range(52, 100, 4)), 1.6, line=False)
     d.stroke("dark", "M100 41 V22 M97 28 H103", 1.6)
     d.band("near", "M-30 124 Q20 112 60 118 Q110 108 150 116 Q190 110 230 118")
     # the small city: low blocks and the round Wrest Point tower
@@ -288,23 +287,28 @@ def adelaide(d: Drawing):
     d.shape("light", circle(153, 112, 3), shadow=False)
     d.band("near", "M-30 136 Q100 132 230 136")
     # Adelaide Oval: grandstands under the white petal roofs
-    d.shape("deep", "M28 144 V128 H172 V144Z")
-    d.shape("light", "M24 131 Q34 112 54 118 Q60 108 74 110 Q86 104 98 114 Q112 102 126 110 Q140 104 150 114 Q166 110 176 130 "
-                     "Q170 126 160 127 Q100 120 40 127 Q30 127 24 131Z")
-    d.stroke("far", "M54 118 Q58 122 60 126 M98 114 Q100 120 100 124 M150 114 Q148 120 148 126", 1.2, line=False)
-    d.marks("mid", " ".join(rrect(34 + i * 10, 133, 6, 2.2, .6) for i in range(14)))
+    d.shape("deep", "M30 144 V124 Q100 116 170 124 V144Z")
+    d.stroke("near", "M34 130 Q100 123 166 130 M34 136 Q100 130 166 136", 1.6, line=False)
+    d.shape("light", "M24 124 Q30 112 44 116 Q58 106 72 113 Q86 104 100 112 Q114 104 128 113 Q142 106 156 116 Q170 112 176 124 "
+                     "Q170 119 156 121 Q142 113 128 119 Q114 111 100 118 Q86 111 72 119 Q58 113 44 121 Q30 118 24 124Z")
+    d.stroke("light", "M44 120 V128 M72 118 V126 M100 117 V125 M128 118 V126 M156 120 V128", 1.4, line=False)
     sea(d, 144, "far", "mid", [(20, 154, 14), (60, 160, 18), (140, 154, 16), (40, 176, 18), (150, 172, 18)])
-    swan(d, 104, 166, 1.1)
-    swan(d, 126, 172, .9)
+    swan(d, 70, 166, 1.1)
+    swan(d, 92, 172, .9)
+    # Popeye, the river launch
+    d.shape("light", "M118 162 H152 L148 168 H122Z")
+    d.stroke("dark", "M124 162 V154 M146 162 V154", 1.2)
+    d.shape("hero2", "M120 155 Q135 149 150 155Z", spot=True)
 
 
 # ================================================================ DARWIN
 def croc(d: Drawing, x, y, s=1.0, role="deep"):
     """A saltwater crocodile cruising with only its head and back above the water (waterline y)."""
     def draw():
-        d.shape(role, "M-40 0 Q-34 -4 -20 -3 Q-14 -6 -8 -4 Q-2 -9 4 -5 Q12 -5 30 -3 Q36 -3 38 0Z")
-        d.marks(role, "M-34 -2 l2 -2.5 l2 2.5Z M-26 -2.5 l2 -2.5 l2 2.5Z M-18 -3 l2 -2.5 l2 2.5Z")
-        d.marks("glow", circle(0, -6, 1.3))
+        d.shape(role, "M-36 0 Q-37 -4 -32 -5 Q-26 -6 -20 -5 Q-14 -5 -10 -6 Q-8 -11 -3 -10 Q0 -9 1 -6 Q4 -6 6 -8 "
+                      "Q9 -11 12 -8 Q14 -6 18 -6 Q30 -5 36 -3 Q40 -2 42 0Z")
+        d.marks(role, "M22 -5 l2.5 -3 l2.5 3Z M30 -4 l2.5 -3 l2.5 3Z M-34 -5 a2 2 0 0 1 4 0Z")
+        d.marks("glow", circle(-4.5, -8, 1.5) + " " + circle(8.5, -8.6, 1.5))
     group(d, f"translate({x} {y}) scale({s})", draw)
 
 
@@ -333,7 +337,7 @@ def darwin(d: Drawing):
     d.shape("deep", "M150 124 V116 L160 110 L170 116 V124Z")
     d.band("mid", waves(150, 2, 30), line=False)
     lugger(d, 70, 146, .9)
-    croc(d, 120, 166, 1.0)
+    croc(d, 120, 168, 1.15, role="dark")
     ripples(d, [(70, 170, 14), (150, 172, 18), (30, 160, 14)], "far")
     palm(d, 14, 186, 26, 104, 1.05, role="dark", trunk="dark", bend=-8)
     palm(d, 186, 186, 176, 120, .85, role="dark", trunk="dark", bend=8)
@@ -373,9 +377,12 @@ def cairns(d: Drawing):
 # ================================================================ CHRISTCHURCH
 def willow(d: Drawing, x, base, s=1.0, role="deep"):
     def draw():
-        d.limb("dark", "M0 0 V-24 M0 -14 L-8 -26 M0 -16 L8 -28", 3)
-        d.shape(role, "M-24 -4 Q-28 -42 0 -48 Q28 -42 24 -4 L18 -12 L13 -2 L8 -14 L3 -3 L-2 -14 L-7 -2 L-12 -13 L-17 -3Z")
-        d.stroke("near", "M-14 -36 Q-18 -24 -16 -12 M-4 -40 Q-6 -26 -5 -14 M8 -40 Q10 -26 9 -14 M17 -34 Q20 -22 18 -12", 1.2, line=False)
+        d.limb("dark", "M2 0 Q0 -20 -2 -34 M-1 -24 L-10 -36 M0 -26 L10 -38", 3)
+        d.shape(role, "M-20 -34 Q-12 -50 2 -50 Q16 -50 22 -36 Q10 -42 2 -42 Q-10 -42 -20 -34Z")
+        for i in range(-5, 6):
+            x0 = i * 3.8
+            top = -44 + abs(i) * 1.6
+            d.limb(role, f"M{x0:.1f} {top:.1f} Q{x0 * 1.25:.1f} {top + 14:.1f} {x0 * 1.45:.1f} {-6 + abs(i) * 1.2:.1f}", 3.6, shadow=i % 2 == 0)
     group(d, f"translate({x} {base}) scale({s})", draw)
 
 
@@ -411,7 +418,7 @@ def christchurch(d: Drawing):
 
 
 # ================================================================ HONOLULU
-DIAMOND = "M70 140 Q96 126 116 112 Q134 98 146 84 L156 72 Q162 67 168 71 L174 82 Q182 98 196 110 L230 120 V150 H70Z"
+DIAMOND = ("M62 140 Q90 124 110 110 Q124 100 138 97 Q150 95 156 88 L163 78 Q166 75 169 79 L176 94 Q186 112 204 124 L230 130 V150 H62Z")
 
 
 def outrigger(d: Drawing, x, y, s=1.0):
@@ -429,7 +436,7 @@ def outrigger(d: Drawing, x, y, s=1.0):
 def honolulu(d: Drawing):
     d.disc("glow", 56, 50, 13)
     d.shape("mid", DIAMOND)
-    d.stroke("near", "M118 112 L124 128 M132 100 L138 122 M146 88 L150 114 M160 74 L162 100 M172 82 L178 104", 1.6, line=False)
+    d.stroke("near", "M114 108 L120 126 M128 100 L134 122 M142 97 L146 116 M156 90 L158 108 M167 80 L168 98 M176 96 L182 112", 1.6, line=False)
     # Waikiki hotel towers
     blocks = [(12, 10, 30), (23, 12, 50), (37, 9, 38), (47, 12, 58), (61, 10, 44), (73, 12, 34), (87, 9, 26)]
     d.shape("light", towers(140, blocks))
@@ -499,16 +506,17 @@ def flamingo(d: Drawing, x, y, s=1.0, role="pink"):
 def tunis(d: Drawing):
     d.disc("glow", 58, 50, 12)
     # Boukornine's twin horns across the gulf
-    d.band("far", "M-30 112 Q40 106 100 110 Q122 108 136 98 L146 78 L152 88 L160 74 L168 92 Q184 104 230 106")
+    d.band("far", "M-30 112 Q30 108 66 110 Q80 108 88 98 L96 80 L102 90 L109 76 L116 94 Q130 106 230 108")
     # the medina: white cubes and domes
     med = towers(134, [(14, 12, 14), (26, 10, 20), (64, 12, 16), (76, 10, 12), (88, 12, 18)]) + " " + dome(32, 114, 6) + " " + dome(82, 122, 5) + " " + dome(94, 116, 4.5)
     d.shape("light", med)
     # Zitouna Mosque minaret
-    d.shape("stone", T(44, 136, 14, 62) + " " + T(46, 74, 10, 8) + " " + dome(51, 66, 4.5, 6))
-    d.shape("stone", " ".join(f"M{x} 74 V71 H{x + 2.4} V74Z" for x in (44, 47.8, 51.6, 55.4)), shadow=False)
-    d.stroke("stone2", "M44 84 H58 M44 112 H58", 1.4, line=False)
-    d.marks("stone2", rrect(47.5, 90, 7, 16, 3.5) + " " + rrect(48.5, 118, 5, 9, 2.5))
-    d.stroke("dark", "M51 60 V54", 1.2)
+    d.shape("stone", T(42, 136, 18, 62) + " " + T(41, 76, 20, 3) + " " + T(46.5, 73, 9, 11) + " " + poly((46, 62), (51, 55), (56, 62)))
+    d.shape("stone", " ".join(f"M{x} 73 V69.5 H{x + 2.6} V73Z" for x in (41, 45.5, 54, 58.4)), shadow=False)
+    d.stroke("stone2", "M42 84 H60 M42 114 H60", 1.4, line=False)
+    d.marks("stone2", rrect(46, 89, 10, 21, 1) + " " + rrect(48.5, 119, 5, 9, 2.5) + " " + rrect(49, 65, 4, 6, 2))
+    d.stroke("stone", "M48 91 L54 97 L48 103 L54 109 M54 91 L48 97 L54 103 L48 109", 1, line=False)
+    d.stroke("dark", "M51 55 V48", 1.2)
     # Cathedral of St Vincent de Paul: twin towers and dome
     cx = 140
     d.shape("stone", dome(cx, 98, 13, 14) + " " + T(cx - 2, 86, 4, 6))
@@ -533,7 +541,7 @@ def renaissance(d: Drawing, x, base, s=1.0, role="bronze"):
         # woman, leaning back behind him, dress and hair streaming back
         d.shape(role, "M6 0 L10 -20 Q12 -34 14 -42 Q18 -50 22 -46 Q26 -40 22 -30 Q24 -14 28 0Z")
         d.limb(role, "M18 -42 Q28 -38 34 -30", 3)
-        d.shape(role, circle(20, -52, 4.2) + " M22 -55 Q32 -56 38 -48 Q30 -52 23 -49Z")
+        d.shape(role, circle(20, -52, 4.2) + " M21 -56 Q30 -58 34 -50 Q28 -53 22 -48Z")
         # man: legs, torso, head
         d.limb(role, "M-6 0 L-3 -26 M6 0 L3 -26", 5.5)
         d.shape(role, "M-8 -24 Q-10 -40 -12 -52 Q-2 -56 10 -52 Q8 -40 7 -24Z")
@@ -558,8 +566,9 @@ def pirogue(d: Drawing, x, y, s=1.0, body="pir", stripe="hero2", spot=True):
 
 def baobab(d: Drawing, x, base, s=1.0, role="deep"):
     def draw():
-        d.shape(role, "M-7 0 Q-5 -14 -6 -22 L-14 -30 M-6 -22 Z M-7 0 Q-6 -16 -5 -24 L-16 -32 L-14 -34 L-3 -27 L-3 -36 L0 -36 L1 -27 L12 -35 L14 -33 L5 -24 Q6 -14 8 0Z")
-        d.shape(role, ellipse(-15, -35, 7, 3.5) + " " + ellipse(13, -36, 7, 3.5) + " " + ellipse(-1, -39, 6, 3.2), shadow=False)
+        d.shape(role, "M-10 0 Q-8 -14 -7 -24 L-18 -34 L-16 -37 L-6 -29 L-5 -40 L-1 -40 L0 -30 L8 -40 L11 -38 L5 -27 L16 -33 L17 -30 "
+                      "L6 -23 Q8 -12 11 0Z")
+        d.shape(role, ellipse(-18, -37, 5, 2.6) + " " + ellipse(-3, -41, 5, 2.6) + " " + ellipse(10, -40, 5, 2.6) + " " + ellipse(17, -32, 4.4, 2.4), shadow=False)
     group(d, f"translate({x} {base}) scale({s})", draw)
 
 
@@ -598,7 +607,6 @@ def kigali(d: Drawing):
         ribs.append(f"M{bx:.1f} 132 Q{100 + i * 6.2 + 6:.1f} 102 {100 + i * 1.4 + 2:.1f} 80")
     d.stroke("light", " ".join(ribs), 1.3, line=False)
     d.shape("hero", T(97, 78, 6, 4), shadow=False)
-    d.shape("light", T(60, 136, 80, 4), shadow=False)
     d.band("mid", "M-30 140 Q40 132 100 138 T230 134")
     # red-roofed houses on the near hill
     for x, y in [(20, 142), (38, 146), (150, 140), (168, 144), (186, 140), (58, 152), (136, 150)]:
@@ -606,8 +614,8 @@ def kigali(d: Drawing):
         d.shape("pop", f"M{x - 7} {y + 1} L{x} {y - 4} L{x + 7} {y + 1}Z", shadow=False)
     d.band("deep", hills(170, 6, 20))
     # banana plant
-    d.limb("dark", "M168 190 Q166 172 168 156", 4)
-    d.shape("dark", " ".join(frond(168, 156, a, L, dr, .42) for a, L, dr in [(-150, 24, 8), (-110, 22, 2), (-70, 22, 2), (-30, 24, 8)]))
+    d.limb("dark", "M170 196 Q166 170 170 150", 5)
+    d.shape("dark", " ".join(frond(170, 150, a, L, dr, .46) for a, L, dr in [(-160, 32, 12), (-120, 30, 4), (-84, 26, 0), (-50, 30, 4), (-14, 32, 12)]))
     d.band("dark", hills(188, 3, 0), line=False)
 
 
@@ -671,7 +679,6 @@ def eth_cross(d: Drawing, x, y, s=1.0, role="gold"):
 def addis(d: Drawing):
     d.disc("glow", 52, 46, 12)
     d.band("far", "M-30 96 Q20 72 60 80 Q96 62 136 72 Q172 62 230 80")  # the Entoto hills
-    d.stroke("mid", "M30 84 l3 -6 l3 6 M44 80 l3 -6 l3 6 M104 72 l3 -6 l3 6 M150 70 l3 -6 l3 6 M166 72 l3 -6 l3 6", 1.4, line=False)
     # the city, the Commercial Bank of Ethiopia tower rising highest
     d.shape("mid", towers(132, [(14, 10, 24), (26, 9, 34), (108, 10, 30), (120, 12, 40), (170, 10, 28), (182, 9, 18)]) + " " +
             "M140 132 V56 L150 34 L162 46 V132Z")
@@ -696,8 +703,8 @@ def addis(d: Drawing):
 
 
 # ================================================================ BEIRUT
-PIGEON = ("M116 156 L120 122 Q124 104 140 98 Q158 92 172 102 Q180 114 182 156Z "
-          "M130 156 V140 Q131 126 140 124 Q149 126 150 140 V156Z")
+PIGEON = ("M118 156 L121 128 Q122 112 132 106 L140 96 Q150 88 160 92 L168 90 Q178 96 180 112 L184 132 L186 156Z "
+          "M128 156 Q128 144 133 138 Q138 134 143 138 Q148 144 148 156Z")
 
 
 def beirut(d: Drawing):
@@ -722,8 +729,8 @@ def beirut(d: Drawing):
     sea(d, 142, "far", "mid", [(24, 152, 14), (70, 160, 18), (40, 178, 16)])
     # Pigeon Rocks with their sea arch
     d.shape("rock", PIGEON, extra='fill-rule="evenodd"', spot=True)
-    d.shape("rock2", "M168 100 Q180 114 182 156 H170 Q172 124 164 102Z", shadow=False, line=False)
-    d.shape("green", "M128 106 Q142 94 160 96 Q170 98 172 102 Q156 96 140 102Z", shadow=False, line=False)
+    d.shape("rock2", "M170 92 Q178 98 180 112 L184 132 L186 156 H172 Q174 126 166 96Z M150 120 L156 132 L152 146 M164 108 L160 122", shadow=False, line=False)
+    d.shape("green", "M131 107 L140 97 Q150 89 160 93 L168 91 Q174 94 176 99 Q164 94 156 98 Q144 96 131 107Z", shadow=False, line=False)
     d.shape("rock", "M92 156 L96 136 Q100 128 106 130 Q112 134 112 156Z")
     d.stroke("light", "M112 158 h76 M90 158 h24", 2, line=False)
 
@@ -770,9 +777,9 @@ def manama(d: Drawing):
 def port_louis(d: Drawing):
     d.disc("glow", 30, 66, 10)
     # the Moka range: Le Pouce's thumb and Pieter Both's balanced boulder
-    d.band("far", "M-30 108 L-4 96 L14 90 L28 94 L42 80 L50 66 Q52 56 58 55 Q64 56 63 64 L70 78 L86 86 L104 82 L118 70 L128 58 "
-                  "L133 52 L139 52 L144 60 L152 72 L166 82 L184 84 L200 94 L230 100")
-    d.shape("far", "M133.5 53 L134.6 44 H137.4 L138.5 53Z " + circle(136, 40, 5))
+    d.band("far", "M-30 106 L-6 96 L10 86 L22 90 L36 74 L46 66 L50 54 Q52 46 57 46 Q62 47 61 54 L60 62 L66 72 L80 82 L96 80 L108 70 "
+                  "L120 60 L128 48 L132 40 L136 40 L140 50 L150 66 L164 76 L180 78 L196 90 L230 98")
+    d.shape("far", "M131.5 41 L132.6 34 H135.4 L136.5 41Z " + circle(134, 29.5, 5.6))
     d.band("near", "M-30 118 Q20 106 60 112 Q100 104 140 112 Q180 106 230 114")
     blocks = [(30, 10, 22), (42, 12, 34), (56, 9, 26), (66, 12, 40), (80, 10, 28), (122, 10, 24), (134, 12, 36), (148, 10, 22)]
     d.shape("light", towers(134, blocks))

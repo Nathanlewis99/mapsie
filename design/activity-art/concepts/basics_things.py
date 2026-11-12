@@ -177,7 +177,7 @@ def speedboat(d: Drawing):
         d.shape("hero", hull)
         d.shape("light", "M28 116 H178 L176 122 H30Z", shadow=False, spot=True)
         d.shape("hero2", "M30 124 H174 Q170 132 156 134 H40 Q32 132 30 124Z", shadow=False, spot=True)
-    group(d, "rotate(-7 100 116)", boat)
+    group(d, "rotate(-7 100 116) translate(100 116) scale(.9) translate(-100 -116)", boat)
     # spray and wake
     d.shape("light", "M-10 142 Q30 120 60 136 Q90 146 130 140 Q150 138 172 128 Q160 150 120 154 Q60 160 -10 156Z")
     d.shape("light", "M168 128 Q178 112 192 114 Q182 120 184 132Z", shadow=False)
@@ -192,6 +192,13 @@ def train(d: Drawing):
     d.shape("light", cloud(116, 40, 1.0))
     d.shape("light", cloud(150, 26, 0.7))
     d.band("far", hills(140, 8, 10))
+    group(d, "translate(104 152) scale(.92) translate(-100 -152)", lambda: loco(d))
+    d.band("ground", "M-30 164 H230")
+    d.stroke("dark", "M-30 164 H230", 3)
+    d.band("near", hills(184, 4, 20), line=False)
+
+
+def loco(d: Drawing):
     # cab (back, left)
     d.shape("dark", rrect(28, 60, 52, 9, 3))
     d.shape("hero", rrect(34, 66, 44, 72, 4))
@@ -211,9 +218,6 @@ def train(d: Drawing):
     wheel(d, 142, 154, 10)
     d.stroke("light", "M58 152 H100", 3.2)
     d.stroke("dark", "M58 152 H100", 1.2)
-    d.band("ground", "M-30 164 H230")
-    d.stroke("dark", "M-30 164 H230", 3)
-    d.band("near", hills(184, 4, 20), line=False)
 
 
 # ================================================================ PLANE
@@ -252,7 +256,7 @@ def bicycle(d: Drawing):
         d.marks("dark", circle(x, y, 3))
     # frame: rear hub, crank (96,132), seat (84,90), head tube (128,86)
     frame = "M54 132 L96 132 L84 90 Z M84 90 L130 92 L96 132 M128 86 L146 132"
-    d.limb("hero", frame, 5)
+    d.limb("hero", frame, 5, spot=True)
     d.stroke("dark", "M84 90 L82 80", 3)
     d.shape("dark", "M70 78 Q82 72 94 78 Q92 82 82 82 Q72 82 70 78Z")
     d.stroke("dark", "M128 86 L126 74 Q132 70 142 74", 3)
@@ -500,8 +504,8 @@ def noodles(d: Drawing):
     d.disc("glow", 100, 96, 70, line=False)
     steam(d, [62, 140], 98, 26)
     chopsticks(d, 160, 26, 104, 70, 8, w=5)
-    for x0, x1 in [(98, 70), (104, 84), (110, 100), (116, 114)]:
-        d.stroke("hero2", f"M{x0} 70 C{x0 - 4} 84 {x1 + 6} 96 {x1} 116", 3.4, shadow=True)
+    for x0, x1 in [(96, 66), (101, 78), (106, 90), (111, 102), (116, 114), (121, 126)]:
+        d.stroke("hero2", f"M{x0} 72 C{x0 - 4} 86 {x1 + 6} 96 {x1} 116", 4.4, shadow=True)
     d.shape("hero", "M30 112 H170 C170 146 142 166 100 166 C58 166 30 146 30 112Z", spot=True)
     d.shape("mark", ellipse(100, 112, 70, 13), shadow=False)
     d.shape("pop", ellipse(100, 114, 64, 9), shadow=False, line=False)

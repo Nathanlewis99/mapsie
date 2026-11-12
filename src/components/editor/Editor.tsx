@@ -8,7 +8,7 @@ import WallPreview from "@/components/WallPreview";
 import { useEditor } from "@/lib/store";
 import { reverseGeocode } from "@/lib/geo";
 import { itemPrice, money, posterAspect, REGIONS } from "@/lib/products";
-import { FONTS } from "@/lib/fonts";
+import { FONTS, fontBold, fontCss } from "@/lib/fonts";
 import { ART_STYLES, stickerSrc, type ArtStyleId } from "@/lib/stickers";
 import { PALETTE_NAMES, getOriginal, type OriginalStyle } from "@/lib/originals";
 import { normalizeDesign, type Design } from "@/lib/types";
@@ -40,6 +40,8 @@ export default function Editor() {
   const [busy, setBusy] = useState<"" | "order" | "share" | "save">("");
   const [toast, setToast] = useState("");
   const [wall, setWall] = useState(false);
+  const [fontMenu, setFontMenu] = useState(false);
+  useEffect(() => setFontMenu(false), [selectedSticker]);
   // "Lock framing": the map stays put and the poster itself can be zoomed and panned,
   // so labels and stickers are easy to rearrange on a phone.
   const [locked, setLocked] = useState(false);
@@ -459,6 +461,26 @@ export default function Editor() {
             </div>
           )}
 
+          {sel?.kind === "text" && fontMenu && (
+            <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 w-[min(30rem,94%)] max-h-[60%] overflow-y-auto rounded-3xl bg-white shadow-2xl p-3 grid grid-cols-2 sm:grid-cols-3 gap-2" role="listbox" aria-label="Fonts">
+              {FONTS.map((f) => (
+                <button
+                  key={f.id}
+                  role="option"
+                  aria-selected={(sel.font ?? "caveat") === f.id}
+                  onClick={() => {
+                    store.updateSticker(sel.id, { font: f.id });
+                    setFontMenu(false);
+                  }}
+                  className={`rounded-2xl border-2 px-3 py-2 text-left transition ${(sel.font ?? "caveat") === f.id ? "border-coral bg-coral/5" : "border-ink/10 hover:border-ink/30"}`}
+                >
+                  <span className="block text-lg leading-tight truncate" style={{ fontFamily: f.css, fontWeight: f.bold }}>{sel.text?.trim() || "Best day ever!"}</span>
+                  <span className="block text-[11px] font-bold text-ink/50">{f.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
           {sel && (
             <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-full bg-ink text-white px-2 py-1.5 shadow-xl text-sm font-bold max-w-[96%] overflow-x-auto">
               {sel.kind === "text" && (
@@ -470,13 +492,17 @@ export default function Editor() {
                     className="bg-white/10 rounded-full px-3 py-1 outline-none w-40 placeholder:text-white/40"
                     placeholder="Type your note"
                   />
-                  <select
-                    value={sel.font ?? "caveat"}
-                    onChange={(e) => store.updateSticker(sel.id, { font: e.target.value as Design["font"] })}
-                    className="bg-white/10 rounded-full px-2 py-1 outline-none"
-                  >
-                    {FONTS.map((f) => <option key={f.id} value={f.id} className="text-ink">{f.name}</option>)}
-                  </select>
+                  <span className="relative">
+                    <button
+                      onClick={() => setFontMenu((v) => !v)}
+                      className="bg-white/10 rounded-full px-3 py-1 whitespace-nowrap"
+                      style={{ fontFamily: fontCss(sel.font ?? "caveat"), fontWeight: fontBold(sel.font ?? "caveat") }}
+                      aria-haspopup="listbox"
+                      aria-expanded={fontMenu}
+                    >
+                      {FONTS.find((f) => f.id === (sel.font ?? "caveat"))?.name ?? "Font"} ▾
+                    </button>
+                  </span>
                   <input type="color" value={sel.color ?? design.theme.colors.ink} onChange={(e) => store.updateSticker(sel.id, { color: e.target.value }, `color-${sel.id}`)} className="w-7 h-7 rounded-full bg-transparent border-0 p-0" />
                   <span className="w-px h-5 bg-white/20 mx-1" />
                 </>

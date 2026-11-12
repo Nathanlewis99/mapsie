@@ -487,7 +487,7 @@ export default function MapView(props: Props) {
             inner = document.createElement("div");
             inner.className = "mapsie-note";
             inner.textContent = st.text || "Your note";
-            inner.style.cssText = `font-family:${fontCss(st.font ?? "caveat")};color:${st.color ?? design.theme.colors.ink};font-size:${px}px`;
+            inner.style.cssText = `font-family:${fontCss(st.font ?? "caveat")};font-weight:${fontBold(st.font ?? "caveat")};color:${st.color ?? design.theme.colors.ink};font-size:${px}px`;
           } else {
             node.style.width = `${px}px`;
             node.style.height = `${px}px`;

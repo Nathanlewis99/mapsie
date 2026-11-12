@@ -160,7 +160,7 @@ export const DEFAULT_TEXT: TextStyle = {
   align: "center",
 };
 
-export type FontId = "playfair" | "caveat" | "montserrat" | "pacifico" | "bebas" | "cormorant" | "josefin" | "abril" | "courier" | "vibes";
+export type FontId = "playfair" | "caveat" | "montserrat" | "pacifico" | "bebas" | "cormorant" | "josefin" | "abril" | "courier" | "vibes" | "marker" | "amatic" | "indie" | "patrick" | "kalam" | "dancing" | "satisfy" | "lobster" | "righteous" | "fredoka" | "elite" | "rocksalt";
 
 /** Fill in fields added after a design was first saved. */
 export function normalizeDesign(d: Partial<Design> & Pick<Design, "id">): Design {

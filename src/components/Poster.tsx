@@ -238,7 +238,7 @@ export function Compass({ u, ink, accent, paper, variant = "classic", corner = "
         {[0, 90, 180, 270].map((a) => star(a, 31, 5.5, a === 0 ? accent : ink, paper))}
         <circle r="4" fill={paper} stroke={ink} strokeWidth="1" />
         {[["N", 0], ["E", 90], ["S", 180], ["W", 270]].map(([l, a]) => (
-          <text key={l} transform={`rotate(${a}) translate(0 -48) rotate(${-Number(a)})`} textAnchor="middle" dominantBaseline="middle" fontSize="9" fontWeight="700" fill={l === "N" ? accent : ink} style={serif}>{l}</text>
+          <text key={l} transform={`rotate(${a}) translate(0 -53) rotate(${-Number(a)})`} textAnchor="middle" dominantBaseline="middle" fontSize="9" fontWeight="700" fill={l === "N" ? accent : ink} style={serif}>{l}</text>
         ))}
       </>
     );

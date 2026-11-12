@@ -720,9 +720,14 @@ function OriginalsPanel() {
     </button>
   );
   const near = q ? [] : landmarksNear(design.stops);
-  const landmarkGroups = Object.entries(LANDMARK_REGIONS)
-    .map(([g, name]) => [name, results.filter((o) => o.category === "Landmarks" && o.group === g)] as const)
-    .filter(([, list]) => list.length);
+  // Landmarks and city skylines are listed by region rather than by activity.
+  const PLACE_CATEGORIES = ["City skylines", "Landmarks"];
+  const placeSections = PLACE_CATEGORIES.map((cat) => ({
+    cat,
+    groups: Object.entries(LANDMARK_REGIONS)
+      .map(([g, name]) => [name, results.filter((o) => o.category === cat && o.group === g)] as const)
+      .filter(([, list]) => list.length),
+  })).filter((x) => x.groups.length);
 
   return (
     <div className="space-y-5">
@@ -784,22 +789,22 @@ function OriginalsPanel() {
       {results.length === 0 && <div className="text-sm text-ink/50">Nothing matches “{q}” yet. Try the activity, like “boat” or “mountain”.</div>}
       {near.length > 0 && (
         <div>
-          <Label>📍 Landmarks on your trip</Label>
+          <Label>📍 On your trip</Label>
           <div className="grid grid-cols-3 gap-2">{near.map(origTile)}</div>
         </div>
       )}
-      {landmarkGroups.length > 0 && (
-        <div>
-          <Label>Landmarks</Label>
-          {landmarkGroups.map(([name, list]) => (
+      {placeSections.map(({ cat, groups }) => (
+        <div key={cat}>
+          <Label>{cat}</Label>
+          {groups.map(([name, list]) => (
             <div key={name}>
               <div className="text-xs font-extrabold text-coral mt-3 mb-1">{name}</div>
               <div className="grid grid-cols-3 gap-2">{list.map(origTile)}</div>
             </div>
           ))}
         </div>
-      )}
-      {categories.filter((c) => c !== "Landmarks").map((cat) => (
+      ))}
+      {categories.filter((c) => !PLACE_CATEGORIES.includes(c)).map((cat) => (
         <div key={cat}>
           <Label>{cat}</Label>
           <div className="space-y-3">

@@ -64,6 +64,10 @@ export interface User {
   googleSub: string | null;
   totpSecret: string | null;
   totpEnabled: boolean;
+  /** scrypt hash, for email and password sign-in (null for Google-only accounts). */
+  passwordHash: string | null;
+  /** Proven to own the email (by Google, or by clicking our link). Needed to see guest orders or be an admin. */
+  emailVerified: boolean;
   createdAt: string;
   lastLoginAt: string | null;
 }
@@ -186,6 +190,9 @@ async function connect(): Promise<Driver> {
       run: async (sql, params = []) => (await pool.query(pg(sql), params)).rowCount ?? 0,
     };
     await pool.query(SCHEMA);
+    // Email and password sign-in. Accounts made before this all came from Google, so are verified.
+    await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT");
+    await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified INTEGER NOT NULL DEFAULT 1");
     await importSqliteIntoPostgres(d);
     return d;
   }
@@ -206,6 +213,9 @@ async function connect(): Promise<Driver> {
   } catch (e) {
     if (!/already exists|UNIQUE/.test(String(e))) throw e;
   }
+  const userCols = (db.prepare("SELECT name FROM pragma_table_info('users')").all() as { name: string }[]).map((c) => c.name);
+  if (!userCols.includes("password_hash")) db.exec("ALTER TABLE users ADD COLUMN password_hash TEXT");
+  if (!userCols.includes("email_verified")) db.exec("ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 1");
   const d: Driver = {
     kind: "sqlite",
     all: async (sql, params = []) => db.prepare(sql).all(...params) as Row[],
@@ -337,6 +347,11 @@ export async function listOrdersByStatus(status: OrderStatus): Promise<Order[]> 
 }
 /** A customer's orders: placed while signed in, or (once verified by Google) with their email. */
 export async function listOrdersForUser(user: User): Promise<Order[]> {
+  // Guest orders are only matched by email once the person has proved they own it.
+  if (!user.emailVerified) {
+    const mine = await all("SELECT json FROM orders WHERE user_id = ? ORDER BY created_at DESC", [user.id]);
+    return mine.map((r) => JSON.parse(String(r.json)) as Order).filter((o) => o.status !== "pending_payment");
+  }
   const rows = await all("SELECT json FROM orders WHERE user_id = ? OR (user_id IS NULL AND lower(email) = lower(?)) ORDER BY created_at DESC", [user.id, user.email]);
   return rows.map((r) => JSON.parse(String(r.json)) as Order).filter((o) => o.status !== "pending_payment");
 }
@@ -351,6 +366,7 @@ export const rendersDir = async () => {
 const toUser = (r: Row): User => ({
   id: String(r.id), email: String(r.email), name: (r.name as string) ?? null, picture: (r.picture as string) ?? null,
   googleSub: (r.google_sub as string) ?? null, totpSecret: (r.totp_secret as string) ?? null, totpEnabled: !!Number(r.totp_enabled),
+  passwordHash: (r.password_hash as string) ?? null, emailVerified: Number(r.email_verified ?? 1) === 1,
   createdAt: String(r.created_at), lastLoginAt: (r.last_login_at as string) ?? null,
 });
 
@@ -363,9 +379,13 @@ export async function getUser(id: string): Promise<User | null> {
 export async function upsertGoogleUser(p: { sub: string; email: string; name?: string; picture?: string }): Promise<User> {
   const existing = (await one("SELECT * FROM users WHERE google_sub = ?", [p.sub])) ?? (await one("SELECT * FROM users WHERE lower(email) = lower(?)", [p.email]));
   if (existing) {
-    await run("UPDATE users SET google_sub = ?, email = ?, name = ?, picture = ?, last_login_at = ? WHERE id = ?", [
-      p.sub, p.email, p.name ?? existing.name ?? null, p.picture ?? existing.picture ?? null, now(), existing.id,
-    ]);
+    // Google has proved this email belongs to the person signing in. If the account was made with a
+    // password that was never verified, that password may have been set by someone else: remove it.
+    const unverifiedPassword = Number(existing.email_verified ?? 1) !== 1;
+    await run(
+      `UPDATE users SET google_sub = ?, email = ?, name = ?, picture = ?, last_login_at = ?, email_verified = 1${unverifiedPassword ? ", password_hash = NULL" : ""} WHERE id = ?`,
+      [p.sub, p.email, p.name ?? existing.name ?? null, p.picture ?? existing.picture ?? null, now(), existing.id],
+    );
     return (await getUser(String(existing.id)))!;
   }
   const id = `usr_${nanoid(14)}`;
@@ -373,6 +393,30 @@ export async function upsertGoogleUser(p: { sub: string; email: string; name?: s
     id, p.email, p.name ?? null, p.picture ?? null, p.sub, now(), now(),
   ]);
   return (await getUser(id))!;
+}
+
+export async function getUserByEmail(email: string): Promise<User | null> {
+  const r = await one("SELECT * FROM users WHERE lower(email) = lower(?)", [email]);
+  return r ? toUser(r) : null;
+}
+
+/** A new account made with an email and password (unverified until they click the emailed link). */
+export async function createPasswordUser(p: { email: string; name?: string; passwordHash: string }): Promise<User> {
+  const id = `usr_${nanoid(14)}`;
+  await run("INSERT INTO users (id, email, name, password_hash, email_verified, created_at, last_login_at) VALUES (?, ?, ?, ?, 0, ?, ?)", [
+    id, p.email, p.name ?? null, p.passwordHash, now(), now(),
+  ]);
+  return (await getUser(id))!;
+}
+
+export async function setPassword(userId: string, passwordHash: string) {
+  await run("UPDATE users SET password_hash = ? WHERE id = ?", [passwordHash, userId]);
+}
+export async function markEmailVerified(userId: string) {
+  await run("UPDATE users SET email_verified = 1 WHERE id = ?", [userId]);
+}
+export async function touchLogin(userId: string) {
+  await run("UPDATE users SET last_login_at = ? WHERE id = ?", [now(), userId]);
 }
 
 export async function setTotp(userId: string, secret: string | null, enabled: boolean) {

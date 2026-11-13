@@ -26,7 +26,8 @@ export async function currentUser(): Promise<User | null> {
 }
 
 export async function startSession(user: User, mfaAt?: number) {
-  const token = await signSession({ sub: user.id, email: user.email, admin: isAdminEmail(user.email), mfaAt });
+  // Admin rights need an email the person has proved they own: a password account can't claim one just by typing it.
+  const token = await signSession({ sub: user.id, email: user.email, admin: user.emailVerified && isAdminEmail(user.email), mfaAt });
   (await cookies()).set(SESSION_COOKIE, token, cookieOptions);
 }
 

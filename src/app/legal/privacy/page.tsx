@@ -69,6 +69,11 @@ export default function PrivacyPage() {
             and show you your order history. We don&apos;t get your Google password or access to anything else in your Google
             account. We also record when you created your account and last signed in.
           </p>
+          <p>
+            If you create an account with your email and a password instead, we store your email, the first name you give us
+            (if any) and a secure one-way hash of your password, never the password itself. We email you a link to confirm
+            your address, and a link to reset your password if you ask for one.
+          </p>
         </Sub>
         <Sub title="Your orders">
           <p>

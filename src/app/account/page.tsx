@@ -7,6 +7,7 @@ import { money, type RegionId, describeOptions } from "@/lib/products";
 import { normalizeDesign } from "@/lib/types";
 import SiteFooter from "@/components/SiteFooter";
 import DeleteDesignButton from "./DeleteDesignButton";
+import { ResendVerification } from "../signin/PasswordForms";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "My account · Mapsie" };
@@ -22,7 +23,8 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 };
 const date = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-export default async function Account() {
+export default async function Account({ searchParams }: { searchParams: Promise<{ verified?: string; password?: string }> }) {
+  const { verified, password } = await searchParams;
   const user = await currentUser();
   if (!user) redirect("/signin?next=/account");
   const designs = await listSavedDesigns(user.id);
@@ -47,6 +49,15 @@ export default async function Account() {
         <div>
           <h1 className="font-display text-4xl font-extrabold">Hi{user.name ? `, ${user.name.split(" ")[0]}` : ""} 👋</h1>
           <p className="text-ink/60 mt-1">{user.email}</p>
+          {verified === "1" && <p className="mt-4 rounded-2xl bg-sea/10 px-4 py-3 text-sm font-bold text-sea">Thanks, your email is confirmed.</p>}
+          {verified === "expired" && <p className="mt-4 rounded-2xl bg-coral/10 px-4 py-3 text-sm font-bold text-coral-dark">That confirmation link has expired.{!user.emailVerified && " You can send a new one below."}</p>}
+          {password === "1" && <p className="mt-4 rounded-2xl bg-sea/10 px-4 py-3 text-sm font-bold text-sea">Your new password is saved.</p>}
+          {!user.emailVerified && (
+            <div className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Please confirm your email: we&apos;ve sent a link to <b>{user.email}</b>. Until then, only orders you place while signed in show here.{" "}
+              <ResendVerification />
+            </div>
+          )}
         </div>
 
         <section className="space-y-4">

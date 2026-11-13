@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/lib/store";
-import { searchPlaces, MODES, type PlaceResult } from "@/lib/geo";
+import { searchPlaces, MODES, VEHICLES, vehicleFor, type PlaceResult } from "@/lib/geo";
 import { PRESETS, themeFromPreset } from "@/lib/themes";
 import { ART_STYLES, PACKS, STICKERS, getArtStyle, searchStickers, stickerSrc, suggestedStyleFor, type ArtStyleId } from "@/lib/stickers";
 import StickerFilters, { filterId } from "@/components/StickerFilters";
@@ -82,21 +82,65 @@ function Slider({ value, min, max, step, onChange, label, disabled }: { value: n
 }
 
 // ---------------------------------------------------------------- Trip
-function ModePicker({ value, onChange }: { value: TravelMode; onChange: (m: TravelMode) => void }) {
+function ModePicker({
+  value,
+  onChange,
+  vehicle,
+  onVehicle,
+  art,
+}: {
+  value: TravelMode;
+  onChange: (m: TravelMode) => void;
+  vehicle?: string;
+  onVehicle: (v: string) => void;
+  art: ArtStyleId;
+}) {
+  const [open, setOpen] = useState(false);
+  const choices = VEHICLES[value];
+  const current = vehicleFor(value, vehicle);
+  const label = (n: string) => STICKERS.find((x) => x.name === n)?.label ?? n;
   return (
-    <div className="flex items-center gap-1 pl-10 py-1">
-      <span className="w-px h-4 bg-ink/15 mr-2" />
-      {MODES.map((m) => (
-        <button
-          key={m.id}
-          title={m.label}
-          onClick={() => onChange(m.id)}
-          className={`w-8 h-8 rounded-full grid place-items-center transition ${value === m.id ? "bg-coral/15 ring-2 ring-coral" : "opacity-40 hover:opacity-100"}`}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={m.icon} alt={m.label} className="w-5 h-5" />
-        </button>
-      ))}
+    <div className="pl-7 py-1">
+      <div className="flex flex-wrap items-center gap-0.5">
+        <span className="w-px h-4 bg-ink/15 mr-1.5" />
+        {MODES.map((m) => (
+          <button
+            key={m.id}
+            title={m.label}
+            onClick={() => onChange(m.id)}
+            className={`w-7 h-7 rounded-full grid place-items-center transition ${value === m.id ? "bg-coral/15 ring-2 ring-coral" : "opacity-40 hover:opacity-100"}`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={m.icon} alt={m.label} className="w-[18px] h-[18px]" />
+          </button>
+        ))}
+        {choices.length > 1 && (
+          <button
+            onClick={() => setOpen(!open)}
+            title="Choose the vehicle drawn on this leg"
+            className={`ml-1 flex items-center gap-0.5 rounded-full border px-1.5 h-7 text-[10px] font-bold transition ${open ? "border-coral text-coral-dark" : "border-ink/10 text-ink/60 hover:text-ink"}`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={stickerSrc(current, art)} alt="" className="w-4 h-4" />
+            {open ? "▴" : "▾"}
+          </button>
+        )}
+      </div>
+      {open && choices.length > 1 && (
+        <div className="mt-1 ml-3 flex flex-wrap gap-1 rounded-2xl bg-sand/60 p-1.5">
+          {choices.map((v) => (
+            <button
+              key={v}
+              title={label(v)}
+              onClick={() => onVehicle(v)}
+              className={`w-9 h-9 rounded-xl grid place-items-center transition ${current === v ? "bg-white ring-2 ring-coral" : "hover:bg-white"}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={stickerSrc(v, art)} alt={label(v)} className="w-6 h-6" />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -197,7 +241,7 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
               }
               if (e.key === "Escape") setQ("");
             }}
-            placeholder="Search a city, island, park…"
+            placeholder="Search a place, or paste coordinates"
             className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral"
           />
           {searchState === "searching" && (
@@ -208,7 +252,9 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
               {searchState === "searching" && results.length === 0 && <div className="px-4 py-3 text-sm text-ink/50">Searching…</div>}
               {searchState === "error" && <div className="px-4 py-3 text-sm text-coral-dark font-bold">Search isn&apos;t responding. Try again in a moment.</div>}
               {searchState === "done" && results.length === 0 && (
-                <div className="px-4 py-3 text-sm text-ink/60">No places found for “{q.trim()}”.</div>
+                <div className="px-4 py-3 text-sm text-ink/60">
+                  No places found for “{q.trim()}”. Tip: in Google Maps, right-click the spot to copy its coordinates, then paste them here.
+                </div>
               )}
               {results.map((r, i) => (
                 <button
@@ -267,7 +313,15 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
         <ol>
           {design.stops.map((s, i) => (
             <li key={s.id}>
-              {i > 0 && <ModePicker value={s.arriveBy ?? "plane"} onChange={(m) => updateStop(s.id, { arriveBy: m })} />}
+              {i > 0 && (
+                <ModePicker
+                  value={s.arriveBy ?? "plane"}
+                  onChange={(m) => updateStop(s.id, { arriveBy: m })}
+                  vehicle={s.vehicle}
+                  onVehicle={(v) => updateStop(s.id, { vehicle: v })}
+                  art={design.route.iconArt ?? "cartoon"}
+                />
+              )}
               <div
                 draggable
                 onDragStart={() => (dragFrom.current = i)}
@@ -315,6 +369,15 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
           {/* (settings below grey out when the route is hidden or has no flights) */}
           <Toggle on={design.route.show} onChange={(v) => set({ route: { ...design.route, show: v } })} label="Draw the route" />
           <Toggle disabled={!routeOn} hint="Turn on “Draw the route” first" on={design.route.modeIcons} onChange={(v) => set({ route: { ...design.route, modeIcons: v } })} label="Show ✈️ 🚗 🚆 icons on legs" />
+          <div className={`pl-1 pb-2 space-y-1 ${!routeOn || !design.route.modeIcons ? "opacity-40 pointer-events-none" : ""}`}>
+            <div className="text-xs font-bold text-ink/50">Icon style (pick each leg&apos;s vehicle with ▾ in your stops)</div>
+            <Chips
+              disabled={!routeOn || !design.route.modeIcons}
+              value={design.route.iconArt ?? "cartoon"}
+              options={(["cartoon", "flat", "illustrated", "line"] as ArtStyleId[]).map((id) => ({ id, label: getArtStyle(id).name }))}
+              onChange={(v) => set({ route: { ...design.route, iconArt: v } })}
+            />
+          </div>
           <Toggle
             disabled={!routeOn || !hasFlights}
             hint={!routeOn ? "Turn on “Draw the route” first" : "No flights on this trip (set a leg to ✈️ in your stops)"}

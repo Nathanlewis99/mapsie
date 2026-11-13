@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
 import { normalizeDesign, type Design, type Stop, type Sticker } from "./types";
 import { PRESETS, themeFromPreset } from "./themes";
-import { fetchRoads, guessMode, legKey } from "./geo";
+import { fetchRoads, followsRoads, guessMode, legKey } from "./geo";
 import { guessRegion, type RegionId } from "./products";
 import { templateStops, type TripTemplate } from "./templates";
 import { suggestedStyleFor, stickerSrc, type ArtStyleId } from "./stickers";
@@ -253,11 +253,11 @@ export const useEditor = create<EditorState>()(
               : d.stickers,
           })),
 
-        /** Fetch road geometry for any car/bus leg that doesn't have it yet. */
+        /** Fetch road geometry for any road leg (car, bus, tuk-tuk, moped) that doesn't have it yet. */
         ensureRoads: async () => {
           const stops = get().design.stops;
           const needs = (i: number) =>
-            i > 0 && (stops[i].arriveBy === "car" || stops[i].arriveBy === "bus") && stops[i].pathFor !== legKey(stops[i - 1], stops[i]);
+            i > 0 && followsRoads(stops[i].arriveBy) && stops[i].pathFor !== legKey(stops[i - 1], stops[i]);
           // Group consecutive drives into runs: each run is one request.
           const runs: number[][] = [];
           for (let i = 1; i < stops.length; i++) {

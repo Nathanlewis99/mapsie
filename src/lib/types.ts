@@ -6,7 +6,7 @@ import type { OriginalStyle } from "./originals";
 
 export type LngLat = [number, number];
 
-export type TravelMode = "plane" | "car" | "bus" | "train" | "boat" | "walk";
+export type TravelMode = "plane" | "car" | "bus" | "train" | "boat" | "walk" | "tuktuk" | "moped";
 
 export interface Stop {
   id: string;
@@ -17,6 +17,8 @@ export interface Stop {
   date?: string; // free text, e.g. "12–18 March"
   // How they travelled TO this stop (ignored for the first stop).
   arriveBy?: TravelMode;
+  /** The vehicle sticker drawn on the leg TO this stop, e.g. "steam-train" (default: the mode's own). */
+  vehicle?: string;
   // Road geometry for car/bus legs, fetched once and stored so prints never re-fetch.
   path?: LngLat[];
   pathFor?: string; // which leg the path was fetched for, so moved stops refetch
@@ -118,7 +120,7 @@ export interface Design {
   // density, so the framing and label sizes match the editor exactly.
   view: { center: LngLat; zoom: number; bearing: number; refWidth: number };
   stops: Stop[];
-  route: { show: boolean; style: RouteStyle; curved: boolean; width: number; modeIcons: boolean };
+  route: { show: boolean; style: RouteStyle; curved: boolean; width: number; modeIcons: boolean; /** Art style of the transport icons. */ iconArt?: ArtStyleId };
   markers: { style: MarkerStyle; showDates: boolean; size: number; labelSize: number };
   visited: { show: boolean; opacity: number };
   stickers: Sticker[];
@@ -184,7 +186,7 @@ export function normalizeDesign(d: Partial<Design> & Pick<Design, "id">): Design
     mount: x.mount && x.mount !== "none" ? "white" : "none",
     glaze: "perspex",
     theme: x.theme && { ...x.theme, hypso: x.theme.hypso ?? false, physical: x.theme.physical ?? false, details: { ...NO_DETAILS, ...(x.theme.details ?? {}) } },
-    route: { show: r.show ?? true, style: r.style ?? "auto", curved: r.curved ?? true, width: r.width ?? 0.45, modeIcons: r.modeIcons ?? true },
+    route: { show: r.show ?? true, style: r.style ?? "auto", curved: r.curved ?? true, width: r.width ?? 0.45, modeIcons: r.modeIcons ?? true, iconArt: r.iconArt ?? "cartoon" },
     markers: { style: m.style ?? "number", showDates: m.showDates ?? false, size: m.size ?? 1, labelSize: m.labelSize ?? 1 },
     visited: { show: v.show ?? false, opacity: v.opacity ?? 0.35 },
     text: { ...DEFAULT_TEXT, ...(x.text ?? {}) },

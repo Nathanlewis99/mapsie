@@ -1,653 +1,786 @@
 [
- {
-  "name": "diving-mask",
-  "code": "1f93f",
-  "label": "Snorkel",
-  "keywords": "scuba diving snorkelling reef underwater",
-  "pack": "Adventures"
- },
- {
-  "name": "swimmer",
-  "code": "1f3ca",
-  "label": "Swimmer",
-  "keywords": "swimming pool sea",
-  "pack": "Adventures"
- },
- {
-  "name": "surfer",
-  "code": "1f3c4",
-  "label": "Surfer",
-  "keywords": "surfing waves beach",
-  "pack": "Adventures"
- },
- {
-  "name": "canoe",
-  "code": "1f6f6",
-  "label": "Canoe",
-  "keywords": "kayak paddle river",
-  "pack": "Adventures"
- },
- {
-  "name": "climber",
-  "code": "1f9d7",
-  "label": "Climber",
-  "keywords": "climbing rock bouldering",
-  "pack": "Adventures"
- },
- {
-  "name": "hiking-boot",
-  "code": "1f97e",
-  "label": "Hiking boot",
-  "keywords": "hike trek walk trail",
-  "pack": "Adventures"
- },
- {
-  "name": "skier",
-  "code": "26f7",
-  "label": "Skier",
-  "keywords": "skiing snow ski",
-  "pack": "Adventures"
- },
- {
-  "name": "snowboarder",
-  "code": "1f3c2",
-  "label": "Snowboarder",
-  "keywords": "snowboarding snow",
-  "pack": "Adventures"
- },
- {
-  "name": "parachute",
-  "code": "1fa82",
-  "label": "Parachute",
-  "keywords": "skydiving skydive paragliding",
-  "pack": "Adventures"
- },
- {
-  "name": "yoga",
-  "code": "1f9d8",
-  "label": "Yoga",
-  "keywords": "meditation retreat wellness",
-  "pack": "Adventures"
- },
- {
-  "name": "backpack",
-  "code": "1f392",
-  "label": "Backpack",
-  "keywords": "backpacking travel bag",
-  "pack": "Adventures"
- },
- {
-  "name": "tent",
-  "code": "26fa",
-  "label": "Tent",
-  "keywords": "camping camp",
-  "pack": "Adventures"
- },
- {
-  "name": "camping",
-  "code": "1f3d5",
-  "label": "Campsite",
-  "keywords": "camping camp tent forest",
-  "pack": "Adventures"
- },
- {
-  "name": "camera",
-  "code": "1f4f7",
-  "label": "Camera",
-  "keywords": "photo photography",
-  "pack": "Adventures"
- },
- {
-  "name": "camera-flash",
-  "code": "1f4f8",
-  "label": "Camera flash",
-  "keywords": "photo selfie",
-  "pack": "Adventures"
- },
- {
-  "name": "compass",
-  "code": "1f9ed",
-  "label": "Compass",
-  "keywords": "navigation explore",
-  "pack": "Adventures"
- },
- {
-  "name": "sunglasses",
-  "code": "1f60e",
-  "label": "Cool face",
-  "keywords": "sunglasses smile happy",
-  "pack": "Adventures"
- },
- {
-  "name": "motorbike",
-  "code": "1f3cd",
-  "label": "Motorbike",
-  "keywords": "motorcycle ride",
-  "pack": "Adventures"
- },
- {
-  "name": "crocodile",
-  "code": "1f40a",
-  "label": "Crocodile",
-  "keywords": "croc alligator reptile",
-  "pack": "Wildlife"
- },
- {
-  "name": "kangaroo",
-  "code": "1f998",
-  "label": "Kangaroo",
-  "keywords": "australia roo",
-  "pack": "Wildlife"
- },
- {
-  "name": "koala",
-  "code": "1f428",
-  "label": "Koala",
-  "keywords": "australia bear",
-  "pack": "Wildlife"
- },
- {
-  "name": "elephant",
-  "code": "1f418",
-  "label": "Elephant",
-  "keywords": "safari india thailand sri lanka",
-  "pack": "Wildlife"
- },
- {
-  "name": "tiger",
-  "code": "1f405",
-  "label": "Tiger",
-  "keywords": "big cat safari india",
-  "pack": "Wildlife"
- },
- {
-  "name": "lion",
-  "code": "1f981",
-  "label": "Lion",
-  "keywords": "safari africa big cat",
-  "pack": "Wildlife"
- },
- {
-  "name": "giraffe",
-  "code": "1f992",
-  "label": "Giraffe",
-  "keywords": "safari africa",
-  "pack": "Wildlife"
- },
- {
-  "name": "zebra",
-  "code": "1f993",
-  "label": "Zebra",
-  "keywords": "safari africa",
-  "pack": "Wildlife"
- },
- {
-  "name": "panda",
-  "code": "1f43c",
-  "label": "Panda",
-  "keywords": "china bear",
-  "pack": "Wildlife"
- },
- {
-  "name": "monkey",
-  "code": "1f412",
-  "label": "Monkey",
-  "keywords": "ape jungle",
-  "pack": "Wildlife"
- },
- {
-  "name": "penguin",
-  "code": "1f427",
-  "label": "Penguin",
-  "keywords": "antarctica bird",
-  "pack": "Wildlife"
- },
- {
-  "name": "flamingo",
-  "code": "1f9a9",
-  "label": "Flamingo",
-  "keywords": "bird pink",
-  "pack": "Wildlife"
- },
- {
-  "name": "camel",
-  "code": "1f42b",
-  "label": "Camel",
-  "keywords": "desert egypt morocco",
-  "pack": "Wildlife"
- },
- {
-  "name": "parrot",
-  "code": "1f99c",
-  "label": "Parrot",
-  "keywords": "bird jungle tropical",
-  "pack": "Wildlife"
- },
- {
-  "name": "turtle",
-  "code": "1f422",
-  "label": "Turtle",
-  "keywords": "sea turtle reef",
-  "pack": "Wildlife"
- },
- {
-  "name": "whale",
-  "code": "1f40b",
-  "label": "Whale",
-  "keywords": "ocean whale watching",
-  "pack": "Wildlife"
- },
- {
-  "name": "shark",
-  "code": "1f988",
-  "label": "Shark",
-  "keywords": "ocean diving",
-  "pack": "Wildlife"
- },
- {
-  "name": "dolphin",
-  "code": "1f42c",
-  "label": "Dolphin",
-  "keywords": "ocean sea",
-  "pack": "Wildlife"
- },
- {
-  "name": "octopus",
-  "code": "1f419",
-  "label": "Octopus",
-  "keywords": "sea ocean",
-  "pack": "Wildlife"
- },
- {
-  "name": "crab",
-  "code": "1f980",
-  "label": "Crab",
-  "keywords": "beach seafood",
-  "pack": "Wildlife"
- },
- {
-  "name": "tropical-fish",
-  "code": "1f420",
-  "label": "Tropical fish",
-  "keywords": "fish reef snorkelling diving",
-  "pack": "Wildlife"
- },
- {
-  "name": "palm-tree",
-  "code": "1f334",
-  "label": "Palm tree",
-  "keywords": "tropical beach island",
-  "pack": "Places"
- },
- {
-  "name": "beach",
-  "code": "1f3d6",
-  "label": "Beach",
-  "keywords": "umbrella sand sea",
-  "pack": "Places"
- },
- {
-  "name": "island",
-  "code": "1f3dd",
-  "label": "Island",
-  "keywords": "desert island tropical",
-  "pack": "Places"
- },
- {
-  "name": "desert",
-  "code": "1f3dc",
-  "label": "Desert",
-  "keywords": "sand dunes",
-  "pack": "Places"
- },
- {
-  "name": "cactus",
-  "code": "1f335",
-  "label": "Cactus",
-  "keywords": "desert mexico",
-  "pack": "Places"
- },
- {
-  "name": "hibiscus",
-  "code": "1f33a",
-  "label": "Hibiscus",
-  "keywords": "flower tropical hawaii",
-  "pack": "Places"
- },
- {
-  "name": "snowy-mountain",
-  "code": "1f3d4",
-  "label": "Snowy mountain",
-  "keywords": "himalaya alps everest peak",
-  "pack": "Places"
- },
- {
-  "name": "mountain",
-  "code": "26f0",
-  "label": "Mountain",
-  "keywords": "peak hike",
-  "pack": "Places"
- },
- {
-  "name": "volcano",
-  "code": "1f30b",
-  "label": "Volcano",
-  "keywords": "lava eruption",
-  "pack": "Places"
- },
- {
-  "name": "sunrise",
-  "code": "1f305",
-  "label": "Sunrise",
-  "keywords": "sunset sun sea",
-  "pack": "Places"
- },
- {
-  "name": "temple",
-  "code": "1f6d5",
-  "label": "Temple",
-  "keywords": "hindu india nepal bali",
-  "pack": "Places"
- },
- {
-  "name": "shrine",
-  "code": "26e9",
-  "label": "Shrine",
-  "keywords": "japan torii",
-  "pack": "Places"
- },
- {
-  "name": "mosque",
-  "code": "1f54c",
-  "label": "Mosque",
-  "keywords": "islam middle east",
-  "pack": "Places"
- },
- {
-  "name": "castle",
-  "code": "1f3ef",
-  "label": "Japanese castle",
-  "keywords": "japan castle",
-  "pack": "Places"
- },
- {
-  "name": "classical-building",
-  "code": "1f3db",
-  "label": "Ancient ruins",
-  "keywords": "greece rome museum colosseum",
-  "pack": "Places"
- },
- {
-  "name": "tower",
-  "code": "1f5fc",
-  "label": "Tower",
-  "keywords": "tokyo eiffel landmark",
-  "pack": "Places"
- },
- {
-  "name": "statue-of-liberty",
-  "code": "1f5fd",
-  "label": "Statue of Liberty",
-  "keywords": "new york usa",
-  "pack": "Places"
- },
- {
-  "name": "moai",
-  "code": "1f5ff",
-  "label": "Moai",
-  "keywords": "easter island statue",
-  "pack": "Places"
- },
- {
-  "name": "ferris-wheel",
-  "code": "1f3a1",
-  "label": "Ferris wheel",
-  "keywords": "fair london eye",
-  "pack": "Places"
- },
- {
-  "name": "world-map",
-  "code": "1f5fa",
-  "label": "World map",
-  "keywords": "map travel",
-  "pack": "Places"
- },
- {
-  "name": "airplane",
-  "code": "2708",
-  "label": "Airplane",
-  "keywords": "plane flight fly",
-  "pack": "Getting around"
- },
- {
-  "name": "departure",
-  "code": "1f6eb",
-  "label": "Take-off",
-  "keywords": "plane flight airport",
-  "pack": "Getting around"
- },
- {
-  "name": "helicopter",
-  "code": "1f681",
-  "label": "Helicopter",
-  "keywords": "heli flight",
-  "pack": "Getting around"
- },
- {
-  "name": "sailboat",
-  "code": "26f5",
-  "label": "Sailboat",
-  "keywords": "sailing yacht boat",
-  "pack": "Getting around"
- },
- {
-  "name": "ship",
-  "code": "1f6a2",
-  "label": "Ship",
-  "keywords": "cruise ferry boat",
-  "pack": "Getting around"
- },
- {
-  "name": "train",
-  "code": "1f686",
-  "label": "Train",
-  "keywords": "rail railway interrail",
-  "pack": "Getting around"
- },
- {
-  "name": "bus",
-  "code": "1f68c",
-  "label": "Bus",
-  "keywords": "coach",
-  "pack": "Getting around"
- },
- {
-  "name": "campervan",
-  "code": "1f690",
-  "label": "Campervan",
-  "keywords": "van road trip",
-  "pack": "Getting around"
- },
- {
-  "name": "car",
-  "code": "1f697",
-  "label": "Car",
-  "keywords": "road trip drive",
-  "pack": "Getting around"
- },
- {
-  "name": "scooter",
-  "code": "1f6f5",
-  "label": "Scooter",
-  "keywords": "moped vespa",
-  "pack": "Getting around"
- },
- {
-  "name": "bicycle",
-  "code": "1f6b2",
-  "label": "Bicycle",
-  "keywords": "bike cycling",
-  "pack": "Getting around"
- },
- {
-  "name": "walking",
-  "code": "1f6b6",
-  "label": "Walker",
-  "keywords": "walking hike",
-  "pack": "Getting around"
- },
- {
-  "name": "beer",
-  "code": "1f37a",
-  "label": "Beer",
-  "keywords": "pub drink",
-  "pack": "Food & drink"
- },
- {
-  "name": "wine",
-  "code": "1f377",
-  "label": "Wine",
-  "keywords": "vineyard drink",
-  "pack": "Food & drink"
- },
- {
-  "name": "cocktail",
-  "code": "1f379",
-  "label": "Cocktail",
-  "keywords": "drink tropical",
-  "pack": "Food & drink"
- },
- {
-  "name": "cheers",
-  "code": "1f942",
-  "label": "Cheers",
-  "keywords": "champagne celebrate toast",
-  "pack": "Food & drink"
- },
- {
-  "name": "coconut",
-  "code": "1f965",
-  "label": "Coconut",
-  "keywords": "tropical drink",
-  "pack": "Food & drink"
- },
- {
-  "name": "coffee",
-  "code": "2615",
-  "label": "Coffee",
-  "keywords": "cafe tea",
-  "pack": "Food & drink"
- },
- {
-  "name": "ramen",
-  "code": "1f35c",
-  "label": "Ramen",
-  "keywords": "noodles japan",
-  "pack": "Food & drink"
- },
- {
-  "name": "sushi",
-  "code": "1f363",
-  "label": "Sushi",
-  "keywords": "japan food",
-  "pack": "Food & drink"
- },
- {
-  "name": "curry",
-  "code": "1f35b",
-  "label": "Curry",
-  "keywords": "india food",
-  "pack": "Food & drink"
- },
- {
-  "name": "pizza",
-  "code": "1f355",
-  "label": "Pizza",
-  "keywords": "italy food",
-  "pack": "Food & drink"
- },
- {
-  "name": "taco",
-  "code": "1f32e",
-  "label": "Taco",
-  "keywords": "mexico food",
-  "pack": "Food & drink"
- },
- {
-  "name": "croissant",
-  "code": "1f950",
-  "label": "Croissant",
-  "keywords": "france breakfast",
-  "pack": "Food & drink"
- },
- {
-  "name": "ice-cream",
-  "code": "1f366",
-  "label": "Ice cream",
-  "keywords": "gelato dessert",
-  "pack": "Food & drink"
- },
- {
-  "name": "heart",
-  "code": "2764",
-  "label": "Heart",
-  "keywords": "love",
-  "pack": "Moments"
- },
- {
-  "name": "ring",
-  "code": "1f48d",
-  "label": "Ring",
-  "keywords": "engaged engagement proposal",
-  "pack": "Moments"
- },
- {
-  "name": "wedding",
-  "code": "1f492",
-  "label": "Wedding",
-  "keywords": "married chapel",
-  "pack": "Moments"
- },
- {
-  "name": "party",
-  "code": "1f389",
-  "label": "Party",
-  "keywords": "celebrate birthday",
-  "pack": "Moments"
- },
- {
-  "name": "star",
-  "code": "2b50",
-  "label": "Star",
-  "keywords": "favourite best",
-  "pack": "Moments"
- },
- {
-  "name": "sun",
-  "code": "2600",
-  "label": "Sun",
-  "keywords": "sunny weather",
-  "pack": "Moments"
- },
- {
-  "name": "rainbow",
-  "code": "1f308",
-  "label": "Rainbow",
-  "keywords": "weather",
-  "pack": "Moments"
- },
- {
-  "name": "pin",
-  "code": "1f4cd",
-  "label": "Pin",
-  "keywords": "location marker",
-  "pack": "Moments"
- },
- {
-  "name": "flag",
-  "code": "1f3c1",
-  "label": "Finish flag",
-  "keywords": "finish end",
-  "pack": "Moments"
- }
+  {
+    "name": "diving-mask",
+    "code": "1f93f",
+    "label": "Snorkel",
+    "keywords": "scuba diving snorkelling reef underwater",
+    "pack": "Adventures"
+  },
+  {
+    "name": "swimmer",
+    "code": "1f3ca",
+    "label": "Swimmer",
+    "keywords": "swimming pool sea",
+    "pack": "Adventures"
+  },
+  {
+    "name": "surfer",
+    "code": "1f3c4",
+    "label": "Surfer",
+    "keywords": "surfing waves beach",
+    "pack": "Adventures"
+  },
+  {
+    "name": "canoe",
+    "code": "1f6f6",
+    "label": "Canoe",
+    "keywords": "kayak paddle river",
+    "pack": "Adventures"
+  },
+  {
+    "name": "climber",
+    "code": "1f9d7",
+    "label": "Climber",
+    "keywords": "climbing rock bouldering",
+    "pack": "Adventures"
+  },
+  {
+    "name": "hiking-boot",
+    "code": "1f97e",
+    "label": "Hiking boot",
+    "keywords": "hike trek walk trail",
+    "pack": "Adventures"
+  },
+  {
+    "name": "skier",
+    "code": "26f7",
+    "label": "Skier",
+    "keywords": "skiing snow ski",
+    "pack": "Adventures"
+  },
+  {
+    "name": "snowboarder",
+    "code": "1f3c2",
+    "label": "Snowboarder",
+    "keywords": "snowboarding snow",
+    "pack": "Adventures"
+  },
+  {
+    "name": "parachute",
+    "code": "1fa82",
+    "label": "Parachute",
+    "keywords": "skydiving skydive paragliding",
+    "pack": "Adventures"
+  },
+  {
+    "name": "yoga",
+    "code": "1f9d8",
+    "label": "Yoga",
+    "keywords": "meditation retreat wellness",
+    "pack": "Adventures"
+  },
+  {
+    "name": "backpack",
+    "code": "1f392",
+    "label": "Backpack",
+    "keywords": "backpacking travel bag",
+    "pack": "Adventures"
+  },
+  {
+    "name": "tent",
+    "code": "26fa",
+    "label": "Tent",
+    "keywords": "camping camp",
+    "pack": "Adventures"
+  },
+  {
+    "name": "camping",
+    "code": "1f3d5",
+    "label": "Campsite",
+    "keywords": "camping camp tent forest",
+    "pack": "Adventures"
+  },
+  {
+    "name": "camera",
+    "code": "1f4f7",
+    "label": "Camera",
+    "keywords": "photo photography",
+    "pack": "Adventures"
+  },
+  {
+    "name": "camera-flash",
+    "code": "1f4f8",
+    "label": "Camera flash",
+    "keywords": "photo selfie",
+    "pack": "Adventures"
+  },
+  {
+    "name": "compass",
+    "code": "1f9ed",
+    "label": "Compass",
+    "keywords": "navigation explore",
+    "pack": "Adventures"
+  },
+  {
+    "name": "sunglasses",
+    "code": "1f60e",
+    "label": "Cool face",
+    "keywords": "sunglasses smile happy",
+    "pack": "Adventures"
+  },
+  {
+    "name": "motorbike",
+    "code": "1f3cd",
+    "label": "Motorbike",
+    "keywords": "motorcycle ride",
+    "pack": "Adventures"
+  },
+  {
+    "name": "crocodile",
+    "code": "1f40a",
+    "label": "Crocodile",
+    "keywords": "croc alligator reptile",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "kangaroo",
+    "code": "1f998",
+    "label": "Kangaroo",
+    "keywords": "australia roo",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "koala",
+    "code": "1f428",
+    "label": "Koala",
+    "keywords": "australia bear",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "elephant",
+    "code": "1f418",
+    "label": "Elephant",
+    "keywords": "safari india thailand sri lanka",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "tiger",
+    "code": "1f405",
+    "label": "Tiger",
+    "keywords": "big cat safari india",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "lion",
+    "code": "1f981",
+    "label": "Lion",
+    "keywords": "safari africa big cat",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "giraffe",
+    "code": "1f992",
+    "label": "Giraffe",
+    "keywords": "safari africa",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "zebra",
+    "code": "1f993",
+    "label": "Zebra",
+    "keywords": "safari africa",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "panda",
+    "code": "1f43c",
+    "label": "Panda",
+    "keywords": "china bear",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "monkey",
+    "code": "1f412",
+    "label": "Monkey",
+    "keywords": "ape jungle",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "penguin",
+    "code": "1f427",
+    "label": "Penguin",
+    "keywords": "antarctica bird",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "flamingo",
+    "code": "1f9a9",
+    "label": "Flamingo",
+    "keywords": "bird pink",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "camel",
+    "code": "1f42b",
+    "label": "Camel",
+    "keywords": "desert egypt morocco",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "parrot",
+    "code": "1f99c",
+    "label": "Parrot",
+    "keywords": "bird jungle tropical",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "turtle",
+    "code": "1f422",
+    "label": "Turtle",
+    "keywords": "sea turtle reef",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "whale",
+    "code": "1f40b",
+    "label": "Whale",
+    "keywords": "ocean whale watching",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "shark",
+    "code": "1f988",
+    "label": "Shark",
+    "keywords": "ocean diving",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "dolphin",
+    "code": "1f42c",
+    "label": "Dolphin",
+    "keywords": "ocean sea",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "octopus",
+    "code": "1f419",
+    "label": "Octopus",
+    "keywords": "sea ocean",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "crab",
+    "code": "1f980",
+    "label": "Crab",
+    "keywords": "beach seafood",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "tropical-fish",
+    "code": "1f420",
+    "label": "Tropical fish",
+    "keywords": "fish reef snorkelling diving",
+    "pack": "Wildlife"
+  },
+  {
+    "name": "palm-tree",
+    "code": "1f334",
+    "label": "Palm tree",
+    "keywords": "tropical beach island",
+    "pack": "Places"
+  },
+  {
+    "name": "beach",
+    "code": "1f3d6",
+    "label": "Beach",
+    "keywords": "umbrella sand sea",
+    "pack": "Places"
+  },
+  {
+    "name": "island",
+    "code": "1f3dd",
+    "label": "Island",
+    "keywords": "desert island tropical",
+    "pack": "Places"
+  },
+  {
+    "name": "desert",
+    "code": "1f3dc",
+    "label": "Desert",
+    "keywords": "sand dunes",
+    "pack": "Places"
+  },
+  {
+    "name": "cactus",
+    "code": "1f335",
+    "label": "Cactus",
+    "keywords": "desert mexico",
+    "pack": "Places"
+  },
+  {
+    "name": "hibiscus",
+    "code": "1f33a",
+    "label": "Hibiscus",
+    "keywords": "flower tropical hawaii",
+    "pack": "Places"
+  },
+  {
+    "name": "snowy-mountain",
+    "code": "1f3d4",
+    "label": "Snowy mountain",
+    "keywords": "himalaya alps everest peak",
+    "pack": "Places"
+  },
+  {
+    "name": "mountain",
+    "code": "26f0",
+    "label": "Mountain",
+    "keywords": "peak hike",
+    "pack": "Places"
+  },
+  {
+    "name": "volcano",
+    "code": "1f30b",
+    "label": "Volcano",
+    "keywords": "lava eruption",
+    "pack": "Places"
+  },
+  {
+    "name": "sunrise",
+    "code": "1f305",
+    "label": "Sunrise",
+    "keywords": "sunset sun sea",
+    "pack": "Places"
+  },
+  {
+    "name": "temple",
+    "code": "1f6d5",
+    "label": "Temple",
+    "keywords": "hindu india nepal bali",
+    "pack": "Places"
+  },
+  {
+    "name": "shrine",
+    "code": "26e9",
+    "label": "Shrine",
+    "keywords": "japan torii",
+    "pack": "Places"
+  },
+  {
+    "name": "mosque",
+    "code": "1f54c",
+    "label": "Mosque",
+    "keywords": "islam middle east",
+    "pack": "Places"
+  },
+  {
+    "name": "castle",
+    "code": "1f3ef",
+    "label": "Japanese castle",
+    "keywords": "japan castle",
+    "pack": "Places"
+  },
+  {
+    "name": "classical-building",
+    "code": "1f3db",
+    "label": "Ancient ruins",
+    "keywords": "greece rome museum colosseum",
+    "pack": "Places"
+  },
+  {
+    "name": "tower",
+    "code": "1f5fc",
+    "label": "Tower",
+    "keywords": "tokyo eiffel landmark",
+    "pack": "Places"
+  },
+  {
+    "name": "statue-of-liberty",
+    "code": "1f5fd",
+    "label": "Statue of Liberty",
+    "keywords": "new york usa",
+    "pack": "Places"
+  },
+  {
+    "name": "moai",
+    "code": "1f5ff",
+    "label": "Moai",
+    "keywords": "easter island statue",
+    "pack": "Places"
+  },
+  {
+    "name": "ferris-wheel",
+    "code": "1f3a1",
+    "label": "Ferris wheel",
+    "keywords": "fair london eye",
+    "pack": "Places"
+  },
+  {
+    "name": "world-map",
+    "code": "1f5fa",
+    "label": "World map",
+    "keywords": "map travel",
+    "pack": "Places"
+  },
+  {
+    "name": "airplane",
+    "code": "2708",
+    "label": "Airplane",
+    "keywords": "plane flight fly",
+    "pack": "Getting around"
+  },
+  {
+    "name": "departure",
+    "code": "1f6eb",
+    "label": "Take-off",
+    "keywords": "plane flight airport",
+    "pack": "Getting around"
+  },
+  {
+    "name": "helicopter",
+    "code": "1f681",
+    "label": "Helicopter",
+    "keywords": "heli flight",
+    "pack": "Getting around"
+  },
+  {
+    "name": "sailboat",
+    "code": "26f5",
+    "label": "Sailboat",
+    "keywords": "sailing yacht boat",
+    "pack": "Getting around"
+  },
+  {
+    "name": "ship",
+    "code": "1f6a2",
+    "label": "Ship",
+    "keywords": "cruise ferry boat",
+    "pack": "Getting around"
+  },
+  {
+    "name": "train",
+    "code": "1f686",
+    "label": "Train",
+    "keywords": "rail railway interrail",
+    "pack": "Getting around"
+  },
+  {
+    "name": "bus",
+    "code": "1f68c",
+    "label": "Bus",
+    "keywords": "coach",
+    "pack": "Getting around"
+  },
+  {
+    "name": "campervan",
+    "code": "1f690",
+    "label": "Campervan",
+    "keywords": "van road trip",
+    "pack": "Getting around"
+  },
+  {
+    "name": "car",
+    "code": "1f697",
+    "label": "Car",
+    "keywords": "road trip drive",
+    "pack": "Getting around"
+  },
+  {
+    "name": "scooter",
+    "code": "1f6f5",
+    "label": "Moped",
+    "keywords": "moped scooter vespa motorbike",
+    "pack": "Getting around"
+  },
+  {
+    "name": "bicycle",
+    "code": "1f6b2",
+    "label": "Bicycle",
+    "keywords": "bike cycling",
+    "pack": "Getting around"
+  },
+  {
+    "name": "walking",
+    "code": "1f6b6",
+    "label": "Walker",
+    "keywords": "walking hike",
+    "pack": "Getting around"
+  },
+  {
+    "name": "beer",
+    "code": "1f37a",
+    "label": "Beer",
+    "keywords": "pub drink",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "wine",
+    "code": "1f377",
+    "label": "Wine",
+    "keywords": "vineyard drink",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "cocktail",
+    "code": "1f379",
+    "label": "Cocktail",
+    "keywords": "drink tropical",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "cheers",
+    "code": "1f942",
+    "label": "Cheers",
+    "keywords": "champagne celebrate toast",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "coconut",
+    "code": "1f965",
+    "label": "Coconut",
+    "keywords": "tropical drink",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "coffee",
+    "code": "2615",
+    "label": "Coffee",
+    "keywords": "cafe tea",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "ramen",
+    "code": "1f35c",
+    "label": "Ramen",
+    "keywords": "noodles japan",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "sushi",
+    "code": "1f363",
+    "label": "Sushi",
+    "keywords": "japan food",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "curry",
+    "code": "1f35b",
+    "label": "Curry",
+    "keywords": "india food",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "pizza",
+    "code": "1f355",
+    "label": "Pizza",
+    "keywords": "italy food",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "taco",
+    "code": "1f32e",
+    "label": "Taco",
+    "keywords": "mexico food",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "croissant",
+    "code": "1f950",
+    "label": "Croissant",
+    "keywords": "france breakfast",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "ice-cream",
+    "code": "1f366",
+    "label": "Ice cream",
+    "keywords": "gelato dessert",
+    "pack": "Food & drink"
+  },
+  {
+    "name": "heart",
+    "code": "2764",
+    "label": "Heart",
+    "keywords": "love",
+    "pack": "Moments"
+  },
+  {
+    "name": "ring",
+    "code": "1f48d",
+    "label": "Ring",
+    "keywords": "engaged engagement proposal",
+    "pack": "Moments"
+  },
+  {
+    "name": "wedding",
+    "code": "1f492",
+    "label": "Wedding",
+    "keywords": "married chapel",
+    "pack": "Moments"
+  },
+  {
+    "name": "party",
+    "code": "1f389",
+    "label": "Party",
+    "keywords": "celebrate birthday",
+    "pack": "Moments"
+  },
+  {
+    "name": "star",
+    "code": "2b50",
+    "label": "Star",
+    "keywords": "favourite best",
+    "pack": "Moments"
+  },
+  {
+    "name": "sun",
+    "code": "2600",
+    "label": "Sun",
+    "keywords": "sunny weather",
+    "pack": "Moments"
+  },
+  {
+    "name": "rainbow",
+    "code": "1f308",
+    "label": "Rainbow",
+    "keywords": "weather",
+    "pack": "Moments"
+  },
+  {
+    "name": "pin",
+    "code": "1f4cd",
+    "label": "Pin",
+    "keywords": "location marker",
+    "pack": "Moments"
+  },
+  {
+    "name": "flag",
+    "code": "1f3c1",
+    "label": "Finish flag",
+    "keywords": "finish end",
+    "pack": "Moments"
+  },
+  {
+    "name": "auto-rickshaw",
+    "code": "1f6fa",
+    "label": "Tuk-tuk",
+    "keywords": "tuktuk tuk tuk auto rickshaw sri lanka thailand india",
+    "pack": "Getting around"
+  },
+  {
+    "name": "kick-scooter",
+    "code": "1f6f4",
+    "label": "Kick scooter",
+    "keywords": "scooter ride",
+    "pack": "Getting around"
+  },
+  {
+    "name": "small-airplane",
+    "code": "1f6e9",
+    "label": "Small plane",
+    "keywords": "plane light aircraft seaplane flight",
+    "pack": "Getting around"
+  },
+  {
+    "name": "taxi",
+    "code": "1f695",
+    "label": "Taxi",
+    "keywords": "cab car ride",
+    "pack": "Getting around"
+  },
+  {
+    "name": "suv",
+    "code": "1f699",
+    "label": "4x4",
+    "keywords": "jeep safari offroad car drive",
+    "pack": "Getting around"
+  },
+  {
+    "name": "racing-car",
+    "code": "1f3ce",
+    "label": "Sports car",
+    "keywords": "race fast car drive",
+    "pack": "Getting around"
+  },
+  {
+    "name": "pickup-truck",
+    "code": "1f6fb",
+    "label": "Pickup truck",
+    "keywords": "ute truck car drive",
+    "pack": "Getting around"
+  },
+  {
+    "name": "oncoming-bus",
+    "code": "1f68d",
+    "label": "Coach",
+    "keywords": "bus coach",
+    "pack": "Getting around"
+  },
+  {
+    "name": "trolleybus",
+    "code": "1f68e",
+    "label": "Trolleybus",
+    "keywords": "bus tram city",
+    "pack": "Getting around"
+  },
+  {
+    "name": "high-speed-train",
+    "code": "1f684",
+    "label": "High-speed train",
+    "keywords": "train rail tgv eurostar",
+    "pack": "Getting around"
+  },
+  {
+    "name": "bullet-train",
+    "code": "1f685",
+    "label": "Bullet train",
+    "keywords": "shinkansen train rail japan",
+    "pack": "Getting around"
+  },
+  {
+    "name": "steam-train",
+    "code": "1f682",
+    "label": "Steam train",
+    "keywords": "locomotive train rail heritage",
+    "pack": "Getting around"
+  },
+  {
+    "name": "tram",
+    "code": "1f68b",
+    "label": "Tram",
+    "keywords": "streetcar train rail city",
+    "pack": "Getting around"
+  },
+  {
+    "name": "mountain-railway",
+    "code": "1f69e",
+    "label": "Mountain railway",
+    "keywords": "train rail scenic ella",
+    "pack": "Getting around"
+  },
+  {
+    "name": "monorail",
+    "code": "1f69d",
+    "label": "Monorail",
+    "keywords": "train rail",
+    "pack": "Getting around"
+  },
+  {
+    "name": "metro",
+    "code": "1f687",
+    "label": "Metro",
+    "keywords": "subway underground tube train",
+    "pack": "Getting around"
+  },
+  {
+    "name": "speedboat",
+    "code": "1f6a4",
+    "label": "Speedboat",
+    "keywords": "boat ride island hopping",
+    "pack": "Getting around"
+  },
+  {
+    "name": "ferry",
+    "code": "26f4",
+    "label": "Ferry",
+    "keywords": "boat ship crossing",
+    "pack": "Getting around"
+  },
+  {
+    "name": "cruise-ship",
+    "code": "1f6f3",
+    "label": "Cruise ship",
+    "keywords": "boat ship cruise",
+    "pack": "Getting around"
+  }
 ]

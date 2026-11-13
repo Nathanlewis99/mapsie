@@ -6,7 +6,7 @@
 //   after it fails, so a slow outage doesn't slow every keystroke.
 // Search (explicit, on Enter): Nominatim, which doesn't allow as-you-type use.
 // Reverse (tap on map): Photon → Nominatim → BigDataCloud.
-import type { PlaceResult } from "../geo";
+import { formatCoords, parseCoords, type PlaceResult } from "../geo";
 
 const UA = "Mapsie/1.0 (https://mapsie.shop; hello@mapsie.shop)";
 const cache = new Map<string, unknown>();
@@ -74,6 +74,12 @@ function travelScore(x: OpenMeteoPlace, query: string) {
 }
 
 export async function searchPlaces(q: string, full = false): Promise<PlaceResult[]> {
+  // Typed or pasted coordinates (or a map link): drop a pin there, named after the nearest place.
+  const at = parseCoords(q);
+  if (at) {
+    const name = await reversePlace(at.lng, at.lat).catch(() => null);
+    return [{ name: name ?? "Pinned spot", detail: `📍 ${formatCoords(at.lat, at.lng)}`, lng: at.lng, lat: at.lat }];
+  }
   const query = q.trim().slice(0, 100);
   if (query.length < 2) return [];
   const key = `s:${full ? 1 : 0}:${query.toLowerCase()}`;

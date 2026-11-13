@@ -4,7 +4,7 @@ import maplibregl, { Map as MLMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { DEFAULT_TEXT, type Design, type FontId, type Sticker, type Stop } from "@/lib/types";
 import { buildStyle, loadBaseStyle } from "@/lib/themes";
-import { buildLegs, routeGeoJSON, stopsBounds, MODES } from "@/lib/geo";
+import { buildLegs, routeGeoJSON, stopsBounds } from "@/lib/geo";
 import { loadCountries, visitedCountries } from "@/lib/countries";
 import { fontBold, fontCss } from "@/lib/fonts";
 import { getArtStyle, stickerSrc } from "@/lib/stickers";
@@ -235,7 +235,7 @@ export default function MapView(props: Props) {
       if (l.pattern) m.setPaintProperty(l.id, "line-dasharray", l.pattern);
     }
   }
-  const routeKey = JSON.stringify([design.stops.map((s) => [s.lng, s.lat, s.arriveBy, s.pathFor, s.path?.length]), design.route, design.theme.colors, width]);
+  const routeKey = JSON.stringify([design.stops.map((s) => [s.lng, s.lat, s.arriveBy, s.vehicle, s.pathFor, s.path?.length]), design.route, design.theme.colors, width]);
   useEffect(() => {
     syncRoute();
      
@@ -253,7 +253,7 @@ export default function MapView(props: Props) {
           const node = document.createElement("div");
           node.className = "mapsie-mode";
           node.style.cssText = `--u:${u}px;background:${c.paper};border-color:${c.accent}`;
-          node.innerHTML = `<img src="${MODES.find((x) => x.id === leg.mode)?.icon}" alt="" />`;
+          node.innerHTML = `<img src="${stickerSrc(leg.vehicle, design.route.iconArt ?? "cartoon")}" alt="" />`;
           const a = leg.line[0];
           const b = leg.line[leg.line.length - 1];
           // Only show the icon when the leg is long enough on screen not to crowd the stops.

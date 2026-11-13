@@ -41,7 +41,27 @@ export const MODES: { id: TravelMode; label: string; icon: string }[] = [
   { id: "train", label: "Train", icon: "/stickers/train.svg" },
   { id: "boat", label: "Boat", icon: "/stickers/sailboat.svg" },
   { id: "walk", label: "Hike", icon: "/stickers/walking.svg" },
+  { id: "tuktuk", label: "Tuk-tuk", icon: "/stickers/auto-rickshaw.svg" },
+  { id: "moped", label: "Moped", icon: "/stickers/scooter.svg" },
 ];
+
+/** Vehicles to choose from for each way of travelling (sticker names; the first is the default). */
+export const VEHICLES: Record<TravelMode, string[]> = {
+  plane: ["airplane", "small-airplane", "departure", "helicopter"],
+  car: ["car", "taxi", "suv", "campervan", "pickup-truck", "racing-car"],
+  bus: ["bus", "oncoming-bus", "trolleybus", "campervan"],
+  train: ["train", "high-speed-train", "bullet-train", "steam-train", "mountain-railway", "tram", "metro", "monorail"],
+  boat: ["sailboat", "ship", "ferry", "cruise-ship", "speedboat", "canoe"],
+  walk: ["walking", "hiking-boot", "bicycle", "camel"],
+  tuktuk: ["auto-rickshaw"],
+  moped: ["scooter", "motorbike", "bicycle", "kick-scooter"],
+};
+/** The vehicle sticker for a leg: the stop's choice if it suits the mode, else the mode's default. */
+export const vehicleFor = (mode: TravelMode, chosen?: string) => (chosen && VEHICLES[mode].includes(chosen) ? chosen : VEHICLES[mode][0]);
+
+/** Legs that follow real roads (fetched from a routing service). */
+export const ROAD_MODES: TravelMode[] = ["car", "bus", "tuktuk", "moped"];
+export const followsRoads = (mode: TravelMode | undefined) => !!mode && ROAD_MODES.includes(mode);
 
 export type Dash = "solid" | "dashed" | "dotted" | "rail";
 
@@ -76,6 +96,7 @@ export const legKey = (a: { lng: number; lat: number }, b: { lng: number; lat: n
 
 export interface Leg {
   mode: TravelMode;
+  vehicle: string;
   line: LngLat[];
   mid: LngLat;
 }
@@ -89,11 +110,11 @@ export function buildLegs(stops: Stop[], curved: boolean): Leg[] {
     const A: LngLat = [a.lng, a.lat];
     const B: LngLat = [b.lng, b.lat];
     let line: LngLat[];
-    if ((mode === "car" || mode === "bus") && b.path?.length && b.pathFor === legKey(a, b)) line = b.path;
+    if (followsRoads(mode) && b.path?.length && b.pathFor === legKey(a, b)) line = b.path;
     else if (mode === "plane") line = arc(A, B, curved, i % 2 === 0);
     else if (mode === "boat") line = arc(A, B, curved, i % 2 === 0, 0.1);
     else line = [A, B];
-    legs.push({ mode, line, mid: midpoint(line) });
+    legs.push({ mode, vehicle: vehicleFor(mode, b.vehicle), line, mid: midpoint(line) });
   }
   return legs;
 }
@@ -201,3 +222,49 @@ export async function reverseGeocode(lng: number, lat: number): Promise<string |
     return null;
   }
 }
+
+/**
+ * Coordinates typed or pasted into the place search, for spots no search service
+ * knows. Accepts "5.9643, 80.7076", "5.9643 N 80.7076 E", "5°57'51\"N 80°42'27\"E",
+ * "-33.85, 151.21" and Google / Apple / OpenStreetMap links. Latitude comes first,
+ * as in Google Maps. Returns null if it isn't coordinates.
+ */
+export function parseCoords(input: string): { lat: number; lng: number } | null {
+  const s = input.trim();
+  if (!s) return null;
+  // Map links: Google "@lat,lng", "?q=lat,lng", "ll=lat,lng"; OpenStreetMap "#map=z/lat/lng" or "mlat=..&mlon=..".
+  const link =
+    /@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/.exec(s) ??
+    /[?&](?:q|ll|query|sll|daddr)=(-?\d+(?:\.\d+)?)(?:,|%2C)\s*(-?\d+(?:\.\d+)?)/i.exec(s) ??
+    /#map=\d+(?:\.\d+)?\/(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)/.exec(s);
+  if (link) return check(Number(link[1]), Number(link[2]));
+  const osm = /mlat=(-?\d+(?:\.\d+)?).*mlon=(-?\d+(?:\.\d+)?)/.exec(s);
+  if (osm) return check(Number(osm[1]), Number(osm[2]));
+  if (/[a-z]{2,}/i.test(s.replace(/\b(lat|lng|lon|long|latitude|longitude)\b/gi, ""))) return null;
+
+  // Each half: degrees with optional minutes and seconds, and an optional hemisphere letter.
+  const part = String.raw`([NSEW])?\s*(-?\d+(?:[.,]\d+)?)\s*(?:°|º|d|\s)?\s*(?:(\d+(?:[.,]\d+)?)\s*(?:'|′|’|m|\s|(?=[NSEW,;/]|$))\s*)?(?:(\d+(?:[.,]\d+)?)\s*(?:"|″|”|''|s)?\s*)?([NSEW])?`;
+  const m = new RegExp(String.raw`^(?:lat(?:itude)?\s*[:=]?\s*)?${part}\s*[,;/\s]\s*(?:l(?:ng|on|ong|ongitude)\s*[:=]?\s*)?${part}$`, "i").exec(
+    s.replace(/\s+/g, " "),
+  );
+  if (!m) return null;
+  const val = (h1: string | undefined, d: string, mi: string | undefined, se: string | undefined, h2: string | undefined) => {
+    const n = (x?: string) => (x ? Number(x.replace(",", ".")) : 0);
+    const deg = n(d);
+    let v = Math.abs(deg) + n(mi) / 60 + n(se) / 3600;
+    const hemi = (h1 ?? h2 ?? "").toUpperCase();
+    if (deg < 0 || hemi === "S" || hemi === "W") v = -v;
+    return { v, hemi };
+  };
+  const a = val(m[1], m[2], m[3], m[4], m[5]);
+  const b = val(m[6], m[7], m[8], m[9], m[10]);
+  // "80.7 E, 5.9 N": hemisphere letters say which is which.
+  if ((a.hemi === "E" || a.hemi === "W") && (b.hemi === "N" || b.hemi === "S" || !b.hemi)) return check(b.v, a.v);
+  return check(a.v, b.v);
+}
+const check = (lat: number, lng: number) =>
+  Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? { lat, lng } : null;
+
+/** "5.9643° N, 80.7076° E" */
+export const formatCoords = (lat: number, lng: number) =>
+  `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? "N" : "S"}, ${Math.abs(lng).toFixed(4)}° ${lng >= 0 ? "E" : "W"}`;

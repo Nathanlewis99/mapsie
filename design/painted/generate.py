@@ -29,9 +29,10 @@ SIZE = 768  # final sticker size in px (prints at ~6.5 cm at 300 dpi, plenty for
 STYLE = (
     "A single travel sticker illustration in a realistic painted style: rich gouache and watercolour on textured paper, "
     "natural colours and lighting, believable detail and proportions, soft painterly edges, like a page from a beautiful "
-    "illustrated travel journal. The subject is centred and fills a circular composition with a simple, softly painted "
-    "background scene that fades to the edges. Not a photo, not 3D render, not cartoon, not flat vector. "
-    "No text, no letters, no numbers, no logos, no watermark, no border, no frame. Square image."
+    "illustrated travel journal. The subject is centred and large, with its painted setting continuing right to all four "
+    "edges of the square: full-bleed, no empty paper margin, no circle or vignette, no border, no frame (it will be cut into a "
+    "circle afterwards, so keep the subject inside the central circle). Not a photo, not 3D render, not cartoon, not flat vector. "
+    "No text, no letters, no numbers, no logos, no watermark. Square image."
 )
 
 def prompt_for(c):
@@ -71,8 +72,37 @@ def ref_parts():
         parts.append({"text": "Match the painting style, palette and finish of the reference image(s) exactly, but paint the new subject below."})
     return parts
 
+def trim_margin(im: Image.Image) -> Image.Image:
+    """If the painting sits inside a plain paper margin (a painted circle on cream paper),
+    crop to the painting so every sticker fills its circle the same way."""
+    w, h = im.size
+    small = im.resize((128, 128))
+    px = small.load()
+    corners = [px[2, 2], px[125, 2], px[2, 125], px[125, 125]]
+    paper = tuple(sum(c[i] for c in corners) // 4 for i in range(3))
+    if max(max(abs(c[i] - paper[i]) for i in range(3)) for c in corners) > 30:
+        return im  # the corners differ: the painting already runs to the edges
+    def busy(x, y):
+        return sum(abs(px[x, y][i] - paper[i]) for i in range(3)) > 60
+    # Radius of the painted area along the 8 directions from the centre.
+    import math
+    reach = []
+    for k in range(16):
+        a = 2 * math.pi * k / 16
+        r = 63
+        while r > 10 and not busy(int(64 + r * math.cos(a)), int(64 + r * math.sin(a))):
+            r -= 1
+        reach.append(r)
+    r = sorted(reach)[len(reach) // 4]  # robust: ignore a few stray strokes
+    if r > 58:
+        return im
+    scale = w / 128
+    half = int(r * 0.97 * scale)
+    cx, cy = w // 2, h // 2
+    return im.crop((cx - half, cy - half, cx + half, cy + half))
+
 def to_sticker(png: bytes) -> Image.Image:
-    im = Image.open(io.BytesIO(png)).convert("RGB").resize((SIZE, SIZE), Image.LANCZOS)
+    im = trim_margin(Image.open(io.BytesIO(png)).convert("RGB")).resize((SIZE, SIZE), Image.LANCZOS)
     # Circle cut with a soft, slightly feathered edge and a white rim, like the papercut set.
     mask = Image.new("L", (SIZE, SIZE), 0)
     m = int(SIZE * 0.04)
@@ -90,6 +120,8 @@ def make(c):
     if dest.exists():
         return "exists"
     png = call(ref_parts() + [{"text": prompt_for(c)}])
+    raw = Path(__file__).parent / "raw" / f"{c['id']}.png"  # kept (not in git) so stickers can be re-cut for free
+    raw.parent.mkdir(exist_ok=True); raw.write_bytes(png)
     dest.parent.mkdir(parents=True, exist_ok=True)
     to_sticker(png).save(dest, "WEBP", quality=88, method=6)
     return "ok"

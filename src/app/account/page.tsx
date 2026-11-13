@@ -13,6 +13,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "My account · Mapsie" };
 
 const STATUS: Record<string, { label: string; cls: string }> = {
+  awaiting_design: { label: "Waiting for your design", cls: "bg-amber-100 text-amber-800" },
   paid: { label: "Paid", cls: "bg-sea/15 text-sea" },
   rendering: { label: "Preparing print", cls: "bg-amber-100 text-amber-800" },
   ready: { label: "Final check", cls: "bg-amber-100 text-amber-800" },

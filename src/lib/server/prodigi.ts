@@ -20,13 +20,14 @@ export async function submitPrintOrder(order: Order, design: Design, address: Ad
     callbackUrl: `${publicUrl()}/api/webhooks/prodigi?o=${encodeURIComponent(order.id)}&t=${callbackToken(order.id)}`,
     recipient: {
       name: address.name,
-      email: order.email,
+      email: order.email || undefined,
       address: {
         line1: address.line1,
         line2: address.line2 ?? "",
         postalOrZipCode: address.postcode,
         countryCode: address.country,
         townOrCity: address.city,
+        stateOrCounty: address.state ?? "",
       },
     },
     items: [

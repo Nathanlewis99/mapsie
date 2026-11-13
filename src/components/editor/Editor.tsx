@@ -67,6 +67,44 @@ export default function Editor() {
   lockedRef.current = locked;
   const router = useRouter();
   const params = useSearchParams();
+
+  // Etsy buyers design here what they've already paid for on Etsy: the size and frame
+  // are fixed by their order, and "Order print" becomes "Send to print".
+  type EtsyCtx = { id: string; k: string; productId: string; frame: string; label: string; receiptId: string; unit: number; of: number };
+  const [etsy, setEtsy] = useState<EtsyCtx | null>(null);
+  useEffect(() => {
+    const id = params.get("etsy");
+    const k = params.get("k");
+    let stored: EtsyCtx | null = null;
+    try {
+      stored = JSON.parse(sessionStorage.getItem("mapsie-etsy") ?? "null");
+    } catch {}
+    const want = id && k ? { id, k } : stored;
+    if (!want) return;
+    fetch(`/api/etsy/orders/${want.id}?k=${encodeURIComponent(want.k)}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((o: Omit<EtsyCtx, "k"> & { status: string }) => {
+        if (o.status !== "awaiting_design") throw new Error("done");
+        const ctx = { ...o, k: want.k };
+        setEtsy(ctx);
+        try {
+          sessionStorage.setItem("mapsie-etsy", JSON.stringify(ctx));
+        } catch {}
+      })
+      .catch(() => {
+        setEtsy(null);
+        try {
+          sessionStorage.removeItem("mapsie-etsy");
+        } catch {}
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
+  const leaveEtsy = () => {
+    setEtsy(null);
+    try {
+      sessionStorage.removeItem("mapsie-etsy");
+    } catch {}
+  };
   const stage = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
 
@@ -276,12 +314,22 @@ export default function Editor() {
   const sel = design.stickers.find((s) => s.id === selectedSticker);
   const price = itemPrice(design, region);
 
+  useEffect(() => {
+    if (!etsy) return;
+    if (design.productId !== etsy.productId || design.frame !== etsy.frame) {
+      const changed = design.productId !== etsy.productId && design.stops.length > 0;
+      store.set({ productId: etsy.productId, frame: etsy.frame as Design["frame"], paper: "ema" });
+      if (changed) setToast(`Your size and frame come from your Etsy order (${etsy.label}).`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [etsy, design.productId, design.frame]);
+
   const order = async () => {
     track("order_click");
     setBusy("order");
     try {
       const id = await saveSnapshot(design);
-      router.push(`/checkout/${id}`);
+      router.push(etsy ? `/etsy/${etsy.id}/confirm?k=${encodeURIComponent(etsy.k)}&d=${id}` : `/checkout/${id}`);
     } catch {
       setToast("Couldn't save your design, please try again.");
       setBusy("");
@@ -346,7 +394,7 @@ export default function Editor() {
             </button>
           </div>
           <span className="w-px h-6 bg-ink/10 mx-1 sm:mx-2 hidden sm:block" />
-          <label className="hidden sm:flex items-center rounded-full border border-ink/15 pl-2 pr-1 h-9 text-sm font-semibold text-ink/70 hover:border-ink/30 cursor-pointer" title="Where should we ship it? Prices and printing are local to each country.">
+          <label className={`${etsy ? "hidden" : "hidden sm:flex"} items-center rounded-full border border-ink/15 pl-2 pr-1 h-9 text-sm font-semibold text-ink/70 hover:border-ink/30 cursor-pointer`} title="Where should we ship it? Prices and printing are local to each country.">
             <select value={region} onChange={(e) => store.setRegion(e.target.value as typeof region)} aria-label="Ship to" className="bg-transparent outline-none cursor-pointer pr-1">
               {REGIONS.map((r) => (
                 <option key={r.id} value={r.id}>{r.flag} {r.id === "GB" ? "UK" : r.id}</option>
@@ -360,6 +408,11 @@ export default function Editor() {
           >
             {busy === "order" ? (
               "Saving…"
+            ) : etsy ? (
+              <>
+                <span>Send to print</span>
+                <span aria-hidden className="transition group-hover:translate-x-0.5">→</span>
+              </>
             ) : (
               <>
                 <span>
@@ -388,6 +441,15 @@ export default function Editor() {
           )}
         </div>
       </header>
+      {etsy && (
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-2 bg-sea/10 border-b border-sea/20 text-sm">
+          <span>
+            🧡 <b>Etsy order {etsy.receiptId}</b>
+            {etsy.of > 1 && <> · print {etsy.unit} of {etsy.of}</>} · {etsy.label}. Already paid: design your map, then press <b>Send to print</b>.
+          </span>
+          <button onClick={leaveEtsy} className="text-xs font-bold text-ink/50 underline hover:text-ink">Not your order?</button>
+        </div>
+      )}
 
       <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
         {/* poster stage */}
@@ -711,7 +773,7 @@ export default function Editor() {
             <WallPreview design={design} />
             <div className="mt-4 flex justify-end gap-2">
               <button onClick={() => { setWall(false); setTab("size"); }} className="rounded-full border-2 border-ink/15 px-5 py-2.5 font-bold">Change size or frame</button>
-              <button onClick={order} className="rounded-full bg-coral px-5 py-2.5 font-extrabold text-white">Order · {money(region, price)}</button>
+              <button onClick={order} className="rounded-full bg-coral px-5 py-2.5 font-extrabold text-white">{etsy ? "Send to print" : `Order · ${money(region, price)}`}</button>
             </div>
           </div>
         </div>

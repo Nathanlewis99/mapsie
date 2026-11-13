@@ -4,6 +4,7 @@ import { deleteOldErrors, deleteOldEvents, deleteUnorderedDesigns, listOrdersByS
 import { processPaidOrders, sendToPrint } from "./fulfil";
 import { getCosts, refreshCosts } from "./prodigiCosts";
 import { logError } from "./log";
+import { etsyJob } from "./etsy";
 
 // Background jobs, started once when the server boots (see src/instrumentation.ts).
 // State lives in the database, so nothing is lost if the server restarts.
@@ -50,4 +51,7 @@ export function startScheduler() {
   setTimeout(safe(async () => { if (!(await getCosts())) await refreshCosts(); }, "costs"), 120_000);
   setTimeout(safe(sendDueOrders, "print-queue"), 5_000);
   setTimeout(safe(cleanUp, "cleanup"), 60_000);
+  // Etsy: new orders and design reminders (does nothing until a shop is connected).
+  setInterval(safe(etsyJob, "etsy"), 5 * 60_000);
+  setTimeout(safe(etsyJob, "etsy"), 30_000);
 }

@@ -17,13 +17,16 @@ export interface Address {
   line1: string;
   line2?: string;
   city: string;
+  /** State, county or province (US, Australian and Canadian addresses need it). */
+  state?: string;
   postcode: string;
   country: string; // ISO-2
 }
 
+// Etsy orders start at awaiting_design (paid on Etsy, the buyer hasn't designed it yet), then paid.
 // pending_payment -> paid -> rendering -> ready (print file done, waiting out the
 // cancellation window) -> submitted (sent to the printer) -> shipped. Or cancelled / failed.
-export type OrderStatus = "pending_payment" | "paid" | "rendering" | "ready" | "submitted" | "shipped" | "cancelled" | "failed";
+export type OrderStatus = "pending_payment" | "awaiting_design" | "paid" | "rendering" | "ready" | "submitted" | "shipped" | "cancelled" | "failed";
 
 export interface Order {
   id: string;
@@ -53,6 +56,20 @@ export interface Order {
   visitId?: string;
   /** Which customer emails have gone out, so none is sent twice. */
   emailsSent?: string[];
+  /** Where it was bought: our checkout (default) or Etsy. */
+  source?: "mapsie" | "etsy";
+  /** Etsy orders: the size and frame that were paid for (the design must use them). */
+  print?: { productId: string; frame: string };
+  etsy?: {
+    receiptId: string;
+    transactionId: string;
+    unit: number; // which copy, when one Etsy order is for several prints
+    of: number;
+    title?: string;
+    choices?: string; // the variations the buyer picked, as text
+    matched: boolean; // false if we had to guess the size or frame
+    trackingSent?: boolean;
+  };
   createdAt: string;
 }
 
@@ -340,6 +357,12 @@ export async function claimOrder(id: string, from: OrderStatus, to: OrderStatus)
 export async function listOrders(): Promise<Order[]> {
   const rows = await all("SELECT json FROM orders ORDER BY created_at DESC");
   return rows.map((r) => JSON.parse(String(r.json)));
+}
+/** The Mapsie orders made from one Etsy order (one per print). */
+export async function listOrdersByEtsyReceipt(receiptId: string): Promise<Order[]> {
+  if (!/^\d{1,20}$/.test(receiptId)) return [];
+  const rows = await all("SELECT json FROM orders WHERE id LIKE 'ord_etsy_%' AND json LIKE ? ORDER BY created_at", [`%"receiptId":"${receiptId}"%`]);
+  return rows.map((r) => JSON.parse(String(r.json)) as Order).filter((o) => o.etsy?.receiptId === receiptId);
 }
 export async function listOrdersByStatus(status: OrderStatus): Promise<Order[]> {
   const rows = await all("SELECT json FROM orders WHERE status = ? ORDER BY created_at", [status]);

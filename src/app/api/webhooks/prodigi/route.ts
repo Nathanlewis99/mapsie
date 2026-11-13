@@ -4,6 +4,7 @@ import { getProdigiOrder } from "@/lib/server/prodigi";
 import { callbackTokenValid } from "@/lib/server/printToken";
 import { logError } from "@/lib/server/log";
 import { alertAdmin, sendOrderEmail } from "@/lib/server/email";
+import { sendEtsyTracking } from "@/lib/server/etsy";
 
 // Prodigi calls this when one of our orders changes (in production, shipped, etc.).
 // The URL carries a signed token per order, and we re-read the order from
@@ -29,7 +30,10 @@ export async function POST(req: Request) {
     ...(stage === "Complete" || shipments.length ? { status: "shipped" as const } : {}),
     ...(stage === "Cancelled" ? { status: "failed" as const, error: "Cancelled by the printer" } : {}),
   });
-  if (stage === "Complete" || shipments.length) await sendOrderEmail(orderId, "shipped");
+  if (stage === "Complete" || shipments.length) {
+    await sendOrderEmail(orderId, "shipped");
+    if (order.etsy) await sendEtsyTracking(orderId);
+  }
   if (stage === "Cancelled") await alertAdmin(`Order ${orderId} was cancelled by Prodigi`, `Prodigi order ${order.printProviderOrderId} is now Cancelled. Check the Prodigi dashboard and contact the customer (${order.email}).`);
   return NextResponse.json({ ok: true });
 }

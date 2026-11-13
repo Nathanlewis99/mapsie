@@ -65,8 +65,8 @@ async function renderOrder(order: Order) {
       console.warn("[fulfil] render failed, retrying with lighter settings:", String(e).slice(0, 200));
       r = await renderDesign(design, `${order.id}.png`, FALLBACK);
     }
-    // The customer may have cancelled while we were rendering.
-    if ((await getOrder(orderId))?.status === "cancelled") return;
+    // The customer may have cancelled (or, for Etsy, reopened the design) while we were rendering.
+    if ((await getOrder(orderId))?.status !== "rendering") return;
     await updateOrder(orderId, {
       status: "ready",
       renderFile: r.file,

@@ -7,7 +7,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (process.env.STRIPE_SECRET_KEY) return NextResponse.json({ error: "disabled" }, { status: 404 });
   const { id } = await params;
   const order = await getOrder(id);
-  if (!order || order.status !== "pending_payment") return NextResponse.json({ error: "Order not payable" }, { status: 400 });
+  if (!order || order.status !== "pending_payment" || order.etsy) return NextResponse.json({ error: "Order not payable" }, { status: 400 });
   const address = (await req.json()) as Address;
   after(() => fulfilOrder(id, { ...address, country: order.region ?? "GB" }));
   return NextResponse.json({ ok: true });

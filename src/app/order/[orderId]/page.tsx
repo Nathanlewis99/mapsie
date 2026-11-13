@@ -14,6 +14,7 @@ interface Status {
   holdUntil?: string;
   canCancel?: boolean;
   refunded?: boolean;
+  etsy?: boolean;
   shipments?: { carrier?: string; trackingNumber?: string; trackingUrl?: string }[];
 }
 
@@ -59,6 +60,11 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
     setCancelErr("");
     const r = await fetch(`/api/orders/${orderId}/cancel`, { method: "POST" });
     const j = await r.json();
+    if (r.ok && j.reopened) {
+      // Etsy orders: back to the editor to change the design.
+      window.location.href = j.url;
+      return;
+    }
     if (r.ok) {
       track("order_cancelled");
       setO((x) => (x ? { ...x, status: "cancelled", refunded: j.refunded, canCancel: false } : x));
@@ -100,7 +106,8 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
             const rank = o ? RANK[o.status] ?? 0 : 0;
             const done = rank > i + 1 || (s.key === "shipped" && o?.status === "shipped");
             const active = !done && rank === i + 1;
-            const label = s.key === "ready" && o?.holdUntil ? `Final check: goes to print at ${time(o.holdUntil)}` : s.label;
+            const label =
+              s.key === "ready" && o?.holdUntil ? `Final check: goes to print at ${time(o.holdUntil)}` : s.key === "paid" && o?.etsy ? "Design received" : s.label;
             return (
               <li key={s.key} className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-sm font-bold">
                 <span className={`grid place-items-center w-7 h-7 rounded-full text-sm shrink-0 ${done ? "bg-sea text-white" : active ? "bg-coral/20 animate-pulse" : "bg-ink/10"}`}>
@@ -134,17 +141,21 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
       {o?.canCancel && o.holdUntil && (
         <div className="rounded-2xl border-2 border-ink/10 p-4 space-y-3">
           <p className="text-sm text-ink/70">
-            Spotted a mistake? You can cancel for a full refund until <b>{time(o.holdUntil)}</b>, when your print goes to our studio.
+            {o.etsy ? (
+              <>Spotted a mistake? You can reopen your design and change it until <b>{time(o.holdUntil)}</b>, when your print goes to our studio.</>
+            ) : (
+              <>Spotted a mistake? You can cancel for a full refund until <b>{time(o.holdUntil)}</b>, when your print goes to our studio.</>
+            )}
           </p>
           {confirming ? (
             <div className="flex flex-wrap gap-2">
               <button onClick={cancel} disabled={busy} className="rounded-full bg-coral-dark px-5 py-2.5 font-extrabold text-white disabled:opacity-50">
-                {busy ? "Cancelling…" : "Yes, cancel and refund"}
+                {busy ? (o.etsy ? "Opening…" : "Cancelling…") : o.etsy ? "Yes, change my design" : "Yes, cancel and refund"}
               </button>
-              <button onClick={() => setConfirming(false)} className="rounded-full border-2 border-ink/15 px-5 py-2.5 font-bold">Keep my order</button>
+              <button onClick={() => setConfirming(false)} className="rounded-full border-2 border-ink/15 px-5 py-2.5 font-bold">{o.etsy ? "Keep it as it is" : "Keep my order"}</button>
             </div>
           ) : (
-            <button onClick={() => setConfirming(true)} className="rounded-full border-2 border-ink/15 px-5 py-2.5 font-bold hover:border-ink/40">Cancel order</button>
+            <button onClick={() => setConfirming(true)} className="rounded-full border-2 border-ink/15 px-5 py-2.5 font-bold hover:border-ink/40">{o.etsy ? "Change my design" : "Cancel order"}</button>
           )}
           {cancelErr && <p className="text-sm font-bold text-coral-dark">{cancelErr}</p>}
         </div>

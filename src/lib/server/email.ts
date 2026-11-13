@@ -58,6 +58,51 @@ export async function sendOrderEmail(orderId: string, kind: "confirmed" | "shipp
   }
 }
 
+/** Etsy buyers: the link to design their map ("invite"), and reminders. Each sent once. Never throws. */
+export async function sendEtsyDesignEmail(o: Order, kind: "invite" | "remind1" | "remind2", force = false) {
+  const key = `etsy-${kind}`;
+  try {
+    const fresh = await getOrder(o.id);
+    if (!fresh || !fresh.email || fresh.status !== "awaiting_design" || (!force && fresh.emailsSent?.includes(key))) return;
+    // A reminder only after the invite went out, and never two at once.
+    if (kind === "remind1" && !fresh.emailsSent?.includes("etsy-invite")) return;
+    if (kind === "remind2" && !fresh.emailsSent?.includes("etsy-remind1")) return;
+    const { etsyDesignUrl } = await import("./etsy");
+    const name = fresh.address?.name?.split(" ")[0];
+    const what = fresh.print ? describeOptions({ productId: fresh.print.productId, frame: fresh.print.frame, paper: "ema", mount: "none", glaze: "perspex", orientation: "portrait" } as never) : "map print";
+    const several = fresh.etsy && fresh.etsy.of > 1 ? ` (print ${fresh.etsy.unit} of ${fresh.etsy.of})` : "";
+    const lines = {
+      invite: [
+        name ? `Hi ${name},` : "Hi,",
+        `Thank you for your Etsy order! Now for the fun part: designing your map${several}.`,
+        "Add the places you went, pick a style, add stickers and a title. It takes about five minutes, and you'll see exactly how it will look before it's printed.",
+        `Your print: ${what}.`,
+        `Etsy order ${fresh.etsy?.receiptId}`,
+      ],
+      remind1: [
+        name ? `Hi ${name},` : "Hi,",
+        `Your map${several} is waiting for you! We can't print it until you've designed it.`,
+        `Your print: ${what}.`,
+        `Etsy order ${fresh.etsy?.receiptId}`,
+      ],
+      remind2: [
+        name ? `Hi ${name},` : "Hi,",
+        `Just checking in: your map${several} still needs designing before we can print and send it.`,
+        "Stuck or have a question? Reply to this email and we'll help.",
+        `Etsy order ${fresh.etsy?.receiptId}`,
+      ],
+    }[kind];
+    const subject = { invite: "Design your Mapsie map", remind1: "Your map is waiting to be designed", remind2: "Don't forget to design your map" }[kind];
+    const heading = { invite: "Let's design your map 🗺️", remind1: "Your map is waiting", remind2: "Still there?" }[kind];
+    await sendEmail(page(fresh.email, subject, heading, lines, { label: "Design my map", href: etsyDesignUrl(fresh.id) }));
+    const sent = (await getOrder(o.id))?.emailsSent ?? [];
+    if (!sent.includes(key)) await updateOrder(o.id, { emailsSent: [...sent, key] });
+  } catch (e) {
+    const { logError } = await import("./log");
+    await logError("email.etsy", e, { orderId: o.id, kind });
+  }
+}
+
 /** Tell us when something needs a human (failed renders, printer problems). Never throws. */
 export async function alertAdmin(subject: string, text: string) {
   try {
@@ -89,6 +134,17 @@ async function build(o: Order, kind: "confirmed" | "shipped" | "cancelled"): Pro
   const total = money(o.region, o.total);
   const ship = SHIPPING.find((s) => s.id === o.shipping) ?? SHIPPING[0];
 
+  if (kind === "confirmed" && o.source === "etsy") {
+    const until = o.holdUntil ? clock(o.holdUntil, o.region) : null;
+    const lines = [
+      hi,
+      `Thank you! Your design is in, and we're getting ${what} ready to print.`,
+      until ? `Want to change something? You can reopen your design until ${until}, on your order page. After that it goes to print.` : "",
+      `We'll email you when it's on its way, and Etsy will show the tracking too.`,
+      `Etsy order ${o.etsy?.receiptId}`,
+    ].filter(Boolean);
+    return page(o.email, `Your map is going to print`, "Design received 🎉", lines, { label: "View your order", href: link });
+  }
   if (kind === "confirmed") {
     const until = o.holdUntil ? clock(o.holdUntil, o.region) : null;
     const lines = [

@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 
 const STATUS: Record<string, string> = {
   pending_payment: "bg-ink/10 text-ink/60",
+  awaiting_design: "bg-amber-50 text-amber-700",
   paid: "bg-sea/20 text-sea",
   rendering: "bg-amber-100 text-amber-700",
   ready: "bg-amber-100 text-amber-700",
@@ -19,7 +20,7 @@ const STATUS: Record<string, string> = {
 
 export default async function Admin() {
   const orders = await listOrders();
-  const rows = await Promise.all(orders.map(async (o) => ({ o, d: await getDesign(o.designId) })));
+  const rows = await Promise.all(orders.map(async (o) => ({ o, d: o.designId ? await getDesign(o.designId) : null })));
   const paid = orders.filter((o) => o.status !== "pending_payment");
   return (
     <main className="max-w-6xl mx-auto px-6 py-10 space-y-6">
@@ -28,6 +29,7 @@ export default async function Admin() {
           <Link href="/" className="font-display text-2xl font-extrabold"><Logo /></Link>
           <h1 className="text-3xl font-extrabold mt-2">Orders</h1>
           <div className="flex flex-wrap gap-4">
+            <Link href="/admin/etsy" className="text-sm font-bold text-coral-dark">Etsy →</Link>
             <Link href="/admin/costs" className="text-sm font-bold text-coral-dark">Costs &amp; margins →</Link>
             <Link href="/admin/errors" className="text-sm font-bold text-coral-dark">Errors →</Link>
             <Link href="/admin/funnel" className="text-sm font-bold text-coral-dark">Funnel →</Link>
@@ -47,14 +49,14 @@ export default async function Admin() {
           <tbody>
             {rows.map(({ o, d }) => (
               <tr key={o.id} className="border-t border-ink/5 align-top">
-                <td className="px-4 py-3 font-mono text-xs">{o.id}<div className="text-ink/40">{o.email}</div></td>
+                <td className="px-4 py-3 font-mono text-xs">{o.id}<div className="text-ink/40">{o.email}</div>{o.etsy && <div className="font-sans font-bold text-[#f1641e]">Etsy {o.etsy.receiptId}</div>}</td>
                 <td className="px-4 py-3 whitespace-nowrap">{new Date(o.createdAt).toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" })}</td>
                 <td className="px-4 py-3"><Link className="font-bold underline" href={`/d/${o.designId}`}>{d?.title ?? "?"}</Link><div className="text-ink/40">{d?.stops.length} stops</div></td>
                 <td className="px-4 py-3">{d ? describeOptions(d) : "?"}</td>
                 <td className="px-4 py-3 font-bold">{money((o.region ?? "GB") as RegionId, o.total ?? 0)}</td>
                 <td className="px-4 py-3">{o.address ? `${o.address.name}, ${o.address.city} ${o.address.postcode}, ${o.address.country}` : "—"}</td>
                 <td className="px-4 py-3">
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${STATUS[o.status] ?? ""}`}>{o.status.replace("_", " ")}</span>
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${STATUS[o.status] ?? ""}`}>{o.status.replace(/_/g, " ")}</span>
                   {o.error && <div className="text-xs text-coral-dark mt-1 max-w-[220px] break-words">{o.error.slice(0, 160)}</div>}
                   {o.printProviderOrderId && <div className="text-xs text-ink/40 mt-1">{o.printProviderOrderId}</div>}
                 </td>

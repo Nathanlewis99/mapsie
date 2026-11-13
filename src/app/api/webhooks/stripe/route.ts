@@ -23,6 +23,7 @@ export async function POST(req: Request) {
           line1: a.line1 ?? "",
           line2: a.line2 ?? undefined,
           city: a.city ?? "",
+          state: a.state ?? undefined,
           postcode: a.postal_code ?? "",
           country: a.country ?? "GB",
         }, { stripePaymentIntent: typeof s.payment_intent === "string" ? s.payment_intent : s.payment_intent?.id }),

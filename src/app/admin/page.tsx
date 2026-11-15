@@ -29,6 +29,7 @@ export default async function Admin() {
           <Link href="/" className="font-display text-2xl font-extrabold"><Logo /></Link>
           <h1 className="text-3xl font-extrabold mt-2">Orders</h1>
           <div className="flex flex-wrap gap-4">
+            <Link href="/admin/support" className="text-sm font-bold text-coral-dark">Support →</Link>
             <Link href="/admin/etsy" className="text-sm font-bold text-coral-dark">Etsy →</Link>
             <Link href="/admin/costs" className="text-sm font-bold text-coral-dark">Costs &amp; margins →</Link>
             <Link href="/admin/errors" className="text-sm font-bold text-coral-dark">Errors →</Link>

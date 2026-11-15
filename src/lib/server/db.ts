@@ -56,6 +56,9 @@ export interface Order {
   visitId?: string;
   /** Which customer emails have gone out, so none is sent twice. */
   emailsSent?: string[];
+  /** A free replacement: the order it replaces, and the support ticket behind it. */
+  reprintOf?: string;
+  supportTicket?: string;
   /** Where it was bought: our checkout (default) or Etsy. */
   source?: "mapsie" | "etsy";
   /** Etsy orders: the size and frame that were paid for (the design must use them). */
@@ -182,6 +185,25 @@ const SCHEMA = `
     json TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
+  -- Customer support: one row per ticket (the conversation is in json), photos separately.
+  CREATE TABLE IF NOT EXISTS support_tickets (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    order_id TEXT,
+    status TEXT NOT NULL,
+    json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS support_status ON support_tickets(status, updated_at);
+  CREATE TABLE IF NOT EXISTS support_files (
+    id TEXT PRIMARY KEY,
+    ticket_id TEXT NOT NULL,
+    mime TEXT NOT NULL,
+    data TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS support_files_ticket ON support_files(ticket_id);
 `;
 
 let driverPromise: Promise<Driver> | null = null;
@@ -482,6 +504,52 @@ export async function getCachedRoute(key: string): Promise<unknown | undefined> 
 }
 export async function putCachedRoute(key: string, value: unknown) {
   await run("INSERT INTO route_cache (key, json, created_at) VALUES (?, ?, ?) ON CONFLICT (key) DO UPDATE SET json = excluded.json", [key, JSON.stringify(value), now()]);
+}
+
+// ---------------------------------------------------------------- support
+export type TicketStatus = "open" | "waiting" | "resolved";
+export type TicketReason = "not_arrived" | "damaged" | "quality" | "wrong" | "unhappy" | "change" | "address" | "other";
+export interface TicketMessage {
+  from: "customer" | "mapsie";
+  text: string;
+  at: string;
+  files?: string[]; // support_files ids
+}
+export interface Ticket {
+  id: string; // e.g. MS-7K2QX9
+  email: string;
+  name?: string;
+  orderRef: string; // what the customer typed
+  orderId?: string; // the order it matched (email checked)
+  reason: TicketReason;
+  status: TicketStatus;
+  messages: TicketMessage[];
+  /** What we did about it, e.g. "Reprint ord_abc", "Refunded £44". */
+  actions?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+export async function saveTicket(t: Ticket) {
+  await run(
+    `INSERT INTO support_tickets (id, email, order_id, status, json, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT (id) DO UPDATE SET email = excluded.email, order_id = excluded.order_id, status = excluded.status, json = excluded.json, updated_at = excluded.updated_at`,
+    [t.id, t.email, t.orderId ?? null, t.status, JSON.stringify(t), t.createdAt, t.updatedAt],
+  );
+}
+export async function getTicket(id: string): Promise<Ticket | null> {
+  const r = await one("SELECT json FROM support_tickets WHERE id = ?", [id]);
+  return r ? JSON.parse(String(r.json)) : null;
+}
+export async function listTickets(): Promise<Ticket[]> {
+  const rows = await all("SELECT json FROM support_tickets ORDER BY updated_at DESC LIMIT 500");
+  return rows.map((r) => JSON.parse(String(r.json)));
+}
+export async function saveSupportFile(f: { id: string; ticketId: string; mime: string; data: string }) {
+  await run("INSERT INTO support_files (id, ticket_id, mime, data, created_at) VALUES (?, ?, ?, ?, ?)", [f.id, f.ticketId, f.mime, f.data, now()]);
+}
+export async function getSupportFile(id: string): Promise<{ ticketId: string; mime: string; data: string } | null> {
+  const r = await one("SELECT ticket_id, mime, data FROM support_files WHERE id = ?", [id]);
+  return r ? { ticketId: String(r.ticket_id), mime: String(r.mime), data: String(r.data) } : null;
 }
 
 // ---------------------------------------------------------------- key/value

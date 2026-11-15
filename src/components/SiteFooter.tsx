@@ -2,6 +2,7 @@ import Link from "next/link";
 import { COMPANY } from "@/lib/company";
 
 export const LEGAL_LINKS = [
+  { href: "/support", label: "Help & support" },
   { href: "/legal/terms", label: "Terms & Conditions" },
   { href: "/legal/privacy", label: "Privacy Policy" },
   { href: "/legal/refunds", label: "Returns & Refunds" },

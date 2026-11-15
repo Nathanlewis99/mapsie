@@ -174,6 +174,9 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
           )}
         </div>
       )}
+      <p className="text-sm">
+        <Link href={`/support?order=${orderId}`} className="font-bold text-coral-dark underline">Need help with this order?</Link>
+      </p>
       <p className="text-xs text-ink/40">Map data © OpenStreetMap contributors.</p>
     </main>
   );

@@ -9,6 +9,6 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
   if (!o?.address) return NextResponse.json({ error: "Order has no address yet" }, { status: 400 });
   // Admin re-send: no new cancellation window.
   const now = new Date().toISOString();
-  after(() => fulfilOrder(id, o.address!, { paidAt: o.paidAt ?? now, holdUntil: now, stripePaymentIntent: o.stripePaymentIntent }));
+  after(() => fulfilOrder(id, o.address!, { paidAt: o.paidAt ?? now, holdUntil: now, stripePaymentIntent: o.stripePaymentIntent }, "failed"));
   return NextResponse.json({ ok: true });
 }

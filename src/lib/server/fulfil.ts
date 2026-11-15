@@ -20,7 +20,10 @@ export const ROLE = (process.env.MAPSIE_ROLE ?? "all") as "web" | "worker" | "al
  * separate render worker when the site runs on several servers) makes the
  * print file, then holds the order until the cancellation window ends.
  */
-export async function fulfilOrder(orderId: string, address: Address, extra: Partial<Order> = {}) {
+export async function fulfilOrder(orderId: string, address: Address, extra: Partial<Order> = {}, from: Order["status"] = "pending_payment") {
+  // Exactly once: payment webhooks can arrive more than once (retries, completed and
+  // async_payment_succeeded), and a repeat must never re-queue an order already in progress.
+  if (!(await claimOrder(orderId, from, "paid"))) return;
   const now = new Date();
   await updateOrder(orderId, {
     status: "paid",
@@ -34,6 +37,13 @@ export async function fulfilOrder(orderId: string, address: Address, extra: Part
   if (paid?.visitId) await recordEvent(paid.visitId, "paid", { total: paid.total, currency: paid.currency }).catch(() => {});
   await sendOrderEmail(orderId, "confirmed");
   if (ROLE !== "web") void processPaidOrders();
+}
+
+/** A delayed payment (e.g. bank debit) failed after checkout: the order is never printed. */
+export async function markPaymentFailed(orderId: string) {
+  const o = await getOrder(orderId);
+  if (o?.status !== "pending_payment") return;
+  await updateOrder(orderId, { status: "cancelled", error: "Payment failed", cancelledAt: new Date().toISOString() });
 }
 
 let rendering = false;

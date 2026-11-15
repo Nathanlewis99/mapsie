@@ -54,6 +54,9 @@ export async function POST(req: Request) {
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const cents = (n: number) => Math.round(n * 100);
+  // Stripe Tax: switch on (STRIPE_TAX=on) once registered for VAT or sales tax somewhere and the
+  // registration is added in Stripe. Prices stay tax-inclusive, so customers see the same totals.
+  const tax = process.env.STRIPE_TAX === "on";
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     // Discount codes are created in the Stripe dashboard (Products > Coupons > promotion codes).
@@ -65,7 +68,9 @@ export async function POST(req: Request) {
         price_data: {
           currency: region.currency,
           unit_amount: cents(item),
+          ...(tax ? { tax_behavior: "inclusive" as const } : {}),
           product_data: {
+            ...(tax ? { tax_code: "txcd_99999999" } : {}), // general tangible goods (printed posters)
             name: `Mapsie print: ${design.title}`,
             description: `Art print: ${describeOptions(design)}`,
           },
@@ -79,10 +84,14 @@ export async function POST(req: Request) {
           type: "fixed_amount",
           display_name: `${ship.label} (${ship.detail})`,
           fixed_amount: { amount: cents(ship.price[region.id]), currency: region.currency },
+          ...(tax ? { tax_behavior: "inclusive" as const, tax_code: "txcd_92010001" } : {}), // shipping
         },
       },
     ],
     metadata: { orderId: order.id },
+    // Shown on the payment in the Stripe dashboard, so payments and orders are easy to match up.
+    payment_intent_data: { description: `Mapsie order ${order.id}`, metadata: { orderId: order.id } },
+    ...(tax ? { automatic_tax: { enabled: true } } : {}),
     success_url: `${base}/order/${order.id}`,
     cancel_url: `${base}/checkout/${body.designId}`,
   });

@@ -103,6 +103,39 @@ export async function sendEtsyDesignEmail(o: Order, kind: "invite" | "remind1" |
   }
 }
 
+/**
+ * A sale! Emailed to SALES_EMAIL (or the alert address) once per order, when it's paid
+ * (or, for Etsy, when the buyer sends their design to print). Never throws.
+ */
+export async function sendSaleAlert(orderId: string) {
+  try {
+    const o = await getOrder(orderId);
+    if (!o || o.emailsSent?.includes("sale-alert")) return;
+    const raw = o.designId ? await getDesign(o.designId) : null;
+    const d = raw ? normalizeDesign(raw) : null;
+    const where = [o.address?.city, o.address?.country].filter(Boolean).join(", ");
+    const what = d ? describeOptions(d) : "map print";
+    const etsy = o.etsy ? ` (Etsy order ${o.etsy.receiptId})` : "";
+    const to = process.env.SALES_EMAIL ?? process.env.ALERT_EMAIL ?? COMPANY.supportEmail;
+    const lines = [
+      `${money(o.region, o.total)}${etsy}: ${what}`,
+      d ? `“${d.title}”, ${d.stops.length} stops` : "",
+      where ? `Going to ${where}` : "",
+      `Order ${o.id}`,
+      `${publicUrl()}/admin`,
+    ].filter(Boolean);
+    await sendEmail({
+      to,
+      subject: `🎉 New Mapsie sale: ${money(o.region, o.total)}${etsy}`,
+      text: lines.join("\n"),
+      html: `<div style="font:15px/1.6 -apple-system,Segoe UI,sans-serif">${lines.map((l) => `<div>${esc(l)}</div>`).join("")}</div>`,
+    });
+    await updateOrder(orderId, { emailsSent: [...((await getOrder(orderId))?.emailsSent ?? []), "sale-alert"] });
+  } catch (e) {
+    console.error(JSON.stringify({ level: "error", scope: "email.sale", message: String(e) }));
+  }
+}
+
 /** Tell us when something needs a human (failed renders, printer problems). Never throws. */
 export async function alertAdmin(subject: string, text: string) {
   try {

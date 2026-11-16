@@ -4,7 +4,7 @@ import { renderDesign, FALLBACK } from "./render";
 import { publicUrl } from "./urls";
 import { submitPrintOrder } from "./prodigi";
 import { logError } from "./log";
-import { alertAdmin, sendOrderEmail } from "./email";
+import { alertAdmin, sendOrderEmail, sendSaleAlert } from "./email";
 
 /** Minutes after payment during which the customer can cancel. */
 export const HOLD_MINUTES = Number(process.env.ORDER_HOLD_MINUTES ?? 60);
@@ -36,6 +36,7 @@ export async function fulfilOrder(orderId: string, address: Address, extra: Part
   const paid = await getOrder(orderId);
   if (paid?.visitId) await recordEvent(paid.visitId, "paid", { total: paid.total, currency: paid.currency }).catch(() => {});
   await sendOrderEmail(orderId, "confirmed");
+  await sendSaleAlert(orderId);
   if (ROLE !== "web") void processPaidOrders();
 }
 

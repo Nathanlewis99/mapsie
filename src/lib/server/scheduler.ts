@@ -1,7 +1,9 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { deleteOldErrors, deleteOldEvents, deleteUnorderedDesigns, listOrdersByStatus, listOrdersDueForPrint, rendersDir, updateOrder } from "./db";
-import { processPaidOrders, sendToPrint } from "./fulfil";
+import { processPaidOrders, ROLE, sendToPrint } from "./fulfil";
+import { alertAdmin } from "./email";
+import { publicUrl } from "./urls";
 import { getCosts, refreshCosts } from "./prodigiCosts";
 import { logError } from "./log";
 import { etsyJob } from "./etsy";
@@ -37,6 +39,32 @@ async function requeueInterrupted() {
   for (const o of await listOrdersByStatus("rendering")) await updateOrder(o.id, { status: "paid" });
 }
 
+/**
+ * Uptime: the worker checks the public site every 5 minutes and emails us after 3 failures
+ * in a row (about 15 minutes down), then again when it's back. If Render itself is down the
+ * worker is too, so an outside monitor on /api/health is still worth having.
+ */
+let failures = 0;
+let alerted = false;
+async function checkSite() {
+  let ok = false;
+  try {
+    const r = await fetch(`${publicUrl()}/api/health`, { signal: AbortSignal.timeout(15_000), cache: "no-store" });
+    ok = r.ok && (await r.json()).ok === true;
+  } catch {}
+  if (ok) {
+    if (alerted) await alertAdmin("mapsie.shop is back up", `The site answered its health check again at ${new Date().toISOString()}.`);
+    failures = 0;
+    alerted = false;
+    return;
+  }
+  failures++;
+  if (failures >= 3 && !alerted) {
+    alerted = true;
+    await alertAdmin("mapsie.shop looks down", `${publicUrl()}/api/health has failed ${failures} checks in a row (5 minutes apart). Check the Render dashboard.`);
+  }
+}
+
 /** Runs on the worker (or the single server): renders, sends due orders, tidies up. */
 export function startScheduler() {
   if (started) return;
@@ -53,5 +81,6 @@ export function startScheduler() {
   setTimeout(safe(cleanUp, "cleanup"), 60_000);
   // Etsy: new orders and design reminders (does nothing until a shop is connected).
   setInterval(safe(etsyJob, "etsy"), 5 * 60_000);
+  if (ROLE === "worker") setInterval(safe(checkSite, "uptime"), 5 * 60_000);
   setTimeout(safe(etsyJob, "etsy"), 30_000);
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import { listOrders } from "@/lib/server/db";
 import { ALL_SKUS, etsyConfigured, etsyConnection, etsyDesignUrl, etsyRedirectUri } from "@/lib/server/etsy";
-import { FRAMES, getProduct } from "@/lib/products";
+import { FRAMES, PRODUCTS, getProduct } from "@/lib/products";
 import { publicUrl } from "@/lib/server/urls";
 
 export const dynamic = "force-dynamic";
@@ -34,10 +34,64 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
       {q.connected && <p className="rounded-2xl bg-sea/10 px-4 py-3 text-sm font-bold text-sea">Connected to {q.connected}. New paid orders will appear here within 5 minutes.</p>}
       {q.error && <p className="rounded-2xl bg-coral/10 px-4 py-3 text-sm font-bold text-coral-dark">{NOTES[q.error] ?? q.error}</p>}
       {q.synced && <p className="rounded-2xl bg-sea/10 px-4 py-3 text-sm font-bold text-sea">Checked Etsy: {q.synced} new print{q.synced === "1" ? "" : "s"}.</p>}
+      {q.added && <p className="rounded-2xl bg-sea/10 px-4 py-3 text-sm font-bold text-sea">Added Etsy order {q.receipt} ({q.added} print{q.added === "1" ? "" : "s"}). If you gave an email, the buyer has been sent their design link.</p>}
       {q.resent && <p className="rounded-2xl bg-sea/10 px-4 py-3 text-sm font-bold text-sea">Design link sent again.</p>}
 
+
       <section className={box}>
-        <h2 className="text-xl font-extrabold">Connection</h2>
+        <h2 className="text-xl font-extrabold">Add an Etsy order</h2>
+        <p className="text-sm text-ink/60">
+          When Etsy emails you about a sale, copy its details here. Mapsie then emails the buyer their design link (if you add their email), locks the size and frame, and
+          sends it to print when they&apos;re done. Buyers can also find their order at {publicUrl().replace(/^https?:\/\//, "")}/etsy with the order number and postcode.
+        </p>
+        <form action="/api/admin/etsy" method="post" className="grid gap-3 sm:grid-cols-2 text-sm">
+          <input type="hidden" name="action" value="manual" />
+          {[
+            ["receipt", "Etsy order number", true],
+            ["email", "Buyer email (from Etsy, if shown)", false],
+            ["name", "Name on the delivery address", true],
+            ["line1", "Address line 1", true],
+            ["line2", "Address line 2", false],
+            ["city", "Town or city", true],
+            ["state", "County / state (needed for US & AU)", false],
+            ["postcode", "Postcode / ZIP", true],
+            ["country", "Country code, e.g. GB, US, AU", true],
+            ["price", "Amount paid on Etsy (optional, for your records)", false],
+          ].map(([name, label, req]) => (
+            <label key={name as string} className="block">
+              <span className="font-bold">{label as string}</span>
+              <input name={name as string} required={req as boolean} defaultValue={name === "country" ? "GB" : undefined} className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2 outline-none focus:border-coral" />
+            </label>
+          ))}
+          <label className="block">
+            <span className="font-bold">Size</span>
+            <select name="productId" defaultValue="a3" className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2">
+              {PRODUCTS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
+            </select>
+          </label>
+          <label className="block">
+            <span className="font-bold">Frame</span>
+            <select name="frame" defaultValue="none" className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2">
+              {FRAMES.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}
+            </select>
+          </label>
+          <label className="block">
+            <span className="font-bold">How many prints</span>
+            <input name="quantity" type="number" min={1} max={10} defaultValue={1} className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2" />
+          </label>
+          <label className="flex items-center gap-2 pt-6">
+            <input type="checkbox" name="express" className="accent-coral" /> <span className="font-bold">Express delivery</span>
+          </label>
+          <input type="hidden" name="currency" value="GBP" />
+          <div className="sm:col-span-2">
+            <button className={`${btn} bg-coral text-white`}>Add order and email the buyer</button>
+          </div>
+        </form>
+      </section>
+
+      <section className={box}>
+        <h2 className="text-xl font-extrabold">Automatic connection</h2>
+        <p className="text-sm text-ink/60">Optional: needs Etsy to approve API access for your app. Until then, add orders above.</p>
         {!etsyConfigured() ? (
           <div className="text-sm space-y-2">
             <p>Add these on Render, to <b>both</b> services (mapsie and mapsie-worker), then redeploy:</p>
@@ -111,6 +165,13 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
                   <td className="px-2 py-2">{o.address?.name}<div className="text-ink/40">{o.email || "no email from Etsy"}</div></td>
                   <td className="px-2 py-2">
                     <span className="rounded-full bg-sand px-2.5 py-1 text-xs font-bold">{o.status.replace(/_/g, " ")}</span>
+                    {o.shipments?.find((x) => x.trackingNumber) && (
+                      <div className="text-xs mt-1">
+                        Tracking for Etsy: <b className="font-mono select-all">{o.shipments.find((x) => x.trackingNumber)!.trackingNumber}</b>
+                        {o.shipments[0].carrier ? ` (${o.shipments[0].carrier})` : ""}
+                        {!o.etsy?.trackingSent && <div className="text-coral-dark font-bold">Add this on Etsy: Mark as dispatched</div>}
+                      </div>
+                    )}
                     {o.emailsSent?.some((k) => k.startsWith("etsy-")) && <div className="text-xs text-ink/40 mt-1">{o.emailsSent.filter((k) => k.startsWith("etsy-")).join(", ").replace(/etsy-/g, "")}</div>}
                   </td>
                   <td className="px-2 py-2 space-y-1 text-xs">

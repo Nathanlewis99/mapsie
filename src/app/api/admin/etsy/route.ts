@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { disconnectEtsy, syncEtsyOrders } from "@/lib/server/etsy";
+import { disconnectEtsy, etsySku, importReceipt, syncEtsyOrders } from "@/lib/server/etsy";
+import { listOrdersByEtsyReceipt } from "@/lib/server/db";
+import { FRAMES, PRODUCTS } from "@/lib/products";
 import { getOrder } from "@/lib/server/db";
 import { sendEtsyDesignEmail } from "@/lib/server/email";
 import { publicUrl } from "@/lib/server/urls";
@@ -11,6 +13,41 @@ export async function POST(req: Request) {
   let q = "";
   try {
     if (action === "sync") q = `synced=${await syncEtsyOrders()}`;
+    if (action === "manual") {
+      // An Etsy order typed in by hand (when the Etsy connection isn't available).
+      const v = (k: string) => String(f.get(k) ?? "").trim();
+      const receipt = v("receipt").replace(/[^\d]/g, "");
+      const productId = v("productId");
+      const frame = v("frame");
+      const qty = Math.min(10, Math.max(1, Number(v("quantity")) || 1));
+      if (!receipt) throw new Error("Enter the Etsy order number.");
+      if (!PRODUCTS.some((p) => p.id === productId) || !FRAMES.some((x) => x.id === frame)) throw new Error("Choose a size and frame.");
+      if (!v("name") || !v("line1") || !v("city") || !v("postcode") || !/^[A-Z]{2}$/i.test(v("country"))) throw new Error("Fill in the full delivery address (country as a 2-letter code, e.g. GB).");
+      if ((await listOrdersByEtsyReceipt(receipt)).length) throw new Error(`Etsy order ${receipt} is already on Mapsie.`);
+      const price = Number(v("price"));
+      const made = await importReceipt({
+        receipt_id: Number(receipt),
+        buyer_email: v("email") || null,
+        name: v("name"),
+        first_line: v("line1"),
+        second_line: v("line2") || null,
+        city: v("city"),
+        state: v("state") || null,
+        zip: v("postcode"),
+        country_iso: v("country").toUpperCase(),
+        is_paid: true,
+        created_timestamp: Math.floor(Date.now() / 1000),
+        transactions: [{
+          transaction_id: Number(receipt),
+          title: "Custom travel map (added by hand)",
+          quantity: qty,
+          sku: etsySku(productId, frame),
+          price: price > 0 ? { amount: Math.round((price / qty) * 100), divisor: 100, currency_code: v("currency") || "GBP" } : undefined,
+          shipping_upgrade: f.get("express") ? "Express" : null,
+        }],
+      });
+      q = `added=${made}&receipt=${receipt}`;
+    }
     if (action === "disconnect") {
       await disconnectEtsy();
       q = "disconnected=1";
@@ -21,7 +58,7 @@ export async function POST(req: Request) {
       q = "resent=1";
     }
   } catch (e) {
-    q = `error=${encodeURIComponent(String(e).slice(0, 200))}`;
+    q = `error=${encodeURIComponent(String((e as Error).message ?? e).slice(0, 200))}`;
   }
   return NextResponse.redirect(`${publicUrl()}/admin/etsy?${q}`, { status: 303 });
 }

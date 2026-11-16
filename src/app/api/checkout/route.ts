@@ -89,6 +89,16 @@ export async function POST(req: Request) {
       },
     ],
     metadata: { orderId: order.id },
+    // Stripe's payment page in Mapsie's colours, font, icon and wordmark.
+    branding_settings: {
+      display_name: "Mapsie",
+      background_color: "#fbf6ee",
+      button_color: "#ff6b4a",
+      border_style: "rounded",
+      font_family: "nunito",
+      icon: { type: "url", url: `${base}/apple-icon.png` },
+      logo: { type: "url", url: `${base}/brand/mapsie-logo.png` },
+    },
     // Shown on the payment in the Stripe dashboard, so payments and orders are easy to match up.
     payment_intent_data: { description: `Mapsie order ${order.id}`, metadata: { orderId: order.id } },
     ...(tax ? { automatic_tax: { enabled: true } } : {}),

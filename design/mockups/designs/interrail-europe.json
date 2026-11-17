@@ -1,0 +1,255 @@
+{
+ "id": "interrail-europe",
+ "subtitle": "Summer 2025 · 8 cities · 1 rail pass",
+ "font": "abril",
+ "layout": "band",
+ "productId": "a3",
+ "orientation": "portrait",
+ "frame": "white",
+ "paper": "ema",
+ "mount": "none",
+ "glaze": "perspex",
+ "stickerStyle": "illustrated",
+ "title": "Interrailing Europe",
+ "stops": [
+  {
+   "id": "s0",
+   "name": "Amsterdam",
+   "lng": 4.9041,
+   "lat": 52.3676,
+   "showLabel": true
+  },
+  {
+   "id": "s1",
+   "name": "Paris",
+   "lng": 2.3522,
+   "lat": 48.8566,
+   "showLabel": true,
+   "arriveBy": "train",
+   "vehicle": "high-speed-train"
+  },
+  {
+   "id": "s2",
+   "name": "Barcelona",
+   "lng": 2.1734,
+   "lat": 41.3851,
+   "showLabel": true,
+   "arriveBy": "train",
+   "vehicle": "high-speed-train"
+  },
+  {
+   "id": "s3",
+   "name": "Nice",
+   "lng": 7.262,
+   "lat": 43.7102,
+   "showLabel": true,
+   "arriveBy": "train",
+   "vehicle": "train"
+  },
+  {
+   "id": "s4",
+   "name": "Venice",
+   "lng": 12.3155,
+   "lat": 45.4408,
+   "showLabel": true,
+   "arriveBy": "train",
+   "vehicle": "train"
+  },
+  {
+   "id": "s5",
+   "name": "Interlaken",
+   "lng": 7.8632,
+   "lat": 46.6863,
+   "showLabel": true,
+   "arriveBy": "train",
+   "vehicle": "mountain-railway"
+  },
+  {
+   "id": "s6",
+   "name": "Munich",
+   "lng": 11.582,
+   "lat": 48.1351,
+   "showLabel": true,
+   "arriveBy": "train",
+   "vehicle": "steam-train"
+  },
+  {
+   "id": "s7",
+   "name": "Prague",
+   "lng": 14.4378,
+   "lat": 50.0755,
+   "showLabel": true,
+   "arriveBy": "train",
+   "vehicle": "train"
+  },
+  {
+   "id": "s8",
+   "name": "Berlin",
+   "lng": 13.405,
+   "lat": 52.52,
+   "showLabel": true,
+   "arriveBy": "train",
+   "vehicle": "high-speed-train"
+  }
+ ],
+ "route": {
+  "show": true,
+  "style": "auto",
+  "curved": false,
+  "width": 0.5,
+  "modeIcons": true,
+  "iconArt": "flat"
+ },
+ "markers": {
+  "style": "heart",
+  "showDates": false,
+  "size": 1.1,
+  "labelSize": 1
+ },
+ "visited": {
+  "show": true,
+  "opacity": 0.2
+ },
+ "stickers": [
+  {
+   "id": "g1",
+   "kind": "original",
+   "name": "lm-eiffel-sunset",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": -0.6,
+   "lat": 49.9,
+   "size": 11,
+   "rotation": -5
+  },
+  {
+   "id": "g2",
+   "kind": "original",
+   "name": "lm-sagrada-spires",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": -1.2,
+   "lat": 41.6,
+   "size": 11,
+   "rotation": 5
+  },
+  {
+   "id": "g3",
+   "kind": "original",
+   "name": "lm-venice-rialto",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": 15.3,
+   "lat": 44.4,
+   "size": 11,
+   "rotation": 6
+  },
+  {
+   "id": "g4",
+   "kind": "original",
+   "name": "lm2-charlesbridge",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": 17.4,
+   "lat": 49.4,
+   "size": 10,
+   "rotation": -4
+  },
+  {
+   "id": "g5",
+   "kind": "original",
+   "name": "scenic-alpine",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": 5.6,
+   "lat": 46.1,
+   "size": 9,
+   "rotation": -6
+  },
+  {
+   "id": "g6",
+   "kind": "original",
+   "name": "sky-amsterdam",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": 1.9,
+   "lat": 53.2,
+   "size": 9,
+   "rotation": 4
+  },
+  {
+   "id": "t1",
+   "kind": "text",
+   "src": "",
+   "text": "all aboard",
+   "font": "dancing",
+   "lng": 9.2,
+   "lat": 39.6,
+   "size": 6,
+   "rotation": -6,
+   "curve": -40,
+   "effect": "none"
+  }
+ ],
+ "text": {
+  "titleSize": 1,
+  "titleCase": "none",
+  "titleSpacing": 0,
+  "titleItalic": false,
+  "subtitleFont": "cormorant",
+  "subtitleSize": 1.3,
+  "subtitleCase": "none",
+  "subtitleSpacing": 0.5,
+  "subtitleItalic": true,
+  "showRoute": true,
+  "labelFont": "title",
+  "labelCase": "none",
+  "labelItalic": false,
+  "align": "center"
+ },
+ "theme": {
+  "presetId": "blush",
+  "colors": {
+   "land": "#fbe9e4",
+   "water": "#c9d8ef",
+   "park": "#f2d8cf",
+   "roads": "#ffffff",
+   "borders": "#d9a5a0",
+   "labels": "#8a5b63",
+   "accent": "#d0507a",
+   "paper": "#fff5f2",
+   "ink": "#5a2e3a"
+  },
+  "labels": true,
+  "relief": false,
+  "texture": true,
+  "hypso": false,
+  "physical": false,
+  "details": {
+   "grid": false,
+   "tropics": false,
+   "currents": false,
+   "lanes": false,
+   "compass": false
+  }
+ },
+ "view": {
+  "center": [
+   8.3056,
+   47.24407867400135
+  ],
+  "zoom": 3.61,
+  "bearing": 0,
+  "refWidth": 400
+ },
+ "originals": {
+  "style": "papercut",
+  "palette": "auto"
+ }
+}

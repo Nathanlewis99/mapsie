@@ -1,0 +1,238 @@
+{
+ "id": "london-pub-crawl",
+ "subtitle": "Six pints · seven pubs · zero regrets",
+ "font": "marker",
+ "layout": "band",
+ "productId": "a3",
+ "orientation": "portrait",
+ "frame": "black",
+ "paper": "ema",
+ "mount": "none",
+ "glaze": "perspex",
+ "stickerStyle": "illustrated",
+ "title": "The Great London Pub Crawl",
+ "stops": [
+  {
+   "id": "s0",
+   "name": "The Lamb & Flag",
+   "lng": -0.1262,
+   "lat": 51.5117,
+   "showLabel": true,
+   "date": "6pm",
+   "marker": {
+    "kind": "sticker",
+    "name": "beer",
+    "art": "illustrated"
+   }
+  },
+  {
+   "id": "s1",
+   "name": "The Harp",
+   "lng": -0.1263,
+   "lat": 51.5096,
+   "showLabel": true,
+   "arriveBy": "walk",
+   "date": "7pm",
+   "marker": {
+    "kind": "sticker",
+    "name": "beer",
+    "art": "illustrated"
+   }
+  },
+  {
+   "id": "s2",
+   "name": "Ye Olde Cheshire Cheese",
+   "lng": -0.1074,
+   "lat": 51.5144,
+   "showLabel": true,
+   "arriveBy": "walk",
+   "date": "8pm",
+   "marker": {
+    "kind": "sticker",
+    "name": "beer",
+    "art": "illustrated"
+   }
+  },
+  {
+   "id": "s3",
+   "name": "The Black Friar",
+   "lng": -0.1036,
+   "lat": 51.5121,
+   "showLabel": true,
+   "arriveBy": "walk",
+   "date": "9pm",
+   "marker": {
+    "kind": "sticker",
+    "name": "beer",
+    "art": "illustrated"
+   }
+  },
+  {
+   "id": "s4",
+   "name": "The Anchor Bankside",
+   "lng": -0.0943,
+   "lat": 51.5077,
+   "showLabel": true,
+   "arriveBy": "walk",
+   "date": "10pm",
+   "marker": {
+    "kind": "sticker",
+    "name": "beer",
+    "art": "illustrated"
+   }
+  },
+  {
+   "id": "s5",
+   "name": "The George Inn",
+   "lng": -0.0898,
+   "lat": 51.5045,
+   "showLabel": true,
+   "arriveBy": "walk",
+   "date": "11pm",
+   "marker": {
+    "kind": "sticker",
+    "name": "beer",
+    "art": "illustrated"
+   }
+  },
+  {
+   "id": "s6",
+   "name": "Kebab shop",
+   "lng": -0.0866,
+   "lat": 51.5023,
+   "showLabel": true,
+   "arriveBy": "walk",
+   "date": "1am",
+   "vehicle": "walking",
+   "marker": {
+    "kind": "sticker",
+    "name": "pizza",
+    "art": "illustrated"
+   }
+  }
+ ],
+ "route": {
+  "show": true,
+  "style": "dotted",
+  "curved": false,
+  "width": 0.6,
+  "modeIcons": false,
+  "iconArt": "cartoon"
+ },
+ "markers": {
+  "style": "sticker",
+  "showDates": true,
+  "size": 1.15,
+  "labelSize": 0.95
+ },
+ "visited": {
+  "show": false,
+  "opacity": 0.3
+ },
+ "stickers": [
+  {
+   "id": "d1",
+   "kind": "original",
+   "name": "lm-bigben-bus",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": -0.1225,
+   "lat": 51.5038,
+   "size": 15,
+   "rotation": -6
+  },
+  {
+   "id": "d2",
+   "kind": "original",
+   "name": "lm-towerbridge-bascules",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": -0.0835,
+   "lat": 51.5118,
+   "size": 13,
+   "rotation": 5
+  },
+  {
+   "id": "d3",
+   "kind": "original",
+   "name": "pub-darts",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": -0.1155,
+   "lat": 51.5155,
+   "size": 10,
+   "rotation": -4
+  },
+  {
+   "id": "t1",
+   "kind": "text",
+   "src": "",
+   "text": "cheers!",
+   "font": "marker",
+   "lng": -0.1105,
+   "lat": 51.5072,
+   "size": 7,
+   "rotation": -10,
+   "effect": "outline",
+   "color": "#e9512f"
+  }
+ ],
+ "text": {
+  "titleSize": 0.82,
+  "titleCase": "none",
+  "titleSpacing": 0,
+  "titleItalic": false,
+  "subtitleFont": "patrick",
+  "subtitleSize": 1,
+  "subtitleCase": "none",
+  "subtitleSpacing": 0.5,
+  "subtitleItalic": false,
+  "showRoute": false,
+  "labelFont": "patrick",
+  "labelCase": "none",
+  "labelItalic": false,
+  "align": "center"
+ },
+ "theme": {
+  "presetId": "minimal",
+  "colors": {
+   "land": "#f4f2ee",
+   "water": "#d3dce4",
+   "park": "#e7eae0",
+   "roads": "#ffffff",
+   "borders": "#b9b9b9",
+   "labels": "#6b6b6b",
+   "accent": "#ff5a5f",
+   "paper": "#ffffff",
+   "ink": "#1d1d1f"
+  },
+  "labels": true,
+  "relief": false,
+  "texture": false,
+  "hypso": false,
+  "physical": false,
+  "details": {
+   "grid": false,
+   "tropics": false,
+   "currents": false,
+   "lanes": false,
+   "compass": false
+  }
+ },
+ "view": {
+  "center": [
+   -0.10644999999999999,
+   51.50835040168243
+  ],
+  "zoom": 12.2,
+  "bearing": 0,
+  "refWidth": 400
+ },
+ "originals": {
+  "style": "papercut",
+  "palette": "auto"
+ }
+}

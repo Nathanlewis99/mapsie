@@ -1,4 +1,5 @@
-import { getDesign, getOrder, updateOrder, type Order } from "./db";
+import { createHmac, timingSafeEqual } from "node:crypto";
+import { getDesign, getOrder, updateOrder, type DesignEmail, type Order } from "./db";
 import { publicUrl } from "./urls";
 import { COMPANY } from "../company";
 import { describeOptions, getRegion, money, SHIPPING, type RegionId } from "../products";
@@ -227,8 +228,10 @@ async function build(o: Order, kind: "confirmed" | "shipped" | "cancelled" | "de
   return page(o.email, `Your Mapsie order ${o.id} is cancelled`, "Order cancelled", lines, { label: "Back to Mapsie", href: `${publicUrl()}/create` });
 }
 
-function page(to: string, subject: string, heading: string, lines: string[], cta: { label: string; href: string }): Email {
-  const footer = `Questions? Just reply to this email or write to ${COMPANY.supportEmail}.\n${COMPANY.brand} is run by ${COMPANY.legalName}, ${COMPANY.address}. Company no. ${COMPANY.number}.`;
+function page(to: string, subject: string, heading: string, lines: string[], cta: { label: string; href: string }, unsubscribe?: string): Email {
+  const footer =
+    `Questions? Just reply to this email or write to ${COMPANY.supportEmail}.\n${COMPANY.brand} is run by ${COMPANY.legalName}, ${COMPANY.address}. Company no. ${COMPANY.number}.` +
+    (unsubscribe ? `\nDon't want reminders? Unsubscribe: ${unsubscribe}` : "");
   const text = [heading, "", ...lines, "", `${cta.label}: ${cta.href}`, "", footer].join("\n");
   const html = `<!doctype html><html><body style="margin:0;background:#fbf6ee;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1f2430">
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
@@ -240,4 +243,38 @@ ${lines.map((l) => `<tr><td style="font-size:15px;line-height:1.55;padding:6px 0
 <tr><td style="font-size:12px;line-height:1.5;color:#8a8f99;padding-top:20px;white-space:pre-line">${esc(footer)}</td></tr>
 </table></td></tr></table></body></html>`;
   return { to, subject, html, text };
+}
+
+// ---------------------------------------------------------------- "Email me my design"
+const linkSecret = () => process.env.SESSION_SECRET ?? "dev-only-session-secret-change-me-0123456789";
+export const unsubscribeToken = (email: string) => createHmac("sha256", linkSecret()).update(`unsub:${email.trim().toLowerCase()}`).digest("base64url").slice(0, 22);
+export function unsubscribeTokenValid(email: string, token: string | null | undefined) {
+  const want = Buffer.from(unsubscribeToken(email));
+  const got = Buffer.from(token ?? "");
+  return got.length === want.length && timingSafeEqual(got, want);
+}
+export const unsubscribeUrl = (email: string) => `${publicUrl()}/unsubscribe?e=${encodeURIComponent(email)}&t=${unsubscribeToken(email)}`;
+const designLink = (designId: string) => `${publicUrl()}/create?d=${designId}`;
+
+/** The link to their design, which they asked for. */
+export async function sendDesignLinkEmail(row: DesignEmail, title: string) {
+  const lines = [
+    "Here's the link to the map you were designing. Open it on any device to pick up where you left off.",
+    title ? `Your map: “${title}”.` : "",
+    row.remind ? "As you asked, we'll send you one reminder tomorrow if you haven't ordered it yet." : "",
+  ].filter(Boolean);
+  await sendEmail(page(row.email, "Your Mapsie map design", "Your map is saved 🗺️", lines, { label: "Open my map", href: designLink(row.designId) }, row.remind ? unsubscribeUrl(row.email) : undefined));
+}
+
+/** The one reminder they opted in to, a day later. */
+export async function sendDesignReminderEmail(row: DesignEmail, title: string) {
+  const code = process.env.LAUNCH_CODE;
+  const lines = [
+    "Your map is still waiting for you, just as you left it.",
+    title ? `Your map: “${title}”.` : "",
+    "Every print is made to order, framed if you like, and delivered in a few days.",
+    code ? `To say thanks for trying Mapsie, use code ${code} at checkout for ${process.env.LAUNCH_CODE_TEXT ?? "money off"}.` : "",
+    "This is the only reminder we'll send.",
+  ].filter(Boolean);
+  await sendEmail(page(row.email, "Your map is still waiting", "Still dreaming about that trip?", lines, { label: "Finish my map", href: designLink(row.designId) }, unsubscribeUrl(row.email)));
 }

@@ -1,4 +1,5 @@
 "use client";
+import EmailDesign from "./EmailDesign";
 import { adEvent } from "@/lib/adTrack";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Logo from "@/components/Logo";
@@ -53,6 +54,8 @@ export default function Editor() {
   const [busy, setBusy] = useState<"" | "order" | "share" | "save">("");
   const [toast, setToast] = useState("");
   const [wall, setWall] = useState(false);
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [emailNudge, setEmailNudge] = useState(false);
   const [fontMenu, setFontMenu] = useState(false);
   const [fxMenu, setFxMenu] = useState(false);
   useEffect(() => {
@@ -356,6 +359,26 @@ export default function Editor() {
     }
   };
 
+  // A gentle, one-time offer to email the design to people who've started a map but
+  // haven't ordered after a few minutes (not for Etsy buyers, who've already paid).
+  const nudgeArmed = design.stops.length >= 2 && !etsy;
+  useEffect(() => {
+    if (!nudgeArmed) return;
+    try {
+      if (localStorage.getItem("mapsie-email-nudge")) return;
+    } catch {
+      return;
+    }
+    const t = setTimeout(() => setEmailNudge(true), 3 * 60_000);
+    return () => clearTimeout(t);
+  }, [nudgeArmed]);
+  const dismissNudge = () => {
+    setEmailNudge(false);
+    try {
+      localStorage.setItem("mapsie-email-nudge", "1");
+    } catch {}
+  };
+
   const share = async () => {
     setBusy("share");
     try {
@@ -399,6 +422,12 @@ export default function Editor() {
               <Icon name="share" />
               <span className="hidden lg:inline">{busy === "share" ? "Sharing…" : "Share"}</span>
             </button>
+            {!etsy && (
+              <button title="Email this design to yourself" className={textBtn} onClick={() => setEmailOpen(true)} disabled={!design.stops.length}>
+                <span aria-hidden className="text-base leading-none">✉️</span>
+                <span className="hidden lg:inline">Email me</span>
+              </button>
+            )}
             <button
               title={savedId && !dirty ? "Saved to your account" : me?.user ? "Save to your account" : "Sign in to save"}
               className={`${textBtn} ${savedId && !dirty ? "!opacity-100 text-coral-dark" : ""}`}
@@ -816,6 +845,27 @@ export default function Editor() {
         </aside>
       </div>
 
+      {emailOpen && (
+        <EmailDesign
+          save={() => saveSnapshot(design)}
+          onClose={() => setEmailOpen(false)}
+          onSent={() => {
+            setEmailOpen(false);
+            dismissNudge();
+            setToast("Sent! Check your inbox for the link to your map.");
+          }}
+        />
+      )}
+      {emailNudge && !emailOpen && (
+        <div className="fixed left-3 bottom-20 lg:bottom-6 z-40 max-w-xs rounded-2xl bg-white p-4 shadow-xl border border-ink/10 text-sm space-y-2">
+          <div className="font-extrabold">Not ready to order yet?</div>
+          <p className="text-ink/60">Email yourself this map to finish later, on any device.</p>
+          <div className="flex gap-2">
+            <button onClick={() => (setEmailOpen(true), dismissNudge())} className="rounded-full bg-coral px-3 py-1.5 font-extrabold text-white">Email it to me</button>
+            <button onClick={dismissNudge} className="rounded-full px-3 py-1.5 font-bold text-ink/50">No thanks</button>
+          </div>
+        </div>
+      )}
       {wall && (
         <div className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm grid place-items-center p-4" onClick={() => setWall(false)}>
           <div className="w-full max-w-4xl rounded-3xl bg-cream p-4 sm:p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>

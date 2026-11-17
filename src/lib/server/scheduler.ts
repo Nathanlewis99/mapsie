@@ -65,6 +65,26 @@ async function checkSite() {
   }
 }
 
+/**
+ * The one reminder people asked for when they emailed themselves their design: a day
+ * later, unless they've ordered or unsubscribed. Only the latest request per address.
+ */
+async function sendDesignReminders() {
+  const { listDueReminders, markReminded, isOptedOut, orderedSince, getDesign } = await import("./db");
+  const { sendDesignReminderEmail } = await import("./email");
+  const day = 24 * 3600_000;
+  const due = await listDueReminders(new Date(Date.now() - 7 * day).toISOString(), new Date(Date.now() - day).toISOString());
+  const latest = new Map<string, (typeof due)[number]>();
+  for (const r of due) latest.set(r.email, r); // oldest first, so the last wins
+  for (const r of due) if (latest.get(r.email) !== r) await markReminded(r.id);
+  for (const r of latest.values()) {
+    await markReminded(r.id); // first, so a failure never means two emails
+    if ((await isOptedOut(r.email)) || (await orderedSince(r.email, r.createdAt))) continue;
+    const d = await getDesign(r.designId);
+    if (d) await sendDesignReminderEmail(r, d.title ?? "");
+  }
+}
+
 /** Runs on the worker (or the single server): renders, sends due orders, tidies up. */
 export function startScheduler() {
   if (started) return;
@@ -82,5 +102,6 @@ export function startScheduler() {
   // Etsy: new orders and design reminders (does nothing until a shop is connected).
   setInterval(safe(etsyJob, "etsy"), 5 * 60_000);
   if (ROLE === "worker") setInterval(safe(checkSite, "uptime"), 5 * 60_000);
+  setInterval(safe(sendDesignReminders, "design-reminders"), 30 * 60_000);
   setTimeout(safe(etsyJob, "etsy"), 30_000);
 }

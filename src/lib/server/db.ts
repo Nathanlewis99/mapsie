@@ -217,6 +217,21 @@ const SCHEMA = `
     created_at TEXT NOT NULL
   );
   CREATE INDEX IF NOT EXISTS support_files_ticket ON support_files(ticket_id);
+  -- "Email me my design": the link we sent, and whether they asked for one reminder.
+  CREATE TABLE IF NOT EXISTS design_emails (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    design_id TEXT NOT NULL,
+    remind INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    reminded_at TEXT
+  );
+  CREATE INDEX IF NOT EXISTS design_emails_due ON design_emails(remind, reminded_at, created_at);
+  -- People who unsubscribed from reminder and offer emails (never emailed again except about orders).
+  CREATE TABLE IF NOT EXISTS email_optouts (
+    email TEXT PRIMARY KEY,
+    at TEXT NOT NULL
+  );
 `;
 
 let driverPromise: Promise<Driver> | null = null;
@@ -651,4 +666,39 @@ export async function topSearches(sinceIso: string, limit = 50): Promise<{ q: st
     map.set(p.q, e);
   }
   return [...map.entries()].map(([q, e]) => ({ q, ...e })).sort((a, b) => b.n - a.n).slice(0, limit);
+}
+
+// ---------------------------------------------------------------- design emails
+export interface DesignEmail { id: string; email: string; designId: string; remind: boolean; createdAt: string; remindedAt: string | null }
+const designEmailRow = (r: Row): DesignEmail => ({
+  id: String(r.id), email: String(r.email), designId: String(r.design_id), remind: !!Number(r.remind), createdAt: String(r.created_at), remindedAt: r.reminded_at ? String(r.reminded_at) : null,
+});
+export async function addDesignEmail(email: string, designId: string, remind: boolean): Promise<DesignEmail> {
+  const row = { id: nanoid(12), email: email.trim().toLowerCase(), designId, remind, createdAt: now(), remindedAt: null };
+  await run("INSERT INTO design_emails (id, email, design_id, remind, created_at) VALUES (?, ?, ?, ?, ?)", [row.id, row.email, designId, remind ? 1 : 0, row.createdAt]);
+  return row;
+}
+/** How many design emails went to this address since a time (to stop abuse). */
+export async function countDesignEmails(email: string, sinceIso: string): Promise<number> {
+  const r = await one("SELECT COUNT(*) AS n FROM design_emails WHERE email = ? AND created_at >= ?", [email.trim().toLowerCase(), sinceIso]);
+  return Number(r?.n ?? 0);
+}
+/** Reminders asked for between `from` and `to` (ISO times) that haven't gone yet. */
+export async function listDueReminders(fromIso: string, toIso: string): Promise<DesignEmail[]> {
+  const rows = await all("SELECT * FROM design_emails WHERE remind = 1 AND reminded_at IS NULL AND created_at >= ? AND created_at <= ? ORDER BY created_at", [fromIso, toIso]);
+  return rows.map(designEmailRow);
+}
+export async function markReminded(id: string) {
+  await run("UPDATE design_emails SET reminded_at = ? WHERE id = ?", [now(), id]);
+}
+export async function isOptedOut(email: string): Promise<boolean> {
+  return !!(await one("SELECT email FROM email_optouts WHERE email = ?", [email.trim().toLowerCase()]));
+}
+export async function optOut(email: string) {
+  await run("INSERT INTO email_optouts (email, at) VALUES (?, ?) ON CONFLICT (email) DO NOTHING", [email.trim().toLowerCase(), now()]);
+}
+/** Has this address placed an order (paid or later) since a time? */
+export async function orderedSince(email: string, sinceIso: string): Promise<boolean> {
+  const r = await one("SELECT id FROM orders WHERE lower(email) = ? AND created_at >= ? AND status NOT IN ('pending_payment', 'cancelled', 'failed')", [email.trim().toLowerCase(), sinceIso]);
+  return !!r;
 }

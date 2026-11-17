@@ -7,9 +7,12 @@ export const CHRISTMAS = {
   year: 2026,
   showFrom: "2026-11-01",
   lastOrder: {
-    GB: { standard: "2026-12-14", express: "2026-12-18" },
-    US: { standard: "2026-12-09", express: "2026-12-15" },
-    AU: { standard: "2026-12-07", express: "2026-12-13" },
+    // Prodigi 2026 (prodigi.com/christmas-delivery-dates), one day earlier to allow for
+    // finishing the design and our cancellation hold. Unframed and framed use the earlier
+    // of the two; Australia uses the WA/TAS/NT dates so every state is covered.
+    GB: { standard: "2026-12-16", express: "2026-12-16" }, // Prodigi: prints 17/17, framed 17/21
+    US: { standard: "2026-12-12", express: "2026-12-16" }, // Prodigi: prints 13/17, framed 15/17
+    AU: { standard: "2026-12-12", express: "2026-12-15" }, // Prodigi WA/TAS/NT: 13/16 (other states 15/17)
   } satisfies Record<RegionId, { standard: string; express: string }>,
 };
 

@@ -20,7 +20,7 @@ export default function ChristmasBanner() {
   return (
     <div className="bg-[#1f4d3a] text-white text-sm text-center px-4 py-2 font-semibold">
       🎄{" "}
-      {s.kind === "standard" && <>Order by <b>{niceDate(s.date)}</b> for delivery before Christmas (or {niceDate(s.express)} with express).</>}
+      {s.kind === "standard" && <>Order by <b>{niceDate(s.date)}</b> for delivery before Christmas{s.express !== s.date ? ` (or ${niceDate(s.express)} with express)` : ""}.</>}
       {s.kind === "express" && <>Last days for Christmas: order by <b>{niceDate(s.date)}</b> with <b>express delivery</b>.</>}
       {s.kind === "digital" && <>Too late for delivery before Christmas? Give a <b>gift card</b> or the <b>digital file</b>: both arrive by email in minutes.</>}{" "}
       <Link href="/gift" className="underline underline-offset-2 whitespace-nowrap">Gift cards</Link>

@@ -7,7 +7,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import ChristmasBanner from "@/components/ChristmasBanner";
 import { Faq, Gallery, OccasionLinks } from "@/components/seo/Sections";
 import { OCCASIONS, getOccasion, occasionStartUrl } from "@/lib/occasions";
-import { EXAMPLES, FAQ, PRICE_RANGE, SITE, faqJsonLd } from "@/lib/seo";
+import { EXAMPLES, FAQ, OFFER_COUNT, PRICE_RANGE, SITE, faqJsonLd } from "@/lib/seo";
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -95,7 +95,7 @@ export default async function OccasionPage({ params }: { params: Promise<{ slug:
             description: o.description,
             image: `${SITE}/examples/${ex.slug}.webp`,
             brand: { "@type": "Brand", name: "Mapsie" },
-            offers: { "@type": "AggregateOffer", priceCurrency: "GBP", lowPrice: PRICE_RANGE.low, highPrice: PRICE_RANGE.high, availability: "https://schema.org/InStock", url: `${SITE}/create` },
+            offers: { "@type": "AggregateOffer", priceCurrency: "GBP", lowPrice: PRICE_RANGE.low, highPrice: PRICE_RANGE.high, offerCount: OFFER_COUNT, availability: "https://schema.org/InStock", url: `${SITE}/create` },
           },
           faqJsonLd(faq),
         ]}

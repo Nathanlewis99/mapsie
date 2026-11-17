@@ -1,6 +1,7 @@
 // Search-engine content shared by the homepage, occasion pages and structured data.
 import { COMPANY } from "./company";
 import { DIGITAL_PRICE, FRAMES, PAPERS, PRODUCTS, SHIPPING, itemPrice } from "./products";
+import { ETSY_VARIATIONS } from "./etsyOptions";
 
 export const SITE = "https://mapsie.shop";
 
@@ -17,6 +18,8 @@ export const EXAMPLES = [
 ] as const;
 
 const gbp = (n: number) => `£${n}`;
+/** Every size × finish (and digital) we sell: the same set as the Etsy listing. */
+export const OFFER_COUNT = ETSY_VARIATIONS.length;
 const cheapest = Math.min(...PRODUCTS.map((p) => p.price.GB));
 const framedFrom = Math.min(...PRODUCTS.map((p) => itemPrice({ productId: p.id, frame: "black", paper: "ema", mount: "none", glaze: "perspex" } as never, "GB")));
 export const PRICE_RANGE = {
@@ -92,6 +95,7 @@ export function homeJsonLd(reviews?: { count: number; average: number; items: { 
         priceCurrency: "GBP",
         lowPrice: PRICE_RANGE.low,
         highPrice: PRICE_RANGE.high,
+        offerCount: OFFER_COUNT,
         availability: "https://schema.org/InStock",
         url: `${SITE}/create`,
       },

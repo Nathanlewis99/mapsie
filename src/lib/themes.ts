@@ -171,7 +171,8 @@ export function buildStyle(base: StyleSpecification, theme: Theme): StyleSpecifi
       paint["line-color"] = c.borders;
     } else if (layer.type === "symbol") {
       const isPlaceOrWater = id.startsWith("label_") || id.startsWith("water_name");
-      if (!theme.labels || !isPlaceOrWater || id === "label_other") hide(layer);
+      const minorPlace = id.startsWith("label_") && !id.startsWith("label_country");
+      if (!theme.labels || !isPlaceOrWater || id === "label_other" || (theme.countriesOnly && minorPlace)) hide(layer);
       else {
         // English names read best on a poster; fall back to the local name.
         layer.layout = { ...(layer.layout ?? {}), "text-field": ["coalesce", ["get", "name:en"], ["get", "name_en"], ["get", "name:latin"], ["get", "name"]] };

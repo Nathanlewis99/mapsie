@@ -17,7 +17,11 @@
    "name": "Cape Town",
    "lng": 18.4241,
    "lat": -33.9249,
-   "showLabel": true
+   "showLabel": true,
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s1",
@@ -26,7 +30,11 @@
    "lat": -23.9884,
    "showLabel": true,
    "arriveBy": "plane",
-   "vehicle": "small-airplane"
+   "vehicle": "small-airplane",
+   "labelOffset": [
+    -6.59,
+    3.65
+   ]
   },
   {
    "id": "s2",
@@ -34,7 +42,11 @@
    "lng": 25.8572,
    "lat": -17.9243,
    "showLabel": true,
-   "arriveBy": "plane"
+   "arriveBy": "plane",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s3",
@@ -43,7 +55,11 @@
    "lat": -19.3,
    "showLabel": true,
    "arriveBy": "plane",
-   "vehicle": "helicopter"
+   "vehicle": "helicopter",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s4",
@@ -51,7 +67,11 @@
    "lng": 34.8333,
    "lat": -2.3333,
    "showLabel": true,
-   "arriveBy": "plane"
+   "arriveBy": "plane",
+   "labelOffset": [
+    -15.1,
+    0
+   ]
   },
   {
    "id": "s5",
@@ -559,7 +579,11 @@
      -3.08168
     ]
    ],
-   "pathFor": "34.8333,-2.3333>37.3556,-3.0674"
+   "pathFor": "34.8333,-2.3333>37.3556,-3.0674",
+   "labelOffset": [
+    -8.82,
+    3.65
+   ]
   },
   {
    "id": "s6",
@@ -567,7 +591,11 @@
    "lng": 39.2026,
    "lat": -6.1659,
    "showLabel": true,
-   "arriveBy": "plane"
+   "arriveBy": "plane",
+   "labelOffset": [
+    -14.59,
+    0
+   ]
   }
  ],
  "route": {
@@ -704,7 +732,8 @@
    "compass": true,
    "compassStyle": "nautical",
    "compassCorner": "bl"
-  }
+  },
+  "countriesOnly": true
  },
  "view": {
   "center": [

@@ -535,6 +535,13 @@ export function StylePanel() {
           </div>
         )}
         <Toggle on={t.labels} onChange={(v) => setTheme({ labels: v })} label="🔤 Place names" />
+        <Toggle
+          disabled={!t.labels}
+          hint="Turn on “Place names” first"
+          on={!!t.countriesOnly}
+          onChange={(v) => setTheme({ countriesOnly: v })}
+          label="Countries & seas only (no cities)"
+        />
         <Toggle on={t.texture} onChange={(v) => setTheme({ texture: v })} label="📜 Aged paper texture" />
       </div>
     </div>

@@ -2,7 +2,7 @@
 // real road routes for car/bus/tuk-tuk legs (from mapsie.shop's router), a map view
 // fitted to the trip, and the theme. Writes design/mockups/designs/<slug>.json.
 //   npx tsx design/mockups/build.ts
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { TRIPS } from "./trips";
 import { PRESETS, themeFromPreset } from "../../src/lib/themes";
 import { followsRoads, legKey } from "../../src/lib/geo";
@@ -76,7 +76,13 @@ async function main() {
       ...rest,
       theme,
       view: { center: [0, 0], zoom: 2, bearing: 0, refWidth: REF_W },
-      stickers: (rest.stickers ?? []).map((s) => (s.kind === "sticker" && s.name ? { ...s, src: stickerSrc(s.name, s.art) } : s)),
+      stickers: (rest.stickers ?? []).map((s) =>
+        s.kind === "sticker" && s.name
+          ? { ...s, src: stickerSrc(s.name, s.art) }
+          : s.kind === "photo" && s.src.startsWith("photo:")
+            ? { ...s, src: `data:image/jpeg;base64,${readFileSync(`design/mockups/photos/${s.src.slice(6)}.jpg`).toString("base64")}` }
+            : s,
+      ),
       text: { ...(rest.text ?? {}) } as Design["text"],
     } as Design);
     if (t.slug === "london-pub-crawl") {

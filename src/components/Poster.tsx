@@ -23,6 +23,10 @@ interface Props {
 }
 
 /** Everything is sized relative to the poster width, so it scales to any print size. */
+
+/** Title fonts whose descenders need extra line height. */
+const TALL_TAILS = new Set(["pacifico", "vibes", "satisfy", "lobster", "dancing", "caveat", "kalam", "rocksalt", "marker"]);
+
 export default function Poster({ design, width, editable = false, print, selectedSticker, selectedLabel, fitRequest, handlers, onReady, frozen }: Props) {
   const height = Math.round(width * posterAspect(design.productId, design.orientation));
   const u = width / 100;
@@ -36,9 +40,12 @@ export default function Poster({ design, width, editable = false, print, selecte
   // The title area grows to fit a big title, a subtitle and the list of stops.
   const lines = (chars: number, fontPx: number, boxPx: number) => Math.max(1, Math.ceil((chars * fontPx * 0.55) / boxPx));
   const titleFont = u * (design.font === "bebas" ? 8 : 6.2) * t.titleSize;
+  // Script fonts have long tails (g, p, y) that hang well below the line: give them room
+  // so they don't run into the subtitle.
+  const titleLine = TALL_TAILS.has(design.font) ? 1.42 : 1.05;
   const needed =
     u * 4 +
-    lines(design.title.length, titleFont, width * 0.86) * titleFont * 1.08 +
+    lines(design.title.length, titleFont, width * 0.86) * titleFont * (titleLine + 0.03) +
     (design.subtitle ? u * 2.1 * t.subtitleSize * 1.3 + u : 0) +
     (route ? Math.min(2, lines(route.length, u * 1.5, width * 0.78)) * u * 1.5 * 1.35 + u * 0.9 : 0);
   const bandH = design.layout === "overlay" || mapOnly ? 0 : Math.max(u * (landscape ? 11 : 17), needed);
@@ -85,8 +92,8 @@ export default function Poster({ design, width, editable = false, print, selecte
       <div
         style={{
           fontFamily: font,
-          fontSize: u * (design.font === "bebas" ? 8 : 6.2) * t.titleSize,
-          lineHeight: 1.05,
+          fontSize: titleFont,
+          lineHeight: titleLine,
           color: c.ink,
           fontWeight: fontBold(design.font),
           fontStyle: t.titleItalic ? "italic" : undefined,

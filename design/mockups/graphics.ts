@@ -41,7 +41,7 @@ const page = async (name: string, html: string) => {
     "all-designs",
     `<div style="padding:80px 110px 0;text-align:center">
        <h1>Any trip. Any style.<span class="pin"></span></h1>
-       <p style="font-size:40px;margin-top:14px;color:#1f2430b3">12 map styles · 20+ fonts · 1,400 illustrated stickers · routes by plane, train, car, boat, tuk-tuk…</p>
+       <p style="font-size:40px;margin-top:14px;color:#1f2430b3">12 map styles · your own photos · 1,400 illustrated stickers · routes by plane, train, car, boat, tuk-tuk…</p>
      </div>
      ${shot("southeast-asia", "left:150px;top:330px;height:640px", -3)}
      ${shot("sri-lanka", "left:640px;top:310px;height:640px", 2)}
@@ -55,10 +55,10 @@ const page = async (name: string, html: string) => {
   // 2. Detail close-up (crop of the Sri Lanka print)
   await page(
     "detail",
-    `<div style="position:absolute;inset:0;background:url(${img(`${renders}/../detail/sri-lanka.png`)}) no-repeat;background-size:3000px auto;background-position:-560px -380px"></div>
-     <div style="position:absolute;left:80px;bottom:80px;background:#fbf6eeee;border-radius:36px;padding:44px 56px;max-width:1150px;box-shadow:0 10px 30px rgba(0,0,0,.15)">
-       <h1 style="font-size:72px">Every detail, printed sharp</h1>
-       <p style="font-size:38px;margin-top:14px;line-height:1.35">Printed at 300 dpi on museum-quality 200gsm matte art paper. Real terrain, your route, and stickers for the moments that made the trip.</p>
+    `<div style="position:absolute;inset:0;background:url(${img(`${renders}/../detail/sri-lanka.png`)}) no-repeat;background-size:2600px auto;background-position:-100px -1150px"></div>
+     <div style="position:absolute;left:70px;top:70px;background:#fbf6eef2;border-radius:36px;padding:44px 56px;max-width:1150px;box-shadow:0 10px 30px rgba(0,0,0,.15)">
+       <h1 style="font-size:72px">Add your own photos</h1>
+       <p style="font-size:38px;margin-top:14px;line-height:1.35">Upload snaps from your trip and pin them anywhere on the map, next to your route, stickers and real terrain. Printed sharp at 300 dpi on 200gsm matte art paper.</p>
      </div>`,
   );
 
@@ -75,7 +75,7 @@ const page = async (name: string, html: string) => {
        <h1 style="text-align:center">How it works<span class="pin"></span></h1>
        <div style="display:flex;gap:56px;margin-top:100px">
          ${step(1, "Order here", "Choose your size and frame. It's personalised after you buy, so there's nothing to type now.")}
-         ${step(2, "Design your map", "Go to <b>mapsie.shop/etsy</b> and enter your order number and postcode. Add your places, route, stickers and title. It takes about 5 minutes.")}
+         ${step(2, "Design your map", "Go to <b>mapsie.shop/etsy</b> and enter your order number and postcode. Add your places, route, photos from your trip, stickers and a title. About 5 minutes.")}
          ${step(3, "We print & ship", "Check the preview and press Send to print. Printed to order and delivered to your door, framed or rolled.")}
        </div>
        <p style="text-align:center;font-size:40px;margin-top:70px;color:#1f2430a0">Nothing more to pay · you see exactly how it looks before it's printed</p>

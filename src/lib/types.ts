@@ -71,6 +71,8 @@ export interface Theme {
   presetId: string;
   colors: ThemeColors;
   labels: boolean;
+  /** With labels on: only country and sea names, no cities or towns (so they don't clash with the trip's own labels). */
+  countriesOnly?: boolean;
   relief: boolean; // hillshade terrain
   texture: boolean; // paper grain overlay
   hypso: boolean; // colour land by height (green lowlands to snowy peaks)

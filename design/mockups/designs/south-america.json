@@ -17,7 +17,11 @@
    "name": "Lima",
    "lng": -77.0428,
    "lat": -12.0464,
-   "showLabel": true
+   "showLabel": true,
+   "labelOffset": [
+    -5.63,
+    3.65
+   ]
   },
   {
    "id": "s1",
@@ -901,7 +905,11 @@
      -13.5319
     ]
    ],
-   "pathFor": "-77.0428,-12.0464>-71.9675,-13.5319"
+   "pathFor": "-77.0428,-12.0464>-71.9675,-13.5319",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s2",
@@ -910,7 +918,11 @@
    "lat": -13.1631,
    "showLabel": true,
    "arriveBy": "train",
-   "vehicle": "mountain-railway"
+   "vehicle": "mountain-railway",
+   "labelOffset": [
+    -0.8,
+    -3.65
+   ]
   },
   {
    "id": "s3",
@@ -1569,7 +1581,11 @@
      -16.48983
     ]
    ],
-   "pathFor": "-72.5450,-13.1631>-68.1193,-16.4897"
+   "pathFor": "-72.5450,-13.1631>-68.1193,-16.4897",
+   "labelOffset": [
+    -12.88,
+    0
+   ]
   },
   {
    "id": "s4",
@@ -1901,7 +1917,11 @@
      -20.04845
     ]
    ],
-   "pathFor": "-68.1193,-16.4897>-67.4891,-20.1338"
+   "pathFor": "-68.1193,-16.4897>-67.4891,-20.1338",
+   "labelOffset": [
+    -19.51,
+    -3.65
+   ]
   },
   {
    "id": "s5",
@@ -1909,7 +1929,11 @@
    "lng": -73,
    "lat": -51,
    "showLabel": true,
-   "arriveBy": "plane"
+   "arriveBy": "plane",
+   "labelOffset": [
+    -21.14,
+    0
+   ]
   },
   {
    "id": "s6",
@@ -1917,7 +1941,11 @@
    "lng": -58.3816,
    "lat": -34.6037,
    "showLabel": true,
-   "arriveBy": "plane"
+   "arriveBy": "plane",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s7",
@@ -2364,7 +2392,11 @@
      -25.69202
     ]
    ],
-   "pathFor": "-58.3816,-34.6037>-54.4367,-25.6953"
+   "pathFor": "-58.3816,-34.6037>-54.4367,-25.6953",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s8",
@@ -2372,7 +2404,11 @@
    "lng": -43.1729,
    "lat": -22.9068,
    "showLabel": true,
-   "arriveBy": "plane"
+   "arriveBy": "plane",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   }
  ],
  "route": {
@@ -2513,7 +2549,8 @@
    "compass": true,
    "compassStyle": "minimal",
    "compassCorner": "bl"
-  }
+  },
+  "countriesOnly": true
  },
  "view": {
   "center": [

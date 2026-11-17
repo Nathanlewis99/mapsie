@@ -14,6 +14,10 @@ const orig = (id: string, name: string, lng: number, lat: number, size = 13, rot
 const emoji = (id: string, name: string, lng: number, lat: number, size = 9, rotation = 0, art = "illustrated"): Sticker => ({
   id, kind: "sticker", name, art: art as Sticker["art"], src: "", lng, lat, size, rotation,
 });
+/** A trip photo, placed like a sticker (file in design/mockups/photos, loaded by build.ts). */
+const photo = (id: string, file: string, lng: number, lat: number, size = 22, rotation = 0): Sticker => ({
+  id, kind: "photo", src: `photo:${file}`, lng, lat, size, rotation,
+});
 const text = (id: string, t: string, lng: number, lat: number, o: Partial<Sticker> = {}): Sticker => ({
   id, kind: "text", src: "", text: t, font: "caveat", lng, lat, size: 5, rotation: 0, ...o,
 });
@@ -23,17 +27,20 @@ export interface Trip {
   frame: Design["frame"]; // the frame shown in its mockup
   room: string; // which room photo it hangs in
   view?: { zoom?: number; up?: number }; // hand-tuned framing
+  labels?: Record<string, [number, number]>; // hand-placed labels (stop name -> offset, % of width); the rest are placed automatically
   design: Partial<Design> & { preset: string; themePatch?: Partial<Design["theme"]> };
 }
 
 export const TRIPS: Trip[] = [
   {
     slug: "southeast-asia",
+    labels: { "Hoi An": [3.2, 0] },
     view: { zoom: -0.3, up: 0.02 },
     frame: "oak",
     room: "living-oak",
     design: {
       preset: "tropical",
+      themePatch: { countriesOnly: true },
       title: "Backpacking South East Asia",
       subtitle: "Three months · five countries · one backpack",
       font: "pacifico",
@@ -87,13 +94,13 @@ export const TRIPS: Trip[] = [
         ["Santa Fe", -105.9378, 35.687, "car"],
         ["Flagstaff", -111.6513, 35.1983, "car"],
         ["Grand Canyon", -112.1129, 36.0544, "car"],
-        ["Las Vegas", -115.1398, 36.1699, "car", { labelOffset: [-17, -1.5] }],
+        ["Las Vegas", -115.1398, 36.1699, "car"],
         ["Santa Monica", -118.4912, 34.0195, "car"],
       ]),
       route: { show: true, style: "solid", curved: false, width: 0.55, modeIcons: true, iconArt: "flat" },
       markers: { style: "pin", showDates: false, size: 1.05, labelSize: 1 },
       visited: { show: false, opacity: 0.3 },
-      themePatch: { details: { grid: false, tropics: false, currents: false, lanes: false, compass: true, compassStyle: "vintage", compassCorner: "br" } },
+      themePatch: { countriesOnly: true, details: { grid: false, tropics: false, currents: false, lanes: false, compass: true, compassStyle: "vintage", compassCorner: "br" } },
       stickers: [
         orig("b1", "lm-grandcanyon-sunset", -110.2, 40.6, 8, -5),
         orig("b2", "sky-chicago", -91.0, 42.0, 7.5, 4),
@@ -107,7 +114,7 @@ export const TRIPS: Trip[] = [
   },
   {
     slug: "sri-lanka",
-    view: { zoom: -0.18 },
+    view: { zoom: -0.05 },
     frame: "white",
     room: "bedroom-sage",
     design: {
@@ -129,16 +136,17 @@ export const TRIPS: Trip[] = [
         ["Galle", 80.217, 6.0329, "train", { vehicle: "train" }],
       ]),
       route: { show: true, style: "auto", curved: true, width: 0.5, modeIcons: true, iconArt: "illustrated" },
-      markers: { style: "dot", showDates: false, size: 1.1, labelSize: 1.05 },
+      markers: { style: "dot", showDates: false, size: 1.2, labelSize: 1.4 },
       visited: { show: false, opacity: 0.3 },
-      themePatch: { details: { grid: false, tropics: false, currents: false, lanes: false, compass: true, compassStyle: "classic", compassCorner: "tr" } },
+      themePatch: { countriesOnly: true, details: { grid: false, tropics: false, currents: false, lanes: false, compass: true, compassStyle: "classic", compassCorner: "tr" } },
       stickers: [
-        orig("c1", "lm-sigiriya-rock", 81.55, 8.05, 15, 5),
-        orig("c2", "tea-terraces", 79.95, 7.6, 13, -6),
-        orig("c3", "srileopard-rock", 81.72, 7.05, 12, 6),
-        orig("c4", "tuktuk-ride", 79.75, 6.25, 13, -5),
-        orig("c5", "elephant-bath", 81.5, 7.65, 11, 4),
-        text("t1", "ayubowan!", 80.6, 5.55, { font: "vibes", size: 6, rotation: -3, effect: "glow" }),
+        orig("c1", "lm-sigiriya-rock", 80.55, 8.3, 13, -5),
+        photo("p1", "ella-train", 81.45, 7.85, 24, 4),
+        photo("p2", "hiriketiya", 81.3, 5.95, 23, -3),
+        photo("p3", "tuktuk", 79.95, 6.55, 22, -5),
+        orig("c3", "srileopard-rock", 81.75, 6.55, 11, 6),
+        orig("c5", "elephant-bath", 80.25, 7.75, 11, 4),
+        text("t1", "ayubowan!", 79.95, 5.65, { font: "vibes", size: 6, rotation: -3, effect: "glow" }),
       ],
       text: { titleSize: 1.35, titleItalic: true, subtitleFont: "montserrat", showRoute: true } as Design["text"],
     },
@@ -205,7 +213,7 @@ export const TRIPS: Trip[] = [
       markers: { style: "number", showDates: false, size: 1, labelSize: 1 },
       visited: { show: true, opacity: 0.18 },
       originals: { style: "line", palette: "auto" },
-      themePatch: { details: { grid: true, tropics: true, currents: false, lanes: false, compass: true, compassStyle: "minimal", compassCorner: "bl" } },
+      themePatch: { countriesOnly: true, details: { grid: true, tropics: true, currents: false, lanes: false, compass: true, compassStyle: "minimal", compassCorner: "bl" } },
       stickers: [
         orig("f1", "lm-machupicchu-terraces", -80.5, -9.5, 12, -5, "line"),
         orig("f2", "lm2-uyuni", -61.0, -19.0, 11, 5, "line"),
@@ -219,11 +227,13 @@ export const TRIPS: Trip[] = [
   },
   {
     slug: "interrail-europe",
+    labels: { Amsterdam: [0.5, -3.2] },
     view: { zoom: -0.22 },
     frame: "white",
     room: "office-terracotta",
     design: {
       preset: "blush",
+      themePatch: { countriesOnly: true },
       title: "Interrailing Europe",
       subtitle: "Summer 2025 · 8 cities · 1 rail pass",
       font: "abril",
@@ -251,7 +261,7 @@ export const TRIPS: Trip[] = [
         orig("g4", "lm2-charlesbridge", 17.4, 49.4, 10, -4),
         orig("g5", "scenic-alpine", 5.6, 46.1, 9, -6),
         orig("g6", "sky-amsterdam", 1.9, 53.2, 9, 4),
-        text("t1", "all aboard", 9.2, 39.6, { font: "dancing", size: 6, rotation: -6, curve: -40, effect: "none" }),
+        text("t1", "all aboard", 4.6, 38.6, { font: "dancing", size: 6, rotation: -6, curve: -40, effect: "none" }),
       ],
       text: { titleSize: 1.0, subtitleFont: "cormorant", subtitleCase: "none", subtitleItalic: true, subtitleSize: 1.3, showRoute: true } as Design["text"],
     },
@@ -281,7 +291,7 @@ export const TRIPS: Trip[] = [
       route: { show: true, style: "auto", curved: true, width: 0.5, modeIcons: true, iconArt: "illustrated" },
       markers: { style: "number", showDates: false, size: 1, labelSize: 1 },
       visited: { show: true, opacity: 0.28 },
-      themePatch: { details: { grid: false, tropics: true, currents: true, lanes: false, compass: true, compassStyle: "nautical", compassCorner: "bl" } },
+      themePatch: { countriesOnly: true, details: { grid: false, tropics: true, currents: true, lanes: false, compass: true, compassStyle: "nautical", compassCorner: "bl" } },
       stickers: [
         orig("h1", "lm-tablemountain-bay", 13.0, -31.2, 13, -6),
         orig("h2", "safari-giraffe", 35.4, -21.5, 13, 6),

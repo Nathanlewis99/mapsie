@@ -17,7 +17,11 @@
    "name": "Bangkok",
    "lng": 100.5018,
    "lat": 13.7563,
-   "showLabel": true
+   "showLabel": true,
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s1",
@@ -26,7 +30,11 @@
    "lat": 18.7883,
    "showLabel": true,
    "arriveBy": "train",
-   "vehicle": "steam-train"
+   "vehicle": "steam-train",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s2",
@@ -35,7 +43,11 @@
    "lat": 19.8856,
    "showLabel": true,
    "arriveBy": "boat",
-   "vehicle": "speedboat"
+   "vehicle": "speedboat",
+   "labelOffset": [
+    -9.67,
+    -3.65
+   ]
   },
   {
    "id": "s3",
@@ -43,7 +55,11 @@
    "lng": 105.8342,
    "lat": 21.0278,
    "showLabel": true,
-   "arriveBy": "plane"
+   "arriveBy": "plane",
+   "labelOffset": [
+    -11.42,
+    0
+   ]
   },
   {
    "id": "s4",
@@ -306,7 +322,11 @@
      20.94493
     ]
    ],
-   "pathFor": "105.8342,21.0278>107.0843,20.9101"
+   "pathFor": "105.8342,21.0278>107.0843,20.9101",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s5",
@@ -315,7 +335,11 @@
    "lat": 15.8801,
    "showLabel": true,
    "arriveBy": "train",
-   "vehicle": "high-speed-train"
+   "vehicle": "high-speed-train",
+   "labelOffset": [
+    3.2,
+    0
+   ]
   },
   {
    "id": "s6",
@@ -1014,7 +1038,11 @@
      10.82309
     ]
    ],
-   "pathFor": "108.3380,15.8801>106.6297,10.8231"
+   "pathFor": "108.3380,15.8801>106.6297,10.8231",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s7",
@@ -1317,7 +1345,11 @@
      13.36328
     ]
    ],
-   "pathFor": "106.6297,10.8231>103.8600,13.3633"
+   "pathFor": "106.6297,10.8231>103.8600,13.3633",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s8",
@@ -1325,7 +1357,11 @@
    "lng": 100.0136,
    "lat": 9.7319,
    "showLabel": true,
-   "arriveBy": "plane"
+   "arriveBy": "plane",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   }
  ],
  "route": {
@@ -1472,7 +1508,8 @@
    "currents": false,
    "lanes": false,
    "compass": false
-  }
+  },
+  "countriesOnly": true
  },
  "view": {
   "center": [

@@ -17,7 +17,11 @@
    "name": "Amsterdam",
    "lng": 4.9041,
    "lat": 52.3676,
-   "showLabel": true
+   "showLabel": true,
+   "labelOffset": [
+    0.5,
+    -3.2
+   ]
   },
   {
    "id": "s1",
@@ -26,7 +30,11 @@
    "lat": 48.8566,
    "showLabel": true,
    "arriveBy": "train",
-   "vehicle": "high-speed-train"
+   "vehicle": "high-speed-train",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s2",
@@ -35,7 +43,11 @@
    "lat": 41.3851,
    "showLabel": true,
    "arriveBy": "train",
-   "vehicle": "high-speed-train"
+   "vehicle": "high-speed-train",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s3",
@@ -44,7 +56,11 @@
    "lat": 43.7102,
    "showLabel": true,
    "arriveBy": "train",
-   "vehicle": "train"
+   "vehicle": "train",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s4",
@@ -53,7 +69,11 @@
    "lat": 45.4408,
    "showLabel": true,
    "arriveBy": "train",
-   "vehicle": "train"
+   "vehicle": "train",
+   "labelOffset": [
+    -13.24,
+    0
+   ]
   },
   {
    "id": "s5",
@@ -62,7 +82,11 @@
    "lat": 46.6863,
    "showLabel": true,
    "arriveBy": "train",
-   "vehicle": "mountain-railway"
+   "vehicle": "mountain-railway",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s6",
@@ -71,7 +95,11 @@
    "lat": 48.1351,
    "showLabel": true,
    "arriveBy": "train",
-   "vehicle": "steam-train"
+   "vehicle": "steam-train",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   },
   {
    "id": "s7",
@@ -80,7 +108,11 @@
    "lat": 50.0755,
    "showLabel": true,
    "arriveBy": "train",
-   "vehicle": "train"
+   "vehicle": "train",
+   "labelOffset": [
+    -13.74,
+    0
+   ]
   },
   {
    "id": "s8",
@@ -89,7 +121,11 @@
    "lat": 52.52,
    "showLabel": true,
    "arriveBy": "train",
-   "vehicle": "high-speed-train"
+   "vehicle": "high-speed-train",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
   }
  ],
  "route": {
@@ -189,8 +225,8 @@
    "src": "",
    "text": "all aboard",
    "font": "dancing",
-   "lng": 9.2,
-   "lat": 39.6,
+   "lng": 4.6,
+   "lat": 38.6,
    "size": 6,
    "rotation": -6,
    "curve": -40,
@@ -237,7 +273,8 @@
    "currents": false,
    "lanes": false,
    "compass": false
-  }
+  },
+  "countriesOnly": true
  },
  "view": {
   "center": [

@@ -23,7 +23,11 @@
     "kind": "sticker",
     "name": "beer",
     "art": "illustrated"
-   }
+   },
+   "labelOffset": [
+    -0.16,
+    0
+   ]
   },
   {
    "id": "s1",
@@ -37,7 +41,11 @@
     "kind": "sticker",
     "name": "beer",
     "art": "illustrated"
-   }
+   },
+   "labelOffset": [
+    -0.16,
+    0
+   ]
   },
   {
    "id": "s2",
@@ -51,7 +59,11 @@
     "kind": "sticker",
     "name": "beer",
     "art": "illustrated"
-   }
+   },
+   "labelOffset": [
+    -0.16,
+    0
+   ]
   },
   {
    "id": "s3",
@@ -65,7 +77,11 @@
     "kind": "sticker",
     "name": "beer",
     "art": "illustrated"
-   }
+   },
+   "labelOffset": [
+    -0.16,
+    0
+   ]
   },
   {
    "id": "s4",
@@ -79,7 +95,11 @@
     "kind": "sticker",
     "name": "beer",
     "art": "illustrated"
-   }
+   },
+   "labelOffset": [
+    -0.16,
+    0
+   ]
   },
   {
    "id": "s5",
@@ -93,7 +113,11 @@
     "kind": "sticker",
     "name": "beer",
     "art": "illustrated"
-   }
+   },
+   "labelOffset": [
+    -0.16,
+    0
+   ]
   },
   {
    "id": "s6",
@@ -108,7 +132,11 @@
     "kind": "sticker",
     "name": "pizza",
     "art": "illustrated"
-   }
+   },
+   "labelOffset": [
+    -0.16,
+    0
+   ]
   }
  ],
  "route": {

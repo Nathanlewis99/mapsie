@@ -29,6 +29,11 @@ export function track(name: TrackEvent, props?: Record<string, string | number |
     fetch("/api/events", { method: "POST", body, headers: { "content-type": "application/json" }, keepalive: true }).catch(() => {});
 }
 
+/** Where this visit came from, kept in page memory only (sent with an order, to credit the right ad channel). */
+export interface Attribution { source?: string; medium?: string; campaign?: string; click?: string; referrer?: string; landing?: string }
+let landed: Attribution | null = null;
+export const attribution = (): Attribution | undefined => (visitId() ? landed ?? undefined : undefined);
+
 /** First event of a visit: where they came from and on what. */
 export function trackVisit() {
   const p = new URLSearchParams(location.search);
@@ -37,6 +42,16 @@ export function trackVisit() {
     ref = document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, "") : "";
   } catch {}
   if (ref === location.hostname.replace(/^www\./, "")) ref = "";
+  // Which ad network sent them, from the click id it adds to the link (the id itself isn't kept).
+  const click = ["gclid", "gbraid", "wbraid", "fbclid", "epik", "msclkid", "ttclid"].find((k) => p.has(k));
+  landed ??= {
+    ...(p.get("utm_source") ? { source: p.get("utm_source")!.slice(0, 40) } : {}),
+    ...(p.get("utm_medium") ? { medium: p.get("utm_medium")!.slice(0, 40) } : {}),
+    ...(p.get("utm_campaign") ? { campaign: p.get("utm_campaign")!.slice(0, 80) } : {}),
+    ...(click ? { click } : {}),
+    ...(ref ? { referrer: ref.slice(0, 80) } : {}),
+    landing: location.pathname.slice(0, 80),
+  };
   track("visit", {
     source: p.get("utm_source") ?? (ref || "direct"),
     ...(p.get("utm_campaign") ? { campaign: p.get("utm_campaign")! } : {}),

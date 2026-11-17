@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { clientIp, limit, tooMany } from "@/lib/server/rateLimit";
 import { adConsentFrom } from "@/lib/server/conversions";
+import { classifyChannel, cleanAttribution } from "@/lib/channels";
 import { nanoid } from "nanoid";
 import Stripe from "stripe";
 import { getDesign, saveDesign, saveOrder, type Order } from "@/lib/server/db";
@@ -48,6 +49,10 @@ export async function POST(req: Request) {
     status: "pending_payment",
     visitId: typeof body.visitId === "string" && /^[a-z0-9]{8,40}$/.test(body.visitId) ? body.visitId : undefined,
     adConsent: adConsentFrom(req, clientIp(req)),
+    ...(() => {
+      const attribution = cleanAttribution((body as { attribution?: unknown }).attribution);
+      return { attribution, channel: classifyChannel(attribution) };
+    })(),
     createdAt: new Date().toISOString(),
   };
   await saveOrder(order);

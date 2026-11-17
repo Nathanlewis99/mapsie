@@ -56,6 +56,9 @@ export interface Order {
   error?: string;
   /** Anonymous analytics visit that placed the order (for the funnel). */
   visitId?: string;
+  /** Where the visit that placed the order came from (no personal data), and the channel it counts towards. */
+  attribution?: import("../channels").AttributionIn;
+  channel?: import("../channels").ChannelId;
   /** Cookie choices at checkout, and the ad identifiers we may use with them (see conversions.ts). */
   adConsent?: import("./conversions").AdConsent;
   /** Which customer emails have gone out, so none is sent twice. */
@@ -752,6 +755,8 @@ export interface GiftCard {
   parentId?: string;
   redeemedOrderId?: string;
   stripeSessionId?: string;
+  attribution?: import("../channels").AttributionIn;
+  channel?: import("../channels").ChannelId;
   createdAt: string;
 }
 const giftRow = (r: Row) => JSON.parse(String(r.json)) as GiftCard;

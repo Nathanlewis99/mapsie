@@ -8,7 +8,7 @@ import { describeOptions, getRegion, guessRegion, itemPrice, money, priceLines, 
 import PrintOptionsPicker from "@/components/PrintOptionsPicker";
 import ChristmasBanner from "@/components/ChristmasBanner";
 import { sizeNote } from "@/lib/legibility";
-import { track, visitId } from "@/lib/track";
+import { attribution, track, visitId } from "@/lib/track";
 import { adEvent } from "@/lib/adTrack";
 
 const FramedPoster = dynamic(() => import("@/components/FramedPoster"), { ssr: false });
@@ -57,7 +57,7 @@ export default function Checkout({ design: saved }: { design: Design }) {
     track("pay_click", { region, framed: opts.frame !== "none", size: opts.productId });
     setBusy(true);
     setErr("");
-    const r = await fetch("/api/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ designId: saved.id, email, shipping, region, options: opts, visitId: visitId() }) });
+    const r = await fetch("/api/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ designId: saved.id, email, shipping, region, options: opts, visitId: visitId(), attribution: attribution() }) });
     const j = await r.json();
     if (!r.ok) return setErr(j.error ?? "Something went wrong"), setBusy(false);
     window.location.href = j.url;

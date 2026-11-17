@@ -8,6 +8,7 @@ import { clientIp, limit, sameOrigin, tooMany } from "@/lib/server/rateLimit";
 import { publicUrl } from "@/lib/server/urls";
 import { getRegion } from "@/lib/products";
 import { GIFT_MAX, GIFT_MIN } from "@/lib/giftcards";
+import { classifyChannel, cleanAttribution } from "@/lib/channels";
 
 const clean = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/[\u0000-\u001f]/g, " ").trim().slice(0, max) : "");
 
@@ -39,6 +40,10 @@ export async function POST(req: Request) {
     recipientName: clean(b.recipientName, 60),
     message: clean(b.message, 300),
     ...(recipientEmail ? { recipientEmail, ...(sendOn ? { sendOn } : {}) } : {}),
+    ...(() => {
+      const attribution = cleanAttribution(b.attribution);
+      return { attribution, channel: classifyChannel(attribution) };
+    })(),
     createdAt: new Date().toISOString(),
   };
   await saveGiftCard(g);

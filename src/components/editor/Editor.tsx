@@ -11,7 +11,7 @@ import FramedPoster, { frameWidth } from "@/components/FramedPoster";
 import WallPreview from "@/components/WallPreview";
 import { useEditor } from "@/lib/store";
 import { reverseGeocode } from "@/lib/geo";
-import { itemPrice, money, posterAspect, REGIONS } from "@/lib/products";
+import { FRAMES, itemPrice, MOUNTS, money, posterAspect, PRODUCTS, REGIONS } from "@/lib/products";
 import { FONTS, fontBold, fontCss } from "@/lib/fonts";
 import { ART_STYLES, stickerSrc, type ArtStyleId } from "@/lib/stickers";
 import { PAINTED, PALETTE_NAMES, getOriginal, type OriginalStyle } from "@/lib/originals";
@@ -163,6 +163,19 @@ export default function Editor() {
           router.replace("/create");
         })
         .catch(() => setToast("Sorry, we couldn't open that map."));
+    } else if (params.get("product") || params.get("format")) {
+      // From a shopping ad / product feed: preselect the size, frame and mount it showed.
+      const pick = <T extends { id: string }>(list: readonly T[], v: string | null) => (list.some((x) => x.id === v) ? (v as T["id"]) : undefined);
+      const patch = {
+        ...(pick(PRODUCTS, params.get("product")) ? { productId: params.get("product")! } : {}),
+        ...(pick(FRAMES, params.get("frame")) ? { frame: params.get("frame") as Design["frame"] } : {}),
+        ...(pick(MOUNTS, params.get("mount")) ? { mount: params.get("mount") as Design["mount"] } : {}),
+        ...(params.get("format") === "digital" ? { format: "digital" as const } : {}),
+      };
+      if (Object.keys(patch).length) useEditor.getState().set(patch as Partial<Design>);
+      const r = params.get("region");
+      if (r && REGIONS.some((x) => x.id === r)) useEditor.getState().setRegion(r as typeof region);
+      router.replace("/create");
     } else if (params.get("template")) {
       // From an occasion page: start from that quick-start trip.
       const t = TEMPLATES.find((x) => x.id === params.get("template"));

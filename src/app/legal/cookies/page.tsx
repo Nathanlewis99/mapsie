@@ -21,7 +21,7 @@ export default function CookiesPage() {
           <li>We use one sign-in cookie (plus a few short-lived ones while you sign in), and only if you sign in.</li>
           <li>Your browser&apos;s local storage autosaves the map you&apos;re designing, so you don&apos;t lose your work.</li>
           <li>
-            Analytics (Google Analytics) and advertising (Meta, Google Ads) cookies are optional and off unless you choose to allow
+            Analytics (Google Analytics) and advertising (Meta, Pinterest, Google Ads) cookies are optional and off unless you choose to allow
             them. Change your mind any time with &ldquo;Cookie settings&rdquo; at the bottom of every page.
           </li>
           <li>We count visits anonymously without storing anything on your device (see below).</li>
@@ -96,13 +96,16 @@ export default function CookiesPage() {
             [<code key="n">_gcl_au</code>, "Google Ads (advertising)", "Links an order to the Google ad that led to it, so we know which ads work.", "90 days"],
             [<code key="n">_fbp</code>, "Meta (advertising)", "Links visits and orders to Meta (Facebook and Instagram) ads, to measure them and show our ads to people likely to be interested.", "90 days"],
             [<code key="n">_fbc</code>, "Meta (advertising)", "Set when you arrive from a Meta ad, to link the visit to that ad.", "90 days"],
+            [<code key="n">_pin_unauth</code>, "Pinterest (advertising)", "Links visits and orders to Pinterest ads, to measure them.", "1 year"],
+            [<code key="n">_epik</code>, "Pinterest (advertising)", "Set when you arrive from a Pinterest ad, to link the visit to that ad.", "1 year"],
             [<code key="n">mapsie-conv-*</code>, "Mapsie (local storage, with either choice)", "Notes that an order has been counted, so it isn't reported twice.", "Until you clear your browser's site data"],
           ]}
         />
         <p>
           Google and Meta use these under their own privacy policies: see{" "}
           <Ext href="https://policies.google.com/technologies/partner-sites">how Google uses information from sites that use its services</Ext>{" "}
-          and <Ext href="https://www.facebook.com/privacy/policy">Meta&apos;s privacy policy</Ext>.
+          , <Ext href="https://www.facebook.com/privacy/policy">Meta&apos;s privacy policy</Ext> and{" "}
+          <Ext href="https://policy.pinterest.com/en-gb/privacy-policy">Pinterest&apos;s privacy policy</Ext>.
         </p>
         <p>
           To see which parts of the site work and where people get stuck, we count anonymous steps such as &quot;opened the

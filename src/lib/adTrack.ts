@@ -7,6 +7,7 @@ declare global {
   interface Window {
     gtag?: Gtag;
     fbq?: Fbq;
+    pintrk?: (...args: unknown[]) => void;
     __mapsieAds?: { googleAds?: string; adsPurchaseLabel?: string };
   }
 }
@@ -17,14 +18,16 @@ export type AdEvent =
   | { name: "purchase"; orderId: string; value: number; currency: string };
 
 export function adEvent(e: AdEvent) {
-  const { gtag, fbq } = window;
+  const { gtag, fbq, pintrk } = window;
   if (e.name === "view_design") {
     gtag?.("event", "view_item", { items: [{ item_id: "custom-map", item_name: "Custom map print" }] });
     fbq?.("track", "ViewContent", { content_name: "Map designer" });
+    pintrk?.("track", "pagevisit", { line_items: [{ product_name: "Custom map print" }] });
   } else if (e.name === "begin_checkout") {
     const currency = e.currency.toUpperCase();
     gtag?.("event", "begin_checkout", { currency, value: e.value });
     fbq?.("track", "InitiateCheckout", { currency, value: e.value });
+    pintrk?.("track", "addtocart", { value: e.value, order_quantity: 1, currency });
   } else if (e.name === "purchase") {
     const currency = e.currency.toUpperCase();
     // The same order is also sent from our server (in case the browser blocks tags),
@@ -33,5 +36,6 @@ export function adEvent(e: AdEvent) {
     const ads = window.__mapsieAds;
     if (ads?.googleAds && ads.adsPurchaseLabel) gtag?.("event", "conversion", { send_to: `${ads.googleAds}/${ads.adsPurchaseLabel}`, transaction_id: e.orderId, currency, value: e.value });
     fbq?.("track", "Purchase", { currency, value: e.value }, { eventID: e.orderId });
+    pintrk?.("track", "checkout", { event_id: e.orderId, order_id: e.orderId, value: e.value, order_quantity: 1, currency });
   }
 }

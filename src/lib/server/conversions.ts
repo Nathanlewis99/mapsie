@@ -5,6 +5,7 @@
 //
 //   Meta Conversions API:     META_PIXEL_ID + META_CAPI_TOKEN (System User token, from Events Manager)
 //   GA4 Measurement Protocol: GA4_MEASUREMENT_ID + GA4_API_SECRET (Admin > Data streams > Measurement Protocol)
+//   Pinterest Conversions API: PINTEREST_AD_ACCOUNT_ID + PINTEREST_CAPI_TOKEN (Ads Manager > Conversions > Conversion access token)
 import { createHash } from "node:crypto";
 import type { Order } from "./db";
 import { logError } from "./log";
@@ -16,6 +17,7 @@ export interface AdConsent {
   ads: boolean;
   fbp?: string;
   fbc?: string;
+  epik?: string;
   gaClientId?: string;
   ip?: string;
   userAgent?: string;
@@ -39,7 +41,7 @@ export function adConsentFrom(req: Request, ip: string): AdConsent | undefined {
   return {
     analytics: !!c.analytics,
     ads: !!c.ads,
-    ...(c.ads ? { fbp: cookie(header, "_fbp"), fbc: cookie(header, "_fbc"), ip: ip !== "unknown" ? ip : undefined, userAgent: req.headers.get("user-agent")?.slice(0, 400) } : {}),
+    ...(c.ads ? { fbp: cookie(header, "_fbp"), fbc: cookie(header, "_fbc"), epik: cookie(header, "_epik"), ip: ip !== "unknown" ? ip : undefined, userAgent: req.headers.get("user-agent")?.slice(0, 400) } : {}),
     ...(c.analytics && ga ? { gaClientId: ga } : {}),
   };
 }
@@ -98,6 +100,38 @@ export async function sendPurchaseConversions(o: Order) {
         body: JSON.stringify({ client_id: c.gaClientId, events: [{ name: "purchase", params: { transaction_id: o.id, currency, value } }] }),
       }).then((r) => {
         if (!r.ok) throw new Error(`GA4 ${r.status}`);
+      }),
+    );
+  }
+
+  const pinAccount = process.env.PINTEREST_AD_ACCOUNT_ID;
+  const pinToken = process.env.PINTEREST_CAPI_TOKEN;
+  if (c.ads && pinAccount && pinToken) {
+    jobs.push(
+      fetch(`https://api.pinterest.com/v5/ad_accounts/${encodeURIComponent(pinAccount)}/events`, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${pinToken}` },
+        signal: AbortSignal.timeout(10_000),
+        body: JSON.stringify({
+          data: [
+            {
+              event_name: "checkout",
+              action_source: "web",
+              event_time: Math.floor(Date.now() / 1000),
+              event_id: o.id,
+              event_source_url: `${publicUrl()}/order/${o.id}`,
+              user_data: {
+                em: o.email ? [sha256(o.email)] : undefined,
+                client_ip_address: c.ip,
+                client_user_agent: c.userAgent,
+                click_id: c.epik,
+              },
+              custom_data: { currency, value: String(value), order_id: o.id, num_items: 1 },
+            },
+          ],
+        }),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error(`Pinterest CAPI ${r.status}: ${(await r.text()).slice(0, 300)}`);
       }),
     );
   }

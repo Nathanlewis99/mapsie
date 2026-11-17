@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { readConsent, saveConsent, type Consent } from "@/lib/consent";
 
-type Config = { metaPixel: string | null; ga4: string | null; googleAds: string | null; adsPurchaseLabel: string | null };
+type Config = { metaPixel: string | null; ga4: string | null; googleAds: string | null; adsPurchaseLabel: string | null; pinterest: string | null };
 
 // Loads Google (Analytics and Ads, with Consent Mode) and the Meta Pixel only after
 // the visitor agrees, and shows the cookie banner. With no IDs set on Render there are
@@ -60,6 +60,15 @@ function startMeta(pixel: string) {
   fbq("init", pixel);
 }
 
+function startPinterest(tag: string) {
+  if (window.pintrk) return;
+  const q: unknown[][] = [];
+  const pintrk = Object.assign((...args: unknown[]) => void q.push(args), { queue: q, version: "3.0" });
+  window.pintrk = pintrk;
+  loadScript("https://s.pinimg.com/ct/core.js");
+  pintrk("load", tag);
+}
+
 export default function ConsentManager() {
   const [cfg, setCfg] = useState<Config | null>(null);
   const [consent, setConsent] = useState<Consent | null>(null);
@@ -67,14 +76,14 @@ export default function ConsentManager() {
   const [choosing, setChoosing] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [ads, setAds] = useState(false);
-  const started = useRef({ google: false, meta: false });
+  const started = useRef({ google: false, meta: false, pinterest: false });
   const pathname = usePathname();
 
   useEffect(() => {
     fetch("/api/site-config")
       .then((r) => r.json())
       .then((c: Config) => {
-        if (!c.metaPixel && !c.ga4 && !c.googleAds) return;
+        if (!c.metaPixel && !c.ga4 && !c.googleAds && !c.pinterest) return;
         setCfg(c);
         const saved = readConsent();
         setConsent(saved);
@@ -107,6 +116,10 @@ export default function ConsentManager() {
       startMeta(cfg.metaPixel);
       started.current.meta = true;
     }
+    if (consent.ads && cfg.pinterest && !started.current.pinterest) {
+      startPinterest(cfg.pinterest);
+      started.current.pinterest = true;
+    }
     if (!consent.ads && window.fbq) window.fbq("consent", "revoke");
     if (consent.ads && window.fbq && started.current.meta) window.fbq("consent", "grant");
   }, [cfg, consent]);
@@ -117,6 +130,7 @@ export default function ConsentManager() {
     const t = setTimeout(() => {
       if (consent.analytics || consent.ads) window.gtag?.("event", "page_view", { page_path: pathname, page_location: location.href });
       if (consent.ads) window.fbq?.("track", "PageView");
+      if (consent.ads) window.pintrk?.("page");
     }, 50);
     return () => clearTimeout(t);
   }, [pathname, consent]);
@@ -132,18 +146,18 @@ export default function ConsentManager() {
     <div role="dialog" aria-label="Cookie choices" className="fixed inset-x-3 bottom-3 z-[60] mx-auto max-w-xl rounded-3xl bg-white p-5 shadow-2xl border border-ink/10 text-sm space-y-3">
       <div className="font-extrabold text-base">🍪 Cookies</div>
       <p className="text-ink/70">
-        We&apos;d like to use cookies to see how people find Mapsie (Google Analytics) and to measure our ads on Instagram, Facebook
-        and Google. They&apos;re optional and off unless you say yes. <Link href="/legal/cookies" className="underline font-bold">Details</Link>
+        We&apos;d like to use cookies to see how people find Mapsie (Google Analytics) and to measure our ads on Instagram, Facebook,
+        Pinterest and Google. They&apos;re optional and off unless you say yes. <Link href="/legal/cookies" className="underline font-bold">Details</Link>
       </p>
       {choosing && (
         <div className="space-y-2 rounded-2xl bg-sand/50 p-3">
           <label className="flex items-start gap-2"><input type="checkbox" checked disabled className="mt-1" /><span><b>Essential</b>: sign-in and saving your design. Always on.</span></label>
           {cfg.ga4 && <label className="flex items-start gap-2"><input type="checkbox" checked={analytics} onChange={(e) => setAnalytics(e.target.checked)} className="mt-1 accent-coral" /><span><b>Analytics</b>: Google Analytics, to see which pages help and which confuse.</span></label>}
-          {(cfg.metaPixel || cfg.googleAds) && <label className="flex items-start gap-2"><input type="checkbox" checked={ads} onChange={(e) => setAds(e.target.checked)} className="mt-1 accent-coral" /><span><b>Advertising</b>: Meta and Google, to measure which ads lead to orders and show our ads to people likely to want them.</span></label>}
+          {(cfg.metaPixel || cfg.googleAds || cfg.pinterest) && <label className="flex items-start gap-2"><input type="checkbox" checked={ads} onChange={(e) => setAds(e.target.checked)} className="mt-1 accent-coral" /><span><b>Advertising</b>: Meta, Google and Pinterest, to measure which ads lead to orders and show our ads to people likely to want them.</span></label>}
         </div>
       )}
       <div className="flex flex-wrap gap-2">
-        <button onClick={() => decide(!!cfg.ga4, !!(cfg.metaPixel || cfg.googleAds))} className="rounded-full bg-coral px-4 py-2 font-extrabold text-white">Accept all</button>
+        <button onClick={() => decide(!!cfg.ga4, !!(cfg.metaPixel || cfg.googleAds || cfg.pinterest))} className="rounded-full bg-coral px-4 py-2 font-extrabold text-white">Accept all</button>
         <button onClick={() => decide(false, false)} className="rounded-full border-2 border-ink/15 px-4 py-2 font-extrabold">Reject all</button>
         {choosing ? (
           <button onClick={() => decide(analytics && !!cfg.ga4, ads)} className="rounded-full border-2 border-ink/15 px-4 py-2 font-extrabold">Save my choices</button>

@@ -130,11 +130,11 @@ export default function PrivacyPage() {
         </Sub>
         <Sub title="Analytics and advertising cookies (only if you agree)">
           <p>
-            If you choose to allow them, Google Analytics and our advertising partners (Meta, for Facebook and Instagram, and
-            Google Ads) set cookies that record the pages you visit on {COMPANY.site} and whether you start checkout or order. This
+            If you choose to allow them, Google Analytics and our advertising partners (Meta, for Facebook and Instagram, Pinterest
+            and Google Ads) set cookies that record the pages you visit on {COMPANY.site} and whether you start checkout or order. This
             lets us see which pages help, and which ads lead to orders. When you order, and only if you allowed advertising
             cookies, we also send the order&apos;s value and a scrambled (hashed) copy of your email address, your IP address and
-            browser type to Meta, so it can match the sale to an ad you saw. If you allowed analytics cookies, we send the order
+            browser type to Meta and Pinterest, so they can match the sale to an ad you saw. If you allowed analytics cookies, we send the order
             value to Google Analytics. You can change your choices at any time with &ldquo;Cookie settings&rdquo; at the bottom of
             every page. See our <In href="/legal/cookies">Cookie policy</In> for the details.
           </p>
@@ -154,7 +154,9 @@ export default function PrivacyPage() {
             on your device or linked to your name, email or IP address. We use this, in our legitimate interest in running and
             improving the shop, to see where the site is confusing. Browsers sending Global Privacy Control or Do Not Track
             signals aren&apos;t counted. When you place an order we note the visit&apos;s random number on the order so we can
-            count it as &quot;paid&quot;, and nothing more.
+            count it as &quot;paid&quot;, and where the visit came from (the website, search engine or ad campaign that
+            linked to us, and which kind of ad it was), so we can see which kinds of advertising lead to orders. We don&apos;t
+            keep the ad&apos;s own tracking ID.
           </p>
         </Sub>
         <p>
@@ -201,7 +203,7 @@ export default function PrivacyPage() {
               <>Your <strong>consent</strong> (the box on the review form), which you can withdraw at any time.</>,
             ],
             [
-              "Send you one design reminder, analytics and advertising cookies, and sharing your order with Meta or Google",
+              "Send you one design reminder, analytics and advertising cookies, and sharing your order with Meta, Pinterest or Google",
               <>Your <strong>consent</strong>, which you can withdraw at any time (unsubscribe link, or &ldquo;Cookie settings&rdquo;).</>,
             ],
             [
@@ -242,7 +244,7 @@ export default function PrivacyPage() {
             [<strong key="w">Anthropic</strong>, "The AI behind “Describe your trip”: plans your map from your description", "The description you type or say. Under its commercial terms Anthropic doesn’t use it to train its models, and keeps it only for a limited time for safety monitoring"],
             [<strong key="w">Cloudflare</strong>, "Checks requests to “Describe your trip” come from a person, not a bot (if shown)", "Technical information about your browser and your IP address"],
             [<strong key="w">Etsy</strong>, "If you buy on Etsy: sends us your order so you can design it here", "Your name, delivery address, email (if Etsy shares it) and what you bought"],
-            [<strong key="w">Meta and Google (only if you agree)</strong>, "Analytics and measuring our ads, as described in section 2", "The pages you visit and actions you take on our site, and, when you order, the order value, a hashed email address, IP address and browser type"],
+            [<strong key="w">Meta, Pinterest and Google (only if you agree)</strong>, "Analytics and measuring our ads, as described in section 2", "The pages you visit and actions you take on our site, and, when you order, the order value, a hashed email address, IP address and browser type"],
             [<strong key="w">Photon (komoot)</strong>, "Place search: finds the places you type in", "The places you search for, the coordinates of points you add to the map (to look up their names), and, because your browser sends these requests directly, your IP address"],
             [<strong key="w">OSRM (Project OSRM)</strong>, "Calculates road routes between your stops", "The coordinates of the stops being joined. Requests are sent from our server, not your browser"],
             [<strong key="w">OpenFreeMap</strong>, "Supplies the map tiles (map data from OpenStreetMap)", "Your IP address and which area of the map you’re viewing, as your browser loads the tiles"],
@@ -259,8 +261,8 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p>
-          <strong>We never sell your personal information</strong>. We only share it for advertising with Meta and Google, and
-          only if you allow advertising cookies.
+          <strong>We never sell your personal information</strong>. We only share it for advertising with Meta, Pinterest and
+          Google, and only if you allow advertising cookies.
         </p>
       </Section>
 
@@ -270,7 +272,7 @@ export default function PrivacyPage() {
           an adequate level of protection for personal information.
         </p>
         <p>
-          Some of our service providers are based in, or use systems in, other countries. In particular, Stripe, Google, Meta, Anthropic,
+          Some of our service providers are based in, or use systems in, other countries. In particular, Stripe, Google, Meta, Pinterest, Anthropic,
           Resend and Cloudflare may process information in the United States, and Prodigi prints and ships your order from a site in or near your
           country, so if you order from the US or Australia, your order details will be processed there. Where your information
           is transferred outside the UK or EU to a country without an adequacy decision, we make sure it is protected by

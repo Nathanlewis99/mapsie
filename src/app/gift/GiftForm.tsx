@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { giftAmounts, GIFT_MAX, GIFT_MIN } from "@/lib/giftcards";
 import { getRegion, guessRegion, REGIONS, type RegionId } from "@/lib/products";
+import { attribution } from "@/lib/track";
 
 const field = "w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral";
 
@@ -31,7 +32,7 @@ export default function GiftForm() {
     const res = await fetch("/api/gift/checkout", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ amount: value, region, buyerEmail, fromName, recipientName, message, ...(toThem ? { recipientEmail, sendOn } : {}) }),
+      body: JSON.stringify({ amount: value, region, buyerEmail, fromName, recipientName, message, ...(toThem ? { recipientEmail, sendOn } : {}), attribution: attribution() }),
     });
     const j = await res.json().catch(() => ({}));
     if (!res.ok) return setErr(j.error ?? "Something went wrong"), setBusy(false);

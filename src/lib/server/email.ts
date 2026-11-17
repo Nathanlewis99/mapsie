@@ -317,3 +317,24 @@ export async function sendGiftCardEmail(g: GiftCard, kind: "buyer" | "recipient"
     ], { label: "See my gift card", href: giftCardUrl(g.id) }));
   }
 }
+
+// ---------------------------------------------------------------- reviews
+/** A few days after delivery: how was it? (Etsy buyers: please review on Etsy.) */
+export async function sendReviewRequestEmail(o: Order, reviewLink: string) {
+  const name = o.address?.name?.split(" ")[0];
+  const what = o.digital ? "your map file" : "your map";
+  if (o.source === "etsy") {
+    await sendEmail(page(o.email, "How's your map?", "How's your map? 🗺️", [
+      name ? `Hi ${name},` : "Hi,",
+      `We hope ${what} has found a good spot on the wall!`,
+      "If you have a moment, a review on Etsy would mean a lot: it really helps a small shop like ours. You'll find the order under Purchases and reviews.",
+      "If anything isn't right, just reply to this email and we'll sort it.",
+    ], { label: "Review on Etsy", href: "https://www.etsy.com/your/purchases" }, unsubscribeUrl(o.email)));
+    return;
+  }
+  await sendEmail(page(o.email, "How's your map?", "How's your map? 🗺️", [
+    name ? `Hi ${name},` : "Hi,",
+    `We hope ${what} has found a good spot on the wall! Would you tell us what you think? It takes a minute, and a photo of it in its new home would make our day.`,
+    "If anything isn't right, reply to this email and we'll put it right.",
+  ], { label: "Leave a review", href: reviewLink }, unsubscribeUrl(o.email)));
+}

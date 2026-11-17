@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   await updateOrder(orderId, {
     printStage: stage,
     shipments,
-    ...(stage === "Complete" || shipments.length ? { status: "shipped" as const } : {}),
+    ...(stage === "Complete" || shipments.length ? { status: "shipped" as const, ...(order.shippedAt ? {} : { shippedAt: new Date().toISOString() }) } : {}),
     ...(stage === "Cancelled" ? { status: "failed" as const, error: "Cancelled by the printer" } : {}),
   });
   if (stage === "Complete" || shipments.length) {

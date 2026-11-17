@@ -114,6 +114,20 @@ export default function PrivacyPage() {
             address on a do-not-email list so it stays that way.
           </p>
         </Sub>
+        <Sub title="Gift cards">
+          <p>
+            When you buy a gift card we keep your email, the names and message you write, and, if you ask us to send it for you,
+            the recipient&apos;s email address and the date to send it. We use the recipient&apos;s address only to deliver the gift
+            card. Please only give us someone&apos;s email if you&apos;re sure they&apos;d be happy to receive it.
+          </p>
+        </Sub>
+        <Sub title="Reviews">
+          <p>
+            A few days after your order arrives we email you once to ask for a review. If you leave one, we keep your rating, what
+            you write, the name you give and any photo you add. We only show it on our website or social media if you tick the box
+            allowing that, and you can ask us to remove it at any time.
+          </p>
+        </Sub>
         <Sub title="Analytics and advertising cookies (only if you agree)">
           <p>
             If you choose to allow them, Google Analytics and our advertising partners (Meta, for Facebook and Instagram, and
@@ -173,6 +187,18 @@ export default function PrivacyPage() {
             [
               "Plan your map from your trip description (Create with AI), and email you a design you asked for",
               <><strong>Contract</strong>: it&apos;s needed to provide what you&apos;ve asked for.</>,
+            ],
+            [
+              "Sell and deliver gift cards, including emailing the person you name",
+              <><strong>Contract</strong>, and our <strong>legitimate interests</strong> in delivering the gift you bought for them.</>,
+            ],
+            [
+              "Ask for a review after your order arrives",
+              <>Our <strong>legitimate interests</strong> in hearing how we did. One email only, with an unsubscribe link.</>,
+            ],
+            [
+              "Show your review and photo on our website or social media",
+              <>Your <strong>consent</strong> (the box on the review form), which you can withdraw at any time.</>,
             ],
             [
               "Send you one design reminder, analytics and advertising cookies, and sharing your order with Meta or Google",
@@ -279,6 +305,8 @@ export default function PrivacyPage() {
             ["Unsubscribe list (email addresses that asked not to be emailed)", "For as long as we send reminders, so we can keep respecting your choice"],
             ["Your trip description for Create with AI", "We don’t store it. Only the resulting map design is kept, as above"],
             ["Your cookie choices", "6 months, then we ask again"],
+            ["Gift cards (names, message, emails)", "6 years after purchase, as financial records"],
+            ["Reviews and review photos", "Until you ask us to remove them, or we stop showing them"],
             ["Server technical logs", "Up to 30 days, kept by our hosting provider"],
             ["Anonymous usage statistics", "About 13 months, then deleted automatically"],
             ["Error reports (what went wrong, on which page, browser type)", "Until the problem is fixed, and at most 12 months"],

@@ -104,6 +104,8 @@ export function startScheduler() {
   setInterval(safe(etsyJob, "etsy"), 5 * 60_000);
   if (ROLE === "worker") setInterval(safe(checkSite, "uptime"), 5 * 60_000);
   setInterval(safe(sendDesignReminders, "design-reminders"), 30 * 60_000);
+  // Review requests a few days after delivery.
+  setInterval(safe(async () => (await import("./reviews")).sendReviewRequests(), "review-requests"), 3 * 3600_000);
   // Gift cards scheduled for a date (e.g. Christmas morning).
   setInterval(safe(async () => (await import("./giftcards")).sendDueGiftCards(), "gift-cards"), 15 * 60_000);
   setTimeout(safe(etsyJob, "etsy"), 30_000);

@@ -46,6 +46,8 @@ export interface Order {
   shipments?: { carrier?: string; trackingNumber?: string; trackingUrl?: string; dispatchDate?: string }[];
   printStage?: string;
   paidAt?: string;
+  /** When the printer told us it had shipped (for timing the review request). */
+  shippedAt?: string;
   /** Sent to the printer after this time; until then the customer can cancel. */
   holdUntil?: string;
   stripePaymentIntent?: string;

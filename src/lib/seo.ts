@@ -56,7 +56,20 @@ export const FAQ: { q: string; a: string }[] = [
 ];
 
 /** Structured data for the homepage: who we are, what we sell, and the FAQ. */
-export function homeJsonLd() {
+export function homeJsonLd(reviews?: { count: number; average: number; items: { name: string; rating: number; text: string; date: string }[] }) {
+  // Star ratings only from real, approved reviews, and only once there are a few.
+  const rated = reviews && reviews.count >= 3
+    ? {
+        aggregateRating: { "@type": "AggregateRating", ratingValue: Number(reviews.average.toFixed(1)), reviewCount: reviews.count, bestRating: 5, worstRating: 1 },
+        review: reviews.items.slice(0, 5).map((r) => ({
+          "@type": "Review",
+          author: { "@type": "Person", name: r.name },
+          datePublished: r.date.slice(0, 10),
+          reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
+          reviewBody: r.text,
+        })),
+      }
+    : {};
   return [
     {
       "@context": "https://schema.org",
@@ -82,6 +95,7 @@ export function homeJsonLd() {
         availability: "https://schema.org/InStock",
         url: `${SITE}/create`,
       },
+      ...rated,
     },
     faqJsonLd(FAQ),
   ];

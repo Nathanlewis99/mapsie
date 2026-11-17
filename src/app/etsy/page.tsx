@@ -22,6 +22,7 @@ export default function EtsyStart() {
             Your order number is in your Etsy purchase email and under Purchases on Etsy. If we have your email, we&apos;ve also sent you a link.
           </p>
         </div>
+        <p className="text-[11px] text-ink/40 text-center">The term “Etsy” is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.</p>
       </div>
     </main>
   );

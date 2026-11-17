@@ -201,6 +201,7 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
           copy the design link and send it to them in an Etsy message.
         </p>
       </section>
+      <p className="text-[11px] text-ink/40 text-center">The term “Etsy” is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.</p>
     </main>
   );
 }

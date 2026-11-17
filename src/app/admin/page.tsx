@@ -32,6 +32,7 @@ export default async function Admin() {
           <div className="flex flex-wrap gap-4">
             <Link href="/admin/support" className="text-sm font-bold text-coral-dark">Support →</Link>
             <Link href="/admin/etsy" className="text-sm font-bold text-coral-dark">Etsy →</Link>
+            <Link href="/admin/ai" className="text-sm font-bold text-coral-dark">Create with AI →</Link>
             <Link href="/admin/costs" className="text-sm font-bold text-coral-dark">Costs &amp; margins →</Link>
             <Link href="/admin/errors" className="text-sm font-bold text-coral-dark">Errors →</Link>
             <Link href="/admin/funnel" className="text-sm font-bold text-coral-dark">Funnel →</Link>

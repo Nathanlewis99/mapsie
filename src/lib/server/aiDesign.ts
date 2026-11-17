@@ -55,11 +55,27 @@ If the request isn't about a trip, places or a map, set understood to false, lea
 
 let client: Anthropic | null = null;
 
+/** The models we compare on /admin/ai, with list prices per million tokens (input, output). */
+export const AI_MODELS = {
+  "claude-opus-5-5": { label: "Opus 5.5", price: [4, 20] },
+  "claude-sonnet-5-5": { label: "Sonnet 5.5", price: [2, 10] },
+} as const;
+export type AiModel = keyof typeof AI_MODELS;
+/** The model customers get: AI_MODEL on Render, else Opus 5.5. */
+export const liveModel = (): AiModel => (process.env.AI_MODEL && process.env.AI_MODEL in AI_MODELS ? (process.env.AI_MODEL as AiModel) : "claude-opus-5-5");
+
+export interface PlanStats { model: string; ms: number; inputTokens: number; outputTokens: number; costUsd: number }
+
 /** Ask Claude for a plan. */
-export async function planTrip(prompt: string): Promise<AiPlan> {
+export async function planTrip(prompt: string, model: AiModel = liveModel()): Promise<AiPlan> {
+  return (await planTripWithStats(prompt, model)).plan;
+}
+
+export async function planTripWithStats(prompt: string, model: AiModel = liveModel()): Promise<{ plan: AiPlan; stats: PlanStats }> {
   client ??= new Anthropic();
+  const t0 = Date.now();
   const res = await client.beta.messages.parse({
-    model: "claude-opus-5-5",
+    model,
     max_tokens: 8000,
     // A quick, well-formed plan matters more here than deep deliberation.
     output_config: { effort: "low", format: betaZodOutputFormat(Plan) },
@@ -70,7 +86,12 @@ export async function planTrip(prompt: string): Promise<AiPlan> {
     messages: [{ role: "user", content: prompt }],
   });
   if (res.stop_reason === "refusal" || !res.parsed_output) throw new AiError("Sorry, I couldn't plan that map. Try describing the places you went.");
-  return res.parsed_output;
+  const [pin, pout] = AI_MODELS[model].price;
+  const { input_tokens: inputTokens, output_tokens: outputTokens } = res.usage;
+  return {
+    plan: res.parsed_output,
+    stats: { model: res.model, ms: Date.now() - t0, inputTokens, outputTokens, costUsd: (inputTokens * pin + outputTokens * pout) / 1e6 },
+  };
 }
 
 export class AiError extends Error {}
@@ -87,13 +108,23 @@ const km = (a: { lng: number; lat: number }, b: { lng: number; lat: number }) =>
  * sticker ideas become Mapsie Originals.
  */
 export async function planToTrip(plan: AiPlan): Promise<TripTemplate> {
+  return (await planToTripChecked(plan)).trip;
+}
+
+/** As planToTrip, plus how far each stop's position from Claude was from the geocoder's (km; null = no match). */
+export async function planToTripChecked(plan: AiPlan): Promise<{ trip: TripTemplate; driftKm: (number | null)[] }> {
+  const driftKm: (number | null)[] = [];
   const stops = await Promise.all(
     plan.stops.slice(0, 25).map(async (s, i): Promise<TripTemplate["stops"][number]> => {
       const guess = { lng: s.lng, lat: s.lat };
       let at = guess;
+      driftKm[i] = null;
       try {
         const hit = (await searchPlaces(s.search || s.name)).find((p) => km(p, guess) < 150);
-        if (hit) at = { lng: hit.lng, lat: hit.lat };
+        if (hit) {
+          at = { lng: hit.lng, lat: hit.lat };
+          driftKm[i] = +km(hit, guess).toFixed(1);
+        }
       } catch {
         /* keep Claude's position */
       }
@@ -103,7 +134,7 @@ export async function planToTrip(plan: AiPlan): Promise<TripTemplate> {
     }),
   );
   const stickers = [...new Set(plan.stickerIdeas.map((idea) => searchOriginals(idea)[0]?.id).filter((x): x is string => !!x))].slice(0, 5);
-  return {
+  const trip: TripTemplate = {
     id: "ai",
     name: "Your trip",
     emoji: "✨",
@@ -113,4 +144,5 @@ export async function planToTrip(plan: AiPlan): Promise<TripTemplate> {
     stickers,
     stops,
   };
+  return { trip, driftKm };
 }

@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next";
 import { publicUrl } from "@/lib/server/urls";
 
+// Built per request, not at build time: the site address (APP_URL) is only set when the
+// server runs, so a build-time file would point search engines at localhost.
+export const dynamic = "force-dynamic";
+
 /** Pages search engines should know about. Private pages (orders, account, admin) are left out. */
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = publicUrl().replace(/\/$/, "");

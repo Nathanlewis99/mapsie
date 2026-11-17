@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+import { clientIp, limit, tooMany } from "@/lib/server/rateLimit";
 import { nanoid } from "nanoid";
 import { saveDesign } from "@/lib/server/db";
 import type { Design } from "@/lib/types";
 
 export async function POST(req: Request) {
+  // Snapshots are saved for sharing and ordering: plenty for a person, not for filling the database.
+  if (!limit("design-save", clientIp(req), 60, 60 * 60_000)) return tooMany("You've saved a lot of maps in the last hour. Please try again later.", 600);
   const text = await req.text();
   if (text.length > 15_000_000) return NextResponse.json({ error: "Design too large" }, { status: 413 });
   const design = JSON.parse(text) as Design;

@@ -22,6 +22,15 @@ const speechApi = () =>
       (window as unknown as { webkitSpeechRecognition?: new () => Recognition }).webkitSpeechRecognition ??
       null);
 
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+      reset: (id: string) => void;
+    };
+  }
+}
+
 const EXAMPLES = [
   "Two weeks in Sri Lanka: Colombo, the train from Kandy to Ella, then tuk-tuks down to Mirissa and Galle",
   "Our honeymoon: Paris, then the train to Florence and Rome, flying home from Naples",
@@ -41,6 +50,48 @@ export default function AiTripBox({ onTrip, replacing }: { onTrip: (t: TripTempl
 
   useEffect(() => setCanSpeak(!!speechApi()), []);
   useEffect(() => () => rec.current?.stop(), []);
+
+  // Is it switched on, and is there a bot check (Cloudflare Turnstile) to run?
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [siteKey, setSiteKey] = useState<string | null>(null);
+  const checkBox = useRef<HTMLDivElement>(null);
+  const widget = useRef<string | null>(null);
+  const token = useRef<string>("");
+  useEffect(() => {
+    fetch("/api/ai/design")
+      .then((r) => r.json())
+      .then((j: { enabled: boolean; turnstileSiteKey: string | null }) => (setEnabled(j.enabled), setSiteKey(j.turnstileSiteKey)))
+      .catch(() => setEnabled(true));
+  }, []);
+  useEffect(() => {
+    if (!siteKey || !checkBox.current) return;
+    const mount = () => {
+      if (!window.turnstile || !checkBox.current || widget.current) return;
+      // Invisible unless Cloudflare needs the visitor to tick a box.
+      widget.current = window.turnstile.render(checkBox.current, {
+        sitekey: siteKey,
+        appearance: "interaction-only",
+        callback: (t: string) => (token.current = t),
+        "expired-callback": () => (token.current = ""),
+      });
+    };
+    if (window.turnstile) return mount();
+    let s = document.getElementById("cf-turnstile") as HTMLScriptElement | null;
+    if (!s) {
+      s = document.createElement("script");
+      s.id = "cf-turnstile";
+      s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      s.async = true;
+      document.head.appendChild(s);
+    }
+    s.addEventListener("load", mount);
+    return () => s?.removeEventListener("load", mount);
+  }, [siteKey, enabled]);
+  // Tokens work once: get a fresh one after each try.
+  const freshCheck = () => {
+    token.current = "";
+    if (widget.current && window.turnstile) window.turnstile.reset(widget.current);
+  };
 
   const toggleMic = () => {
     if (listening) return rec.current?.stop();
@@ -79,7 +130,12 @@ export default function AiTripBox({ onTrip, replacing }: { onTrip: (t: TripTempl
     setNote("");
     track("ai_create");
     try {
-      const r = await fetch("/api/ai/design", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ prompt: text }) });
+      if (siteKey && !token.current) {
+        // Give the invisible check a moment to finish.
+        for (let i = 0; i < 20 && !token.current; i++) await new Promise((x) => setTimeout(x, 250));
+      }
+      const r = await fetch("/api/ai/design", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ prompt: text, turnstileToken: token.current || undefined }) });
+      freshCheck();
       const j = (await r.json()) as { trip?: TripTemplate | null; reply?: string; error?: string };
       if (!r.ok) return setErr(j.error ?? "Something went wrong. Please try again.");
       if (!j.trip) return setNote(j.reply ?? "Tell me where you went and I'll map it.");
@@ -92,6 +148,7 @@ export default function AiTripBox({ onTrip, replacing }: { onTrip: (t: TripTempl
     }
   };
 
+  if (enabled === false) return null;
   return (
     <div className="rounded-2xl bg-gradient-to-br from-coral/10 to-sea/10 border border-coral/20 p-3 space-y-2">
       <div className="text-sm font-extrabold">✨ Describe your trip</div>
@@ -122,6 +179,7 @@ export default function AiTripBox({ onTrip, replacing }: { onTrip: (t: TripTempl
       <button onClick={go} disabled={busy} className="w-full rounded-full bg-coral py-2.5 text-sm font-extrabold text-white disabled:opacity-60">
         {busy ? "Planning your map…" : "Create my map"}
       </button>
+      {siteKey && <div ref={checkBox} />}
       {err && <div className="text-xs font-bold text-coral-dark">{err}</div>}
       {note && <div className="text-xs text-ink/70">{note}</div>}
       {!text && !busy && !note && (

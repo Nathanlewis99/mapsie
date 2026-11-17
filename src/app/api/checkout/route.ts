@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { clientIp, limit, tooMany } from "@/lib/server/rateLimit";
 import { nanoid } from "nanoid";
 import Stripe from "stripe";
 import { getDesign, saveDesign, saveOrder, type Order } from "@/lib/server/db";
@@ -7,6 +8,7 @@ import { normalizeDesign } from "@/lib/types";
 import { currentUser } from "@/lib/server/auth";
 
 export async function POST(req: Request) {
+  if (!limit("checkout", clientIp(req), 20, 60 * 60_000)) return tooMany("Too many checkout attempts. Please wait a few minutes.", 600);
   const body = (await req.json()) as { designId: string; email: string; shipping: ShippingId; region: RegionId; options?: Partial<PrintOptions>; visitId?: string };
   const raw = await getDesign(body.designId);
   if (!raw) return NextResponse.json({ error: "Design not found" }, { status: 404 });

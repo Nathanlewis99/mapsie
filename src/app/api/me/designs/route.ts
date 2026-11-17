@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { clientIp, limit, tooMany } from "@/lib/server/rateLimit";
 import { currentUser } from "@/lib/server/auth";
 import { listSavedDesigns, upsertSavedDesign } from "@/lib/server/db";
 import type { Design } from "@/lib/types";
@@ -13,6 +14,7 @@ export async function GET() {
 
 /** Save a design to the account. Body: { design, id? } (id updates an existing one). */
 export async function POST(req: Request) {
+  if (!limit("account-save", clientIp(req), 120, 60 * 60_000)) return tooMany("You've saved a lot of maps in the last hour. Please try again later.", 600);
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: "Sign in first" }, { status: 401 });
   const text = await req.text();

@@ -1,20 +1,30 @@
 import { describe, expect, it } from "vitest";
-import { ALL_SKUS, etsySku, etsyToken, etsyTokenValid, matchPrint, samePostcode } from "../../src/lib/server/etsy";
+import { etsyToken, etsyTokenValid, matchPrint, samePostcode } from "../../src/lib/server/etsy";
+import { ETSY_FINISHES, ETSY_VARIATIONS } from "../../src/lib/etsyOptions";
 
 describe("Etsy: what was bought", () => {
-  it("reads our SKUs", () => {
-    expect(matchPrint("MAPSIE-A3-NONE")).toEqual({ productId: "a3", frame: "none", matched: true });
-    expect(matchPrint("mapsie-50x70-oak")).toEqual({ productId: "50x70", frame: "oak", matched: true });
-    expect(matchPrint(etsySku("a1", "darkgrey"))).toEqual({ productId: "a1", frame: "darkgrey", matched: true });
-    expect(ALL_SKUS.every((s) => matchPrint(s.sku).matched)).toBe(true);
+  it("reads our SKUs, old and new", () => {
+    expect(matchPrint("MAPSIE-A3-NONE")).toMatchObject({ productId: "a3", frame: "none", paper: "ema", mount: "none", matched: true });
+    expect(matchPrint("MAPSIE-A3-HGE")).toMatchObject({ productId: "a3", frame: "none", paper: "hge", matched: true });
+    expect(matchPrint("mapsie-50x70-oak")).toMatchObject({ productId: "50x70", frame: "oak", mount: "none", matched: true });
+    expect(matchPrint("MAPSIE-A2-BLACK-MOUNT")).toMatchObject({ productId: "a2", frame: "black", paper: "ema", mount: "white", matched: true });
+    expect(matchPrint("MAPSIE-A1-DIGITAL")).toMatchObject({ productId: "a1", format: "digital", matched: true });
+    expect(ETSY_VARIATIONS.every((v) => matchPrint(v.sku).matched)).toBe(true);
+  });
+  it("uses the website's prices, and only valid pairings", () => {
+    const a3 = (code: string) => ETSY_VARIATIONS.find((v) => v.sku === `MAPSIE-A3-${code}`)!.price;
+    expect([a3("EMA"), a3("HGE"), a3("BLACK"), a3("BLACK-MOUNT"), a3("DIGITAL")]).toEqual([44, 59, 79, 86, 19]);
+    // Specialist papers are never framed; framed prints are matte art.
+    expect(ETSY_FINISHES.filter((f) => f.frame !== "none").every((f) => f.paper === "ema")).toBe(true);
+    expect(Math.max(...ETSY_FINISHES.map((f) => f.label.length))).toBeLessThanOrEqual(20);
   });
   it("falls back to the variation names", () => {
-    expect(matchPrint(null, [{ formatted_name: "Size", formatted_value: "A2 (42 x 59.4 cm)" }, { formatted_name: "Frame", formatted_value: "Black frame" }])).toEqual({ productId: "a2", frame: "black", matched: true });
-    expect(matchPrint("", [{ formatted_name: "Size", formatted_value: "50 × 70 cm" }, { formatted_name: "Frame", formatted_value: "Unframed" }])).toEqual({ productId: "50x70", frame: "none", matched: true });
-    expect(matchPrint("", [{ formatted_name: "Size", formatted_value: "A4" }, { formatted_name: "Frame", formatted_value: "Natural oak" }])).toMatchObject({ frame: "oak", matched: true });
+    expect(matchPrint(null, [{ formatted_name: "Size", formatted_value: "A2" }, { formatted_name: "Finish", formatted_value: "Black + mount" }])).toMatchObject({ productId: "a2", frame: "black", mount: "white", matched: true });
+    expect(matchPrint("", [{ formatted_name: "Size", formatted_value: "50 × 70 cm" }, { formatted_name: "Finish", formatted_value: "Unframed: Cotton rag" }])).toMatchObject({ productId: "50x70", frame: "none", paper: "hpr", matched: true });
+    expect(matchPrint("", [{ formatted_name: "Size", formatted_value: "A4" }, { formatted_name: "Finish", formatted_value: "Digital file" }])).toMatchObject({ format: "digital", matched: true });
   });
   it("says when it had to guess", () => {
-    expect(matchPrint("SOMETHING-ELSE", [{ formatted_name: "Colour", formatted_value: "Blue" }])).toEqual({ productId: "a3", frame: "none", matched: false });
+    expect(matchPrint("SOMETHING-ELSE", [{ formatted_name: "Colour", formatted_value: "Blue" }])).toMatchObject({ productId: "a3", frame: "none", matched: false });
   });
 });
 

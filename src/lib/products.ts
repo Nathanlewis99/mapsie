@@ -121,7 +121,11 @@ export const GLAZES: { id: GlazeId; label: string; detail: string; extra: number
 // Prodigi only offers float glass and anti-reflective (moth-eye) glazing on inch-sized
 // frames, not A sizes, so every A-size frame uses Perspex.
 
+/** A personalised digital file (300 dpi PNG at the chosen size), instead of a print. */
+export const DIGITAL_PRICE: Record<RegionId, number> = { GB: 19, US: 25, AU: 35 };
+
 export interface PrintOptions {
+  format?: "print" | "digital";
   productId: string;
   frame: FrameId;
   paper?: PaperId;
@@ -134,6 +138,7 @@ export function priceLines(o: PrintOptions, region: RegionId) {
   const p = getProduct(o.productId);
   const framed = o.frame !== "none";
   const lines: { label: string; amount: number }[] = [];
+  if (o.format === "digital") return [{ label: `Digital file, ${p.label} at 300 dpi`, amount: DIGITAL_PRICE[region] }];
   const paper = PAPERS.find((x) => x.id === (o.paper ?? "ema")) ?? PAPERS[0];
   const print = p.price[region];
   lines.push({ label: `${p.label} print`, amount: print });
@@ -172,6 +177,7 @@ export function prodigiItem(o: PrintOptions) {
 
 /** One-line description, e.g. "A3 portrait, cotton rag paper" or "A3, black frame, white mount". */
 export function describeOptions(o: PrintOptions & { orientation?: string }) {
+  if (o.format === "digital") return `${getProduct(o.productId).label} digital file (300 dpi)`;
   const p = getProduct(o.productId);
   const parts = [`${p.label}${o.orientation ? ` ${o.orientation}` : ""}`];
   if (o.frame === "none") parts.push(`${(PAPERS.find((x) => x.id === (o.paper ?? "ema")) ?? PAPERS[0]).label.toLowerCase()} paper`);

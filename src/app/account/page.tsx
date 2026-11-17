@@ -19,6 +19,7 @@ const STATUS: Record<string, { label: string; cls: string }> = {
   ready: { label: "Final check", cls: "bg-amber-100 text-amber-800" },
   submitted: { label: "Sent to print", cls: "bg-emerald-100 text-emerald-800" },
   shipped: { label: "Shipped", cls: "bg-emerald-100 text-emerald-800" },
+  delivered: { label: "Ready to download", cls: "bg-emerald-100 text-emerald-800" },
   cancelled: { label: "Cancelled", cls: "bg-ink/10 text-ink/60" },
   failed: { label: "Delayed: we're on it", cls: "bg-coral/15 text-coral-dark" },
 };

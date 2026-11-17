@@ -1166,7 +1166,7 @@ export function SizePanel() {
         <Label>Orientation</Label>
         <Chips value={design.orientation} options={[{ id: "portrait", label: "▯ Portrait" }, { id: "landscape", label: "▭ Landscape" }]} onChange={(v) => set({ orientation: v })} />
       </div>
-      <PrintOptionsPicker value={design} onChange={(patch) => set(patch)} region={region} sizeNote={(id) => sizeNote(design, id)} />
+      <PrintOptionsPicker value={{ ...design, format: design.format ?? "print" }} onChange={(patch) => set(patch)} region={region} sizeNote={(id) => sizeNote(design, id)} />
       <StopsCheck />
       <p className="text-xs text-ink/50">
         Printed and shipped by our print partner in {getRegion(region).label}. Free delivery, or express.

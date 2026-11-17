@@ -17,18 +17,19 @@ export async function POST(req: Request) {
     const s = event.data.object as Stripe.Checkout.Session;
     const orderId = s.metadata?.orderId;
     const ship = s.collected_information?.shipping_details;
-    if (orderId && ship?.address && s.payment_status === "paid") {
-      const a = ship.address;
+    // Digital files have no delivery address.
+    if (orderId && s.payment_status === "paid" && (ship?.address || !s.shipping_address_collection)) {
+      const a = ship?.address;
       after(() =>
-        fulfilOrder(orderId, {
-          name: ship.name,
+        fulfilOrder(orderId, a ? {
+          name: ship!.name,
           line1: a.line1 ?? "",
           line2: a.line2 ?? undefined,
           city: a.city ?? "",
           state: a.state ?? undefined,
           postcode: a.postal_code ?? "",
           country: a.country ?? "GB",
-        }, {
+        } : undefined, {
           stripePaymentIntent: typeof s.payment_intent === "string" ? s.payment_intent : s.payment_intent?.id,
           // What Stripe actually charged (after any discount code), for the order record.
           ...(s.amount_total != null ? { total: s.amount_total / 100 } : {}),

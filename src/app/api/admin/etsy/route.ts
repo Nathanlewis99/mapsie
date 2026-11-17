@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { disconnectEtsy, etsySku, importReceipt, syncEtsyOrders } from "@/lib/server/etsy";
+import { ETSY_FINISHES } from "@/lib/etsyOptions";
 import { listOrdersByEtsyReceipt } from "@/lib/server/db";
-import { FRAMES, PRODUCTS } from "@/lib/products";
+import { PRODUCTS } from "@/lib/products";
 import { getOrder } from "@/lib/server/db";
 import { sendEtsyDesignEmail } from "@/lib/server/email";
 import { publicUrl } from "@/lib/server/urls";
@@ -18,10 +19,10 @@ export async function POST(req: Request) {
       const v = (k: string) => String(f.get(k) ?? "").trim();
       const receipt = v("receipt").replace(/[^\d]/g, "");
       const productId = v("productId");
-      const frame = v("frame");
+      const finish = ETSY_FINISHES.find((x) => x.code === v("finish"));
       const qty = Math.min(10, Math.max(1, Number(v("quantity")) || 1));
       if (!receipt) throw new Error("Enter the Etsy order number.");
-      if (!PRODUCTS.some((p) => p.id === productId) || !FRAMES.some((x) => x.id === frame)) throw new Error("Choose a size and frame.");
+      if (!PRODUCTS.some((p) => p.id === productId) || !finish) throw new Error("Choose a size and finish.");
       if (!v("name") || !v("line1") || !v("city") || !v("postcode") || !/^[A-Z]{2}$/i.test(v("country"))) throw new Error("Fill in the full delivery address (country as a 2-letter code, e.g. GB).");
       if ((await listOrdersByEtsyReceipt(receipt)).length) throw new Error(`Etsy order ${receipt} is already on Mapsie.`);
       const price = Number(v("price"));
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
           transaction_id: Number(receipt),
           title: "Custom travel map (added by hand)",
           quantity: qty,
-          sku: etsySku(productId, frame),
+          sku: etsySku(productId, finish.code),
           price: price > 0 ? { amount: Math.round((price / qty) * 100), divisor: 100, currency_code: v("currency") || "GBP" } : undefined,
           shipping_upgrade: f.get("express") ? "Express" : null,
         }],

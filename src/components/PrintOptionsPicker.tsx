@@ -1,5 +1,5 @@
 "use client";
-import { FRAMES, GLAZES, MOUNTS, PAPERS, PRODUCTS, getProduct, money, type PrintOptions, type RegionId } from "@/lib/products";
+import { DIGITAL_PRICE, FRAMES, GLAZES, MOUNTS, PAPERS, PRODUCTS, getProduct, money, type PrintOptions, type RegionId } from "@/lib/products";
 
 const Heading = ({ children }: { children: React.ReactNode }) => <div className="text-xs font-bold uppercase tracking-wider text-ink/50 mb-2">{children}</div>;
 const card = (on: boolean) => `rounded-2xl border-2 bg-white transition ${on ? "border-coral" : "border-ink/10 hover:border-ink/30"}`;
@@ -23,8 +23,23 @@ export default function PrintOptionsPicker({
   const fp = p.framePrice[region];
   // Prodigi's A-size frames only use Matte art.
   const shownPaper = framed ? "ema" : value.paper;
+  const digital = value.format === "digital";
   return (
     <div className="space-y-5">
+      <div>
+        <Heading>Format</Heading>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { id: "print" as const, label: "Printed poster", note: "Printed, framed if you like, and delivered" },
+            { id: "digital" as const, label: "Digital file", note: `300 dpi PNG to print yourself · ${money(region, DIGITAL_PRICE[region])}` },
+          ].map((f) => (
+            <button key={f.id} onClick={() => onChange({ format: f.id })} className={`px-4 py-3 text-left ${card((value.format ?? "print") === f.id)}`}>
+              <span className="font-bold block">{f.label}</span>
+              <span className="text-[11px] text-ink/50 block">{f.note}</span>
+            </button>
+          ))}
+        </div>
+      </div>
       {showSizes && (
         <div>
           <Heading>Print size</Heading>
@@ -38,13 +53,14 @@ export default function PrintOptionsPicker({
                   )}
                 </span>
                 <span className="text-sm text-ink/50">{x.widthCm} × {x.heightCm} cm</span>
-                <span className="font-extrabold">{money(region, x.price[region])}</span>
+                <span className="font-extrabold">{money(region, digital ? DIGITAL_PRICE[region] : x.price[region])}</span>
               </button>
             ))}
           </div>
         </div>
       )}
 
+      {!digital && <>
       <div>
         <Heading>Frame</Heading>
         <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -131,6 +147,7 @@ export default function PrintOptionsPicker({
           </div>}
         </>
       )}
+      </>}
     </div>
   );
 }

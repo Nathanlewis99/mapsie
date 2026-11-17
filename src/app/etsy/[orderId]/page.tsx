@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Logo from "@/components/Logo";
 import { getOrder, listOrdersByEtsyReceipt } from "@/lib/server/db";
 import { etsyToken, etsyTokenValid } from "@/lib/server/etsy";
-import { FRAMES, getProduct } from "@/lib/products";
+import { etsyPrintLabel } from "@/lib/etsyOptions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Your Etsy map · Mapsie" };
@@ -16,8 +16,6 @@ export default async function EtsyOrder({ params, searchParams }: { params: Prom
   if (!o?.etsy || !o.print || !etsyTokenValid(orderId, k)) notFound();
   if (o.status !== "awaiting_design") redirect(`/order/${orderId}`);
   const siblings = o.etsy.of > 1 ? await listOrdersByEtsyReceipt(o.etsy.receiptId) : [];
-  const size = getProduct(o.print.productId);
-  const frame = FRAMES.find((f) => f.id === o.print!.frame);
   return (
     <main className="min-h-dvh grid place-items-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
@@ -28,7 +26,7 @@ export default async function EtsyOrder({ params, searchParams }: { params: Prom
             <p className="text-ink/60 mt-2 text-sm">Etsy order {o.etsy.receiptId}{o.etsy.of > 1 ? ` · print ${o.etsy.unit} of ${o.etsy.of}` : ""}</p>
           </div>
           <div className="rounded-2xl bg-sand/60 px-4 py-3 text-sm">
-            <div className="font-extrabold">{size.label} print · {frame && frame.id !== "none" ? `${frame.label} frame` : "unframed"}</div>
+            <div className="font-extrabold">{etsyPrintLabel(o.print)}</div>
             <div className="text-ink/60">Delivered to {o.address?.name}, {o.address?.city}</div>
           </div>
           <ol className="text-sm text-ink/70 space-y-1 list-decimal pl-5">

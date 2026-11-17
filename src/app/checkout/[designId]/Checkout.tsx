@@ -22,7 +22,7 @@ function storedRegion(): RegionId {
 
 export default function Checkout({ design: saved }: { design: Design }) {
   // Size, frame and paper can still be changed here; the preview follows.
-  const [opts, setOpts] = useState<Required<PrintOptions>>({ productId: saved.productId, frame: saved.frame, paper: saved.paper, mount: saved.mount, glaze: saved.glaze });
+  const [opts, setOpts] = useState<Required<PrintOptions>>({ format: saved.format ?? "print", productId: saved.productId, frame: saved.frame, paper: saved.paper, mount: saved.mount, glaze: saved.glaze });
   const design = { ...saved, ...opts };
   const [showOptions, setShowOptions] = useState(false);
   const [region, setRegion] = useState<RegionId>("GB");
@@ -30,6 +30,7 @@ export default function Checkout({ design: saved }: { design: Design }) {
   const [view, setView] = useState<"print" | "wall">("wall");
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const [digitalOk, setDigitalOk] = useState(false);
   const [err, setErr] = useState("");
   useEffect(() => setRegion(storedRegion()), []);
   useEffect(() => track("checkout_view"), []);
@@ -41,7 +42,8 @@ export default function Checkout({ design: saved }: { design: Design }) {
   const ship = SHIPPING.find((s) => s.id === shipping)!;
   const item = itemPrice(design, region);
   const lines = priceLines(design, region);
-  const total = item + ship.price[region];
+  const digital = opts.format === "digital";
+  const total = item + (digital ? 0 : ship.price[region]);
 
   const pay = async () => {
     track("pay_click", { region, framed: opts.frame !== "none", size: opts.productId });
@@ -79,7 +81,7 @@ export default function Checkout({ design: saved }: { design: Design }) {
         <div className="space-y-6">
           <div>
             <h1 className="font-display text-4xl font-extrabold">Nearly yours!</h1>
-            <p className="text-ink/60 mt-2">{design.frame !== "none" ? "Framed and ready to hang." : "Printed on thick art paper and shipped in a sturdy tube."}</p>
+            <p className="text-ink/60 mt-2">{digital ? "A full-resolution file of your map, ready to print anywhere you like." : design.frame !== "none" ? "Framed and ready to hang." : "Printed on thick art paper and shipped in a sturdy tube."}</p>
           </div>
           <div className="rounded-3xl bg-white p-5 shadow-sm space-y-1">
             <div className="font-bold truncate">{design.title}</div>
@@ -108,7 +110,7 @@ export default function Checkout({ design: saved }: { design: Design }) {
               ))}
             </div>
           </div>
-          <div className="space-y-2">
+          {!digital && <div className="space-y-2">
             <div className="text-xs font-bold uppercase tracking-wider text-ink/50">Delivery</div>
             {SHIPPING.map((s) => (
               <button key={s.id} onClick={() => setShipping(s.id)} className={`w-full flex justify-between items-center rounded-2xl border-2 bg-white px-4 py-3 ${shipping === s.id ? "border-coral" : "border-ink/10"}`}>
@@ -116,17 +118,26 @@ export default function Checkout({ design: saved }: { design: Design }) {
                 <span className="font-extrabold">{s.price[region] ? money(region, s.price[region]) : "Free"}</span>
               </button>
             ))}
-          </div>
+          </div>}
+          {digital && (
+            <div className="rounded-2xl bg-sea/10 px-4 py-3 text-sm space-y-2">
+              <p><b>Digital file:</b> your map as a 300 dpi PNG, ready to print anywhere. We email you the download link a few minutes after you pay.</p>
+              <label className="flex items-start gap-2">
+                <input type="checkbox" checked={digitalOk} onChange={(e) => setDigitalOk(e.target.checked)} className="mt-1 accent-coral" />
+                <span>I want my file made and delivered straight away, and understand I lose my right to cancel once it&apos;s delivered.</span>
+              </label>
+            </div>
+          )}
           <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-ink/50 mb-2">Email for updates</div>
+            <div className="text-xs font-bold uppercase tracking-wider text-ink/50 mb-2">{digital ? "Email for your download link" : "Email for updates"}</div>
             <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral" />
           </div>
           {err && <div className="text-coral-dark font-bold">{err}</div>}
-          <button onClick={pay} disabled={busy} className="w-full rounded-full bg-coral py-4 text-lg font-extrabold text-white shadow-lg shadow-coral/30 hover:bg-coral-dark disabled:opacity-50">
+          <button onClick={pay} disabled={busy || (digital && !digitalOk)} className="w-full rounded-full bg-coral py-4 text-lg font-extrabold text-white shadow-lg shadow-coral/30 hover:bg-coral-dark disabled:opacity-50">
             {busy ? "One moment…" : `Pay ${money(region, total)}`}
           </button>
           <p className="text-xs text-center text-ink/50 font-bold">Got a discount code? You can add it on the next page.</p>
-          <p className="text-xs text-center text-ink/40">Secure payment by Stripe · Printed locally in {getRegion(region).label} · Made to order</p>
+          <p className="text-xs text-center text-ink/40">Secure payment by Stripe · {digital ? "Instant digital delivery by email" : `Printed locally in ${getRegion(region).label} · Made to order`}</p>
         </div>
       </main>
     </div>

@@ -16,13 +16,14 @@ export async function POST(req: Request) {
   const o = body.options ?? {};
   const pick = <T extends { id: string }>(list: T[], v: unknown, fallback: T["id"]) => (list.some((x) => x.id === v) ? (v as T["id"]) : fallback);
   const chosen = {
+    format: o.format === "digital" ? ("digital" as const) : ("print" as const),
     productId: pick(PRODUCTS, o.productId, design.productId),
     frame: pick(FRAMES, o.frame, design.frame),
     paper: pick(PAPERS, o.paper, design.paper),
     mount: pick(MOUNTS, o.mount, design.mount),
     glaze: pick(GLAZES, o.glaze, design.glaze),
   };
-  if (Object.entries(chosen).some(([k, v]) => design[k as keyof typeof chosen] !== v)) {
+  if (Object.entries(chosen).some(([k, v]) => (design[k as keyof typeof chosen] ?? (k === "format" ? "print" : undefined)) !== v)) {
     // Keep shared snapshots unchanged: the order gets its own copy.
     design = { ...design, ...chosen, id: nanoid(10) };
     await saveDesign(design);
@@ -39,7 +40,8 @@ export async function POST(req: Request) {
     shipping: ship.id,
     region: region.id,
     currency: region.currency,
-    total: item + ship.price[region.id],
+    total: item + (design.format === "digital" ? 0 : ship.price[region.id]),
+    ...(design.format === "digital" ? { digital: true } : {}),
     status: "pending_payment",
     visitId: typeof body.visitId === "string" && /^[a-z0-9]{8,40}$/.test(body.visitId) ? body.visitId : undefined,
     createdAt: new Date().toISOString(),
@@ -77,6 +79,8 @@ export async function POST(req: Request) {
         },
       },
     ],
+    // A digital file has nothing to post: no address or delivery options.
+    ...(design.format === "digital" ? {} : {
     shipping_address_collection: { allowed_countries: region.shipTo as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] },
     shipping_options: [
       {
@@ -88,6 +92,7 @@ export async function POST(req: Request) {
         },
       },
     ],
+    }),
     metadata: { orderId: order.id },
     // Stripe's payment page in Mapsie's colours, font, icon and wordmark.
     branding_settings: {

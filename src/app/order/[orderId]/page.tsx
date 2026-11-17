@@ -15,6 +15,7 @@ interface Status {
   canCancel?: boolean;
   refunded?: boolean;
   etsy?: boolean;
+  digital?: boolean;
   shipments?: { carrier?: string; trackingNumber?: string; trackingUrl?: string }[];
 }
 
@@ -26,6 +27,12 @@ const STEPS = [
   { key: "shipped", label: "On its way" },
 ];
 const RANK: Record<string, number> = { pending_payment: 0, paid: 1, rendering: 2, ready: 3, submitted: 4, shipped: 5 };
+const DIGITAL_STEPS = [
+  { key: "paid", label: "Payment received" },
+  { key: "rendering", label: "Making your full-resolution file" },
+  { key: "delivered", label: "Ready to download" },
+];
+const DIGITAL_RANK: Record<string, number> = { pending_payment: 0, paid: 1, rendering: 2, ready: 2, delivered: 4 };
 const time = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 const FINAL = ["shipped", "failed", "cancelled"];
 
@@ -93,7 +100,7 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
       <Link href="/" className="font-display text-2xl font-extrabold"><Logo /></Link>
       <div>
         <h1 className="font-display text-4xl font-extrabold">Thank you! 🎉</h1>
-        <p className="text-ink/60 mt-2">Order <b>{orderId}</b>. We&apos;ll email you when it ships.</p>
+        <p className="text-ink/60 mt-2">Order <b>{orderId}</b>. {o?.digital ? "We'll email you the download link too." : "We'll email you when it ships."}</p>
       </div>
 
       {o?.status === "failed" ? (
@@ -102,9 +109,9 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
         </div>
       ) : (
         <ol className="space-y-3">
-          {STEPS.map((s, i) => {
-            const rank = o ? RANK[o.status] ?? 0 : 0;
-            const done = rank > i + 1 || (s.key === "shipped" && o?.status === "shipped");
+          {(o?.digital ? DIGITAL_STEPS : STEPS).map((s, i) => {
+            const rank = o ? (o.digital ? DIGITAL_RANK : RANK)[o.status] ?? 0 : 0;
+            const done = rank > i + 1 || (s.key === "shipped" && o?.status === "shipped") || (s.key === "delivered" && o?.status === "delivered");
             const active = !done && rank === i + 1;
             const label =
               s.key === "ready" && o?.holdUntil ? `Final check: goes to print at ${time(o.holdUntil)}` : s.key === "paid" && o?.etsy ? "Design received" : s.label;
@@ -161,6 +168,14 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
         </div>
       )}
 
+      {o?.digital && o.status === "delivered" && o.renderFile && (
+        <a
+          href={`/api/renders/${o.renderFile}?download=1`}
+          className="block rounded-full bg-coral px-6 py-4 text-center text-lg font-extrabold text-white shadow-lg shadow-coral/30"
+        >
+          ⬇ Download your map (300 dpi PNG)
+        </a>
+      )}
       {o?.renderFile && (
         <div className="space-y-2">
           <div className="text-xs font-bold uppercase tracking-wider text-ink/50">Your print</div>

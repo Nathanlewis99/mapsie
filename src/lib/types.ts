@@ -118,6 +118,8 @@ export interface Design {
   layout: Layout;
   productId: string;
   orientation: Orientation;
+  /** A printed poster (default) or a digital file to download. */
+  format?: "print" | "digital";
   frame: FrameId;
   paper: PaperId; // unframed prints only; framed prints use the frame's standard paper
   mount: MountId; // framed only

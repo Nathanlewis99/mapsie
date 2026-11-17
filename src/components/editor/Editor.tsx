@@ -71,7 +71,7 @@ export default function Editor() {
 
   // Etsy buyers design here what they've already paid for on Etsy: the size and frame
   // are fixed by their order, and "Order print" becomes "Send to print".
-  type EtsyCtx = { id: string; k: string; productId: string; frame: string; label: string; receiptId: string; unit: number; of: number };
+  type EtsyCtx = { id: string; k: string; productId: string; frame: string; paper: Design["paper"]; mount: Design["mount"]; format: "print" | "digital"; label: string; receiptId: string; unit: number; of: number };
   const [etsy, setEtsy] = useState<EtsyCtx | null>(null);
   useEffect(() => {
     const id = params.get("etsy");
@@ -317,13 +317,14 @@ export default function Editor() {
 
   useEffect(() => {
     if (!etsy) return;
-    if (design.productId !== etsy.productId || design.frame !== etsy.frame) {
+    const locked = { productId: etsy.productId, frame: etsy.frame as Design["frame"], paper: etsy.paper ?? "ema", mount: etsy.mount ?? "none", format: etsy.format ?? "print" };
+    if ((Object.keys(locked) as (keyof typeof locked)[]).some((k) => (design[k] ?? (k === "format" ? "print" : undefined)) !== locked[k])) {
       const changed = design.productId !== etsy.productId && design.stops.length > 0;
-      store.set({ productId: etsy.productId, frame: etsy.frame as Design["frame"], paper: "ema" });
+      store.set(locked);
       if (changed) setToast(`Your size and frame come from your Etsy order (${etsy.label}).`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [etsy, design.productId, design.frame]);
+  }, [etsy, design.productId, design.frame, design.paper, design.mount, design.format]);
 
   const order = async () => {
     track("order_click");
@@ -417,7 +418,7 @@ export default function Editor() {
             ) : (
               <>
                 <span>
-                  Order<span className="hidden sm:inline"> print</span>
+                  Order<span className="hidden sm:inline">{design.format === "digital" ? " file" : " print"}</span>
                 </span>
                 <span className="rounded-full bg-white/20 px-2 py-0.5 text-[13px] sm:text-sm">{money(region, price)}</span>
                 <span aria-hidden className="transition group-hover:translate-x-0.5">→</span>

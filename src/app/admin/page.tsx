@@ -14,6 +14,7 @@ const STATUS: Record<string, string> = {
   ready: "bg-amber-100 text-amber-700",
   submitted: "bg-emerald-100 text-emerald-700",
   shipped: "bg-emerald-200 text-emerald-800",
+  delivered: "bg-emerald-200 text-emerald-800",
   cancelled: "bg-ink/10 text-ink/50",
   failed: "bg-coral/20 text-coral-dark",
 };

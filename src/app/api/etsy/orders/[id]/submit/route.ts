@@ -20,7 +20,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const order = await claimOrder(id, "awaiting_design", "pending_payment");
   if (!order?.print || !order.address) return NextResponse.json({ error: "This map has already been sent to print." }, { status: 409 });
   try {
-    const design = { ...normalizeDesign(raw), id: nanoid(10), productId: order.print.productId, frame: order.print.frame, paper: "ema", mount: "none", glaze: "perspex" } as ReturnType<typeof normalizeDesign>;
+    const design = {
+      ...normalizeDesign(raw),
+      id: nanoid(10),
+      format: order.print.format ?? "print",
+      productId: order.print.productId,
+      frame: order.print.frame,
+      paper: order.print.paper ?? "ema",
+      mount: order.print.mount ?? "none",
+      glaze: "perspex",
+    } as ReturnType<typeof normalizeDesign>;
     await saveDesign(design);
     const email = typeof body.email === "string" && validEmail(body.email.trim()) ? body.email.trim() : order.email;
     await fulfilOrder(id, order.address, { designId: design.id, email });

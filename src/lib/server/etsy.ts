@@ -1,6 +1,8 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { getKv, getOrder, listOrdersByStatus, putKv, saveOrder, updateOrder, type Address, type Order } from "./db";
 import { FRAMES, PRODUCTS, type RegionId } from "../products";
+import { printFromSku } from "../etsyOptions";
+import type { MountId, PaperId } from "../types";
 import { publicUrl } from "./urls";
 import { logError } from "./log";
 import { alertAdmin, sendEtsyDesignEmail } from "./email";
@@ -101,29 +103,33 @@ async function etsy<T>(method: "GET" | "POST", path: string, body?: unknown): Pr
 
 // ---------------------------------------------------------------- what was bought
 /** SKUs to give each listing variation: MAPSIE-<size>-<frame>, e.g. MAPSIE-A3-NONE or MAPSIE-A3-BLACK. */
-export const etsySku = (productId: string, frame: string) => `MAPSIE-${productId.toUpperCase()}-${frame.toUpperCase()}`;
-export const ALL_SKUS = PRODUCTS.flatMap((p) => FRAMES.map((f) => ({ sku: etsySku(p.id, f.id), product: p.label, frame: f.label })));
+export { etsySku } from "../etsyOptions";
 
 type Variation = { formatted_name?: string; formatted_value?: string };
 /**
- * Size and frame from the SKU, or failing that from the variation names the buyer chose
- * ("Size: A3", "Frame: Black"). Returns matched=false if we had to guess.
+ * Size, paper, frame and mount (or a digital file) from the SKU, or failing that from the
+ * variation names the buyer chose ("Size: A3", "Finish: Black + mount"). matched=false if
+ * we had to guess.
  */
 export function matchPrint(sku: string | null | undefined, variations: Variation[] = []) {
-  const m = /^MAPSIE-([A-Z0-9]+)-([A-Z]+)$/i.exec((sku ?? "").trim());
-  if (m) {
-    const p = PRODUCTS.find((x) => x.id.toUpperCase() === m[1].toUpperCase());
-    const f = FRAMES.find((x) => x.id.toUpperCase() === m[2].toUpperCase());
-    if (p && f) return { productId: p.id, frame: f.id, matched: true };
-  }
+  const fromSku = printFromSku(sku);
+  if (fromSku) return { ...fromSku, paper: fromSku.paper ?? "ema", mount: fromSku.mount ?? "none", matched: true };
   const text = variations.map((v) => `${v.formatted_name ?? ""}: ${v.formatted_value ?? ""}`).join(" | ").toLowerCase();
-  const size = PRODUCTS.find((p) =>
-    p.id === "50x70" ? /50\s*[x×]\s*70/.test(text) : new RegExp(`\\b${p.id}\\b`).test(text),
-  );
-  const frame =
-    /unframed|no frame|print only|poster only/.test(text) ? FRAMES[0]
-    : FRAMES.slice(1).find((f) => text.includes(f.label.toLowerCase()) || text.includes(f.id) || (f.id === "oak" && /oak|natural|wood/.test(text)));
-  return { productId: size?.id ?? "a3", frame: frame?.id ?? "none", matched: !!size && !!frame };
+  const size = PRODUCTS.find((p) => (p.id === "50x70" ? /50\s*[x×]\s*70/.test(text) : new RegExp(`\\b${p.id}\\b`).test(text)));
+  const digital = /digital|download|file/.test(text);
+  const paper: PaperId = /cotton|rag/.test(text) ? "hpr" : /etching|textured/.test(text) ? "hge" : /lustre|luster|photo paper/.test(text) ? "lpp" : "ema";
+  const frame = digital || /unframed|no frame|print only|poster only/.test(text)
+    ? FRAMES[0]
+    : FRAMES.slice(1).find((f) => text.includes(f.label.toLowerCase()) || text.includes(f.id) || (f.id === "oak" && /oak|natural|wood/.test(text)) || (f.id === "darkgrey" && /dark grey/.test(text)) || (f.id === "lightgrey" && /light grey/.test(text)));
+  const framed = !!frame && frame.id !== "none";
+  return {
+    productId: size?.id ?? "a3",
+    frame: frame?.id ?? "none",
+    paper: framed ? ("ema" as PaperId) : paper,
+    mount: (framed && /mount/.test(text) ? "white" : "none") as MountId,
+    ...(digital ? { format: "digital" as const } : {}),
+    matched: !!size && (!!frame || digital),
+  };
 }
 
 const REGION_FOR: Record<string, RegionId> = { GB: "GB", US: "US", AU: "AU" };
@@ -195,7 +201,8 @@ export async function importReceipt(r: Receipt): Promise<number> {
         status: "awaiting_design",
         address,
         source: "etsy",
-        print: { productId: print.productId, frame: print.frame },
+        print: { productId: print.productId, frame: print.frame, paper: print.paper, mount: print.mount, ...(print.format ? { format: print.format } : {}) },
+        ...(print.format === "digital" ? { digital: true } : {}),
         etsy: {
           receiptId: String(r.receipt_id), transactionId: String(t.transaction_id), unit, of: t.quantity,
           title: t.title?.slice(0, 120), matched: print.matched,

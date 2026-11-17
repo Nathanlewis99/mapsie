@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Logo from "@/components/Logo";
 import { getDesign, getOrder } from "@/lib/server/db";
 import { etsyToken, etsyTokenValid } from "@/lib/server/etsy";
-import { FRAMES, getProduct } from "@/lib/products";
+import { etsyPrintLabel } from "@/lib/etsyOptions";
 import { normalizeDesign } from "@/lib/types";
 import SendToPrint, { Preview } from "./SendToPrint";
 
@@ -19,8 +19,7 @@ export default async function Confirm({ params, searchParams }: { params: Promis
   const raw = d ? await getDesign(d) : null;
   if (!raw) redirect(`/create?etsy=${orderId}&k=${etsyToken(orderId)}`);
   // Show it exactly as it will be printed: with the size and frame from the Etsy order.
-  const design = { ...normalizeDesign(raw), productId: o.print.productId, frame: o.print.frame, paper: "ema", mount: "none", glaze: "perspex" } as ReturnType<typeof normalizeDesign>;
-  const frame = FRAMES.find((f) => f.id === o.print!.frame);
+  const design = { ...normalizeDesign(raw), format: o.print.format ?? "print", productId: o.print.productId, frame: o.print.frame, paper: o.print.paper ?? "ema", mount: o.print.mount ?? "none", glaze: "perspex" } as ReturnType<typeof normalizeDesign>;
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       <div className="flex items-center justify-between">
@@ -35,7 +34,7 @@ export default async function Confirm({ params, searchParams }: { params: Promis
             <p className="text-sm text-ink/60 mt-1">Etsy order {o.etsy.receiptId}{o.etsy.of > 1 ? ` · print ${o.etsy.unit} of ${o.etsy.of}` : ""}</p>
           </div>
           <dl className="text-sm space-y-2">
-            <div className="flex justify-between gap-4"><dt className="text-ink/50">Print</dt><dd className="font-bold text-right">{getProduct(o.print.productId).label}, {frame && frame.id !== "none" ? `${frame.label} frame` : "unframed"}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-ink/50">Print</dt><dd className="font-bold text-right">{etsyPrintLabel(o.print)}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-ink/50">Title</dt><dd className="font-bold text-right">{design.title || "—"}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-ink/50">Stops</dt><dd className="font-bold text-right">{design.stops.length}</dd></div>
             <div className="flex justify-between gap-4">

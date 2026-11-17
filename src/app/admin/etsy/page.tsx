@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { listOrders } from "@/lib/server/db";
-import { ALL_SKUS, etsyConfigured, etsyConnection, etsyDesignUrl, etsyRedirectUri } from "@/lib/server/etsy";
+import { etsyConfigured, etsyConnection, etsyDesignUrl, etsyRedirectUri } from "@/lib/server/etsy";
+import { ETSY_FINISHES, ETSY_VARIATIONS, etsyPrintLabel } from "@/lib/etsyOptions";
 import { FRAMES, PRODUCTS, getProduct } from "@/lib/products";
 import { publicUrl } from "@/lib/server/urls";
 
@@ -70,9 +71,9 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
             </select>
           </label>
           <label className="block">
-            <span className="font-bold">Frame</span>
-            <select name="frame" defaultValue="none" className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2">
-              {FRAMES.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}
+            <span className="font-bold">Finish</span>
+            <select name="finish" defaultValue="EMA" className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2">
+              {ETSY_FINISHES.map((x) => <option key={x.code} value={x.code}>{x.label}</option>)}
             </select>
           </label>
           <label className="block">
@@ -131,12 +132,13 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
           <li>Set processing time to allow for the design step (e.g. 3–7 days). Express shipping on Etsy is sent express by Prodigi if its name includes “Express”.</li>
         </ol>
         <details className="text-sm">
-          <summary className="font-bold cursor-pointer">SKUs for every size and frame ({ALL_SKUS.length})</summary>
+          <summary className="font-bold cursor-pointer">Every size and finish with its SKU and price ({ETSY_VARIATIONS.length}) · <a className="underline" href="/api/admin/etsy/variations">download as CSV</a></summary>
+          <p className="text-xs text-ink/50 mt-2">Prices match mapsie.shop (UK, delivery included). Set both variations (Size and Finish) to affect price and SKU in Etsy.</p>
           <table className="mt-2 w-full">
-            <thead className="text-left text-xs uppercase tracking-wider text-ink/50"><tr><th className="py-1">SKU</th><th>Size</th><th>Frame</th></tr></thead>
+            <thead className="text-left text-xs uppercase tracking-wider text-ink/50"><tr><th className="py-1">Size</th><th>Finish</th><th>SKU</th><th className="text-right">Price</th></tr></thead>
             <tbody>
-              {ALL_SKUS.map((s) => (
-                <tr key={s.sku} className="border-t border-ink/5"><td className="py-1 font-mono text-xs">{s.sku}</td><td>{s.product}</td><td>{s.frame}</td></tr>
+              {ETSY_VARIATIONS.map((v) => (
+                <tr key={v.sku} className="border-t border-ink/5"><td className="py-1">{v.size}</td><td>{v.finish}</td><td className="font-mono text-xs">{v.sku}</td><td className="text-right">£{v.price}</td></tr>
               ))}
             </tbody>
           </table>
@@ -159,12 +161,13 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
                   </td>
                   <td className="px-2 py-2 whitespace-nowrap">{new Date(o.createdAt).toLocaleDateString("en-GB")}</td>
                   <td className="px-2 py-2">
-                    {o.print ? `${getProduct(o.print.productId).label}, ${FRAMES.find((f) => f.id === o.print!.frame)?.label}` : "?"}
+                    {o.print ? etsyPrintLabel(o.print) : "?"}
                     {o.etsy && !o.etsy.matched && <div className="text-xs font-bold text-coral-dark">Guessed: check SKU ({o.etsy.choices || "no options"})</div>}
                   </td>
                   <td className="px-2 py-2">{o.address?.name}<div className="text-ink/40">{o.email || "no email from Etsy"}</div></td>
                   <td className="px-2 py-2">
                     <span className="rounded-full bg-sand px-2.5 py-1 text-xs font-bold">{o.status.replace(/_/g, " ")}</span>
+                    {o.digital && o.status === "delivered" && <div className="text-xs mt-1 text-coral-dark font-bold">Digital: mark as dispatched on Etsy (no tracking)</div>}
                     {o.shipments?.find((x) => x.trackingNumber) && (
                       <div className="text-xs mt-1">
                         Tracking for Etsy: <b className="font-mono select-all">{o.shipments.find((x) => x.trackingNumber)!.trackingNumber}</b>

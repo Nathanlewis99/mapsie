@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getOrder } from "@/lib/server/db";
 import { etsyTokenValid } from "@/lib/server/etsy";
-import { getProduct, FRAMES } from "@/lib/products";
+import { etsyPrintLabel } from "@/lib/etsyOptions";
 
 /** For the editor: what an Etsy buyer paid for (needs the token from their link). */
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -17,7 +17,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     of: o.etsy.of,
     productId: o.print.productId,
     frame: o.print.frame,
-    label: `${getProduct(o.print.productId).label} · ${FRAMES.find((f) => f.id === o.print!.frame)?.label ?? "No frame"}`,
+    paper: o.print.paper ?? "ema",
+    mount: o.print.mount ?? "none",
+    format: o.print.format ?? "print",
+    label: etsyPrintLabel(o.print),
     designId: o.designId || null,
   }, { headers: { "cache-control": "no-store" } });
 }

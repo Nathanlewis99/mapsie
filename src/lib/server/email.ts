@@ -45,7 +45,7 @@ export async function sendEmail(m: Email) {
 }
 
 /** Send an order email once only (callbacks and retries can repeat). Never throws. */
-export async function sendOrderEmail(orderId: string, kind: "confirmed" | "shipped" | "cancelled") {
+export async function sendOrderEmail(orderId: string, kind: "confirmed" | "shipped" | "cancelled" | "delivered") {
   try {
     const o = await getOrder(orderId);
     if (!o || o.emailsSent?.includes(kind)) return;
@@ -69,7 +69,8 @@ export async function sendEtsyDesignEmail(o: Order, kind: "invite" | "remind1" |
     if (kind === "remind2" && !fresh.emailsSent?.includes("etsy-remind1")) return;
     const { etsyDesignUrl } = await import("./etsy");
     const name = fresh.address?.name?.split(" ")[0];
-    const what = fresh.print ? describeOptions({ productId: fresh.print.productId, frame: fresh.print.frame, paper: "ema", mount: "none", glaze: "perspex", orientation: "portrait" } as never) : "map print";
+    const { etsyPrintLabel } = await import("../etsyOptions");
+    const what = fresh.print ? etsyPrintLabel(fresh.print) : "map print";
     const several = fresh.etsy && fresh.etsy.of > 1 ? ` (print ${fresh.etsy.unit} of ${fresh.etsy.of})` : "";
     const lines = {
       invite: [
@@ -157,7 +158,7 @@ const TZ: Record<RegionId, { tz: string; label: string }> = {
 const clock = (iso: string, region: RegionId) =>
   `${new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: TZ[region].tz })} ${TZ[region].label}`;
 
-async function build(o: Order, kind: "confirmed" | "shipped" | "cancelled"): Promise<Email> {
+async function build(o: Order, kind: "confirmed" | "shipped" | "cancelled" | "delivered"): Promise<Email> {
   const raw = await getDesign(o.designId);
   const d = raw ? normalizeDesign(raw) : null;
   const what = d ? `“${d.title}”, ${describeOptions(d)}` : "your map print";
@@ -167,6 +168,24 @@ async function build(o: Order, kind: "confirmed" | "shipped" | "cancelled"): Pro
   const total = money(o.region, o.total);
   const ship = SHIPPING.find((s) => s.id === o.shipping) ?? SHIPPING[0];
 
+  if (kind === "delivered") {
+    const lines = [
+      hi,
+      `Your map is ready: ${what}.`,
+      "Download it from your order page. It's a full-resolution 300 dpi PNG, ready to print at any good print shop or online printer, at the size you chose or smaller.",
+      `Order ${o.id}`,
+    ];
+    return page(o.email, "Your Mapsie map is ready to download", "Your map is ready ⬇️", lines, { label: "Download your map", href: link });
+  }
+  if (kind === "confirmed" && o.digital) {
+    const lines = [
+      hi,
+      `Thank you! We're making the full-resolution file of ${what}.`,
+      "We'll email your download link in a few minutes, as soon as the file is ready.",
+      o.etsy ? `Etsy order ${o.etsy.receiptId}` : `Order ${o.id} · ${total}`,
+    ].filter(Boolean);
+    return page(o.email, `Your Mapsie order ${o.id}`, "Thank you! 🎉", lines, { label: "View your order", href: link });
+  }
   if (kind === "confirmed" && o.source === "etsy") {
     const until = o.holdUntil ? clock(o.holdUntil, o.region) : null;
     const lines = [

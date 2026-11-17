@@ -60,7 +60,15 @@ export default function RefundsPage() {
         </p>
       </Section>
 
-      <Section id="problems" n={3} title="If your print arrives damaged, faulty or not as designed">
+      <Section id="digital" n={3} title="Digital files">
+        <p>
+          If you buy your map as a digital file, we make it and email you the download link straight away. At checkout you ask us to
+          do that and confirm you understand that, once the file has been delivered, you lose the usual 14-day right to cancel (this
+          is regulation 37 of the Consumer Contracts Regulations 2013). If the file is faulty, for example it won&apos;t open, is blank or
+          doesn&apos;t match your final preview, email us and we&apos;ll fix it or refund you.
+        </p>
+      </Section>
+      <Section id="problems" n={4} title="If your print arrives damaged, faulty or not as designed">
         <p>We&apos;ll put it right free of charge if your print:</p>
         <ul>
           <li>arrives damaged, for example creased, torn, scratched or with a broken frame or glazing;</li>
@@ -103,7 +111,7 @@ export default function RefundsPage() {
         </Sub>
       </Section>
 
-      <Section id="lost" n={4} title="Lost or late parcels">
+      <Section id="lost" n={5} title="Lost or late parcels">
         <p>
           If your order hasn&apos;t arrived by the end of its estimated delivery window (see our{" "}
           <In href="/legal/shipping">Shipping &amp; Delivery policy</In>), please email us. We&apos;ll chase it with the
@@ -116,7 +124,7 @@ export default function RefundsPage() {
         </p>
       </Section>
 
-      <Section id="how-refunds-work" n={5} title="How refunds are paid">
+      <Section id="how-refunds-work" n={6} title="How refunds are paid">
         <p>
           Refunds are made to the card or payment method you used, through our payment provider Stripe. We&apos;ll process your
           refund within 14 days of agreeing that you&apos;re entitled to it. Depending on your bank, it can take a further 5 to 10
@@ -125,7 +133,7 @@ export default function RefundsPage() {
         </p>
       </Section>
 
-      <Section id="your-rights" n={6} title="Your legal rights">
+      <Section id="your-rights" n={7} title="Your legal rights">
         <p>
           This policy is <strong>in addition to</strong> your legal rights as a consumer, and nothing in it takes them away. Even
           after our 30-day window, you may still be entitled to a repair, replacement, refund or price reduction if your print

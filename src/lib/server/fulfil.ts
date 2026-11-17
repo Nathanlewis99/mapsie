@@ -20,17 +20,19 @@ export const ROLE = (process.env.MAPSIE_ROLE ?? "all") as "web" | "worker" | "al
  * separate render worker when the site runs on several servers) makes the
  * print file, then holds the order until the cancellation window ends.
  */
-export async function fulfilOrder(orderId: string, address: Address, extra: Partial<Order> = {}, from: Order["status"] = "pending_payment") {
+export async function fulfilOrder(orderId: string, address: Address | undefined, extra: Partial<Order> = {}, from: Order["status"] = "pending_payment") {
   // Exactly once: payment webhooks can arrive more than once (retries, completed and
   // async_payment_succeeded), and a repeat must never re-queue an order already in progress.
   if (!(await claimOrder(orderId, from, "paid"))) return;
   const now = new Date();
+  // Digital files are delivered as soon as they're made (the buyer agreed to that at checkout).
+  const instant = (await getOrder(orderId))?.digital;
   await updateOrder(orderId, {
     status: "paid",
     address,
     error: undefined,
     paidAt: now.toISOString(),
-    holdUntil: new Date(now.getTime() + HOLD_MINUTES * 60_000).toISOString(),
+    holdUntil: new Date(now.getTime() + (instant ? 0 : HOLD_MINUTES) * 60_000).toISOString(),
     ...extra,
   });
   const paid = await getOrder(orderId);
@@ -83,7 +85,7 @@ async function renderOrder(order: Order) {
       renderFile: r.file,
       renderInfo: { width: r.width, height: r.height, dpi: r.dpi, mapDpi: r.mapDpi },
     });
-    if (HOLD_MINUTES <= 0) await sendToPrint(orderId);
+    if (HOLD_MINUTES <= 0 || order.digital) await sendToPrint(orderId);
   } catch (e) {
     await logError("order.render", e, { orderId });
     await alertAdmin(`Order ${orderId}: print file failed`, `The print file for order ${orderId} couldn't be made.\n\n${String(e).slice(0, 1500)}\n\nRetry it from the admin page.`);
@@ -94,7 +96,14 @@ async function renderOrder(order: Order) {
 /** Hand a ready order to the print company. */
 export async function sendToPrint(orderId: string) {
   const order = await getOrder(orderId);
-  if (!order || order.status !== "ready" || !order.renderFile || !order.address) return;
+  if (!order || order.status !== "ready" || !order.renderFile) return;
+  if (order.digital) {
+    // A digital file: nothing to print. Deliver the download link.
+    await updateOrder(orderId, { status: "delivered", error: undefined });
+    await sendOrderEmail(orderId, "delivered");
+    return;
+  }
+  if (!order.address) return;
   try {
     const raw = await getDesign(order.designId);
     if (!raw) throw new Error("design missing");

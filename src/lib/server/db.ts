@@ -26,7 +26,7 @@ export interface Address {
 // Etsy orders start at awaiting_design (paid on Etsy, the buyer hasn't designed it yet), then paid.
 // pending_payment -> paid -> rendering -> ready (print file done, waiting out the
 // cancellation window) -> submitted (sent to the printer) -> shipped. Or cancelled / failed.
-export type OrderStatus = "pending_payment" | "awaiting_design" | "paid" | "rendering" | "ready" | "submitted" | "shipped" | "cancelled" | "failed";
+export type OrderStatus = "pending_payment" | "awaiting_design" | "paid" | "rendering" | "ready" | "submitted" | "shipped" | "delivered" | "cancelled" | "failed";
 
 export interface Order {
   id: string;
@@ -59,10 +59,12 @@ export interface Order {
   /** A free replacement: the order it replaces, and the support ticket behind it. */
   reprintOf?: string;
   supportTicket?: string;
+  /** A digital file (download link emailed) rather than a print. */
+  digital?: boolean;
   /** Where it was bought: our checkout (default) or Etsy. */
   source?: "mapsie" | "etsy";
   /** Etsy orders: the size and frame that were paid for (the design must use them). */
-  print?: { productId: string; frame: string };
+  print?: { productId: string; frame: string; paper?: import("../types").PaperId; mount?: import("../types").MountId; format?: "print" | "digital" };
   etsy?: {
     receiptId: string;
     transactionId: string;

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { COMPANY } from "@/lib/company";
+import CookieSettingsLink from "./CookieSettingsLink";
 
 export const LEGAL_LINKS = [
   { href: "/support", label: "Help & support" },
@@ -23,6 +24,7 @@ export default function SiteFooter() {
           <a href={`mailto:${COMPANY.supportEmail}`} className="hover:text-coral-dark">
             Contact us
           </a>
+          <CookieSettingsLink />
         </nav>
         <p className="mt-6 max-w-3xl leading-relaxed">
           © {new Date().getFullYear()} {COMPANY.legalName}. {COMPANY.brand} is a trading name of {COMPANY.legalName}, registered in{" "}

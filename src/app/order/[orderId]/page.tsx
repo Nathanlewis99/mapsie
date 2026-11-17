@@ -4,6 +4,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import { COMPANY } from "@/lib/company";
 import { track } from "@/lib/track";
+import { adEvent } from "@/lib/adTrack";
 
 interface Status {
   status: string;
@@ -11,6 +12,7 @@ interface Status {
   renderInfo?: { width: number; height: number; dpi: number; mapDpi?: number };
   printProviderOrderId?: string;
   total: number;
+  currency?: string;
   holdUntil?: string;
   canCancel?: boolean;
   refunded?: boolean;
@@ -61,6 +63,19 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
     poll();
     return () => clearTimeout(t);
   }, [orderId]);
+
+  // Tell the ad platforms about the sale, once per order (only if the visitor agreed to ad cookies).
+  useEffect(() => {
+    if (!o || o.etsy || ["pending_payment", "failed", "cancelled"].includes(o.status)) return;
+    const key = `mapsie-conv-${orderId}`;
+    try {
+      if (localStorage.getItem(key)) return;
+      localStorage.setItem(key, "1");
+    } catch {
+      return;
+    }
+    adEvent({ name: "purchase", orderId, value: o.total, currency: o.currency ?? "gbp" });
+  }, [o, orderId]);
 
   const cancel = async () => {
     setBusy(true);

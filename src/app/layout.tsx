@@ -28,10 +28,24 @@ import "@fontsource/rock-salt";
 import "./globals.css";
 import ErrorReporter from "@/components/ErrorReporter";
 import Analytics from "@/components/Analytics";
+import ConsentManager from "@/components/ConsentManager";
 
+const DESCRIPTION = "Design a custom map print of your journey: stops, routes, stickers and your style. Printed and delivered to your door.";
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.APP_URL ?? "https://mapsie.shop"),
   title: "Mapsie — turn your trip into a print",
-  description: "Design a custom map print of your journey: stops, routes, stickers and your style. Printed and delivered to your door.",
+  description: DESCRIPTION,
+  // The preview shown when someone shares a link (WhatsApp, Instagram, Facebook, X, iMessage).
+  openGraph: {
+    type: "website",
+    siteName: "Mapsie",
+    title: "Mapsie — turn your trip into a print",
+    description: DESCRIPTION,
+    url: "/",
+    locale: "en_GB",
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Custom travel map prints made with Mapsie" }],
+  },
+  twitter: { card: "summary_large_image", title: "Mapsie — turn your trip into a print", description: DESCRIPTION, images: ["/og.jpg"] },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -41,6 +55,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ErrorReporter />
         <Analytics />
         {children}
+        <ConsentManager />
       </body>
     </html>
   );

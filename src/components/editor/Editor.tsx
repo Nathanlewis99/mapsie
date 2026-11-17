@@ -1,4 +1,5 @@
 "use client";
+import { adEvent } from "@/lib/adTrack";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
@@ -291,7 +292,10 @@ export default function Editor() {
   // Funnel analytics (anonymous): opened the editor, added a stop, made it their own.
   const firstLook = useRef<string | null>(null);
   const stopCount = useRef<number | null>(null);
-  useEffect(() => track("editor_open"), []);
+  useEffect(() => {
+    track("editor_open");
+    adEvent({ name: "view_design" });
+  }, []);
   useEffect(() => {
     if (stopCount.current !== null && design.stops.length > stopCount.current) track("stop_added");
     stopCount.current = design.stops.length;

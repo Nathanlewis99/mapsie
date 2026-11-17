@@ -54,6 +54,8 @@ export interface Order {
   error?: string;
   /** Anonymous analytics visit that placed the order (for the funnel). */
   visitId?: string;
+  /** Cookie choices at checkout, and the ad identifiers we may use with them (see conversions.ts). */
+  adConsent?: import("./conversions").AdConsent;
   /** Which customer emails have gone out, so none is sent twice. */
   emailsSent?: string[];
   /** A free replacement: the order it replaces, and the support ticket behind it. */

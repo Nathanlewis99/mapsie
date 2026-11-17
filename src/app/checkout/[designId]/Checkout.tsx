@@ -8,6 +8,7 @@ import { describeOptions, getRegion, guessRegion, itemPrice, money, priceLines, 
 import PrintOptionsPicker from "@/components/PrintOptionsPicker";
 import { sizeNote } from "@/lib/legibility";
 import { track, visitId } from "@/lib/track";
+import { adEvent } from "@/lib/adTrack";
 
 const FramedPoster = dynamic(() => import("@/components/FramedPoster"), { ssr: false });
 const WallPreview = dynamic(() => import("@/components/WallPreview"), { ssr: false });
@@ -34,6 +35,12 @@ export default function Checkout({ design: saved }: { design: Design }) {
   const [err, setErr] = useState("");
   useEffect(() => setRegion(storedRegion()), []);
   useEffect(() => track("checkout_view"), []);
+  // For the ad platforms (only sent with consent): someone started checking out.
+  useEffect(() => {
+    const t = setTimeout(() => adEvent({ name: "begin_checkout", value: itemPrice({ ...saved, format: saved.format ?? "print" }, storedRegion()), currency: getRegion(storedRegion()).currency }), 1500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // Signed-in customers: fill in their email.
   useEffect(() => {
     fetch("/api/auth/me").then((r) => r.json()).then((j) => j.user?.email && setEmail((e) => e || j.user.email)).catch(() => {});

@@ -1,4 +1,5 @@
 import { claimOrder, getDesign, getOrder, listOrdersByStatus, recordEvent, updateOrder, type Address, type Order } from "./db";
+import { sendPurchaseConversions } from "./conversions";
 import { normalizeDesign } from "../types";
 import { renderDesign, FALLBACK } from "./render";
 import { publicUrl } from "./urls";
@@ -39,6 +40,7 @@ export async function fulfilOrder(orderId: string, address: Address | undefined,
   if (paid?.visitId) await recordEvent(paid.visitId, "paid", { total: paid.total, currency: paid.currency }).catch(() => {});
   await sendOrderEmail(orderId, "confirmed");
   await sendSaleAlert(orderId);
+  if (paid) await sendPurchaseConversions(paid);
   if (ROLE !== "web") void processPaidOrders();
 }
 

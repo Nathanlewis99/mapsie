@@ -199,13 +199,10 @@ export function buildStyle(base: StyleSpecification, theme: Theme): StyleSpecifi
     // Elevation colours go straight on top of the paper, under parks and water.
     if (id === "park" && theme.hypso) out.push(hypsoLayer(c.land));
 
-    out.push(layer);
-
-    // Cartographic extras go just below the place names.
-    if (id === "boundary_disputed") out.push(...detailLayers(theme.details ?? NO_DETAILS, c));
-
-    // Terrain shading sits just above land cover and below water.
-    if (id === "landuse_residential" && theme.relief) {
+    // Terrain shading goes under the sea. The seabed data is coarse (1-2 km a
+    // pixel), so shading it turns into soft smudges at print size; the water
+    // layer covers them and keeps the coast crisp.
+    if (id === "water" && theme.relief) {
       out.push({
         id: "mapsy-relief",
         type: "hillshade",
@@ -218,6 +215,12 @@ export function buildStyle(base: StyleSpecification, theme: Theme): StyleSpecifi
         },
       } as AnyLayer);
     }
+
+    out.push(layer);
+
+    // Cartographic extras go just below the place names.
+    if (id === "boundary_disputed") out.push(...detailLayers(theme.details ?? NO_DETAILS, c));
+
   }
 
   style.layers = out;

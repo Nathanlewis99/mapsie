@@ -29,6 +29,7 @@ import SafeImg from "@/components/SafeImg";
 import { crowding, MIN_STOP_SCALE, readability, recommendedProduct, sizeNote, smallestText, tidyCrowded } from "@/lib/legibility";
 import { getProduct } from "@/lib/products";
 import { TEMPLATES } from "@/lib/templates";
+import AiTripBox from "./AiTripBox";
 import type { CompassStyle, ThemeColors, Layout, TravelMode, MarkerStyle, RouteStyle, TextStyle, TextCase, FontId } from "@/lib/types";
 
 export const Label = ({ children }: { children: React.ReactNode }) => (
@@ -147,6 +148,8 @@ function ModePicker({
 
 export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPickMode: (v: boolean) => void }) {
   const { design, addStop, addStops, updateStop, removeStop, moveStop, set, requestFit, applyTemplate, roadsLoading } = useEditor();
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiReply, setAiReply] = useState("");
   const [q, setQ] = useState("");
   const [results, setResults] = useState<PlaceResult[]>([]);
   const [searchState, setSearchState] = useState<"idle" | "searching" | "done" | "error">("idle");
@@ -211,9 +214,17 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
   const hasFlights = design.stops.slice(1).some((x) => (x.arriveBy ?? "plane") === "plane");
   return (
     <div className="space-y-5">
+      {design.stops.length === 0 || aiOpen ? (
+        <AiTripBox onTrip={(t, reply) => (applyTemplate(t), setAiOpen(false), setAiReply(reply))} replacing={design.stops.length > 0} />
+      ) : (
+        <div className="space-y-1">
+          {aiReply && <div className="rounded-2xl bg-sea/10 px-3 py-2 text-xs text-ink/80">✨ {aiReply}</div>}
+          <button onClick={() => (setAiOpen(true), setAiReply(""))} className="text-xs font-extrabold text-coral-dark">✨ Start again by describing your trip</button>
+        </div>
+      )}
       {design.stops.length === 0 && (
         <div>
-          <Label>Start from a trip</Label>
+          <Label>Or start from a trip</Label>
           <div className="grid grid-cols-2 gap-2">
             {TEMPLATES.map((t) => (
               <button key={t.id} onClick={() => applyTemplate(t)} className="rounded-2xl bg-white border border-ink/5 p-3 text-left hover:border-coral hover:-translate-y-0.5 transition shadow-sm">

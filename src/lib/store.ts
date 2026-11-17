@@ -220,11 +220,15 @@ export const useEditor = create<EditorState>()(
           // Spread the template's stickers along the trip, alternating sides of the route.
           const lngs = stops.map((s) => s.lng);
           const lats = stops.map((s) => s.lat);
-          const span = Math.max(Math.max(...lngs) - Math.min(...lngs), Math.max(...lats) - Math.min(...lats), 2);
+          // (Use the trip's real size, so stickers stay on the poster for compact trips too.)
+          const span = Math.max(Math.max(...lngs) - Math.min(...lngs), Math.max(...lats) - Math.min(...lats), 0.05);
           const art = suggestedStyleFor(preset.id);
+          // Each sticker sits beside its stop on the side facing the middle of the trip,
+          // so stops on the edge of the map don't push stickers off the poster.
+          const midLng = (Math.max(...lngs) + Math.min(...lngs)) / 2;
           const stickers: Sticker[] = t.stickers.map((name, i) => {
             const at = stops[Math.round((i / Math.max(1, t.stickers.length - 1)) * (stops.length - 1))];
-            const side = i % 2 ? 1 : -1;
+            const side = at.lng === midLng ? (i % 2 ? 1 : -1) : Math.sign(midLng - at.lng);
             return { id: nanoid(8), kind: "original", name, origStyle: "papercut", palette: "auto", src: "", lng: at.lng + side * span * 0.16, lat: at.lat + span * 0.05, size: 14, rotation: side * 5 };
           });
           commit(

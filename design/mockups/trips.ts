@@ -115,10 +115,11 @@ export const TRIPS: Trip[] = [
   {
     slug: "sri-lanka",
     view: { zoom: -0.05 },
-    frame: "white",
+    frame: "black",
     room: "bedroom-sage",
     design: {
       preset: "terrain",
+      mount: "white",
       title: "Sri Lanka",
       subtitle: "By tuk-tuk, train & car · March 2026",
       font: "cormorant",
@@ -192,6 +193,7 @@ export const TRIPS: Trip[] = [
     room: "living-oak",
     design: {
       preset: "topo",
+      paper: "hge",
       title: "South America",
       subtitle: "Lima to Rio · overland, mostly",
       font: "josefin",
@@ -229,7 +231,7 @@ export const TRIPS: Trip[] = [
     slug: "interrail-europe",
     labels: { Amsterdam: [0.5, -3.2] },
     view: { zoom: -0.22 },
-    frame: "white",
+    frame: "oak",
     room: "office-terracotta",
     design: {
       preset: "blush",

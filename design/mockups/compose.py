@@ -34,8 +34,24 @@ def shade(rgb, k):
     a = np.array(rgb, float)
     return tuple(int(v) for v in (a + (255 - a) * k if k > 0 else a * (1 + k)))
 
+def paper_texture(w, h, ppc, seed=3):
+    """Embossed grain of a textured etching paper, lit from the top left (1.0 = flat)."""
+    rng = np.random.default_rng(seed)
+    acc = np.zeros((h, w))
+    for scale, amp in [(0.05, 1.0), (0.1, 0.7), (0.25, 0.3)]:
+        sw, sh = max(4, int(w / (scale * ppc))), max(4, int(h / (scale * ppc)))
+        n = Image.fromarray((rng.random((sh, sw)) * 255).astype(np.uint8)).resize((w, h), Image.BICUBIC)
+        acc += amp * (np.array(n, float) / 255 - 0.5)
+    gy, gx = np.gradient(acc)
+    light = -(gx + gy) * 1.4
+    return 1 + np.clip(light, -0.03, 0.03)
+
 def compose(slug, frame, room_id):
     room = ROOMS[room_id]
+    design = json.loads((ROOT / f"design/mockups/designs/{slug}.json").read_text())
+    frame = design.get("frame", frame)
+    mount = design.get("mount", "none") if frame != "none" else "none"
+    paper = design.get("paper", "ema")
     poster = Image.open(RENDERS / f"{slug}.png").convert("RGB")
     bg = Image.open(ROOT / f"public/rooms/{room_id}.jpg").convert("RGB")
     W0, H0 = bg.size
@@ -66,6 +82,14 @@ def compose(slug, frame, room_id):
     L, T = cx - fw / 2, bottom - fh
     L, T, fw, fh, mould = (round(v) for v in (L, T, fw, fh, mould))
     pw, ph = fw - 2 * mould, fh - 2 * mould
+    # A mount: a white card border inside the frame; the print sits in its window.
+    mw = round(5 * ppc) if mount != "none" else 0
+    if mw:
+        ph_art = ph - 2 * mw
+        pw_art = round(ph_art / aspect)
+        mwx = (pw - pw_art) // 2
+    else:
+        pw_art, ph_art, mwx = pw, ph, 0
 
     canvas = bg.convert("RGBA")
     # Wall shadow: light from the left, so it falls down and to the right.
@@ -82,20 +106,43 @@ def compose(slug, frame, room_id):
     canvas = Image.alpha_composite(canvas, shadow)
 
     # The print, with the room's light: brighter towards the window (left), a touch warmer.
-    art = poster.resize((pw, ph), Image.LANCZOS)
+    art = poster.resize((pw_art, ph_art), Image.LANCZOS)
     a = np.array(art).astype(float)
-    gx = np.linspace(1.02, 0.93, pw)[None, :, None]
-    gy = np.linspace(1.0, 0.97, ph)[:, None, None]
+    if paper == "hge":
+        # Textured etching: soft warm white, ink a little muted, visible embossed grain.
+        a = a * 0.95 + np.array([250, 246, 236]) * 0.05
+        a = a * paper_texture(pw_art, ph_art, ppc)[..., None]
+    if mw:
+        # Lay the print into the mount: card colour, a bright bevelled window edge, a hairline shadow.
+        card = np.ones((ph, pw, 3)) * np.array([249, 248, 244], float)
+        top, left = mw, mwx
+        card[top:top + ph_art, left:left + pw_art] = a
+        bev = max(2, round(0.28 * ppc))
+        for (y0, y1, x0, x1, tone) in [
+            (top - bev, top, left - bev, left + pw_art + bev, 0.97),  # top bevel, in shade
+            (top + ph_art, top + ph_art + bev, left - bev, left + pw_art + bev, 1.03),  # bottom bevel, catches light
+            (top, top + ph_art, left - bev, left, 0.99),  # left
+            (top, top + ph_art, left + pw_art, left + pw_art + bev, 1.02),  # right
+        ]:
+            card[y0:y1, x0:x1] = np.clip(np.array([252, 251, 248]) * tone, 0, 255)
+        card[top:top + 1, left:left + pw_art] *= 0.82
+        card[top:top + ph_art, left:left + 1] *= 0.86
+        a = card
+        pw_full, ph_full = pw, ph
+    else:
+        pw_full, ph_full = pw_art, ph_art
+    gx = np.linspace(1.02, 0.93, pw_full)[None, :, None]
+    gy = np.linspace(1.0, 0.97, ph_full)[:, None, None]
     a = a * gx * gy * np.array([1.0, 0.99, 0.965])
     if frame != "none":
         # The frame's lip casts a shadow onto the print along the top and left edges.
         lip = 0.9 * ppc
-        yy, xx = np.mgrid[0:ph, 0:pw]
+        yy, xx = np.mgrid[0:ph_full, 0:pw_full]
         dark = np.clip(1 - yy / lip, 0, 1) * 0.32 + np.clip(1 - xx / lip, 0, 1) * 0.22
-        dark += np.clip(1 - (pw - xx) / (lip * 0.4), 0, 1) * 0.08 + np.clip(1 - (ph - yy) / (lip * 0.4), 0, 1) * 0.06
+        dark += np.clip(1 - (pw_full - xx) / (lip * 0.4), 0, 1) * 0.08 + np.clip(1 - (ph_full - yy) / (lip * 0.4), 0, 1) * 0.06
         a = a * (1 - np.clip(dark, 0, 0.45))[..., None]
         # Glazing: a faint diagonal reflection.
-        diag = (xx / pw * 0.8 + yy / ph * 0.4)
+        diag = (xx / pw_full * 0.8 + yy / ph_full * 0.4)
         sheen = np.exp(-((diag - 0.28) ** 2) / 0.006) * 14 + np.exp(-((diag - 0.62) ** 2) / 0.002) * 7
         a = a + sheen[..., None]
     art = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
@@ -138,7 +185,7 @@ def compose(slug, frame, room_id):
         canvas = Image.alpha_composite(canvas, fr)
     else:
         # Unframed print: a hairline paper edge.
-        ImageDraw.Draw(canvas).rectangle((L, T, L + fw - 1, T + fh - 1), outline=(0, 0, 0, 40), width=1)
+        ImageDraw.Draw(canvas).rectangle((L, T, L + fw - 1, T + fh - 1), outline=(0, 0, 0, 16), width=1)
 
     out = OUT / f"{slug}.jpg"
     canvas.convert("RGB").save(out, quality=92, subsampling=0)

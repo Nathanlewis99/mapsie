@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/lib/store";
 import { searchPlaces, MODES, VEHICLES, vehicleFor, type PlaceResult } from "@/lib/geo";
-import { PRESETS, themeFromPreset } from "@/lib/themes";
+import { PRESETS, showSeaDepth, themeFromPreset } from "@/lib/themes";
 import { ART_STYLES, PACKS, STICKERS, getArtStyle, searchStickers, stickerSrc, suggestedStyleFor, type ArtStyleId } from "@/lib/stickers";
 import StickerFilters, { filterId } from "@/components/StickerFilters";
 import {
@@ -542,6 +542,7 @@ export function StylePanel() {
           onChange={(v) => setTheme({ countriesOnly: v })}
           label="Countries & seas only (no cities)"
         />
+        <Toggle on={showSeaDepth(t)} onChange={(v) => setTheme({ seaDepth: v })} label="🌊 Sea depth lines" />
         <Toggle on={t.texture} onChange={(v) => setTheme({ texture: v })} label="📜 Aged paper texture" />
       </div>
     </div>

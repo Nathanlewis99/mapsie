@@ -39,6 +39,7 @@
     "arctic": "^3.7.0",
     "better-sqlite3": "^12.11.1",
     "jose": "^6.2.17",
+    "maplibre-contour": "^0.1.1",
     "maplibre-gl": "^5.24.0",
     "nanoid": "^6.0.2",
     "next": "15.5.29",

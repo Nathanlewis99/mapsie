@@ -79,7 +79,9 @@ export interface Theme {
   labels: boolean;
   /** With labels on: only country and sea names, no cities or towns (so they don't clash with the trip's own labels). */
   countriesOnly?: boolean;
-  relief: boolean; // hillshade terrain
+  relief: boolean; // hillshade terrain (land only)
+  /** Sea depth as fine contour lines with a gentle deep-water tint. Defaults to on with relief. */
+  seaDepth?: boolean;
   texture: boolean; // paper grain overlay
   hypso: boolean; // colour land by height (green lowlands to snowy peaks)
   physical: boolean; // classic atlas shaded-relief base

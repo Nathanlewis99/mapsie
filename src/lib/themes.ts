@@ -142,7 +142,12 @@ const hide = (l: AnyLayer) => {
   l.layout = { ...(l.layout ?? {}), visibility: "none" };
 };
 
-export function buildStyle(base: StyleSpecification, theme: Theme): StyleSpecification {
+/** Sea depth is on by default for the styles that show relief. */
+export const showSeaDepth = (t: Theme) => t.seaDepth ?? t.relief;
+
+/** `seaTiles`: the sea-depth contour tile URL (from lib/seaDepth), when running in a browser. */
+export function buildStyle(base: StyleSpecification, theme: Theme, opts: { seaTiles?: string } = {}): StyleSpecification {
+  const sea = showSeaDepth(theme) && !!opts.seaTiles;
   const c = theme.colors;
   const style: StyleSpecification = JSON.parse(JSON.stringify(base));
   const out: AnyLayer[] = [];
@@ -218,6 +223,10 @@ export function buildStyle(base: StyleSpecification, theme: Theme): StyleSpecifi
 
     out.push(layer);
 
+    // Sea depth goes straight on top of the sea: a soft deep-water tint, and fine
+    // contour lines (vector, so they stay crisp at any print size).
+    if (id === "water" && sea) out.push(...seaLayers(c.water, c.labels));
+
     // Cartographic extras go just below the place names.
     if (id === "boundary_disputed") out.push(...detailLayers(theme.details ?? NO_DETAILS, c));
 
@@ -230,7 +239,8 @@ export function buildStyle(base: StyleSpecification, theme: Theme): StyleSpecifi
   if (d.tropics) style.sources["mapsie-tropics"] = geo(specialLatitudes);
   if (d.currents) style.sources["mapsie-currents"] = geo(currents);
   if (d.lanes) style.sources["mapsie-lanes"] = geo(shippingLanes);
-  if (theme.relief || theme.hypso) {
+  if (sea) style.sources["mapsie-sea"] = { type: "vector", tiles: [opts.seaTiles!], maxzoom: 11 } as StyleSpecification["sources"][string];
+  if (theme.relief || theme.hypso || sea) {
     style.sources["mapsy-dem"] = {
       type: "raster-dem",
       tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
@@ -353,4 +363,45 @@ function detailLayers(d: MapDetails, c: ThemeColors): AnyLayer[] {
     );
   }
   return layers;
+}
+
+// Deep water a little darker, shallow water untouched, land not at all. The tint
+// fades in gradually from the coast, so the coarse seabed data never shows a hard edge.
+function seaLayers(water: string, ink: string): AnyLayer[] {
+  const rgb = (hex: string, a: number) => {
+    const n = parseInt(hex.replace("#", ""), 16);
+    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+  };
+  const deep = mix(water, ink, 0.35);
+  return [
+    {
+      id: "mapsie-sea-tint",
+      type: "color-relief",
+      source: "mapsy-dem",
+      paint: {
+        "color-relief-opacity": 1,
+        "color-relief-color": ["interpolate", ["linear"], ["elevation"], -6000, rgb(deep, 0.55), -2000, rgb(deep, 0.38), -200, rgb(deep, 0.12), -20, rgb(deep, 0), 0, rgb(deep, 0)],
+      },
+    } as AnyLayer,
+    {
+      id: "mapsie-sea-depth",
+      type: "line",
+      source: "mapsie-sea",
+      "source-layer": "contours",
+      filter: ["<", ["get", "ele"], 0],
+      layout: { "line-join": "round", "line-cap": "round" },
+      paint: {
+        "line-color": mix(water, ink, 0.45),
+        "line-opacity": ["match", ["get", "level"], 1, 0.55, 0.32],
+        "line-width": ["match", ["get", "level"], 1, 0.7, 0.45],
+      },
+    } as AnyLayer,
+  ];
+}
+
+/** Blend two #rrggbb colours: t=0 gives a, t=1 gives b. */
+function mix(a: string, b: string, t: number) {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const ch = (s: number) => Math.round(((pa >> s) & 255) * (1 - t) + ((pb >> s) & 255) * t);
+  return `#${[16, 8, 0].map((s) => ch(s).toString(16).padStart(2, "0")).join("")}`;
 }

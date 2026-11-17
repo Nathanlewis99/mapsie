@@ -1,4 +1,5 @@
 "use client";
+import { seaContourTiles } from "@/lib/seaDepth";
 import { useEffect, useRef } from "react";
 import maplibregl, { Map as MLMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -119,7 +120,7 @@ export default function MapView(props: Props) {
       const zoom = d.view.zoom + Math.log2(widthRef.current / d.view.refWidth);
       const m = new maplibregl.Map({
         container: el.current,
-        style: buildStyle(base, d.theme),
+        style: buildStyle(base, d.theme, { seaTiles: seaContourTiles() }),
         center: d.view.center,
         zoom,
         bearing: d.view.bearing,
@@ -205,7 +206,7 @@ export default function MapView(props: Props) {
     if (!m) return;
     loadBaseStyle().then((base) => {
       styleReady.current = false;
-      m.setStyle(buildStyle(base, design.theme), { diff: false });
+      m.setStyle(buildStyle(base, design.theme, { seaTiles: seaContourTiles() }), { diff: false });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeKey]);

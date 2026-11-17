@@ -765,7 +765,7 @@ function ExtrasRow() {
     c.width = Math.round(img.width * scale);
     c.height = Math.round(img.height * scale);
     c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
-    addSticker({ kind: "photo", src: c.toDataURL("image/jpeg", 0.88), ...at(), size: 16, rotation: -4 });
+    addSticker({ kind: "photo", src: c.toDataURL("image/jpeg", 0.88), photoAspect: +(c.height / c.width).toFixed(3), photoShape: "original", photoBorder: "classic", ...at(), size: 16, rotation: -4 });
   };
   return (
     <div className="grid grid-cols-2 gap-2">

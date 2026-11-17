@@ -53,6 +53,12 @@ export interface Sticker {
   effect?: TextEffect;
   effectColor?: string;
   effectSize?: number; // 0.25–3, 1 = normal
+  /** Photos only: height / width of the uploaded picture. */
+  photoAspect?: number;
+  photoShape?: import("./photoStyle").PhotoShape;
+  photoBorder?: import("./photoStyle").PhotoBorder;
+  photoBorderColor?: string;
+  photoFilter?: import("./photoStyle").PhotoFilter;
 }
 
 export interface ThemeColors {

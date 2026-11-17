@@ -12,6 +12,7 @@ import { itemPrice, money, posterAspect, REGIONS } from "@/lib/products";
 import { FONTS, fontBold, fontCss } from "@/lib/fonts";
 import { ART_STYLES, stickerSrc, type ArtStyleId } from "@/lib/stickers";
 import { PAINTED, PALETTE_NAMES, getOriginal, type OriginalStyle } from "@/lib/originals";
+import { PHOTO_BORDERS, PHOTO_BORDER_COLOURS, PHOTO_FILTERS, PHOTO_SHAPES, photoLook, type PhotoBorder, type PhotoFilter, type PhotoShape } from "@/lib/photoStyle";
 import { normalizeDesign, type Design, type TextEffect } from "@/lib/types";
 import { TripPanel, StylePanel, StickersPanel, TextPanel, SizePanel } from "./Panels";
 import { track } from "@/lib/track";
@@ -683,6 +684,38 @@ export default function Editor() {
                   <span className="w-px h-5 bg-white/20 mx-1" />
                 </>
               )}
+              {sel.kind === "photo" && (() => {
+                const look = photoLook(sel);
+                const colours = [...PHOTO_BORDER_COLOURS, { id: design.theme.colors.accent, label: "Map accent" }, { id: design.theme.colors.ink, label: "Map ink" }];
+                const pick = "bg-white/10 rounded-full px-2 py-1 outline-none";
+                return (
+                  <>
+                    <select title="Shape" value={look.shape} onChange={(e) => store.updateSticker(sel.id, { photoShape: e.target.value as PhotoShape })} className={pick}>
+                      {PHOTO_SHAPES.map((x) => <option key={x.id} value={x.id} className="text-ink">{x.label}</option>)}
+                    </select>
+                    <select title="Border" value={sel.photoBorder ?? "classic"} onChange={(e) => store.updateSticker(sel.id, { photoBorder: e.target.value as PhotoBorder })} className={pick}>
+                      {PHOTO_BORDERS.map((x) => <option key={x.id} value={x.id} className="text-ink">{x.label}</option>)}
+                    </select>
+                    {look.border !== "none" && (
+                      <span className="flex items-center gap-1" title="Border colour">
+                        {colours.map((c) => (
+                          <button
+                            key={c.label}
+                            title={c.label}
+                            onClick={() => store.updateSticker(sel.id, { photoBorderColor: c.id })}
+                            className={`w-5 h-5 rounded-full border ${look.colour.toLowerCase() === c.id.toLowerCase() ? "ring-2 ring-coral border-white" : "border-white/40"}`}
+                            style={{ background: c.id }}
+                          />
+                        ))}
+                      </span>
+                    )}
+                    <select title="Photo style" value={sel.photoFilter ?? "none"} onChange={(e) => store.updateSticker(sel.id, { photoFilter: e.target.value as PhotoFilter })} className={pick}>
+                      {PHOTO_FILTERS.map((x) => <option key={x.id} value={x.id} className="text-ink">{x.label}</option>)}
+                    </select>
+                    <span className="w-px h-5 bg-white/20 mx-1" />
+                  </>
+                );
+              })()}
               {sel.kind === "original" && sel.name && (
                 <>
                   <select

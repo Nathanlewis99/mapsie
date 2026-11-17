@@ -8,6 +8,7 @@ import { buildLegs, routeGeoJSON, stopsBounds } from "@/lib/geo";
 import { loadCountries, visitedCountries } from "@/lib/countries";
 import { fontBold, fontCss } from "@/lib/fonts";
 import { getArtStyle, stickerSrc } from "@/lib/stickers";
+import { buildPhoto } from "@/lib/photoStyle";
 import { originalSrc, resolvePalette } from "@/lib/originals";
 import { filterId } from "./StickerFilters";
 import { TINY_PIN } from "@/lib/legibility";
@@ -490,6 +491,12 @@ export default function MapView(props: Props) {
             inner.style.cssText = `font-family:${fontCss(st.font ?? "caveat")};font-weight:${fontBold(st.font ?? "caveat")};color:${st.color ?? design.theme.colors.ink};font-size:${px}px;${st.curve ? "" : fx.css}`;
             if (st.curve) curvedText(inner, (st.text || "Your note").replace(/\s*\n\s*/g, " "), st.curve, st.font ?? "caveat", fx);
             else inner.textContent = st.text || "Your note";
+          } else if (st.kind === "photo") {
+            // The customer's own photo, with its chosen shape, border and colour style.
+            const photo = buildPhoto(st, px);
+            node.style.width = `${px}px`;
+            node.style.height = `${photo.height}px`;
+            inner = photo.el;
           } else {
             node.style.width = `${px}px`;
             node.style.height = `${px}px`;
@@ -503,7 +510,6 @@ export default function MapView(props: Props) {
             if (art && art.finish !== "none") img.style.filter = `url(#${filterId(filterPrefix, art.finish)})`;
             img.draggable = false;
             img.alt = "";
-            if (st.kind === "photo") img.style.borderWidth = `${Math.max(2, px * 0.05)}px`;
             inner = img;
           }
           inner.style.transform = `rotate(${st.rotation}deg)`;

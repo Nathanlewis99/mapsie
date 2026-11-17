@@ -154,13 +154,8 @@ body {
 .mapsie-sticker.is-multiply { mix-blend-mode: multiply; }
 .mapsie-sticker.is-multiply img { filter: none; }
 .mapsie-sticker.is-text { width: auto; height: auto; }
-.mapsie-sticker.is-photo img {
-  object-fit: cover;
-  border-style: solid;
-  border-color: white;
-  border-radius: 4px;
-  background: white;
-}
+/* the customer's photos: shape, border and style come from photoStyle.ts */
+.mapsie-sticker.is-photo { filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.28)); }
 .mapsie-sticker.is-selected {
   outline: 2px dashed var(--color-coral);
   outline-offset: 4px;

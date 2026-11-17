@@ -37,6 +37,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     price: etsyPrice(to.productId, finish), // the listing is priced in pounds; Etsy converts for the buyer
     paid: o.total,
     currency: o.currency,
-    listingUrl: (await etsyListingUrl()) || "https://www.etsy.com",
+    listingUrl: (await etsyListingUrl(o.region)) || "https://www.etsy.com",
   });
 }

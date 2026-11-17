@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       q = "disconnected=1";
     }
     if (action === "listingUrl") {
-      await setEtsyListingUrl(String(f.get("url") ?? ""));
+      await setEtsyListingUrl(String(f.get("url") ?? ""), String(f.get("region") ?? ""));
       q = "saved=1";
     }
     if (action === "refunded") {

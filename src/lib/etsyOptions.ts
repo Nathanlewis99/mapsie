@@ -18,12 +18,14 @@ const SHORT_FRAME: Record<string, string> = {
   black: "Black", white: "White", oak: "Natural wood", brown: "Brown", darkgrey: "Dark grey", lightgrey: "Light grey", gold: "Antique gold", silver: "Antique silver",
 };
 
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+
 /** Every Finish option, in listing order. Labels fit Etsy's 20-character limit. */
 export const ETSY_FINISHES: { code: string; label: string; frame: string; paper: PaperId; mount: MountId; digital?: boolean }[] = [
   ...PAPERS.map((p) => ({ code: p.id.toUpperCase(), label: `Unframed: ${SHORT_PAPER[p.id]}`, frame: "none", paper: p.id, mount: "none" as MountId })),
   ...FRAMES.filter((f) => f.id !== "none").flatMap((f) => [
     { code: f.id.toUpperCase(), label: `${SHORT_FRAME[f.id] ?? f.label} frame`.replace("Antique silver frame", "Silver frame").replace("Antique gold frame", "Gold frame"), frame: f.id, paper: "ema" as PaperId, mount: "none" as MountId },
-    { code: `${f.id.toUpperCase()}-MOUNT`, label: `${(SHORT_FRAME[f.id] ?? f.label).replace("Antique ", "")} + mount`, frame: f.id, paper: "ema" as PaperId, mount: "white" as MountId },
+    { code: `${f.id.toUpperCase()}-MOUNT`, label: `${cap((SHORT_FRAME[f.id] ?? f.label).replace("Antique ", ""))} + mount`, frame: f.id, paper: "ema" as PaperId, mount: "white" as MountId },
   ]),
   { code: "DIGITAL", label: "Digital file", frame: "none", paper: "ema", mount: "none", digital: true },
 ];
@@ -35,10 +37,20 @@ export const etsySku = (productId: string, finishCode: string) => `MAPSIE-${size
 export const etsyPrice = (productId: string, f: { frame: string; paper: PaperId; mount: MountId; digital?: boolean }, region: RegionId = "GB") =>
   f.digital ? DIGITAL_PRICE[region] : itemPrice({ productId, frame: f.frame as FrameId, paper: f.paper, mount: f.mount, glaze: "perspex" } as never, region);
 
-/** All size × finish combinations for the listing, with SKU and price. */
-export const ETSY_VARIATIONS = PRODUCTS.flatMap((p) =>
-  ETSY_FINISHES.map((f) => ({ sku: etsySku(p.id, f.code), size: p.label, finish: f.label, price: etsyPrice(p.id, f), productId: p.id, ...f })),
-);
+/**
+ * The shop is priced in pounds. The US listing (made in Prodigi's US lab, where frames
+ * cost more) uses mapsie.shop's US dollar prices, converted at a cautious rate and
+ * rounded up to whole pounds; Etsy shows US buyers dollars again.
+ */
+export const USD_PER_GBP = 1.25;
+export const etsyUsPrice = (productId: string, f: Parameters<typeof etsyPrice>[1]) => Math.ceil(etsyPrice(productId, f, "US") / USD_PER_GBP);
+
+/** All size × finish combinations for a listing (UK/AU, or US), with SKU and price in pounds. */
+export const etsyVariations = (listing: "GB" | "US" = "GB") =>
+  PRODUCTS.flatMap((p) =>
+    ETSY_FINISHES.map((f) => ({ sku: etsySku(p.id, f.code), size: p.label, finish: f.label, price: listing === "US" ? etsyUsPrice(p.id, f) : etsyPrice(p.id, f), productId: p.id, ...f })),
+  );
+export const ETSY_VARIATIONS = etsyVariations("GB");
 
 /** What a SKU means. Also reads the first-version SKUs (MAPSIE-A3-NONE, MAPSIE-A3-BLACK). */
 export function printFromSku(sku: string | null | undefined): EtsyPrint | null {

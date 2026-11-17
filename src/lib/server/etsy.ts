@@ -331,14 +331,16 @@ const personalEmail = (vs: Variation[] = []) =>
 
 // ---------------------------------------------------------------- the listing
 /** The Etsy listing buyers are sent to (to buy a switched print). Set on /admin/etsy, or ETSY_LISTING_URL. */
-export async function etsyListingUrl() {
-  return (await getKv<string>("etsy:listingUrl"))?.value || process.env.ETSY_LISTING_URL || process.env.ETSY_SHOP_URL || "";
+export async function etsyListingUrl(region?: RegionId) {
+  const us = region === "US" ? (await getKv<string>("etsy:listingUrl:US"))?.value || process.env.ETSY_LISTING_URL_US : "";
+  return us || (await getKv<string>("etsy:listingUrl"))?.value || process.env.ETSY_LISTING_URL || process.env.ETSY_SHOP_URL || "";
 }
-export async function setEtsyListingUrl(url: string) {
+/** `region` "US" sets the US listing's link; anything else the main (UK/AU) one. */
+export async function setEtsyListingUrl(url: string, region?: string) {
   const u = url.trim();
   if (u && !/^https:\/\/(www\.)?etsy\.com\/([a-z-]+\/)?(listing|shop)\/\S+$/i.test(u)) throw new Error("That doesn't look like an Etsy listing or shop link (https://www.etsy.com/listing/...).");
   // Drop tracking parameters Etsy adds when you copy a link.
-  await putKv("etsy:listingUrl", u ? u.split("?")[0] : null);
+  await putKv(region === "US" ? "etsy:listingUrl:US" : "etsy:listingUrl", u ? u.split("?")[0] : null);
 }
 
 // ---------------------------------------------------------------- refunds and cancellations

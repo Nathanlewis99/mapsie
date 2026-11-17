@@ -2,7 +2,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import { listOrders } from "@/lib/server/db";
 import { etsyConfigured, etsyConnection, etsyDesignUrl, etsyListingUrl, etsyRedirectUri } from "@/lib/server/etsy";
-import { ETSY_FINISHES, ETSY_VARIATIONS, etsyPrintLabel } from "@/lib/etsyOptions";
+import { ETSY_FINISHES, ETSY_VARIATIONS, etsyPrintLabel, etsyUsPrice, USD_PER_GBP } from "@/lib/etsyOptions";
 import { FRAMES, PRODUCTS, getProduct } from "@/lib/products";
 import { publicUrl } from "@/lib/server/urls";
 
@@ -19,6 +19,7 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
   const q = await searchParams;
   const conn = await etsyConnection();
   const listingUrl = await etsyListingUrl();
+  const listingUrlUs = (await etsyListingUrl("US")) === listingUrl ? "" : await etsyListingUrl("US");
   const orders = (await listOrders()).filter((o) => o.source === "etsy");
   const refunds = orders.filter((o) => o.etsy?.refundDue && !o.etsy.refunded);
   const waiting = orders.filter((o) => o.status === "awaiting_design");
@@ -136,22 +137,25 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
           </li>
           <li>Set processing time to allow for the design step (e.g. 3–7 days). Express shipping on Etsy is sent express by Prodigi if its name includes “Express”.</li>
         </ol>
-        <form action="/api/admin/etsy" method="post" className="flex flex-wrap items-end gap-2 text-sm pt-2">
-          <input type="hidden" name="action" value="listingUrl" />
-          <label className="flex-1 min-w-[260px]">
-            <span className="font-bold">Listing link</span> <span className="text-ink/50">(buyers who switch prints are sent here)</span>
-            <input name="url" defaultValue={listingUrl} placeholder="https://www.etsy.com/listing/1234567890/..." className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2 outline-none focus:border-coral" />
-          </label>
-          <button className={`${btn} bg-ink text-white`}>Save</button>
-        </form>
+        {([["GB", "Listing link (UK & Australia)", listingUrl], ["US", "US listing link", listingUrlUs]] as const).map(([region, label, value]) => (
+          <form key={region} action="/api/admin/etsy" method="post" className="flex flex-wrap items-end gap-2 text-sm pt-2">
+            <input type="hidden" name="action" value="listingUrl" />
+            <input type="hidden" name="region" value={region} />
+            <label className="flex-1 min-w-[260px]">
+              <span className="font-bold">{label}</span> <span className="text-ink/50">(buyers who switch prints are sent here{region === "US" ? "; blank = use the main one" : ""})</span>
+              <input name="url" defaultValue={value} placeholder="https://www.etsy.com/listing/1234567890/..." className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2 outline-none focus:border-coral" />
+            </label>
+            <button className={`${btn} bg-ink text-white`}>Save</button>
+          </form>
+        ))}
         <details className="text-sm">
-          <summary className="font-bold cursor-pointer">Every size and finish with its SKU and price ({ETSY_VARIATIONS.length}) · <a className="underline" href="/api/admin/etsy/variations">download as CSV</a></summary>
-          <p className="text-xs text-ink/50 mt-2">Prices match mapsie.shop (UK, delivery included). Set both variations (Size and Finish) to affect price and SKU in Etsy.</p>
+          <summary className="font-bold cursor-pointer">Every size and finish with its SKU and price ({ETSY_VARIATIONS.length}) · CSV: <a className="underline" href="/api/admin/etsy/variations">UK &amp; Australia listing</a> · <a className="underline" href="/api/admin/etsy/variations?listing=US">US listing</a></summary>
+          <p className="text-xs text-ink/50 mt-2">UK prices match mapsie.shop (delivery included). The US listing uses mapsie.shop&apos;s US prices in pounds (at ${USD_PER_GBP} to £1, rounded up), because Prodigi&apos;s US lab costs more for frames. Same SKUs on both. Set both variations (Size and Finish) to affect price and SKU in Etsy.</p>
           <table className="mt-2 w-full">
-            <thead className="text-left text-xs uppercase tracking-wider text-ink/50"><tr><th className="py-1">Size</th><th>Finish</th><th>SKU</th><th className="text-right">Price</th></tr></thead>
+            <thead className="text-left text-xs uppercase tracking-wider text-ink/50"><tr><th className="py-1">Size</th><th>Finish</th><th>SKU</th><th className="text-right">UK/AU</th><th className="text-right">US</th></tr></thead>
             <tbody>
               {ETSY_VARIATIONS.map((v) => (
-                <tr key={v.sku} className="border-t border-ink/5"><td className="py-1">{v.size}</td><td>{v.finish}</td><td className="font-mono text-xs">{v.sku}</td><td className="text-right">£{v.price}</td></tr>
+                <tr key={v.sku} className="border-t border-ink/5"><td className="py-1">{v.size}</td><td>{v.finish}</td><td className="font-mono text-xs">{v.sku}</td><td className="text-right">£{v.price}</td><td className="text-right">£{etsyUsPrice(v.productId, v)}</td></tr>
               ))}
             </tbody>
           </table>

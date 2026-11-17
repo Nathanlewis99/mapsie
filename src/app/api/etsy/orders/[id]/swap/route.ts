@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { getDesign, getOrder } from "@/lib/server/db";
-import { etsyTokenValid, requestSwap } from "@/lib/server/etsy";
+import { etsyListingUrl, etsyTokenValid, requestSwap } from "@/lib/server/etsy";
 import { etsyFinishFor, etsyPrice, etsyPrintLabel, etsySku } from "@/lib/etsyOptions";
 import { PRODUCTS } from "@/lib/products";
 
-/** Where buyers buy the replacement print. Set ETSY_LISTING_URL on Render. */
-const listingUrl = () => process.env.ETSY_LISTING_URL || process.env.ETSY_SHOP_URL || "https://www.etsy.com/your/purchases";
 
 /**
  * An Etsy buyer wants a different print. They buy it on Etsy (with the switch code in
@@ -39,6 +37,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     price: etsyPrice(to.productId, finish), // the listing is priced in pounds; Etsy converts for the buyer
     paid: o.total,
     currency: o.currency,
-    listingUrl: listingUrl(),
+    listingUrl: (await etsyListingUrl()) || "https://www.etsy.com",
   });
 }

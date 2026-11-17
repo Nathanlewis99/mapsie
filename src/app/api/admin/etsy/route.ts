@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { disconnectEtsy, etsySku, importReceipt, syncEtsyOrders } from "@/lib/server/etsy";
+import { disconnectEtsy, etsySku, importReceipt, setEtsyListingUrl, syncEtsyOrders } from "@/lib/server/etsy";
 import { ETSY_FINISHES } from "@/lib/etsyOptions";
 import { listOrdersByEtsyReceipt } from "@/lib/server/db";
 import { PRODUCTS } from "@/lib/products";
@@ -53,6 +53,10 @@ export async function POST(req: Request) {
     if (action === "disconnect") {
       await disconnectEtsy();
       q = "disconnected=1";
+    }
+    if (action === "listingUrl") {
+      await setEtsyListingUrl(String(f.get("url") ?? ""));
+      q = "saved=1";
     }
     if (action === "refunded") {
       const o = await getOrder(String(f.get("orderId")));

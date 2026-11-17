@@ -85,3 +85,18 @@ describe("Etsy: switching to a different print", async () => {
     expect((await listOrdersByEtsyReceipt("3002"))[0].etsy?.replaces).toBeUndefined();
   });
 });
+
+describe("Etsy: listing link and buyer email", async () => {
+  const { etsyListingUrl, setEtsyListingUrl, importReceipt } = await import("../../src/lib/server/etsy");
+  const { listOrdersByEtsyReceipt } = await import("../../src/lib/server/db");
+  it("keeps a clean listing link and refuses other sites", async () => {
+    await setEtsyListingUrl("https://www.etsy.com/uk/listing/123456789/custom-travel-map?ref=shop_home&pro=1");
+    expect(await etsyListingUrl()).toBe("https://www.etsy.com/uk/listing/123456789/custom-travel-map");
+    await expect(setEtsyListingUrl("https://evil.example/listing/1")).rejects.toThrow();
+  });
+  it("takes the buyer's email from the personalisation when Etsy doesn't share it", async () => {
+    await importReceipt({ receipt_id: 4001, name: "Mary Seacole", first_line: "1 Road", city: "Leeds", zip: "LS1 1AA", country_iso: "GB", is_paid: true, created_timestamp: 1,
+      transactions: [{ transaction_id: 4001, quantity: 1, sku: "MAPSIE-A4-EMA", variations: [{ formatted_name: "Personalisation", formatted_value: "mary@Example.com thanks!" }] }] });
+    expect((await listOrdersByEtsyReceipt("4001"))[0].email).toBe("mary@example.com");
+  });
+});

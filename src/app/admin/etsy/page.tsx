@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { listOrders } from "@/lib/server/db";
-import { etsyConfigured, etsyConnection, etsyDesignUrl, etsyRedirectUri } from "@/lib/server/etsy";
+import { etsyConfigured, etsyConnection, etsyDesignUrl, etsyListingUrl, etsyRedirectUri } from "@/lib/server/etsy";
 import { ETSY_FINISHES, ETSY_VARIATIONS, etsyPrintLabel } from "@/lib/etsyOptions";
 import { FRAMES, PRODUCTS, getProduct } from "@/lib/products";
 import { publicUrl } from "@/lib/server/urls";
@@ -18,6 +18,7 @@ const NOTES: Record<string, string> = {
 export default async function EtsyAdmin({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const q = await searchParams;
   const conn = await etsyConnection();
+  const listingUrl = await etsyListingUrl();
   const orders = (await listOrders()).filter((o) => o.source === "etsy");
   const refunds = orders.filter((o) => o.etsy?.refundDue && !o.etsy.refunded);
   const waiting = orders.filter((o) => o.status === "awaiting_design");
@@ -37,6 +38,7 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
       {q.error && <p className="rounded-2xl bg-coral/10 px-4 py-3 text-sm font-bold text-coral-dark">{NOTES[q.error] ?? q.error}</p>}
       {q.synced && <p className="rounded-2xl bg-sea/10 px-4 py-3 text-sm font-bold text-sea">Checked Etsy: {q.synced} new print{q.synced === "1" ? "" : "s"}.</p>}
       {q.added && <p className="rounded-2xl bg-sea/10 px-4 py-3 text-sm font-bold text-sea">Added Etsy order {q.receipt} ({q.added} print{q.added === "1" ? "" : "s"}). If you gave an email, the buyer has been sent their design link.</p>}
+      {q.saved && <p className="rounded-2xl bg-sea/10 px-4 py-3 text-sm font-bold text-sea">Listing link saved.</p>}
       {q.resent && <p className="rounded-2xl bg-sea/10 px-4 py-3 text-sm font-bold text-sea">Design link sent again.</p>}
 
 
@@ -123,7 +125,8 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
         <h2 className="text-xl font-extrabold">Setting up the listing</h2>
         <ol className="list-decimal pl-5 text-sm space-y-1.5">
           <li>Create a listing, e.g. “Custom travel map poster, personalised with your trip”. Mark it as made to order, and add Prodigi as your production partner.</li>
-          <li>Add variations for <b>Size</b> and <b>Frame</b> (choose the ones you want to sell) and give each combination its SKU from the table below. That&apos;s how Mapsie knows what was bought.</li>
+          <li>Add variations for <b>Size</b> and <b>Finish</b>, with prices and SKUs varying, and give each combination its price and SKU from the table below. That&apos;s how Mapsie knows what was bought.</li>
+          <li>Turn on <b>personalisation</b> (optional for buyers) with the prompt: “Your email, so we can send your design link. If we gave you a switch code (MPS-…), add it here too.”</li>
           <li>
             In Shop Manager → Settings → Info &amp; appearance, set the automatic <b>order confirmation message</b> to something like:
             <blockquote className="mt-1 rounded-xl bg-sand/60 px-3 py-2 italic">
@@ -133,6 +136,14 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
           </li>
           <li>Set processing time to allow for the design step (e.g. 3–7 days). Express shipping on Etsy is sent express by Prodigi if its name includes “Express”.</li>
         </ol>
+        <form action="/api/admin/etsy" method="post" className="flex flex-wrap items-end gap-2 text-sm pt-2">
+          <input type="hidden" name="action" value="listingUrl" />
+          <label className="flex-1 min-w-[260px]">
+            <span className="font-bold">Listing link</span> <span className="text-ink/50">(buyers who switch prints are sent here)</span>
+            <input name="url" defaultValue={listingUrl} placeholder="https://www.etsy.com/listing/1234567890/..." className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2 outline-none focus:border-coral" />
+          </label>
+          <button className={`${btn} bg-ink text-white`}>Save</button>
+        </form>
         <details className="text-sm">
           <summary className="font-bold cursor-pointer">Every size and finish with its SKU and price ({ETSY_VARIATIONS.length}) · <a className="underline" href="/api/admin/etsy/variations">download as CSV</a></summary>
           <p className="text-xs text-ink/50 mt-2">Prices match mapsie.shop (UK, delivery included). Set both variations (Size and Finish) to affect price and SKU in Etsy.</p>

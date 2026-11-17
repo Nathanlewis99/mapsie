@@ -1,5 +1,5 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
-import { claimOrder, getKv, getOrder, listOrdersByStatus, putKv, saveOrder, updateOrder, type Address, type Order } from "./db";
+import { claimOrder, getKv, getOrder, listOrders, listOrdersByStatus, putKv, saveOrder, updateOrder, type Address, type Order } from "./db";
 import { FRAMES, PRODUCTS, type RegionId } from "../products";
 import { printFromSku, SWAP_CODE } from "../etsyOptions";
 import type { MountId, PaperId } from "../types";
@@ -193,7 +193,8 @@ export async function importReceipt(r: Receipt): Promise<number> {
       const order: Order = {
         id,
         designId: "",
-        email: r.buyer_email ?? "",
+        // Etsy often doesn't share the buyer's email; the listing asks for it in the personalisation box.
+        email: r.buyer_email || personalEmail(t.variations) || "",
         shipping: /express|priority|next.?day/i.test(t.shipping_upgrade ?? "") ? "express" : "standard",
         region: REGION_FOR[address.country] ?? "GB",
         currency: (t.price?.currency_code ?? r.grandtotal?.currency_code ?? "GBP").toLowerCase(),
@@ -261,6 +262,7 @@ export async function sendEtsyTracking(orderId: string) {
 export async function etsyJob() {
   try {
     await syncEtsyOrders();
+    await checkEtsyRefunds();
     await remindEtsyBuyers();
   } catch (e) {
     await logError("etsy.sync", e);
@@ -321,4 +323,58 @@ async function finishSwap(old: Order, replacement: Order) {
       `Please refund Etsy order ${old.etsy!.receiptId} in full (${refundDue.currency.toUpperCase()} ${refundDue.amount.toFixed(2)}) in Etsy, then press "Mark refunded" at /admin/etsy. ` +
       `Their design carries over to the new order.`,
   );
+}
+
+const personalEmail = (vs: Variation[] = []) =>
+  /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.exec(vs.map((v) => v.formatted_value ?? "").join(" "))?.[0].toLowerCase();
+
+// ---------------------------------------------------------------- the listing
+/** The Etsy listing buyers are sent to (to buy a switched print). Set on /admin/etsy, or ETSY_LISTING_URL. */
+export async function etsyListingUrl() {
+  return (await getKv<string>("etsy:listingUrl"))?.value || process.env.ETSY_LISTING_URL || process.env.ETSY_SHOP_URL || "";
+}
+export async function setEtsyListingUrl(url: string) {
+  const u = url.trim();
+  if (u && !/^https:\/\/(www\.)?etsy\.com\/([a-z-]+\/)?(listing|shop)\/\S+$/i.test(u)) throw new Error("That doesn't look like an Etsy listing or shop link (https://www.etsy.com/listing/...).");
+  // Drop tracking parameters Etsy adds when you copy a link.
+  await putKv("etsy:listingUrl", u ? u.split("?")[0] : null);
+}
+
+// ---------------------------------------------------------------- refunds and cancellations
+// Etsy's API can't issue refunds (only Shop Manager can), but it does report them.
+// With the shop connected we watch for them: a switched order is marked refunded once
+// you've refunded it on Etsy, and an order cancelled or refunded on Etsy before it was
+// designed is closed here so it can't be sent to print.
+const ENDED = new Set(["canceled", "fully refunded"]);
+
+export async function checkEtsyRefunds() {
+  const conn = await etsyConnection();
+  if (!conn?.shopId) return 0;
+  const last = (await getKv<number>("etsy:refundCheck"))?.value ?? 0;
+  if (Date.now() - last < 20 * 60_000) return 0; // every 20 minutes is plenty
+  await putKv("etsy:refundCheck", Date.now());
+  const watch = (await listOrders()).filter(
+    (o) => o.source === "etsy" && o.etsy && ((o.etsy.refundDue && !o.etsy.refunded) || o.status === "awaiting_design"),
+  );
+  const seen = new Map<string, string>();
+  let changed = 0;
+  for (const o of watch) {
+    const id = o.etsy!.receiptId;
+    if (!seen.has(id)) {
+      try {
+        seen.set(id, (await etsy<{ status?: string }>("GET", `/shops/${conn.shopId}/receipts/${id}`)).status?.toLowerCase() ?? "");
+      } catch (e) {
+        await logError("etsy.refunds", e, { receiptId: id });
+        seen.set(id, "");
+      }
+    }
+    if (!ENDED.has(seen.get(id)!)) continue;
+    if (o.etsy!.refundDue && !o.etsy!.refunded) {
+      await updateOrder(o.id, { etsy: { ...o.etsy!, refunded: true } });
+      changed++;
+    } else if (o.status === "awaiting_design" && (await claimOrder(o.id, "awaiting_design", "cancelled"))) {
+      changed++;
+    }
+  }
+  return changed;
 }

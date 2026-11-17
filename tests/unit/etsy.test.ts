@@ -100,3 +100,18 @@ describe("Etsy: listing link and buyer email", async () => {
     expect((await listOrdersByEtsyReceipt("4001"))[0].email).toBe("mary@example.com");
   });
 });
+
+describe("Etsy: refund reminders", async () => {
+  const { importReceipt, requestSwap, remindEtsyRefunds } = await import("../../src/lib/server/etsy");
+  const { listOrdersByEtsyReceipt } = await import("../../src/lib/server/db");
+  it("sends one reminder a day while refunds are outstanding", async () => {
+    const r = (id: number, personal = "") => ({ receipt_id: id, name: "Rosalind Franklin", first_line: "1 Road", city: "Bath", zip: "BA1 1AA", country_iso: "GB", is_paid: true, created_timestamp: 1,
+      transactions: [{ transaction_id: id, quantity: 1, sku: "MAPSIE-A3-EMA", variations: personal ? [{ formatted_name: "Personalisation", formatted_value: personal }] : [] }] });
+    await importReceipt(r(5001));
+    const [old] = await listOrdersByEtsyReceipt("5001");
+    const code = await requestSwap(old.id, { productId: "a2", frame: "none", paper: "ema", mount: "none" });
+    await importReceipt(r(5002, code!));
+    expect(await remindEtsyRefunds()).toBeGreaterThan(0);
+    expect(await remindEtsyRefunds()).toBe(0); // already reminded today
+  });
+});

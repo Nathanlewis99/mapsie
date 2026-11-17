@@ -81,7 +81,7 @@ export interface Order {
     draftDesignId?: string;
     /** This order was replaced by a newer one: refund it in full on Etsy. */
     replacedBy?: string;
-    refundDue?: { amount: number; currency: string };
+    refundDue?: { amount: number; currency: string; since?: string };
     refunded?: boolean;
   };
   createdAt: string;

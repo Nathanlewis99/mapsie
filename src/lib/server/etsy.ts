@@ -263,6 +263,7 @@ export async function etsyJob() {
   try {
     await syncEtsyOrders();
     await checkEtsyRefunds();
+    await remindEtsyRefunds();
     await remindEtsyBuyers();
   } catch (e) {
     await logError("etsy.sync", e);
@@ -315,7 +316,7 @@ async function findSwap(order: Order, text: string): Promise<Order | null> {
 async function finishSwap(old: Order, replacement: Order) {
   const closed = await claimOrder(old.id, "awaiting_design", "cancelled");
   if (!closed) return;
-  const refundDue = { amount: old.total, currency: old.currency };
+  const refundDue = { amount: old.total, currency: old.currency, since: new Date().toISOString() };
   await updateOrder(old.id, { etsy: { ...closed.etsy!, replacedBy: replacement.id, refundDue } });
   await alertAdmin(
     `Refund Etsy order ${old.etsy!.receiptId} in full`,
@@ -377,4 +378,31 @@ export async function checkEtsyRefunds() {
     }
   }
   return changed;
+}
+
+/**
+ * Once a day, while any switched order still needs refunding on Etsy, email one
+ * reminder listing them all with direct links, so nothing has to be tracked by hand.
+ * (Once the shop is connected, refunds done on Etsy clear themselves from the list.)
+ */
+export async function remindEtsyRefunds() {
+  const due = (await listOrders()).filter((o) => o.etsy?.refundDue && !o.etsy.refunded);
+  if (!due.length) return 0;
+  const today = new Date().toISOString().slice(0, 10);
+  if ((await getKv<string>("etsy:refundNag"))?.value === today) return 0;
+  await putKv("etsy:refundNag", today);
+  const day = 24 * 3600_000;
+  const lines = due.map((o) => {
+    const age = Math.floor((Date.now() - new Date(o.etsy!.refundDue!.since ?? o.createdAt).getTime()) / day);
+    const r = o.etsy!.refundDue!;
+    return `• Etsy order ${o.etsy!.receiptId}: refund ${r.currency.toUpperCase()} ${r.amount.toFixed(2)} in full (${o.address?.name ?? "buyer"})${age >= 2 ? `, waiting ${age} days` : ""}\n  https://www.etsy.com/your/orders/sold?order_id=${o.etsy!.receiptId}`;
+  });
+  await alertAdmin(
+    `${due.length} Etsy refund${due.length === 1 ? "" : "s"} to do`,
+    `These buyers switched to a different print and have paid for the new one. Refund each first order in full on Etsy (open the order, then "Issue a refund"):\n\n${lines.join("\n")}\n\n` +
+      ((await etsyConnection())?.shopId
+        ? "They'll drop off this list by themselves once refunded."
+        : `Then press "Mark refunded" at ${publicUrl()}/admin/etsy.`),
+  );
+  return due.length;
 }

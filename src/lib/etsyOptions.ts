@@ -53,3 +53,12 @@ export function printFromSku(sku: string | null | undefined): EtsyPrint | null {
 /** "A3 · Black frame + white mount" style label for the buyer. */
 export const etsyPrintLabel = (pr: EtsyPrint) =>
   describeOptions({ format: pr.format, productId: pr.productId, frame: pr.frame as FrameId, paper: pr.paper ?? "ema", mount: pr.mount ?? "none", glaze: "perspex" } as never);
+
+/** The Etsy Finish option for a print, or undefined if Etsy doesn't sell that combination. */
+export function etsyFinishFor(pr: EtsyPrint) {
+  if (pr.format === "digital") return ETSY_FINISHES.find((f) => f.digital);
+  return ETSY_FINISHES.find((f) => !f.digital && f.frame === pr.frame && f.paper === (pr.paper ?? "ema") && f.mount === (pr.mount ?? "none"));
+}
+
+/** A switch code looks like MPS-7KQ2XD; buyers paste it into Etsy's personalisation box. */
+export const SWAP_CODE = /\bMPS-?([A-Z0-9]{6})\b/i;

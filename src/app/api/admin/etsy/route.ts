@@ -3,7 +3,7 @@ import { disconnectEtsy, etsySku, importReceipt, syncEtsyOrders } from "@/lib/se
 import { ETSY_FINISHES } from "@/lib/etsyOptions";
 import { listOrdersByEtsyReceipt } from "@/lib/server/db";
 import { PRODUCTS } from "@/lib/products";
-import { getOrder } from "@/lib/server/db";
+import { getOrder, updateOrder } from "@/lib/server/db";
 import { sendEtsyDesignEmail } from "@/lib/server/email";
 import { publicUrl } from "@/lib/server/urls";
 
@@ -45,6 +45,7 @@ export async function POST(req: Request) {
           sku: etsySku(productId, finish.code),
           price: price > 0 ? { amount: Math.round((price / qty) * 100), divisor: 100, currency_code: v("currency") || "GBP" } : undefined,
           shipping_upgrade: f.get("express") ? "Express" : null,
+          variations: v("personal") ? [{ formatted_name: "Personalisation", formatted_value: v("personal") }] : [],
         }],
       });
       q = `added=${made}&receipt=${receipt}`;
@@ -52,6 +53,11 @@ export async function POST(req: Request) {
     if (action === "disconnect") {
       await disconnectEtsy();
       q = "disconnected=1";
+    }
+    if (action === "refunded") {
+      const o = await getOrder(String(f.get("orderId")));
+      if (o?.etsy?.refundDue) await updateOrder(o.id, { etsy: { ...o.etsy, refunded: true } });
+      q = "refunded=1";
     }
     if (action === "resend") {
       const o = await getOrder(String(f.get("orderId")));

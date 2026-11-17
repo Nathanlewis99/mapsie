@@ -1,7 +1,7 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
-import { getKv, getOrder, listOrdersByStatus, putKv, saveOrder, updateOrder, type Address, type Order } from "./db";
+import { claimOrder, getKv, getOrder, listOrdersByStatus, putKv, saveOrder, updateOrder, type Address, type Order } from "./db";
 import { FRAMES, PRODUCTS, type RegionId } from "../products";
-import { printFromSku } from "../etsyOptions";
+import { printFromSku, SWAP_CODE } from "../etsyOptions";
 import type { MountId, PaperId } from "../types";
 import { publicUrl } from "./urls";
 import { logError } from "./log";
@@ -210,8 +210,11 @@ export async function importReceipt(r: Receipt): Promise<number> {
         },
         createdAt: new Date(r.created_timestamp * 1000).toISOString(),
       };
+      const swapped = await findSwap(order, (t.variations ?? []).map((v) => `${v.formatted_name ?? ""} ${v.formatted_value ?? ""}`).join(" "));
+      if (swapped) order.etsy = { ...order.etsy!, replaces: swapped.id, draftDesignId: swapped.etsy?.swap?.designId };
       await saveOrder(order);
       made++;
+      if (swapped) await finishSwap(swapped, order);
       if (!print.matched)
         await alertAdmin(
           `Etsy order ${r.receipt_id}: check the size and frame`,
@@ -262,4 +265,60 @@ export async function etsyJob() {
   } catch (e) {
     await logError("etsy.sync", e);
   }
+}
+
+// ---------------------------------------------------------------- switching prints
+// An Etsy buyer who changes their mind (a different size, frame or paper) buys the
+// print they now want as a normal Etsy order, with a switch code in the
+// personalisation box, and we refund the first order in full on Etsy. Every payment
+// stays on Etsy and pays for a real item, as Etsy's rules require: no price-difference
+// listings (Etsy bans listings that only transfer money) and no payment off Etsy.
+
+export const swapCode = (orderId: string) =>
+  "MPS-" + createHmac("sha256", secret()).update(`etsy-swap:${orderId}`).digest("hex").slice(0, 6).toUpperCase();
+
+/** The buyer picked a different print: remember it, with their design so far. */
+export async function requestSwap(orderId: string, to: NonNullable<Order["print"]>, designId?: string) {
+  const o = await getOrder(orderId);
+  if (!o?.etsy || o.status !== "awaiting_design") return null;
+  const code = swapCode(orderId);
+  await updateOrder(orderId, { etsy: { ...o.etsy, swap: { code, to, designId, at: new Date().toISOString() } } });
+  return code;
+}
+
+/**
+ * Is a new Etsy order a switch for an earlier one? Matched by the code in the
+ * personalisation, or (if the buyer forgot it) by the same name and postcode on an
+ * order that asked to switch in the last 30 days.
+ */
+async function findSwap(order: Order, text: string): Promise<Order | null> {
+  const open = (await listOrdersByStatus("awaiting_design")).filter((o) => o.id !== order.id && o.etsy?.swap && !o.etsy.replacedBy);
+  const m = SWAP_CODE.exec(text);
+  if (m) {
+    const code = `MPS-${m[1].toUpperCase()}`;
+    const hit = open.find((o) => o.etsy!.swap!.code === code);
+    if (hit) return hit;
+  }
+  const month = 30 * 24 * 3600_000;
+  const same = open.filter(
+    (o) => o.address && order.address && o.etsy!.receiptId !== order.etsy?.receiptId &&
+      samePostcode(o.address.postcode, order.address.postcode) &&
+      o.address.name.trim().toLowerCase() === order.address.name.trim().toLowerCase() &&
+      Date.now() - new Date(o.etsy!.swap!.at).getTime() < month,
+  );
+  return same.length === 1 ? same[0] : null;
+}
+
+/** Close the old order (it never goes to print) and ask the admin to refund it on Etsy. */
+async function finishSwap(old: Order, replacement: Order) {
+  const closed = await claimOrder(old.id, "awaiting_design", "cancelled");
+  if (!closed) return;
+  const refundDue = { amount: old.total, currency: old.currency };
+  await updateOrder(old.id, { etsy: { ...closed.etsy!, replacedBy: replacement.id, refundDue } });
+  await alertAdmin(
+    `Refund Etsy order ${old.etsy!.receiptId} in full`,
+    `The buyer switched to a different print and bought it as Etsy order ${replacement.etsy!.receiptId}. ` +
+      `Please refund Etsy order ${old.etsy!.receiptId} in full (${refundDue.currency.toUpperCase()} ${refundDue.amount.toFixed(2)}) in Etsy, then press "Mark refunded" at /admin/etsy. ` +
+      `Their design carries over to the new order.`,
+  );
 }

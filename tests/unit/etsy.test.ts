@@ -42,3 +42,46 @@ describe("Etsy: buyer links", () => {
     expect(samePostcode("SW1A 1AA", "SW1A 1AB")).toBe(false);
   });
 });
+
+describe("Etsy: switching to a different print", async () => {
+  const { importReceipt, requestSwap, swapCode } = await import("../../src/lib/server/etsy");
+  const { getOrder, listOrdersByEtsyReceipt } = await import("../../src/lib/server/db");
+  const receipt = (id: number, sku: string, name = "Ada Lovelace", zip = "SW1A 1AA", personal = "") => ({
+    receipt_id: id, name, first_line: "1 Road", city: "London", zip, country_iso: "GB", is_paid: true, created_timestamp: Math.floor(Date.now() / 1000),
+    transactions: [{ transaction_id: id, quantity: 1, sku, price: { amount: 4400, divisor: 100, currency_code: "GBP" },
+      variations: personal ? [{ formatted_name: "Personalisation", formatted_value: personal }] : [] }],
+  });
+
+  it("links the new order by its code, carries the design over and asks for a refund", async () => {
+    await importReceipt(receipt(1001, "MAPSIE-A3-EMA"));
+    const [old] = await listOrdersByEtsyReceipt("1001");
+    const code = await requestSwap(old.id, { productId: "a2", frame: "black", paper: "ema", mount: "white" }, "draft123");
+    expect(code).toBe(swapCode(old.id));
+    expect(code).toMatch(/^MPS-[0-9A-F]{6}$/);
+    // A different name and postcode, so only the code can match it.
+    await importReceipt(receipt(1002, "MAPSIE-A2-BLACK-MOUNT", "A Lovelace", "E1 6AN", `my code is ${code!.toLowerCase()}`));
+    const [fresh] = await listOrdersByEtsyReceipt("1002");
+    expect(fresh.etsy).toMatchObject({ replaces: old.id, draftDesignId: "draft123" });
+    expect(fresh.print).toMatchObject({ productId: "a2", frame: "black", mount: "white" });
+    const after = await getOrder(old.id);
+    expect(after?.status).toBe("cancelled");
+    expect(after?.etsy).toMatchObject({ replacedBy: fresh.id, refundDue: { amount: 44, currency: "gbp" } });
+  });
+
+  it("matches by name and postcode when the code is missing, and leaves other orders alone", async () => {
+    await importReceipt(receipt(2001, "MAPSIE-A4-EMA", "Grace Hopper", "NW1 2DB"));
+    const [old] = await listOrdersByEtsyReceipt("2001");
+    await requestSwap(old.id, { productId: "a3", frame: "none", paper: "ema", mount: "none" });
+    await importReceipt(receipt(2002, "MAPSIE-A3-EMA", "Someone Else", "NW1 2DB"));
+    expect((await getOrder(old.id))?.status).toBe("awaiting_design");
+    await importReceipt(receipt(2003, "MAPSIE-A3-EMA", "grace hopper", "nw12db"));
+    expect((await getOrder(old.id))?.etsy?.replacedBy).toBe((await listOrdersByEtsyReceipt("2003"))[0].id);
+  });
+
+  it("a plain repeat order from someone who never asked to switch isn't linked", async () => {
+    await importReceipt(receipt(3001, "MAPSIE-A3-EMA", "Alan Turing", "M1 1AA"));
+    await importReceipt(receipt(3002, "MAPSIE-A3-EMA", "Alan Turing", "M1 1AA"));
+    expect((await listOrdersByEtsyReceipt("3001"))[0].status).toBe("awaiting_design");
+    expect((await listOrdersByEtsyReceipt("3002"))[0].etsy?.replaces).toBeUndefined();
+  });
+});

@@ -326,6 +326,20 @@ export default function Editor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [etsy, design.productId, design.frame, design.paper, design.mount, design.format]);
 
+  // Etsy buyers who want a different print: save the map so it carries over, then
+  // choose the new print (bought on Etsy, with the first order refunded).
+  const switchPrint = async () => {
+    if (!etsy) return;
+    setBusy("order");
+    try {
+      const id = await saveSnapshot(design);
+      router.push(`/etsy/${etsy.id}/change?k=${encodeURIComponent(etsy.k)}&d=${id}`);
+    } catch {
+      setToast("Couldn't save your design, please try again.");
+      setBusy("");
+    }
+  };
+
   const order = async () => {
     track("order_click");
     setBusy("order");
@@ -449,6 +463,7 @@ export default function Editor() {
             🧡 <b>Etsy order {etsy.receiptId}</b>
             {etsy.of > 1 && <> · print {etsy.unit} of {etsy.of}</>} · {etsy.label}. Already paid: design your map, then press <b>Send to print</b>.
           </span>
+          <button onClick={switchPrint} disabled={!!busy} className="text-xs font-bold text-coral-dark underline hover:text-ink">Change size or frame</button>
           <button onClick={leaveEtsy} className="text-xs font-bold text-ink/50 underline hover:text-ink">Not your order?</button>
         </div>
       )}

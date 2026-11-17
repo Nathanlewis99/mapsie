@@ -29,16 +29,21 @@ export default async function EtsyOrder({ params, searchParams }: { params: Prom
             <div className="font-extrabold">{etsyPrintLabel(o.print)}</div>
             <div className="text-ink/60">Delivered to {o.address?.name}, {o.address?.city}</div>
           </div>
+          {o.etsy.draftDesignId && (
+            <div className="rounded-2xl bg-sea/10 px-4 py-3 text-sm">
+              Your print has been switched, and the map you started is waiting for you. We&apos;re refunding your first Etsy order in full.
+            </div>
+          )}
           <ol className="text-sm text-ink/70 space-y-1 list-decimal pl-5">
             <li>Add the places you went, in order.</li>
             <li>Choose a map style, add stickers and your title.</li>
             <li>Press <b>Send to print</b>. You&apos;ll see a final preview first.</li>
           </ol>
           <Link
-            href={`/create?new=1&etsy=${o.id}&k=${etsyToken(o.id)}`}
+            href={o.etsy.draftDesignId ? `/create?etsy=${o.id}&k=${etsyToken(o.id)}&d=${o.etsy.draftDesignId}` : `/create?new=1&etsy=${o.id}&k=${etsyToken(o.id)}`}
             className="block w-full rounded-full bg-coral px-5 py-3 text-center font-extrabold text-white shadow-lg shadow-coral/30"
           >
-            Start designing
+            {o.etsy.draftDesignId ? "Carry on designing" : "Start designing"}
           </Link>
           {siblings.length > 1 && (
             <div className="text-sm">

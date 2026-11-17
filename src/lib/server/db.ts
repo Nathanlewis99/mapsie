@@ -74,6 +74,15 @@ export interface Order {
     choices?: string; // the variations the buyer picked, as text
     matched: boolean; // false if we had to guess the size or frame
     trackingSent?: boolean;
+    /** The buyer asked to switch to a different print: they buy it on Etsy with this code. */
+    swap?: { code: string; to: NonNullable<Order["print"]>; designId?: string; at: string };
+    /** This order replaced an earlier Etsy order (a switch); the design carries over. */
+    replaces?: string;
+    draftDesignId?: string;
+    /** This order was replaced by a newer one: refund it in full on Etsy. */
+    replacedBy?: string;
+    refundDue?: { amount: number; currency: string };
+    refunded?: boolean;
   };
   createdAt: string;
 }

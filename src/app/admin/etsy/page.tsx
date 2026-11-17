@@ -19,6 +19,7 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
   const q = await searchParams;
   const conn = await etsyConnection();
   const orders = (await listOrders()).filter((o) => o.source === "etsy");
+  const refunds = orders.filter((o) => o.etsy?.refundDue && !o.etsy.refunded);
   const waiting = orders.filter((o) => o.status === "awaiting_design");
   const box = "rounded-3xl bg-white p-6 shadow-sm space-y-3";
   const btn = "rounded-full px-4 py-2 text-sm font-extrabold";
@@ -58,6 +59,7 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
             ["postcode", "Postcode / ZIP", true],
             ["country", "Country code, e.g. GB, US, AU", true],
             ["price", "Amount paid on Etsy (optional, for your records)", false],
+            ["personal", "Personalisation (paste it: a switch code like MPS-1A2B3C links it to their first order)", false],
           ].map(([name, label, req]) => (
             <label key={name as string} className="block">
               <span className="font-bold">{label as string}</span>
@@ -145,6 +147,29 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
         </details>
       </section>
 
+      {refunds.length > 0 && (
+        <section className={`${box} border-2 border-coral`}>
+          <h2 className="text-xl font-extrabold">Refunds to make on Etsy ({refunds.length})</h2>
+          <p className="text-sm text-ink/60">These buyers switched to a different print and bought it as a new Etsy order. Refund the first order in full in Etsy, then mark it here.</p>
+          <ul className="text-sm space-y-2">
+            {refunds.map((o) => (
+              <li key={o.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-ink/5 pt-2">
+                <span>
+                  Refund <a className="font-bold underline" href={`https://www.etsy.com/your/orders/sold?order_id=${o.etsy?.receiptId}`} target="_blank" rel="noreferrer">Etsy order {o.etsy?.receiptId}</a>{" "}
+                  in full: <b>{o.etsy!.refundDue!.currency.toUpperCase()} {o.etsy!.refundDue!.amount.toFixed(2)}</b>
+                  <span className="text-ink/50"> · {o.print ? etsyPrintLabel(o.print) : ""} · {o.address?.name} · replaced by Etsy order {orders.find((x) => x.id === o.etsy?.replacedBy)?.etsy?.receiptId ?? "?"}</span>
+                </span>
+                <form action="/api/admin/etsy" method="post">
+                  <input type="hidden" name="action" value="refunded" />
+                  <input type="hidden" name="orderId" value={o.id} />
+                  <button className="rounded-full bg-ink text-white px-3 py-1.5 text-xs font-bold">Mark refunded</button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className={box}>
         <h2 className="text-xl font-extrabold">Etsy orders <span className="text-ink/40 text-base">({waiting.length} waiting for a design)</span></h2>
         <div className="overflow-x-auto">
@@ -167,6 +192,9 @@ export default async function EtsyAdmin({ searchParams }: { searchParams: Promis
                   <td className="px-2 py-2">{o.address?.name}<div className="text-ink/40">{o.email || "no email from Etsy"}</div></td>
                   <td className="px-2 py-2">
                     <span className="rounded-full bg-sand px-2.5 py-1 text-xs font-bold">{o.status.replace(/_/g, " ")}</span>
+                    {o.etsy?.replacedBy && <div className="text-xs mt-1 font-bold">Switched{o.etsy.refunded ? " · refunded" : " · refund due"}</div>}
+                    {o.etsy?.replaces && <div className="text-xs mt-1 text-ink/50">Switch from Etsy order {orders.find((x) => x.id === o.etsy?.replaces)?.etsy?.receiptId ?? "?"}</div>}
+                    {o.etsy?.swap && !o.etsy.replacedBy && o.status === "awaiting_design" && <div className="text-xs mt-1 text-ink/50">Switching: code {o.etsy.swap.code}</div>}
                     {o.digital && o.status === "delivered" && <div className="text-xs mt-1 text-coral-dark font-bold">Digital: mark as dispatched on Etsy (no tracking)</div>}
                     {o.shipments?.find((x) => x.trackingNumber) && (
                       <div className="text-xs mt-1">

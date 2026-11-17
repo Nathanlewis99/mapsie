@@ -1,4 +1,5 @@
 "use client";
+import { TEMPLATES } from "@/lib/templates";
 import EmailDesign from "./EmailDesign";
 import { adEvent } from "@/lib/adTrack";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -162,6 +163,18 @@ export default function Editor() {
           router.replace("/create");
         })
         .catch(() => setToast("Sorry, we couldn't open that map."));
+    } else if (params.get("template")) {
+      // From an occasion page: start from that quick-start trip.
+      const t = TEMPLATES.find((x) => x.id === params.get("template"));
+      if (t) useEditor.getState().applyTemplate(t);
+      router.replace("/create");
+    } else if (params.get("describe") !== null) {
+      // From an occasion page: a fresh map, with "Describe your trip" filled in (the box reads it once).
+      try {
+        sessionStorage.setItem("mapsie-describe", (params.get("describe") ?? "").slice(0, 2000));
+      } catch {}
+      useEditor.getState().reset();
+      router.replace("/create");
     } else if (params.get("new")) {
       useEditor.getState().reset();
       router.replace("/create");

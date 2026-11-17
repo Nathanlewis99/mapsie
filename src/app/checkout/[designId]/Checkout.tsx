@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import type { Design } from "@/lib/types";
 import { describeOptions, getRegion, guessRegion, itemPrice, money, priceLines, REGIONS, SHIPPING, type PrintOptions, type RegionId, type ShippingId } from "@/lib/products";
 import PrintOptionsPicker from "@/components/PrintOptionsPicker";
+import ChristmasBanner from "@/components/ChristmasBanner";
 import { sizeNote } from "@/lib/legibility";
 import { track, visitId } from "@/lib/track";
 import { adEvent } from "@/lib/adTrack";
@@ -64,6 +65,7 @@ export default function Checkout({ design: saved }: { design: Design }) {
 
   return (
     <div className="min-h-dvh">
+      <ChristmasBanner />
       <header className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
         <Link href="/" className="font-display text-2xl font-extrabold"><Logo /></Link>
         <Link href="/create" className="text-sm font-bold text-ink/60 hover:text-ink">← Back to editing</Link>

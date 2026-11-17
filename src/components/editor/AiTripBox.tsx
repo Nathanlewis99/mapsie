@@ -39,7 +39,21 @@ const EXAMPLES = [
 
 /** "Describe your trip" box: typed or spoken, Claude plans the map, the editor applies it. */
 export default function AiTripBox({ onTrip, replacing }: { onTrip: (t: TripTemplate, reply: string) => void; replacing?: boolean }) {
+  // Occasion pages can start the box with a suggestion (/create?describe=…, handed over by the editor).
   const [text, setText] = useState("");
+  useEffect(() => {
+    const take = () => {
+      try {
+        const v = sessionStorage.getItem("mapsie-describe");
+        if (v === null) return;
+        sessionStorage.removeItem("mapsie-describe");
+        if (v) setText(v);
+      } catch {}
+    };
+    take();
+    const t = setTimeout(take, 600); // in case the editor hands it over just after this mounts
+    return () => clearTimeout(t);
+  }, []);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
   const [err, setErr] = useState("");

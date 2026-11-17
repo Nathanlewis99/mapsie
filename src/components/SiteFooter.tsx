@@ -16,6 +16,9 @@ export default function SiteFooter() {
     <footer className="border-t border-ink/10 mt-8">
       <div className="max-w-6xl mx-auto px-6 py-10 text-sm text-ink/60">
         <nav aria-label="Legal" className="flex flex-wrap gap-x-6 gap-y-2 font-bold text-ink/80">
+          <Link href="/maps" className="hover:text-coral-dark">
+            Map ideas
+          </Link>
           {LEGAL_LINKS.map((l) => (
             <Link key={l.href} href={l.href} className="hover:text-coral-dark">
               {l.label}

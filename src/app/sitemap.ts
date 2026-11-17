@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { publicUrl } from "@/lib/server/urls";
+import { OCCASIONS } from "@/lib/occasions";
 
 // Built per request, not at build time: the site address (APP_URL) is only set when the
 // server runs, so a build-time file would point search engines at localhost.
@@ -12,6 +13,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     page("/", 1, "weekly"),
     page("/create", 0.9, "weekly"),
+    page("/maps", 0.8, "weekly"),
+    ...OCCASIONS.map((o) => page(`/maps/${o.slug}`, 0.8, "weekly")),
     page("/support", 0.4, "monthly"),
     page("/etsy", 0.3, "monthly"),
     ...["shipping", "refunds", "terms", "privacy", "cookies"].map((p) => page(`/legal/${p}`, 0.2, "yearly")),

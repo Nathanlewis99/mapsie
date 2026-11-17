@@ -2,7 +2,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import LookupForm from "./LookupForm";
 
-export const metadata = { title: "Design your Etsy map · Mapsie" };
+export const metadata = { title: "Design your Etsy map · Mapsie", description: "Bought a Mapsie map on Etsy? Enter your order number to design your map. It takes about five minutes.", alternates: { canonical: "/etsy" } };
 
 export default function EtsyStart() {
   return (

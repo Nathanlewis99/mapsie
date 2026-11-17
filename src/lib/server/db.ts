@@ -702,3 +702,6 @@ export async function orderedSince(email: string, sinceIso: string): Promise<boo
   const r = await one("SELECT id FROM orders WHERE lower(email) = ? AND created_at >= ? AND status NOT IN ('pending_payment', 'cancelled', 'failed')", [email.trim().toLowerCase(), sinceIso]);
   return !!r;
 }
+export async function deleteOldDesignEmails(beforeIso: string) {
+  return run("DELETE FROM design_emails WHERE created_at < ?", [beforeIso]);
+}

@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { deleteOldErrors, deleteOldEvents, deleteUnorderedDesigns, listOrdersByStatus, listOrdersDueForPrint, rendersDir, updateOrder } from "./db";
+import { deleteOldErrors, deleteOldDesignEmails, deleteOldEvents, deleteUnorderedDesigns, listOrdersByStatus, listOrdersDueForPrint, rendersDir, updateOrder } from "./db";
 import { processPaidOrders, ROLE, sendToPrint } from "./fulfil";
 import { alertAdmin } from "./email";
 import { publicUrl } from "./urls";
@@ -22,6 +22,7 @@ async function cleanUp() {
   const designs = await deleteUnorderedDesigns(new Date(Date.now() - 90 * day).toISOString());
   await deleteOldEvents(new Date(Date.now() - 400 * day).toISOString()); // analytics: about 13 months
   await deleteOldErrors(new Date(Date.now() - 365 * day).toISOString());
+  await deleteOldDesignEmails(new Date(Date.now() - 365 * day).toISOString()); // "email me my design": 12 months
   const dir = await rendersDir();
   let files = 0;
   for (const f of await fs.readdir(dir)) {

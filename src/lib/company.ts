@@ -9,5 +9,5 @@ export const COMPANY = {
   supportEmail: "support@mapsie.shop",
   helloEmail: "hello@mapsie.shop",
   privacyEmail: "privacy@mapsie.shop",
-  legalUpdated: "12 November 2026",
+  legalUpdated: "17 November 2026",
 } as const;

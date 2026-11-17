@@ -5,7 +5,7 @@ import { Email, Ext, In, LegalTitle, Section, Summary, Table } from "../_ui";
 
 export const metadata: Metadata = {
   title: "Cookies & Local Storage · Mapsie",
-  description: "Mapsie uses only essential cookies and browser storage. No analytics or advertising cookies.",
+  description: "The cookies and browser storage Mapsie uses: essential ones, and optional analytics and advertising cookies only if you agree.",
 };
 
 export default function CookiesPage() {
@@ -13,14 +13,17 @@ export default function CookiesPage() {
     <>
       <LegalTitle
         title="Cookies & Local Storage"
-        intro="The short version: we only store what the site needs to work. No analytics, no advertising, no tracking."
+        intro="The short version: we store what the site needs to work, and only use analytics or advertising cookies if you say yes."
       />
 
       <Summary>
         <ul>
           <li>We use one sign-in cookie (plus a few short-lived ones while you sign in), and only if you sign in.</li>
           <li>Your browser&apos;s local storage autosaves the map you&apos;re designing, so you don&apos;t lose your work.</li>
-          <li>We don&apos;t use analytics, advertising or social media cookies, so there&apos;s no cookie banner to click through.</li>
+          <li>
+            Analytics (Google Analytics) and advertising (Meta, Google Ads) cookies are optional and off unless you choose to allow
+            them. Change your mind any time with &ldquo;Cookie settings&rdquo; at the bottom of every page.
+          </li>
           <li>We count visits anonymously without storing anything on your device (see below).</li>
         </ul>
       </Summary>
@@ -54,6 +57,18 @@ export default function CookiesPage() {
             [<code key="n">g_verifier</code>, "Cookie", "As above.", "10 minutes"],
             [<code key="n">g_next</code>, "Cookie", "As above.", "10 minutes"],
             [
+              <code key="n">mapsie_consent</code>,
+              "Cookie",
+              "Remembers your cookie choices, so we don't ask on every page and only load what you agreed to.",
+              "6 months",
+            ],
+            [
+              <code key="n">mapsie-email-nudge</code>,
+              "Local storage",
+              "Remembers that you've seen (or dismissed) the offer to email yourself your design, so it doesn't keep appearing.",
+              "Until you clear your browser's site data",
+            ],
+            [
               <code key="n">mapsie-design</code>,
               "Local storage",
               "Autosaves the design you're working on (including any photos you've added) and your chosen country, so your work is still there if you close the tab.",
@@ -67,10 +82,27 @@ export default function CookiesPage() {
         </p>
       </Section>
 
-      <Section id="not-used" n={3} title="What we don't use">
+      <Section id="not-used" n={3} title="Optional cookies (only if you agree)">
         <p>
-          We don&apos;t use analytics cookies, advertising or retargeting cookies, social media pixels, or any other tracking
-          technology. We don&apos;t build profiles of what you do on the site.
+          These are only set if you choose &ldquo;Accept all&rdquo;, or switch them on under &ldquo;Choose&rdquo;. Nothing
+          optional loads before you decide, and if your browser sends a Global Privacy Control signal we don&apos;t load them or
+          ask. You can change your choices at any time with &ldquo;Cookie settings&rdquo; at the bottom of every page.
+        </p>
+        <Table
+          head={["Name", "Who sets it", "What it's for", "How long it lasts"]}
+          rows={[
+            [<code key="n">_ga</code>, "Google Analytics (analytics)", "Tells visits apart, so we can see which pages help and where people get stuck.", "2 years"],
+            [<code key="n">_ga_*</code>, "Google Analytics (analytics)", "Keeps track of the current visit.", "2 years"],
+            [<code key="n">_gcl_au</code>, "Google Ads (advertising)", "Links an order to the Google ad that led to it, so we know which ads work.", "90 days"],
+            [<code key="n">_fbp</code>, "Meta (advertising)", "Links visits and orders to Meta (Facebook and Instagram) ads, to measure them and show our ads to people likely to be interested.", "90 days"],
+            [<code key="n">_fbc</code>, "Meta (advertising)", "Set when you arrive from a Meta ad, to link the visit to that ad.", "90 days"],
+            [<code key="n">mapsie-conv-*</code>, "Mapsie (local storage, with either choice)", "Notes that an order has been counted, so it isn't reported twice.", "Until you clear your browser's site data"],
+          ]}
+        />
+        <p>
+          Google and Meta use these under their own privacy policies: see{" "}
+          <Ext href="https://policies.google.com/technologies/partner-sites">how Google uses information from sites that use its services</Ext>{" "}
+          and <Ext href="https://www.facebook.com/privacy/policy">Meta&apos;s privacy policy</Ext>.
         </p>
         <p>
           To see which parts of the site work and where people get stuck, we count anonymous steps such as &quot;opened the
@@ -80,7 +112,7 @@ export default function CookiesPage() {
           signal, we don&apos;t count your visit at all. See our <In href="/legal/privacy">Privacy Policy</In>.
         </p>
         <p>
-          If we ever want to add anything that isn&apos;t strictly necessary, we&apos;ll update this page and our Privacy Policy
+          If we ever add anything else that isn&apos;t strictly necessary, we&apos;ll update this page and our Privacy Policy
           first, and ask for your consent before setting it.
         </p>
       </Section>

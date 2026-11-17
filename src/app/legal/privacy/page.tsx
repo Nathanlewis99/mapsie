@@ -19,10 +19,13 @@ export default function PrivacyPage() {
       <Summary>
         <ul>
           <li>We only collect what we need to let you design maps and to make and deliver your prints.</li>
-          <li>We don&apos;t sell your information, and we don&apos;t use analytics, advertising or tracking cookies. We count visits anonymously, without cookies.</li>
+          <li>
+            We don&apos;t sell your information. We only use analytics and advertising cookies (Google and Meta) if you say yes,
+            and you can change your mind at any time. Otherwise we count visits anonymously, without cookies.
+          </li>
           <li>
             We share your details only with the services that help us run {COMPANY.brand}: hosting, payments, printing and
-            delivery, sign-in, and maps.
+            delivery, email, sign-in, maps, and the AI that plans maps from your trip description.
           </li>
           <li>
             You can ask to see, correct or delete your information at any time: email <Email to={COMPANY.privacyEmail} />.
@@ -94,6 +97,34 @@ export default function PrivacyPage() {
             print) so we can help you.
           </p>
         </Sub>
+        <Sub title="Create with AI">
+          <p>
+            If you use &ldquo;Describe your trip&rdquo;, the words you type (or say) are sent to our AI provider, Anthropic, to
+            plan the stops, title and style of your map. Don&apos;t include anything you wouldn&apos;t want on your map, such as
+            personal details about other people. We don&apos;t store your description ourselves; only the map it creates is kept,
+            like any other design. If you use the microphone, your browser&apos;s own speech recognition (for example
+            Google&apos;s in Chrome, or Apple&apos;s in Safari) turns your voice into text. We never receive the recording.
+          </p>
+        </Sub>
+        <Sub title="Emailing yourself a design">
+          <p>
+            If you ask us to email you your design, we keep your email address with a copy of the design so we can send you the
+            link. If you also tick &ldquo;remind me tomorrow&rdquo;, we send <strong>one</strong> reminder a day later, unless
+            you&apos;ve ordered by then. Every reminder has a one-click unsubscribe link, and if you unsubscribe we keep your
+            address on a do-not-email list so it stays that way.
+          </p>
+        </Sub>
+        <Sub title="Analytics and advertising cookies (only if you agree)">
+          <p>
+            If you choose to allow them, Google Analytics and our advertising partners (Meta, for Facebook and Instagram, and
+            Google Ads) set cookies that record the pages you visit on {COMPANY.site} and whether you start checkout or order. This
+            lets us see which pages help, and which ads lead to orders. When you order, and only if you allowed advertising
+            cookies, we also send the order&apos;s value and a scrambled (hashed) copy of your email address, your IP address and
+            browser type to Meta, so it can match the sale to an ad you saw. If you allowed analytics cookies, we send the order
+            value to Google Analytics. You can change your choices at any time with &ldquo;Cookie settings&rdquo; at the bottom of
+            every page. See our <In href="/legal/cookies">Cookie policy</In> for the details.
+          </p>
+        </Sub>
         <Sub title="Technical information">
           <p>
             Like any website, our servers receive your IP address and basic information about your browser when you visit. Our
@@ -140,6 +171,14 @@ export default function PrivacyPage() {
               <><strong>Contract</strong>, and our <strong>legitimate interests</strong> in providing good customer service.</>,
             ],
             [
+              "Plan your map from your trip description (Create with AI), and email you a design you asked for",
+              <><strong>Contract</strong>: it&apos;s needed to provide what you&apos;ve asked for.</>,
+            ],
+            [
+              "Send you one design reminder, analytics and advertising cookies, and sharing your order with Meta or Google",
+              <>Your <strong>consent</strong>, which you can withdraw at any time (unsubscribe link, or &ldquo;Cookie settings&rdquo;).</>,
+            ],
+            [
               "Keep the site secure, prevent fraud and misuse, and fix problems",
               <>Our <strong>legitimate interests</strong> in running a safe, working service.</>,
             ],
@@ -155,8 +194,9 @@ export default function PrivacyPage() {
         />
         <p>
           Where we rely on legitimate interests, we&apos;ve balanced them against your rights and you can object (see{" "}
-          <a href="#rights">section 9</a>). We don&apos;t send marketing emails. If we start, we&apos;ll only send them to people
-          who have agreed to receive them, and every email will have an unsubscribe link.
+          <a href="#rights">section 9</a>). The only marketing email we send is the one design reminder you can choose to receive.
+          If we ever send others, it will only be to people who have agreed to them, and every email will have an unsubscribe
+          link.
         </p>
       </Section>
 
@@ -172,6 +212,11 @@ export default function PrivacyPage() {
             [<strong key="w">Stripe</strong>, "Takes payments securely and handles refunds", "Your email address, card details, delivery details and the order amount"],
             [<strong key="w">Prodigi</strong>, "Our print partner: prints, frames, packs and delivers your order, using local print labs and couriers", "Your name, delivery address, email address and the print file of your design"],
             [<strong key="w">Google</strong>, "Lets you sign in with your Google account", "That you’re signing in to Mapsie. Google sends us your name, email and profile picture"],
+            [<strong key="w">Resend</strong>, "Sends our emails (order updates, design links, reminders)", "Your email address and the content of the email"],
+            [<strong key="w">Anthropic</strong>, "The AI behind “Describe your trip”: plans your map from your description", "The description you type or say. Under its commercial terms Anthropic doesn’t use it to train its models, and keeps it only for a limited time for safety monitoring"],
+            [<strong key="w">Cloudflare</strong>, "Checks requests to “Describe your trip” come from a person, not a bot (if shown)", "Technical information about your browser and your IP address"],
+            [<strong key="w">Etsy</strong>, "If you buy on Etsy: sends us your order so you can design it here", "Your name, delivery address, email (if Etsy shares it) and what you bought"],
+            [<strong key="w">Meta and Google (only if you agree)</strong>, "Analytics and measuring our ads, as described in section 2", "The pages you visit and actions you take on our site, and, when you order, the order value, a hashed email address, IP address and browser type"],
             [<strong key="w">Photon (komoot)</strong>, "Place search: finds the places you type in", "The places you search for, the coordinates of points you add to the map (to look up their names), and, because your browser sends these requests directly, your IP address"],
             [<strong key="w">OSRM (Project OSRM)</strong>, "Calculates road routes between your stops", "The coordinates of the stops being joined. Requests are sent from our server, not your browser"],
             [<strong key="w">OpenFreeMap</strong>, "Supplies the map tiles (map data from OpenStreetMap)", "Your IP address and which area of the map you’re viewing, as your browser loads the tiles"],
@@ -188,7 +233,8 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p>
-          <strong>We never sell your personal information</strong>, and we don&apos;t share it with anyone for advertising.
+          <strong>We never sell your personal information</strong>. We only share it for advertising with Meta and Google, and
+          only if you allow advertising cookies.
         </p>
       </Section>
 
@@ -198,8 +244,8 @@ export default function PrivacyPage() {
           an adequate level of protection for personal information.
         </p>
         <p>
-          Some of our service providers are based in, or use systems in, other countries. In particular, Stripe and Google
-          may process information in the United States, and Prodigi prints and ships your order from a site in or near your
+          Some of our service providers are based in, or use systems in, other countries. In particular, Stripe, Google, Meta, Anthropic,
+          Resend and Cloudflare may process information in the United States, and Prodigi prints and ships your order from a site in or near your
           country, so if you order from the US or Australia, your order details will be processed there. Where your information
           is transferred outside the UK or EU to a country without an adequacy decision, we make sure it is protected by
           appropriate safeguards, such as the UK International Data Transfer Agreement or Addendum, the EU Standard Contractual
@@ -229,6 +275,10 @@ export default function PrivacyPage() {
               "12 months after the order, so we can deal with reprints and problems, then deleted automatically",
             ],
             ["Emails and support messages", "2 years after the matter is resolved"],
+            ["Design links you emailed yourself (email address and design)", "12 months, then deleted automatically"],
+            ["Unsubscribe list (email addresses that asked not to be emailed)", "For as long as we send reminders, so we can keep respecting your choice"],
+            ["Your trip description for Create with AI", "We don’t store it. Only the resulting map design is kept, as above"],
+            ["Your cookie choices", "6 months, then we ask again"],
             ["Server technical logs", "Up to 30 days, kept by our hosting provider"],
             ["Anonymous usage statistics", "About 13 months, then deleted automatically"],
             ["Error reports (what went wrong, on which page, browser type)", "Until the problem is fixed, and at most 12 months"],

@@ -5,6 +5,7 @@ import Logo from "@/components/Logo";
 import { COMPANY } from "@/lib/company";
 import { track } from "@/lib/track";
 import { adEvent } from "@/lib/adTrack";
+import { readConsent } from "@/lib/consent";
 
 interface Status {
   status: string;
@@ -67,6 +68,8 @@ export default function OrderPage({ params }: { params: Promise<{ orderId: strin
   // Tell the ad platforms about the sale, once per order (only if the visitor agreed to ad cookies).
   useEffect(() => {
     if (!o || o.etsy || ["pending_payment", "failed", "cancelled"].includes(o.status)) return;
+    const c = readConsent();
+    if (!c?.ads && !c?.analytics) return;
     const key = `mapsie-conv-${orderId}`;
     try {
       if (localStorage.getItem(key)) return;

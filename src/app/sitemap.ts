@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page("/", 1, "weekly"),
     page("/create", 0.9, "weekly"),
     page("/maps", 0.8, "weekly"),
+    page("/gift", 0.8, "weekly"),
     ...OCCASIONS.map((o) => page(`/maps/${o.slug}`, 0.8, "weekly")),
     page("/support", 0.4, "monthly"),
     page("/etsy", 0.3, "monthly"),

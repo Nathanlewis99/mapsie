@@ -52,7 +52,11 @@ export default async function OccasionPage({ params }: { params: Promise<{ slug:
             ))}
             <div className="mt-8 flex flex-wrap gap-3 items-center">
               <Link href={start} className="rounded-full bg-coral px-7 py-4 text-lg font-extrabold text-white shadow-xl shadow-coral/30 hover:bg-coral-dark">{o.startLabel} →</Link>
-              <span className="text-sm text-ink/50 font-semibold">Free to design · prints from £34 · free delivery</span>
+              {o.gift ? (
+                <Link href="/gift" className="rounded-full border-2 border-ink/15 px-6 py-3.5 font-extrabold hover:border-coral">🎁 Or give a gift card</Link>
+              ) : (
+                <span className="text-sm text-ink/50 font-semibold">Free to design · prints from £34 · free delivery</span>
+              )}
             </div>
           </div>
           <img src={`/examples/${ex.slug}.webp`} alt={ex.alt} width={1200} height={900} fetchPriority="high" className="w-full h-auto rounded-3xl shadow-xl" />

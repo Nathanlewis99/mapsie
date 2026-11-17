@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GIFT_VALID_YEARS } from "@/lib/giftcards";
 import { COMPANY } from "@/lib/company";
 import { Email, Ext, In, LegalTitle, Section, Sub, Summary } from "../_ui";
 
@@ -68,7 +69,16 @@ export default function RefundsPage() {
           doesn&apos;t match your final preview, email us and we&apos;ll fix it or refund you.
         </p>
       </Section>
-      <Section id="problems" n={4} title="If your print arrives damaged, faulty or not as designed">
+      <Section id="gift-cards" n={4} title="Gift cards">
+        <p>
+          You can cancel a gift card for a full refund within 14 days of buying it, as long as it hasn&apos;t been used: email{" "}
+          us with the code. After that, gift cards can&apos;t be exchanged for cash, but they last for {GIFT_VALID_YEARS} years,
+          and if an order costs less than the card, the rest is emailed as a new code so nothing is lost. If a gift card is
+          lost, contact us with the email address it was bought with and we&apos;ll resend it.
+        </p>
+      </Section>
+
+      <Section id="problems" n={5} title="If your print arrives damaged, faulty or not as designed">
         <p>We&apos;ll put it right free of charge if your print:</p>
         <ul>
           <li>arrives damaged, for example creased, torn, scratched or with a broken frame or glazing;</li>
@@ -111,7 +121,7 @@ export default function RefundsPage() {
         </Sub>
       </Section>
 
-      <Section id="lost" n={5} title="Lost or late parcels">
+      <Section id="lost" n={6} title="Lost or late parcels">
         <p>
           If your order hasn&apos;t arrived by the end of its estimated delivery window (see our{" "}
           <In href="/legal/shipping">Shipping &amp; Delivery policy</In>), please email us. We&apos;ll chase it with the
@@ -124,7 +134,7 @@ export default function RefundsPage() {
         </p>
       </Section>
 
-      <Section id="how-refunds-work" n={6} title="How refunds are paid">
+      <Section id="how-refunds-work" n={7} title="How refunds are paid">
         <p>
           Refunds are made to the card or payment method you used, through our payment provider Stripe. We&apos;ll process your
           refund within 14 days of agreeing that you&apos;re entitled to it. Depending on your bank, it can take a further 5 to 10
@@ -133,7 +143,7 @@ export default function RefundsPage() {
         </p>
       </Section>
 
-      <Section id="your-rights" n={7} title="Your legal rights">
+      <Section id="your-rights" n={8} title="Your legal rights">
         <p>
           This policy is <strong>in addition to</strong> your legal rights as a consumer, and nothing in it takes them away. Even
           after our 30-day window, you may still be entitled to a repair, replacement, refund or price reduction if your print

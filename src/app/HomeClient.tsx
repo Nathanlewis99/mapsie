@@ -38,6 +38,7 @@ export default function HomeClient({ children }: { children?: React.ReactNode })
       <header className="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
         <span className="font-display text-3xl font-extrabold"><Logo /></span>
         <div className="flex items-center gap-5">
+          <Link href="/gift" className="hidden sm:inline font-bold text-ink/70 hover:text-ink">🎁 Gift cards</Link>
           <AccountLink />
           <Link href="/create" className="rounded-full bg-ink text-white px-5 py-2.5 font-extrabold hover:bg-ink/85">Start designing</Link>
         </div>

@@ -1,6 +1,7 @@
 import { NextResponse, after } from "next/server";
 import Stripe from "stripe";
 import { fulfilOrder, markPaymentFailed } from "@/lib/server/fulfil";
+import { issueGiftCard, settleGiftCards } from "@/lib/server/giftcards";
 
 export async function POST(req: Request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -15,10 +16,15 @@ export async function POST(req: Request) {
   // delayed methods (bank debits, some pay-later) finish later with "async_payment_succeeded".
   if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
     const s = event.data.object as Stripe.Checkout.Session;
+    // A gift card: create its code and send it.
+    const giftCardId = s.metadata?.giftCardId;
+    if (giftCardId && s.payment_status === "paid") after(() => issueGiftCard(giftCardId, s.id));
     const orderId = s.metadata?.orderId;
     const ship = s.collected_information?.shipping_details;
     // Digital files have no delivery address.
-    if (orderId && s.payment_status === "paid" && (ship?.address || !s.shipping_address_collection)) {
+    // "no_payment_required": a gift card or discount covered the whole order.
+    const settled = s.payment_status === "paid" || s.payment_status === "no_payment_required";
+    if (orderId && settled && (ship?.address || !s.shipping_address_collection)) {
       const a = ship?.address;
       after(() =>
         fulfilOrder(orderId, a ? {
@@ -35,6 +41,8 @@ export async function POST(req: Request) {
           ...(s.amount_total != null ? { total: s.amount_total / 100 } : {}),
         }),
       );
+      // If a gift card paid for some of it: mark it used, and send any balance as a new code.
+      if (s.total_details?.amount_discount) after(() => settleGiftCards(s.id, orderId, s.customer_details?.email ?? s.customer_email ?? ""));
     }
   }
   if (event.type === "checkout.session.async_payment_failed") {

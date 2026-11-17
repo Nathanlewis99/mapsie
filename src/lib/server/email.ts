@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { getDesign, getOrder, updateOrder, type DesignEmail, type Order } from "./db";
+import { getDesign, getOrder, updateOrder, type DesignEmail, type GiftCard, type Order } from "./db";
 import { publicUrl } from "./urls";
 import { COMPANY } from "../company";
 import { describeOptions, getRegion, money, SHIPPING, type RegionId } from "../products";
@@ -277,4 +277,43 @@ export async function sendDesignReminderEmail(row: DesignEmail, title: string) {
     "This is the only reminder we'll send.",
   ].filter(Boolean);
   await sendEmail(page(row.email, "Your map is still waiting", "Still dreaming about that trip?", lines, { label: "Finish my map", href: designLink(row.designId) }, unsubscribeUrl(row.email)));
+}
+
+// ---------------------------------------------------------------- gift cards
+const giftMoney = (g: GiftCard) => `${{ gbp: "£", usd: "$", aud: "A$" }[g.currency] ?? ""}${Number.isInteger(g.amount) ? g.amount : g.amount.toFixed(2)}`;
+const giftExpiry = (g: GiftCard) => (g.expiresAt ? new Date(g.expiresAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "");
+
+/** buyer: their card (to forward or print). recipient: sent to the person it's for. balance: what's left after an order. */
+export async function sendGiftCardEmail(g: GiftCard, kind: "buyer" | "recipient" | "balance") {
+  const { giftCardUrl } = await import("./giftcards");
+  const how = `To use it: design a map at ${publicUrl().replace(/^https?:\/\//, "")}, then enter the code at checkout.`;
+  if (kind === "buyer") {
+    const sending = g.recipientEmail
+      ? g.sendOn && g.sendOn > new Date().toISOString().slice(0, 10)
+        ? `We'll email it to ${g.recipientName || g.recipientEmail} on ${new Date(`${g.sendOn}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.`
+        : `We've also emailed it to ${g.recipientName || g.recipientEmail}.`
+      : "Print the card, or forward this email to them.";
+    await sendEmail(page(g.buyerEmail, `Your Mapsie gift card (${giftMoney(g)})`, "Your gift card is ready 🎁", [
+      `Thank you! Here's your ${giftMoney(g)} Mapsie gift card${g.recipientName ? ` for ${g.recipientName}` : ""}.`,
+      `Gift card code: ${g.code}`,
+      sending,
+      how,
+      `Valid until ${giftExpiry(g)}.`,
+    ], { label: "See and print the card", href: giftCardUrl(g.id) }));
+  } else if (kind === "recipient") {
+    await sendEmail(page(g.recipientEmail!, `${g.fromName || "Someone"} sent you a Mapsie gift card 🎁`, `A gift for you${g.recipientName ? `, ${g.recipientName}` : ""} 🗺️`, [
+      `${g.fromName || "Someone special"} has given you a ${giftMoney(g)} Mapsie gift card, to turn a trip you love into a map print for your wall.`,
+      g.message ? `“${g.message}”` : "",
+      `Your code: ${g.code}`,
+      how,
+      `Valid until ${giftExpiry(g)}.`,
+    ].filter(Boolean), { label: "Open my gift card", href: giftCardUrl(g.id) }));
+  } else {
+    await sendEmail(page(g.buyerEmail, `Your remaining Mapsie gift card balance (${giftMoney(g)})`, "You've got credit left", [
+      `Your order used part of your gift card, so here's the rest: ${giftMoney(g)}, ready for your next map.`,
+      `Your new code: ${g.code}`,
+      how,
+      `Valid until ${giftExpiry(g)}.`,
+    ], { label: "See my gift card", href: giftCardUrl(g.id) }));
+  }
 }

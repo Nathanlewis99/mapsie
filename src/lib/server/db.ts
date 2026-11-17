@@ -227,6 +227,26 @@ const SCHEMA = `
     reminded_at TEXT
   );
   CREATE INDEX IF NOT EXISTS design_emails_due ON design_emails(remind, reminded_at, created_at);
+  -- Gift cards: a Stripe promotion code per card (details in json).
+  CREATE TABLE IF NOT EXISTS gift_cards (
+    id TEXT PRIMARY KEY,
+    code TEXT,
+    status TEXT NOT NULL,
+    json TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS gift_cards_code ON gift_cards(code);
+  CREATE INDEX IF NOT EXISTS gift_cards_status ON gift_cards(status);
+  -- Customer reviews, one per order (photo stored as a small data URL).
+  CREATE TABLE IF NOT EXISTS reviews (
+    id TEXT PRIMARY KEY,
+    order_id TEXT NOT NULL UNIQUE,
+    status TEXT NOT NULL,
+    rating INTEGER NOT NULL,
+    json TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS reviews_status ON reviews(status, created_at);
   -- People who unsubscribed from reminder and offer emails (never emailed again except about orders).
   CREATE TABLE IF NOT EXISTS email_optouts (
     email TEXT PRIMARY KEY,
@@ -704,4 +724,110 @@ export async function orderedSince(email: string, sinceIso: string): Promise<boo
 }
 export async function deleteOldDesignEmails(beforeIso: string) {
   return run("DELETE FROM design_emails WHERE created_at < ?", [beforeIso]);
+}
+
+// ---------------------------------------------------------------- gift cards
+export type GiftCardStatus = "pending_payment" | "active" | "redeemed" | "expired";
+export interface GiftCard {
+  id: string;
+  status: GiftCardStatus;
+  amount: number;
+  currency: string;
+  region: import("../products").RegionId;
+  buyerEmail: string;
+  fromName: string;
+  recipientName: string;
+  message: string;
+  /** Send the card straight to the recipient, now or on a date (YYYY-MM-DD, morning UK time). */
+  recipientEmail?: string;
+  sendOn?: string;
+  sentToRecipientAt?: string;
+  code?: string;
+  couponId?: string;
+  promoId?: string;
+  expiresAt?: string;
+  /** A card made from the unused balance of another card. */
+  parentId?: string;
+  redeemedOrderId?: string;
+  stripeSessionId?: string;
+  createdAt: string;
+}
+const giftRow = (r: Row) => JSON.parse(String(r.json)) as GiftCard;
+export async function saveGiftCard(g: GiftCard) {
+  await run(
+    "INSERT INTO gift_cards (id, code, status, json, created_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET code = excluded.code, status = excluded.status, json = excluded.json",
+    [g.id, g.code ?? null, g.status, JSON.stringify(g), g.createdAt],
+  );
+}
+export async function getGiftCard(id: string): Promise<GiftCard | null> {
+  const r = await one("SELECT json FROM gift_cards WHERE id = ?", [id]);
+  return r ? giftRow(r) : null;
+}
+export async function getGiftCardByCode(code: string): Promise<GiftCard | null> {
+  const r = await one("SELECT json FROM gift_cards WHERE code = ?", [code.trim().toUpperCase()]);
+  return r ? giftRow(r) : null;
+}
+export async function updateGiftCard(id: string, patch: Partial<GiftCard>) {
+  const g = await getGiftCard(id);
+  if (g) await saveGiftCard({ ...g, ...patch });
+}
+/** Move a card from one status to another exactly once (webhooks can repeat). */
+export async function claimGiftCard(id: string, from: GiftCardStatus, to: GiftCardStatus): Promise<GiftCard | null> {
+  const g = await getGiftCard(id);
+  if (!g || g.status !== from) return null;
+  const changed = await run("UPDATE gift_cards SET status = ? WHERE id = ? AND status = ?", [to, id, from]);
+  if (!changed) return null;
+  const next = { ...g, status: to };
+  await run("UPDATE gift_cards SET json = ? WHERE id = ?", [JSON.stringify(next), id]);
+  return next;
+}
+export async function listGiftCards(limit = 200): Promise<GiftCard[]> {
+  return (await all("SELECT json FROM gift_cards ORDER BY created_at DESC LIMIT ?", [limit])).map(giftRow);
+}
+export async function listGiftCardsToSend(): Promise<GiftCard[]> {
+  return (await all("SELECT json FROM gift_cards WHERE status = 'active' ORDER BY created_at", [])).map(giftRow).filter((g) => g.code && g.recipientEmail && !g.sentToRecipientAt);
+}
+
+// ---------------------------------------------------------------- reviews
+export type ReviewStatus = "pending" | "approved" | "hidden";
+export interface Review {
+  id: string;
+  orderId: string;
+  status: ReviewStatus;
+  rating: number;
+  text: string;
+  name: string; // as they'd like it shown, e.g. "Sarah, Bristol"
+  photo?: string; // data URL, resized in the browser
+  publish: boolean; // they agreed to us showing it on the site
+  product?: string;
+  source: "mapsie" | "etsy";
+  createdAt: string;
+}
+const reviewRow = (r: Row) => JSON.parse(String(r.json)) as Review;
+export async function saveReview(v: Review) {
+  await run(
+    "INSERT INTO reviews (id, order_id, status, rating, json, created_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (order_id) DO UPDATE SET status = excluded.status, rating = excluded.rating, json = excluded.json",
+    [v.id, v.orderId, v.status, v.rating, JSON.stringify(v), v.createdAt],
+  );
+}
+export async function getReviewForOrder(orderId: string): Promise<Review | null> {
+  const r = await one("SELECT json FROM reviews WHERE order_id = ?", [orderId]);
+  return r ? reviewRow(r) : null;
+}
+export async function setReviewStatus(id: string, status: ReviewStatus) {
+  const r = await one("SELECT json FROM reviews WHERE id = ?", [id]);
+  if (!r) return;
+  const v = { ...reviewRow(r), status };
+  await run("UPDATE reviews SET status = ?, json = ? WHERE id = ?", [status, JSON.stringify(v), id]);
+}
+export async function listReviews(status?: ReviewStatus, limit = 200): Promise<Review[]> {
+  const rows = status
+    ? await all("SELECT json FROM reviews WHERE status = ? ORDER BY created_at DESC LIMIT ?", [status, limit])
+    : await all("SELECT json FROM reviews ORDER BY created_at DESC LIMIT ?", [limit]);
+  return rows.map(reviewRow);
+}
+/** Average and count of approved reviews (for the homepage and Google). */
+export async function reviewSummary(): Promise<{ count: number; average: number }> {
+  const r = await one("SELECT COUNT(*) AS n, AVG(rating) AS avg FROM reviews WHERE status = 'approved'", []);
+  return { count: Number(r?.n ?? 0), average: Number(r?.avg ?? 0) };
 }

@@ -145,7 +145,7 @@ export default function Checkout({ design: saved }: { design: Design }) {
           <button onClick={pay} disabled={busy || (digital && !digitalOk)} className="w-full rounded-full bg-coral py-4 text-lg font-extrabold text-white shadow-lg shadow-coral/30 hover:bg-coral-dark disabled:opacity-50">
             {busy ? "One moment…" : `Pay ${money(region, total)}`}
           </button>
-          <p className="text-xs text-center text-ink/50 font-bold">Got a discount code? You can add it on the next page.</p>
+          <p className="text-xs text-center text-ink/50 font-bold">Got a discount code or gift card? Add it on the next page.</p>
           <p className="text-xs text-center text-ink/40">Secure payment by Stripe · {digital ? "Instant digital delivery by email" : `Printed locally in ${getRegion(region).label} · Made to order`}</p>
         </div>
       </main>

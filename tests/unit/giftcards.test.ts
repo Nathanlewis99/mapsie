@@ -12,7 +12,7 @@ describe("gift cards", () => {
     expect(giftTokenValid("gc_2", giftToken("gc_1"))).toBe(false);
   });
   it("offers amounts that match what they buy", () => {
-    expect(giftAmounts("GB").map((a) => a.amount)).toEqual([19, 44, 79, 125]);
+    expect(giftAmounts("GB").map((a) => a.amount)).toEqual([19, 44, 89, 125]);
   });
   it("is claimed once, found by code, and only sent once it has a code", async () => {
     const base = { id: "gc_t", status: "pending_payment" as const, amount: 50, currency: "gbp", region: "GB" as const, buyerEmail: "a@b.com", fromName: "A", recipientName: "B", message: "", recipientEmail: "b@c.com", createdAt: new Date().toISOString() };

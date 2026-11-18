@@ -5,8 +5,8 @@ describe("prices", () => {
   it("adds paper, frame and mount on top of the print", () => {
     expect(itemPrice({ productId: "a3", frame: "none" }, "GB")).toBe(44);
     expect(itemPrice({ productId: "a3", frame: "none", paper: "hpr" }, "GB")).toBe(44 + Math.round(44 * 0.35));
-    expect(itemPrice({ productId: "a3", frame: "black" }, "GB")).toBe(44 + 35);
-    expect(itemPrice({ productId: "a3", frame: "black", mount: "white" }, "GB")).toBe(44 + 35 + 7);
+    expect(itemPrice({ productId: "a3", frame: "black" }, "GB")).toBe(44 + 45);
+    expect(itemPrice({ productId: "a3", frame: "black", mount: "white" }, "GB")).toBe(44 + 45 + 9);
   });
   it("ignores the paper choice on framed prints", () => {
     expect(itemPrice({ productId: "a2", frame: "oak", paper: "hpr" }, "US")).toBe(itemPrice({ productId: "a2", frame: "oak" }, "US"));

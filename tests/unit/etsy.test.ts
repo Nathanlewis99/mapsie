@@ -13,7 +13,7 @@ describe("Etsy: what was bought", () => {
   });
   it("uses the website's prices, and only valid pairings", () => {
     const a3 = (code: string) => ETSY_VARIATIONS.find((v) => v.sku === `MAPSIE-A3-${code}`)!.price;
-    expect([a3("EMA"), a3("HGE"), a3("BLACK"), a3("BLACK-MOUNT"), a3("DIGITAL")]).toEqual([44, 59, 79, 86, 19]);
+    expect([a3("EMA"), a3("HGE"), a3("BLACK"), a3("BLACK-MOUNT"), a3("DIGITAL")]).toEqual([44, 59, 89, 98, 19]);
     // Specialist papers are never framed; framed prints are matte art.
     expect(ETSY_FINISHES.filter((f) => f.frame !== "none").every((f) => f.paper === "ema")).toBe(true);
     expect(Math.max(...ETSY_FINISHES.map((f) => f.label.length))).toBeLessThanOrEqual(20);

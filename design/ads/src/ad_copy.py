@@ -16,7 +16,7 @@ ANGLES = {
         "meta_primary": [
             "The gift they'll actually hang up: a map of their favourite trip, every stop and memory. Order by 16 Dec.",
             "Stuck for a present? Turn their best trip into a framed map print. Designed in minutes, delivered free.",
-            "Their honeymoon, gap year or road trip, printed, framed and on the wall by Christmas. From £34.",
+            "Their honeymoon, gap year or road trip, printed, framed and on the wall by Christmas. Prints from £34.",
         ],
         "meta_headline": ["The gift they'll actually hang up", "Their favourite trip, framed", "Order by 16 Dec for Christmas"],
         "pin_title": ["Personalised travel map gift: their favourite trip, framed", "Christmas gift idea for travellers: a custom map print of their trip"],

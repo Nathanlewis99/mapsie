@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
-import { getKv, listGiftCards, listOrders } from "@/lib/server/db";
+import { getKv, listAdSpend, listGiftCards, listOrders } from "@/lib/server/db";
+import { adsImportKey, refreshAdSpend } from "@/lib/server/adSpend";
+import { GOOGLE_ADS_SCRIPT } from "@/lib/server/googleAdsScript";
 import { CHANNELS, type ChannelId } from "@/lib/channels";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +15,19 @@ const PAID = new Set(["paid", "rendering", "ready", "submitted", "shipped", "del
 export default async function Channels({ searchParams }: { searchParams: Promise<{ days?: string }> }) {
   const days = [7, 30, 90].includes(Number((await searchParams).days)) ? Number((await searchParams).days) : 30;
   const since = new Date(Date.now() - days * 24 * 3600_000).toISOString();
-  const spend = (await getKv<Record<string, number>>(`adspend:${days}`))?.value ?? {};
+  const manual = (await getKv<Record<string, number>>(`adspend:${days}`))?.value ?? {};
+  // Imported spend (Meta / Pinterest APIs, Google Ads Script) wins over typed-in numbers.
+  const sync = await refreshAdSpend();
+  const imported: Record<string, { spend: number; purchases: number; value: number; days: number }> = {};
+  for (const d of await listAdSpend(since.slice(0, 10))) {
+    const t = (imported[d.channel] ??= { spend: 0, purchases: 0, value: 0, days: 0 });
+    t.spend += d.spend;
+    t.purchases += d.platformPurchases ?? 0;
+    t.value += d.platformValue ?? 0;
+    t.days++;
+  }
+  const spend: Record<string, number> = { ...manual };
+  for (const [c, t] of Object.entries(imported)) spend[c] = Math.round(t.spend * 100) / 100;
   const rows = new Map<ChannelId, { orders: number; revenue: number; gifts: number; giftRevenue: number }>();
   const row = (c: ChannelId) => rows.get(c) ?? rows.set(c, { orders: 0, revenue: 0, gifts: 0, giftRevenue: 0 }).get(c)!;
   for (const o of await listOrders()) {
@@ -53,7 +67,7 @@ export default async function Channels({ searchParams }: { searchParams: Promise
         <input type="hidden" name="days" value={days} />
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wider text-ink/50">
-            <tr>{["Channel", "Orders", "Gift cards", "Revenue", "Avg order", "Ad spend (£)", "Cost per sale", "ROAS"].map((h) => <th key={h} className="px-2 py-2">{h}</th>)}</tr>
+            <tr>{["Channel", "Orders", "Gift cards", "Revenue", "Avg order", "Ad spend (£)", "Cost per sale", "ROAS", "Platform says"].map((h) => <th key={h} className="px-2 py-2">{h}</th>)}</tr>
           </thead>
           <tbody>
             {CHANNELS.map((c) => {
@@ -68,9 +82,16 @@ export default async function Channels({ searchParams }: { searchParams: Promise
                   <td className="px-2 py-2">{r.gifts}</td>
                   <td className="px-2 py-2">{gbp(revenue)}</td>
                   <td className="px-2 py-2">{sales ? gbp(revenue / sales) : "–"}</td>
-                  <td className="px-2 py-2"><input name={c.id} defaultValue={s || ""} inputMode="decimal" className="w-24 rounded-lg border border-ink/15 px-2 py-1" /></td>
+                  <td className="px-2 py-2">
+                    {imported[c.id] ? (
+                      <span title="Imported automatically">{gbp(s)} <span className="text-xs text-sea font-bold">auto</span></span>
+                    ) : (
+                      <input name={c.id} defaultValue={s || ""} inputMode="decimal" className="w-24 rounded-lg border border-ink/15 px-2 py-1" />
+                    )}
+                  </td>
                   <td className="px-2 py-2">{s && sales ? gbp(s / sales) : "–"}</td>
                   <td className={`px-2 py-2 font-bold ${s ? (revenue / s >= 2.5 ? "text-sea" : revenue / s < 1.5 ? "text-coral-dark" : "") : ""}`}>{s ? `${(revenue / s).toFixed(1)}×` : "–"}</td>
+                  <td className="px-2 py-2 text-xs text-ink/50">{imported[c.id] ? `${Math.round(imported[c.id].purchases)} sales, ${gbp(imported[c.id].value)}` : ""}</td>
                 </tr>
               );
             })}
@@ -82,6 +103,7 @@ export default async function Channels({ searchParams }: { searchParams: Promise
               <td className="px-2 py-2">{totalSpend ? gbp(totalSpend) : ""}</td>
               <td className="px-2 py-2" />
               <td className="px-2 py-2">{totalSpend ? `${(totals.revenue / totalSpend).toFixed(1)}×` : "–"}</td>
+              <td />
             </tr>
           </tbody>
         </table>
@@ -90,6 +112,24 @@ export default async function Channels({ searchParams }: { searchParams: Promise
           <button className="rounded-full bg-ink text-white px-4 py-2 text-sm font-bold shrink-0">Save spend</button>
         </div>
       </form>
+      <section className="rounded-3xl bg-white p-5 shadow-sm text-sm space-y-2">
+        <h2 className="text-lg font-extrabold">Automatic spend import</h2>
+        <p className="text-ink/60">
+          Last checked {sync.at ? new Date(sync.at).toLocaleString("en-GB") : "never"} (refreshes hourly when you open this page). “Platform says” is what the ad
+          platform claims; the Orders column is what we saw arrive from its links. A big gap usually means the platform is counting view-throughs.
+        </p>
+        <ul className="list-disc pl-5 text-ink/70">
+          <li>Meta: {process.env.META_ADS_TOKEN && process.env.META_AD_ACCOUNT_ID ? "connected" : "add META_ADS_TOKEN and META_AD_ACCOUNT_ID on Render"}</li>
+          <li>Pinterest: {process.env.PINTEREST_ADS_TOKEN && process.env.PINTEREST_AD_ACCOUNT_ID ? "connected" : "add PINTEREST_ADS_TOKEN (ads:read) on Render"}</li>
+          <li>Google Ads: {imported.google_ads ? "receiving data from the script" : "install the Google Ads Script below"}</li>
+        </ul>
+        {sync.errors.length > 0 && <p className="text-coral-dark font-bold">{sync.errors.join(" · ")}</p>}
+        <details>
+          <summary className="cursor-pointer font-bold">Google Ads Script (paste into Google Ads → Tools → Bulk actions → Scripts, run once, schedule daily)</summary>
+          <p className="mt-2 text-ink/60">Your key: <code className="select-all font-mono bg-sand px-2 py-0.5 rounded">{adsImportKey()}</code> (keep it private: it lets the script report spend).</p>
+          <pre className="mt-2 overflow-x-auto rounded-2xl bg-ink text-white p-4 text-xs">{GOOGLE_ADS_SCRIPT.replace("PASTE-KEY-FROM-ADMIN", adsImportKey())}</pre>
+        </details>
+      </section>
     </main>
   );
 }

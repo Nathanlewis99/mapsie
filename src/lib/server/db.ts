@@ -252,6 +252,14 @@ const SCHEMA = `
     created_at TEXT NOT NULL
   );
   CREATE INDEX IF NOT EXISTS reviews_status ON reviews(status, created_at);
+  -- Ad spend per channel per day, imported from the ad platforms (see adSpend.ts).
+  CREATE TABLE IF NOT EXISTS ad_spend (
+    channel TEXT NOT NULL,
+    day TEXT NOT NULL,
+    json TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (channel, day)
+  );
   -- People who unsubscribed from reminder and offer emails (never emailed again except about orders).
   CREATE TABLE IF NOT EXISTS email_optouts (
     email TEXT PRIMARY KEY,
@@ -837,4 +845,27 @@ export async function listReviews(status?: ReviewStatus, limit = 200): Promise<R
 export async function reviewSummary(): Promise<{ count: number; average: number }> {
   const r = await one("SELECT COUNT(*) AS n, AVG(rating) AS avg FROM reviews WHERE status = 'approved'", []);
   return { count: Number(r?.n ?? 0), average: Number(r?.avg ?? 0) };
+}
+
+// ---------------------------------------------------------------- ad spend
+export interface AdSpendDay {
+  channel: string; // a ChannelId (meta_ads, google_ads, pinterest_ads, …)
+  day: string; // YYYY-MM-DD in the ad account's time zone
+  spend: number; // in GBP (converted if the account bills in another currency)
+  impressions?: number;
+  clicks?: number;
+  /** What the platform itself counts (for comparing with our own attribution). */
+  platformPurchases?: number;
+  platformValue?: number;
+  source: "api" | "script";
+}
+export async function saveAdSpend(rows: AdSpendDay[]) {
+  for (const r of rows)
+    await run(
+      "INSERT INTO ad_spend (channel, day, json, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT (channel, day) DO UPDATE SET json = excluded.json, updated_at = excluded.updated_at",
+      [r.channel, r.day, JSON.stringify(r), now()],
+    );
+}
+export async function listAdSpend(sinceDay: string): Promise<AdSpendDay[]> {
+  return (await all("SELECT json FROM ad_spend WHERE day >= ? ORDER BY day", [sinceDay])).map((r) => JSON.parse(String(r.json)) as AdSpendDay);
 }

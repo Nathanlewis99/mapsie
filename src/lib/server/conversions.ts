@@ -77,6 +77,7 @@ export async function sendPurchaseConversions(o: Order) {
                 em: o.email ? [sha256(o.email)] : undefined,
                 client_ip_address: c.ip,
                 client_user_agent: c.userAgent,
+                external_id: o.email ? [sha256(o.email)] : undefined,
                 fbp: c.fbp,
                 fbc: c.fbc,
               },
@@ -125,6 +126,8 @@ export async function sendPurchaseConversions(o: Order) {
                 client_ip_address: c.ip,
                 client_user_agent: c.userAgent,
                 click_id: c.epik,
+                // A stable, hashed customer id (their email) helps Pinterest match repeat buyers.
+                external_id: o.email ? [sha256(o.email)] : undefined,
               },
               custom_data: { currency, value: String(value), order_id: o.id, num_items: 1 },
             },

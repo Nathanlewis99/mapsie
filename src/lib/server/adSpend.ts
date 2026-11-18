@@ -4,9 +4,10 @@
 //   Pinterest: Ads analytics API (PINTEREST_ADS_TOKEN + PINTEREST_AD_ACCOUNT_ID)
 //   Google Ads: a Google Ads Script posts daily numbers to /api/ads/spend (see admin page)
 // Refreshed at most once an hour, when the admin report is opened.
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { getKv, putKv, saveAdSpend, type AdSpendDay } from "./db";
 import { logError } from "./log";
+import { alertAdmin } from "./email";
 
 const DAYS_BACK = 35;
 const day = (d: Date) => d.toISOString().slice(0, 10);
@@ -73,7 +74,9 @@ async function syncPinterest(): Promise<number> {
   const cols = ["SPEND_IN_MICRO_DOLLAR", "TOTAL_IMPRESSION", "TOTAL_CLICKTHROUGH", "TOTAL_CHECKOUT", "TOTAL_CHECKOUT_VALUE_IN_MICRO_DOLLAR"];
   const q = new URLSearchParams({ start_date: since, end_date: until, columns: cols.join(","), granularity: "DAY" });
   const res = await fetch(`https://api.pinterest.com/v5/ad_accounts/${account}/analytics?${q}`, { headers: { authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(20_000) });
+  if (res.status === 401) await markPinterestToken({ rejected: true });
   if (!res.ok) throw new Error(`Pinterest analytics ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  await markPinterestToken({ rejected: false });
   const data = (await res.json()) as Record<string, number | string>[];
   // Pinterest reports money in "micro" units of the ad account's currency (GBP for Mapsie).
   const rows: AdSpendDay[] = data.map((d) => ({
@@ -118,4 +121,65 @@ export async function importScriptRows(channel: "google_ads", rows: { day: strin
     }),
   );
   return ok.length;
+}
+
+// ---------------------------------------------------------------- Pinterest token expiry
+// Pinterest's access tokens expire about 30 days after they're made, and the API
+// doesn't say when. So we note when each new token first appears (by a hash, never
+// the token itself), count 30 days from then, and also notice when Pinterest starts
+// rejecting it. The report shows a warning, and we email 5 days before.
+const PIN_TOKEN_DAYS = 30;
+type PinTokenState = { hash: string; firstSeen: string; rejected?: boolean };
+
+async function pinterestTokenRecord(): Promise<PinTokenState | null> {
+  const token = process.env.PINTEREST_ADS_TOKEN;
+  if (!token) return null;
+  const hash = createHash("sha256").update(token).digest("hex").slice(0, 16);
+  const kv = (await getKv<PinTokenState>("pinterest:token"))?.value;
+  if (kv?.hash === hash) return kv;
+  const fresh = { hash, firstSeen: new Date().toISOString() };
+  await putKv("pinterest:token", fresh);
+  return fresh;
+}
+
+async function markPinterestToken(patch: Partial<PinTokenState>) {
+  const cur = await pinterestTokenRecord();
+  if (cur && cur.rejected !== patch.rejected) await putKv("pinterest:token", { ...cur, ...patch });
+}
+
+export interface TokenStatus { connected: boolean; daysLeft?: number; expiresOn?: string; rejected?: boolean; level: "ok" | "soon" | "expired" | "none" }
+
+/** How long the Pinterest reporting token has left (estimated), for the report and alerts. */
+export async function pinterestTokenStatus(): Promise<TokenStatus> {
+  const rec = await pinterestTokenRecord();
+  if (!rec) return { connected: false, level: "none" };
+  const expires = new Date(new Date(rec.firstSeen).getTime() + PIN_TOKEN_DAYS * 24 * 3600_000);
+  const daysLeft = Math.ceil((expires.getTime() - Date.now()) / (24 * 3600_000));
+  const level = rec.rejected || daysLeft <= 0 ? "expired" : daysLeft <= 5 ? "soon" : "ok";
+  return { connected: true, daysLeft, expiresOn: expires.toISOString().slice(0, 10), rejected: rec.rejected, level };
+}
+
+/** Check the token with Pinterest and email a warning (at most once a day) when it's nearly out or rejected. */
+export async function checkAdTokens() {
+  const token = process.env.PINTEREST_ADS_TOKEN;
+  if (!token) return;
+  try {
+    const r = await fetch("https://api.pinterest.com/v5/user_account", { headers: { authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(15_000) });
+    if (r.status === 401) await markPinterestToken({ rejected: true });
+    else if (r.ok) await markPinterestToken({ rejected: false });
+  } catch {
+    /* network trouble: try again next time */
+  }
+  const st = await pinterestTokenStatus();
+  if (st.level !== "soon" && st.level !== "expired") return;
+  const today = new Date().toISOString().slice(0, 10);
+  if ((await getKv<string>("pinterest:token:alerted"))?.value === today) return;
+  await putKv("pinterest:token:alerted", today);
+  await alertAdmin(
+    st.level === "expired" ? "Pinterest token has expired: ad spend isn't importing" : `Pinterest token expires in ${st.daysLeft} day${st.daysLeft === 1 ? "" : "s"}`,
+    `The Pinterest reporting token (PINTEREST_ADS_TOKEN on Render) ${st.level === "expired" ? "no longer works" : `expires around ${st.expiresOn}`}. ` +
+      "Generate a new one at developers.pinterest.com/apps (your Mapsie app → Generate token, scopes ads:read and user_accounts:read), " +
+      "replace PINTEREST_ADS_TOKEN on the Render service \"mapsie\", and choose Save, rebuild, and deploy. " +
+      "(Pinterest tracking and conversions keep working either way; only the spend import in /admin/channels stops.)",
+  );
 }

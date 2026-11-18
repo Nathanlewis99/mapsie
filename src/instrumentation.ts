@@ -1,6 +1,13 @@
 // Runs once when the Next.js server starts.
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
+    // Ad token checks run where the ad tokens live (the web service), every 6 hours.
+    // Alerts are de-duplicated in the database, so several web instances are fine.
+    if ((process.env.MAPSIE_ROLE ?? "all") !== "worker" && process.env.PINTEREST_ADS_TOKEN) {
+      const { checkAdTokens } = await import("./lib/server/adSpend");
+      setTimeout(() => void checkAdTokens().catch(() => {}), 60_000);
+      setInterval(() => void checkAdTokens().catch(() => {}), 6 * 3600_000);
+    }
     // Web servers (which can scale out) leave rendering and the print queue to the worker.
     if ((process.env.MAPSIE_ROLE ?? "all") === "web") return;
     const { startScheduler } = await import("./lib/server/scheduler");

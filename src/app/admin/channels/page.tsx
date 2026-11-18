@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { getKv, listAdSpend, listGiftCards, listOrders } from "@/lib/server/db";
-import { adsImportKey, refreshAdSpend } from "@/lib/server/adSpend";
+import { adsImportKey, pinterestTokenStatus, refreshAdSpend } from "@/lib/server/adSpend";
 import { GOOGLE_ADS_SCRIPT } from "@/lib/server/googleAdsScript";
 import { CHANNELS, type ChannelId } from "@/lib/channels";
 
@@ -18,6 +18,7 @@ export default async function Channels({ searchParams }: { searchParams: Promise
   const manual = (await getKv<Record<string, number>>(`adspend:${days}`))?.value ?? {};
   // Imported spend (Meta / Pinterest APIs, Google Ads Script) wins over typed-in numbers.
   const sync = await refreshAdSpend();
+  const pin = await pinterestTokenStatus();
   const imported: Record<string, { spend: number; purchases: number; value: number; days: number }> = {};
   for (const d of await listAdSpend(since.slice(0, 10))) {
     const t = (imported[d.channel] ??= { spend: 0, purchases: 0, value: 0, days: 0 });
@@ -57,6 +58,14 @@ export default async function Channels({ searchParams }: { searchParams: Promise
           Which channel brought each sale, from the visit that placed it (UTM tags, ad click ids, referrer). Enter what you spent on each channel for the
           period to see cost per sale and return on ad spend. Revenue in pounds (other currencies converted roughly). Tag ad links with utm_source / utm_medium=paid / utm_campaign.
         </p>
+        {(pin.level === "soon" || pin.level === "expired") && (
+          <div className={`mt-3 rounded-2xl px-4 py-3 text-sm font-bold ${pin.level === "expired" ? "bg-coral/15 text-coral-dark" : "bg-amber-100 text-amber-900"}`}>
+            {pin.level === "expired"
+              ? "⚠️ The Pinterest reporting token has expired, so Pinterest spend isn't importing."
+              : `⏳ The Pinterest reporting token expires in ${pin.daysLeft} day${pin.daysLeft === 1 ? "" : "s"} (around ${pin.expiresOn}).`}{" "}
+            <span className="font-normal">Generate a new one at developers.pinterest.com/apps (scopes ads:read and user_accounts:read) and replace PINTEREST_ADS_TOKEN on Render.</span>
+          </div>
+        )}
         <div className="flex gap-2 mt-3">
           {[7, 30, 90].map((d) => (
             <Link key={d} href={`/admin/channels?days=${d}`} className={`rounded-full px-4 py-1.5 text-sm font-bold ${d === days ? "bg-ink text-white" : "bg-white border border-ink/10"}`}>Last {d} days</Link>
@@ -120,7 +129,7 @@ export default async function Channels({ searchParams }: { searchParams: Promise
         </p>
         <ul className="list-disc pl-5 text-ink/70">
           <li>Meta: {process.env.META_ADS_TOKEN && process.env.META_AD_ACCOUNT_ID ? "connected" : "add META_ADS_TOKEN and META_AD_ACCOUNT_ID on Render"}</li>
-          <li>Pinterest: {process.env.PINTEREST_ADS_TOKEN && process.env.PINTEREST_AD_ACCOUNT_ID ? "connected" : "add PINTEREST_ADS_TOKEN (ads:read) on Render"}</li>
+          <li>Pinterest: {process.env.PINTEREST_ADS_TOKEN && process.env.PINTEREST_AD_ACCOUNT_ID ? `connected (token ${pin.level === "expired" ? "expired" : `good for about ${pin.daysLeft} more days`})` : "add PINTEREST_ADS_TOKEN (ads:read) on Render"}</li>
           <li>Google Ads: {imported.google_ads ? "receiving data from the script" : "install the Google Ads Script below"}</li>
         </ul>
         {sync.errors.length > 0 && <p className="text-coral-dark font-bold">{sync.errors.join(" · ")}</p>}

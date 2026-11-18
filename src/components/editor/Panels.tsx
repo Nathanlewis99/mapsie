@@ -26,7 +26,7 @@ import PrintOptionsPicker from "@/components/PrintOptionsPicker";
 import { Compass } from "@/components/Poster";
 import { trackSearch } from "@/lib/track";
 import SafeImg from "@/components/SafeImg";
-import { crowdedStickers, crowding, MIN_STOP_SCALE, readability, recommendedProduct, sizeNote, smallestText, tidyCrowded, tidyStickers } from "@/lib/legibility";
+import { crowdedStickers, crowding, MIN_STOP_SCALE, readability, recommendedProduct, sizeNote, smallestText, tidyDesign } from "@/lib/legibility";
 import { getProduct } from "@/lib/products";
 import { TEMPLATES } from "@/lib/templates";
 import AiTripBox from "./AiTripBox";
@@ -224,7 +224,7 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
       )}
       {design.stops.length === 0 && (
         <div>
-          <Label>Or start from a trip</Label>
+          <Label>Or use a template</Label>
           <div className="grid grid-cols-2 gap-2">
             {TEMPLATES.map((t) => (
               <button key={t.id} onClick={() => applyTemplate(t)} className="rounded-2xl bg-white border border-ink/5 p-3 text-left hover:border-coral hover:-translate-y-0.5 transition shadow-sm">
@@ -562,7 +562,7 @@ export function StylePanel() {
 
 // ---------------------------------------------------------------- Stops check
 /** Overlapping stops and how readable the smallest name will be when printed. */
-export function StopsCheck() {
+export function StopsCheck({ crowdingOnly = false }: { crowdingOnly?: boolean }) {
   const { design, set } = useEditor();
   if (design.stops.length < 1 && design.stickers.length < 1) return null;
   const pairs = crowding(design);
@@ -574,12 +574,7 @@ export function StopsCheck() {
   const rec = recommendedProduct(design);
   const bigger = rec && rec.widthCm > p.widthCm ? rec : null;
   // Stops first (names move, then shrink), then stickers, photos and notes make room around them.
-  const tidy = () => {
-    const patch = tidyCrowded(design);
-    const stops = design.stops.map((s) => (patch[s.id] ? { ...s, ...patch[s.id] } : s));
-    const sp = tidyStickers({ ...design, stops });
-    set({ stops, stickers: design.stickers.map((x) => (sp[x.id] ? { ...x, ...sp[x.id] } : x)) });
-  };
+  const tidy = () => set(tidyDesign(design));
   const what = small.number < small.label ? "pin numbers" : `“${small.labelStop}”`;
   const crowdedIds = new Set(pairs.flat());
   const canShrink = crowdedItems > 0 || design.stops.some((s) => crowdedIds.has(s.id) && ((s.markerScale ?? 1) > MIN_STOP_SCALE + 0.01 || (s.labelScale ?? 1) > MIN_STOP_SCALE + 0.01));
@@ -601,7 +596,7 @@ export function StopsCheck() {
           )}
         </div>
       )}
-      {Number.isFinite(small.pt) && (
+      {!crowdingOnly && Number.isFinite(small.pt) && (
         <div className={`rounded-2xl p-3 text-sm ${status === "good" ? "bg-sea/10" : status === "small" ? "bg-amber-100" : "bg-coral/10"}`}>
           <div className="font-extrabold">
             {status === "good" ? "✅ Easy to read" : status === "small" ? "👓 Small but readable" : "🔍 Too small to read"} on {p.label}
@@ -980,6 +975,7 @@ export function StickersPanel() {
   const stickerMarkers = design.markers.style === "sticker";
   return (
     <div className="space-y-5">
+      <StopsCheck crowdingOnly />
       {target ? (
         <div className="rounded-2xl bg-coral text-white p-3 text-sm font-bold flex items-center gap-2">
           <span className="flex-1">📍 Tap a sticker to use it as the marker for “{target.name}”</span>

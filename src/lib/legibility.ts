@@ -409,3 +409,11 @@ export function tidyStickers(d: Design): Record<string, Partial<StickerLike>> {
   }
   return out;
 }
+
+/** Tidy everything: stops first (names move, then shrink), then stickers, photos and notes. */
+export function tidyDesign(d: Design): Pick<Design, "stops" | "stickers"> {
+  const patch = tidyCrowded(d);
+  const stops = d.stops.map((s) => (patch[s.id] ? { ...s, ...patch[s.id] } : s));
+  const sp = tidyStickers({ ...d, stops });
+  return { stops, stickers: d.stickers.map((x) => (sp[x.id] ? { ...x, ...sp[x.id] } : x)) };
+}

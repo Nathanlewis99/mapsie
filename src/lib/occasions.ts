@@ -35,8 +35,8 @@ export const OCCASIONS: Occasion[] = [
       "The Blush style for something soft and romantic, or Vintage for a timeless look",
     ],
     example: "sri-lanka",
-    start: { template: "honeymoon" },
-    startLabel: "Start with a honeymoon map",
+    start: { describe: "Our honeymoon: we flew to Bali, took the boat to the Gili Islands, then spent our last week in the Maldives" },
+    startLabel: "Describe your honeymoon",
     gift: true,
   },
   {
@@ -57,7 +57,7 @@ export const OCCASIONS: Occasion[] = [
       "The Vintage or Explorer style for a classic road-atlas feel",
     ],
     example: "route-66",
-    start: { template: "usa" },
+    start: { template: "route-66" },
     startLabel: "Start with a road trip",
   },
   {
@@ -78,7 +78,7 @@ export const OCCASIONS: Occasion[] = [
       "The Explorer or Tropical style for a sense of adventure",
     ],
     example: "southeast-asia",
-    start: { template: "asia" },
+    start: { template: "se-asia" },
     startLabel: "Start with a backpacking trip",
   },
   {
@@ -99,7 +99,7 @@ export const OCCASIONS: Occasion[] = [
       "The Vintage style for a classic railway-poster look",
     ],
     example: "interrail-europe",
-    start: { template: "europe" },
+    start: { template: "interrail" },
     startLabel: "Start with a rail trip",
   },
   {

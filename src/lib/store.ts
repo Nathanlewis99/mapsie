@@ -1,4 +1,5 @@
 "use client";
+import { tidyDesign } from "./legibility";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
@@ -46,6 +47,9 @@ interface EditorState {
   /** Stop whose label is selected on the map. */
   selectedLabel: string | null;
   fitRequest: number; // bump to ask the map to frame all stops
+  /** Tidy crowded stops and stickers once the map has finished framing (after a template or AI trip). */
+  tidyPending: boolean;
+  tidyNow: () => void;
   roadsLoading: number;
 
   set: (patch: Partial<Design>, key?: string) => void;
@@ -111,6 +115,11 @@ export const useEditor = create<EditorState>()(
         selectedSticker: null,
         selectedLabel: null,
         fitRequest: 0,
+        tidyPending: false,
+        tidyNow: () => {
+          set({ tidyPending: false });
+          commit((d) => ({ ...d, ...tidyDesign(d) }), "edit");
+        },
         roadsLoading: 0,
 
         set: (patch, key) => commit((d) => ({ ...d, ...patch }), key),
@@ -234,7 +243,7 @@ export const useEditor = create<EditorState>()(
           commit(
             (d) => ({ ...d, title: t.title, subtitle: t.subtitle, theme: themeFromPreset(preset), stops, stickers, stickerStyle: art }),
             "edit",
-            { fitRequest: get().fitRequest + 1, selectedSticker: null },
+            { fitRequest: get().fitRequest + 1, selectedSticker: null, tidyPending: true },
           );
           afterStopsChange();
         },

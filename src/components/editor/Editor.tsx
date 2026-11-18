@@ -405,6 +405,14 @@ export default function Editor() {
     } catch {}
   };
 
+  // After a template or AI trip, tidy crowded items once the map has settled on its new framing.
+  const tidyPending = useEditor((s) => s.tidyPending);
+  useEffect(() => {
+    if (!tidyPending) return;
+    const t = setTimeout(() => useEditor.getState().tidyNow(), 1600);
+    return () => clearTimeout(t);
+  }, [tidyPending, design.view]);
+
   const share = async () => {
     setBusy("share");
     try {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { crowdedStickers, stickerBox, tidyStickers } from "../../src/lib/legibility";
-import { normalizeDesign } from "../../src/lib/types";
+import { normalizeDesign, type Design, type Sticker } from "../../src/lib/types";
 
 const base = () =>
   normalizeDesign({
@@ -10,11 +10,12 @@ const base = () =>
     stickers: [],
   } as never);
 
-const st = (id: string, lng: number, lat: number, size = 10, kind = "sticker") => ({ id, kind, src: "", name: "tent", lng, lat, size, rotation: 0 }) as never;
+const st = (id: string, lng: number, lat: number, size = 10, kind: Sticker["kind"] = "sticker"): Sticker => ({ id, kind, src: "", name: "tent", lng, lat, size, rotation: 0 });
+const withStickers = (stickers: Sticker[]): Design => ({ ...base(), stickers });
 
 describe("tidying stickers, photos and notes", () => {
   it("moves a sticker off a stop, nearby, without shrinking if there's room", () => {
-    const d = { ...base(), stickers: [st("a", 0, 0)] };
+    const d = withStickers([st("a", 0, 0)]);
     expect(crowdedStickers(d)).toEqual(["a"]);
     const p = tidyStickers(d);
     const moved = { ...d, stickers: [{ ...d.stickers[0], ...p.a }] };
@@ -23,16 +24,16 @@ describe("tidying stickers, photos and notes", () => {
     expect(Math.hypot(p.a.lng!, p.a.lat!)).toBeLessThan(8); // stays near its place
   });
   it("brings a sticker hanging off the edge back onto the map", () => {
-    const d = { ...base(), stickers: [st("b", 8.6, 0)] }; // half off the right edge
+    const d = withStickers([st("b", 8.6, 0)]); // half off the right edge
     expect(crowdedStickers(d)).toEqual(["b"]);
     const p = tidyStickers(d);
     expect(crowdedStickers({ ...d, stickers: [{ ...d.stickers[0], ...p.b }] })).toEqual([]);
   });
   it("separates two stacked items and leaves clear ones alone", () => {
-    const d = { ...base(), stickers: [st("c", -3, 3), st("d", -3, 3, 8, "photo"), st("e", 3, -3)] };
+    const d = withStickers([st("c", -3, 3), st("d", -3, 3, 8, "photo"), st("e", 3, -3)]);
     const p = tidyStickers(d);
     expect(p.e).toBeUndefined();
-    const after = { ...d, stickers: d.stickers.map((x: { id: string }) => ({ ...x, ...(p[x.id] ?? {}) })) };
+    const after = { ...d, stickers: d.stickers.map((x) => ({ ...x, ...(p[x.id] ?? {}) })) };
     expect(crowdedStickers(after)).toEqual([]);
   });
   it("sizes notes by their text", () => {

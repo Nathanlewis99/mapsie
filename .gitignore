@@ -49,3 +49,6 @@ shots/
 design/painted/raw/
 design/painted/pilot-v1/
 __pycache__/
+
+# Download bundle of design/ads (rebuilt on demand; its contents are committed)
+design/ads/mapsie-ad-pack.zip

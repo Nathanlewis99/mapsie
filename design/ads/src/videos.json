@@ -1,0 +1,205 @@
+{
+ "describe-your-trip": {
+  "rec": "rec-describe",
+  "layout": "phone",
+  "segments": [
+   [
+    "start+0.3",
+    "create",
+    1.15
+   ],
+   [
+    "create",
+    "map",
+    1.0
+   ],
+   [
+    "map+1.25",
+    "wall-0.2",
+    1.0
+   ],
+   {
+    "image": "design/mockups/etsy/04-sri-lanka.jpg",
+    "seconds": 3.4,
+    "from": [
+     1200,
+     900,
+     1800
+    ],
+    "to": [
+     1200,
+     760,
+     1460
+    ],
+    "fade": 0.45,
+    "caption": "band-describe-3.png"
+   }
+  ],
+  "captions": [
+   [
+    "start",
+    "create",
+    "cap-describe-1.png"
+   ],
+   [
+    "create",
+    "end",
+    "cap-describe-2.png"
+   ]
+  ],
+  "end": "end-design.png",
+  "end_seconds": 2.2
+ },
+ "your-photos": {
+  "rec": "rec-photos",
+  "layout": "crop",
+  "crop": [
+   62,
+   62,
+   776,
+   820
+  ],
+  "segments": [
+   [
+    "start+0.3",
+    "end-0.4",
+    2.0
+   ]
+  ],
+  "captions": [
+   [
+    "start",
+    "p2",
+    "cap-photos-1.png"
+   ],
+   [
+    "p2",
+    "p3-1.5",
+    "cap-photos-2.png"
+   ],
+   [
+    "p3-1.5",
+    "end",
+    "cap-photos-3.png"
+   ]
+  ],
+  "end": "end-design.png",
+  "end_seconds": 2.2
+ },
+ "framed-detail-vertical": {
+  "segments": [
+   {
+    "image": "design/ads/assets/sri-lanka-print.jpg",
+    "seconds": 3.4,
+    "from": [
+     1540,
+     1380,
+     1550
+    ],
+    "to": [
+     1470,
+     1900,
+     1800
+    ],
+    "fade": 0,
+    "caption": "band-detail-1.png"
+   },
+   {
+    "image": "design/ads/assets/sri-lanka-print.jpg",
+    "seconds": 3.6,
+    "from": [
+     1470,
+     1900,
+     1800
+    ],
+    "to": [
+     1400,
+     2560,
+     1850
+    ],
+    "fade": 0,
+    "caption": "band-detail-2.png"
+   },
+   {
+    "image": "design/mockups/etsy/04-sri-lanka.jpg",
+    "seconds": 3.8,
+    "from": [
+     1200,
+     600,
+     1050
+    ],
+    "to": [
+     1200,
+     870,
+     1700
+    ],
+    "fade": 0.6,
+    "caption": "band-detail-3.png"
+   }
+  ],
+  "end": "end-design.png",
+  "end_seconds": 2.2
+ },
+ "gift-card-christmas": {
+  "rec": "rec-gift",
+  "layout": "phone",
+  "segments": [
+   [
+    "start+0.2",
+    "g2",
+    1.0
+   ],
+   [
+    "g2",
+    "g2end",
+    1.25
+   ],
+   {
+    "image": "/tmp/claude-0/-home-user-mapsie/a3317858-64c2-5ed2-baf1-e72f6e1111ea/scratchpad/ads/overlay/still-gift-card.png",
+    "seconds": 3.0,
+    "from": [
+     540,
+     960,
+     1920
+    ],
+    "to": [
+     540,
+     1000,
+     1780
+    ],
+    "fade": 0.4,
+    "caption": "cap-gift-3.png"
+   },
+   {
+    "image": "design/mockups/etsy/01-southeast-asia.jpg",
+    "seconds": 3.2,
+    "from": [
+     1200,
+     700,
+     1080
+    ],
+    "to": [
+     1200,
+     880,
+     1700
+    ],
+    "fade": 0.5,
+    "caption": "band-gift-4.png"
+   }
+  ],
+  "captions": [
+   [
+    "start",
+    "g2",
+    "cap-gift-1.png"
+   ],
+   [
+    "g2",
+    "end",
+    "cap-gift-2.png"
+   ]
+  ],
+  "end": "end-gift.png",
+  "end_seconds": 2.2
+ }
+}

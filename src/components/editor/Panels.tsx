@@ -26,7 +26,7 @@ import PrintOptionsPicker from "@/components/PrintOptionsPicker";
 import { Compass } from "@/components/Poster";
 import { trackSearch } from "@/lib/track";
 import SafeImg from "@/components/SafeImg";
-import { crowding, MIN_STOP_SCALE, readability, recommendedProduct, sizeNote, smallestText, tidyCrowded } from "@/lib/legibility";
+import { crowdedStickers, crowding, MIN_STOP_SCALE, readability, recommendedProduct, sizeNote, smallestText, tidyCrowded, tidyStickers } from "@/lib/legibility";
 import { getProduct } from "@/lib/products";
 import { TEMPLATES } from "@/lib/templates";
 import AiTripBox from "./AiTripBox";
@@ -564,30 +564,35 @@ export function StylePanel() {
 /** Overlapping stops and how readable the smallest name will be when printed. */
 export function StopsCheck() {
   const { design, set } = useEditor();
-  if (design.stops.length < 1) return null;
+  if (design.stops.length < 1 && design.stickers.length < 1) return null;
   const pairs = crowding(design);
   const crowded = new Set(pairs.flat()).size;
+  const crowdedItems = crowdedStickers(design).length;
   const p = getProduct(design.productId);
   const small = smallestText(design);
   const status = readability(small.pt);
   const rec = recommendedProduct(design);
   const bigger = rec && rec.widthCm > p.widthCm ? rec : null;
+  // Stops first (names move, then shrink), then stickers, photos and notes make room around them.
   const tidy = () => {
     const patch = tidyCrowded(design);
-    set({ stops: design.stops.map((s) => (patch[s.id] ? { ...s, ...patch[s.id] } : s)) });
+    const stops = design.stops.map((s) => (patch[s.id] ? { ...s, ...patch[s.id] } : s));
+    const sp = tidyStickers({ ...design, stops });
+    set({ stops, stickers: design.stickers.map((x) => (sp[x.id] ? { ...x, ...sp[x.id] } : x)) });
   };
   const what = small.number < small.label ? "pin numbers" : `“${small.labelStop}”`;
   const crowdedIds = new Set(pairs.flat());
-  const canShrink = design.stops.some((s) => crowdedIds.has(s.id) && ((s.markerScale ?? 1) > MIN_STOP_SCALE + 0.01 || (s.labelScale ?? 1) > MIN_STOP_SCALE + 0.01));
+  const canShrink = crowdedItems > 0 || design.stops.some((s) => crowdedIds.has(s.id) && ((s.markerScale ?? 1) > MIN_STOP_SCALE + 0.01 || (s.labelScale ?? 1) > MIN_STOP_SCALE + 0.01));
+  const parts = [crowded ? `${crowded} stop${crowded === 1 ? "" : "s"}` : "", crowdedItems ? `${crowdedItems} sticker${crowdedItems === 1 ? "" : "s"}, photo${crowdedItems === 1 ? "" : "s"} or note${crowdedItems === 1 ? "" : "s"}` : ""].filter(Boolean);
   return (
     <div className="space-y-2">
-      {crowded > 0 && (
+      {(crowded > 0 || crowdedItems > 0) && (
         <div className="rounded-2xl bg-coral/10 p-3 text-sm">
-          <div className="font-extrabold">⚠️ {crowded} stops overlap at this zoom</div>
+          <div className="font-extrabold">⚠️ {parts.join(" and ")} {crowded + crowdedItems === 1 ? "is" : "are"} crowded or off the map</div>
           {canShrink ? (
             <>
-              <p className="text-ink/60 text-xs mt-0.5">Shrink just the crowded ones (the rest stay as they are), or tap a pin to size it yourself.</p>
-              <button onClick={tidy} className="mt-2 rounded-full bg-coral px-4 py-1.5 text-sm font-extrabold text-white hover:bg-coral-dark">✨ Shrink crowded stops</button>
+              <p className="text-ink/60 text-xs mt-0.5">Move and shrink just the crowded ones (everything else stays put). You can undo it.</p>
+              <button onClick={tidy} className="mt-2 rounded-full bg-coral px-4 py-1.5 text-sm font-extrabold text-white hover:bg-coral-dark">✨ Tidy crowded items</button>
             </>
           ) : (
             <p className="text-ink/60 text-xs mt-0.5">

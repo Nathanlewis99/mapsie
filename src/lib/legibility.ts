@@ -281,3 +281,131 @@ export function sizeNote(design: Design, productId: string) {
   const smallest = [...PRODUCTS].sort((a, b) => a.widthCm - b.widthCm)[0];
   return rec && rec.id === productId && rec.id !== smallest.id ? "Recommended" : undefined;
 }
+
+// ---------------------------------------------------------------- stickers, photos and notes
+// The same tidy-up for everything else on the map: stickers, Mapsie Originals, the
+// customer's photos and text notes. Anything that covers a stop (its pin or name),
+// sits on top of another item, or hangs off the map is nudged to the nearest clear
+// spot close to where it was (it belongs to that place), and only shrunk a little if
+// there's no room.
+
+type Pt = { x: number; y: number };
+type StickerLike = Design["stickers"][number];
+
+function posOf(d: Design, lng: number, lat: number): Pt {
+  const { center, zoom, refWidth } = d.view;
+  const c = project(center[0], center[1], zoom);
+  const p = project(lng, lat, zoom);
+  let dx = p.x - c.x;
+  dx -= Math.round(dx / c.world) * c.world;
+  const pct = 100 / refWidth;
+  return { x: dx * pct, y: (p.y - c.y) * pct };
+}
+
+/** Poster position (% of width, from the map centre) back to a place on the map. */
+function placeAt(d: Design, x: number, y: number): [number, number] {
+  const { center, zoom, refWidth } = d.view;
+  const c = project(center[0], center[1], zoom);
+  const px = c.x + (x * refWidth) / 100;
+  const py = c.y + (y * refWidth) / 100;
+  const lng = (px / c.world) * 360 - 180;
+  const n = Math.PI - (2 * Math.PI * py) / c.world;
+  const lat = (180 / Math.PI) * Math.atan(Math.sinh(n));
+  return [Math.round((((lng + 540) % 360) - 180) * 1e5) / 1e5, Math.round(lat * 1e5) / 1e5];
+}
+
+/** Half-height of the visible map area (the title band covers the rest), in % of poster width. */
+function mapHalfHeight(d: Design) {
+  const frac = d.layout === "overlay" || d.layout === "none" ? 1 : d.orientation === "landscape" ? 0.78 : 0.84;
+  return (posterAspect(d.productId, d.orientation) * 100 * frac) / 2;
+}
+
+/** The space an item takes up on the poster, around its centre. */
+export function stickerBox(st: StickerLike, at: Pt, size = st.size): Box {
+  let w = size, h = size;
+  if (st.kind === "photo") h = size * (st.photoAspect ?? 0.75) * (st.photoBorder === "polaroid" ? 1.18 : 1.05);
+  if (st.kind === "text") {
+    const lines = (st.text || "Your note").split("\n");
+    w = Math.max(...lines.map((l) => l.length)) * size * 0.52 + size * 0.3;
+    h = lines.length * size * 1.25 + (st.curve ? Math.abs(st.curve) * size * 0.01 : 0);
+  }
+  return { l: at.x - w / 2, r: at.x + w / 2, t: at.y - h / 2, b: at.y + h / 2 };
+}
+
+const area = (a: Box) => Math.max(0, a.r - a.l) * Math.max(0, a.b - a.t);
+const overlap = (a: Box, b: Box) => area({ l: Math.max(a.l, b.l), r: Math.min(a.r, b.r), t: Math.max(a.t, b.t), b: Math.min(a.b, b.b) });
+
+/** Pins and names of the stops, as boxes. */
+function stopBoxes(d: Design): Box[] {
+  const pos = stopPositions(d);
+  const out: Box[] = [];
+  d.stops.forEach((s, i) => {
+    out.push(circleBox(pos[i].x, pos[i].y, markerRadius(d, s)));
+    const lb = labelBox(d, s, pos[i].x, pos[i].y);
+    if (lb) out.push(lb);
+  });
+  return out;
+}
+
+/** How badly an item at this box clashes (0 = clear). Covering a stop counts most. */
+function clash(d: Design, box: Box, stops: Box[], others: Box[]) {
+  const a = area(box) || 1;
+  let score = 0;
+  for (const s of stops) score += (overlap(box, s) / Math.min(a, area(s) || 1)) * 3;
+  for (const o of others) {
+    const f = overlap(box, o) / Math.min(a, area(o) || 1);
+    if (f > 0.12) score += f; // a little tuck behind a neighbour is fine
+  }
+  const halfH = mapHalfHeight(d);
+  const outside = Math.max(0, -50 - box.l) + Math.max(0, box.r - 50) + Math.max(0, -halfH - box.t) + Math.max(0, box.b - halfH);
+  return score + outside / 2;
+}
+
+/** Items that cover a stop, sit on another item, or hang off the map. */
+export function crowdedStickers(d: Design): string[] {
+  const stops = stopBoxes(d);
+  const boxes = d.stickers.map((st) => stickerBox(st, posOf(d, st.lng, st.lat)));
+  return d.stickers.filter((_, i) => clash(d, boxes[i], stops, boxes.filter((_, j) => j !== i)) > 0.15).map((s) => s.id);
+}
+
+/**
+ * Move each crowded item to the nearest clear spot (searching outwards in rings),
+ * shrinking it a little at a time only if nowhere nearby is clear. Run after the
+ * stops are tidied, so items make room for them.
+ */
+export function tidyStickers(d: Design): Record<string, Partial<StickerLike>> {
+  const stops = stopBoxes(d);
+  const items = d.stickers.map((st) => ({ st, at: posOf(d, st.lng, st.lat), size: st.size }));
+  const crowded = new Set(crowdedStickers(d));
+  const out: Record<string, Partial<StickerLike>> = {};
+  // Biggest first: they're hardest to place.
+  const order = items.map((_, i) => i).filter((i) => crowded.has(items[i].st.id)).sort((a, b) => items[b].size - items[a].size);
+  for (const i of order) {
+    const it = items[i];
+    const others = () => items.filter((_, j) => j !== i).map((o) => stickerBox(o.st, o.at, o.size));
+    const minSize = Math.min(it.size, Math.max(it.st.kind === "text" ? 1.2 : 4, it.size * 0.6));
+    let best = { at: it.at, size: it.size, score: clash(d, stickerBox(it.st, it.at, it.size), stops, others()) };
+    for (let size = it.size; size >= minSize - 1e-9 && best.score > 0.05; size = Math.max(minSize, size * 0.88)) {
+      const span = Math.max(size, 4);
+      for (let ring = 0; ring <= 8; ring++) {
+        const r = ring * span * 0.35;
+        const steps = ring === 0 ? 1 : 12 + ring * 2;
+        for (let k = 0; k < steps; k++) {
+          const ang = (2 * Math.PI * k) / steps;
+          const at = { x: it.at.x + r * Math.cos(ang), y: it.at.y + r * Math.sin(ang) };
+          // Stay close to the place it belongs to: a small cost for distance and shrinking.
+          const score = clash(d, stickerBox(it.st, at, size), stops, others()) + r * 0.004 + (1 - size / it.size) * 0.3;
+          if (score < best.score - 1e-6) best = { at, size, score };
+        }
+        if (best.score < 0.05) break;
+      }
+      if (size === minSize) break;
+    }
+    if (best.at !== it.at || best.size !== it.size) {
+      items[i] = { ...it, at: best.at, size: best.size };
+      const [lng, lat] = placeAt(d, best.at.x, best.at.y);
+      out[it.st.id] = { lng, lat, size: Math.round(best.size * 100) / 100 };
+    }
+  }
+  return out;
+}

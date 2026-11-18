@@ -31,21 +31,22 @@ export default async function GiftCardPage({ params, searchParams }: { params: P
           <Link href="/" className="font-display text-2xl font-extrabold"><Logo /></Link>
           <PrintButton />
         </div>
-        <article className="relative overflow-hidden rounded-[2rem] bg-white shadow-2xl print:shadow-none print:rounded-none border border-ink/5" style={{ aspectRatio: "1.414 / 1" }}>
-          <img src="/examples/southeast-asia.webp" alt="" className="absolute inset-y-0 right-0 h-full w-1/2 object-cover opacity-90" />
-          <div className="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-r from-white via-white/30 to-transparent" />
-          <div className="relative h-full w-[62%] p-8 sm:p-10 flex flex-col">
+        {/* Landscape card (like A5) on wider screens and in print; stacked on phones so nothing is cut off. */}
+        <article className="relative overflow-hidden rounded-[2rem] bg-white shadow-2xl print:shadow-none print:rounded-none border border-ink/5 sm:aspect-[1.414/1] print:aspect-[1.414/1]">
+          <img src="/examples/southeast-asia.webp" alt="" className="w-full h-48 object-cover sm:absolute sm:inset-y-0 sm:right-0 sm:h-full sm:w-1/2 print:absolute print:inset-y-0 print:right-0 print:h-full print:w-1/2 opacity-90" />
+          <div className="hidden sm:block print:block absolute inset-y-0 right-0 w-1/2 bg-gradient-to-r from-white via-white/30 to-transparent" />
+          <div className="relative h-full sm:w-[62%] print:w-[62%] p-6 sm:p-10 flex flex-col">
             <div className="font-display text-3xl font-extrabold"><Logo /></div>
-            <div className="mt-auto">
+            <div className="mt-6 sm:mt-auto">
               <div className="text-sm font-extrabold uppercase tracking-[0.2em] text-coral">Gift card</div>
-              <div className="font-display text-6xl font-extrabold leading-none mt-1">{money(g.amount, g.currency)}</div>
+              <div className="font-display text-5xl sm:text-6xl font-extrabold leading-none mt-1">{money(g.amount, g.currency)}</div>
               {g.recipientName && <div className="mt-4 text-lg font-bold">For {g.recipientName}</div>}
               {g.message && <p className="mt-2 text-ink/70 italic leading-snug">“{g.message}”</p>}
               {g.fromName && <div className="mt-2 text-ink/60">With love from {g.fromName}</div>}
             </div>
             <div className="mt-6 rounded-2xl bg-cream px-4 py-3">
               <div className="text-xs text-ink/50 font-bold">YOUR CODE</div>
-              <div className="font-mono text-2xl font-extrabold tracking-wider">{g.code}</div>
+              <div className="font-mono text-xl sm:text-2xl font-extrabold tracking-wider break-all">{g.code}</div>
             </div>
             <div className="mt-3 text-xs text-ink/60">Design your map at <b>mapsie.shop</b> and enter the code at checkout.{expires && ` Valid until ${expires}.`}</div>
           </div>

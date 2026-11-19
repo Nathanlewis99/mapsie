@@ -76,10 +76,13 @@ export async function issueGiftCard(id: string, sessionId?: string) {
  */
 export async function settleGiftCards(sessionId: string, orderId: string, email: string) {
   try {
-    const session = await stripe().checkout.sessions.retrieve(sessionId, { expand: ["total_details.breakdown.discounts.discount.promotion_code"] });
+    const s = stripe();
+    // Stripe allows at most 4 levels of expansion, so the promotion code is looked up separately.
+    const session = await s.checkout.sessions.retrieve(sessionId, { expand: ["total_details.breakdown"] });
     for (const d of session.total_details?.breakdown?.discounts ?? []) {
       const pc = d.discount.promotion_code;
-      const code = typeof pc === "string" ? null : pc?.code;
+      if (!pc) continue;
+      const code = typeof pc === "string" ? (await s.promotionCodes.retrieve(pc)).code : pc.code;
       if (!code?.startsWith("GIFT-")) continue;
       const found = await getGiftCardByCode(code);
       // Exactly once, even if Stripe sends the payment event twice.

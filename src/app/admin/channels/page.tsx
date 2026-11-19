@@ -3,6 +3,7 @@ import Logo from "@/components/Logo";
 import { getKv, listAdSpend, listGiftCards, listOrders } from "@/lib/server/db";
 import { adsImportKey, pinterestTokenStatus, refreshAdSpend } from "@/lib/server/adSpend";
 import { GOOGLE_ADS_SCRIPT } from "@/lib/server/googleAdsScript";
+import { gadsConnection, gadsMissing, gadsRedirectUri } from "@/lib/server/googleAds";
 import { CHANNELS, type ChannelId } from "@/lib/channels";
 
 export const dynamic = "force-dynamic";
@@ -12,8 +13,11 @@ export const metadata = { title: "Sales by channel · Admin" };
 const TO_GBP: Record<string, number> = { gbp: 1, usd: 0.79, aud: 0.52 };
 const PAID = new Set(["paid", "rendering", "ready", "submitted", "shipped", "delivered"]);
 
-export default async function Channels({ searchParams }: { searchParams: Promise<{ days?: string }> }) {
-  const days = [7, 30, 90].includes(Number((await searchParams).days)) ? Number((await searchParams).days) : 30;
+export default async function Channels({ searchParams }: { searchParams: Promise<{ days?: string; google?: string }> }) {
+  const sp = await searchParams;
+  const days = [7, 30, 90].includes(Number(sp.days)) ? Number(sp.days) : 30;
+  const gads = await gadsConnection();
+  const gadsNeeds = gadsMissing();
   const since = new Date(Date.now() - days * 24 * 3600_000).toISOString();
   const manual = (await getKv<Record<string, number>>(`adspend:${days}`))?.value ?? {};
   // Imported spend (Meta / Pinterest APIs, Google Ads Script) wins over typed-in numbers.
@@ -133,6 +137,16 @@ export default async function Channels({ searchParams }: { searchParams: Promise
           <li>Google Ads: {imported.google_ads ? "receiving data from the script" : "install the Google Ads Script below"}</li>
         </ul>
         {sync.errors.length > 0 && <p className="text-coral-dark font-bold">{sync.errors.join(" · ")}</p>}
+        <div className="rounded-2xl bg-sand/50 p-3 space-y-1">
+          <div className="font-bold">Google Ads API (status checks and approved changes)</div>
+          {sp.google === "connected" && <p className="text-green-700 font-bold">Connected.</p>}
+          {sp.google === "failed" && <p className="text-coral-dark font-bold">Connecting didn&apos;t work. Check the client ID, secret and redirect address below, then try again.</p>}
+          {sp.google === "cancelled" && <p className="text-coral-dark font-bold">Cancelled on Google&apos;s screen.</p>}
+          {sp.google === "missing" && <p className="text-coral-dark font-bold">Add GOOGLE_ADS_CLIENT_ID and GOOGLE_ADS_CLIENT_SECRET on Render first.</p>}
+          <p className="text-ink/70">{gads.connected ? `Connected${gads.email ? ` as ${gads.email}` : ""} on ${new Date(gads.at!).toLocaleDateString("en-GB")}.` : "Not connected."}{gadsNeeds.length > 0 && ` Still needed on Render: ${gadsNeeds.join(", ")}.`}</p>
+          <p className="text-ink/60">The OAuth client&apos;s authorised redirect URI must be <code className="select-all font-mono bg-white px-1 rounded">{gadsRedirectUri()}</code></p>
+          <a href="/api/admin/google-ads/connect" className="inline-block rounded-full bg-ink text-white px-4 py-2 font-bold">{gads.connected ? "Reconnect Google Ads" : "Connect Google Ads"}</a>
+        </div>
         <details>
           <summary className="cursor-pointer font-bold">Google Ads Script (paste into Google Ads → Tools → Bulk actions → Scripts, run once, schedule daily)</summary>
           <p className="mt-2 text-ink/60">Your key: <code className="select-all font-mono bg-sand px-2 py-0.5 rounded">{adsImportKey()}</code> (keep it private: it lets the script report spend).</p>

@@ -143,7 +143,7 @@ export default async function Channels({ searchParams }: { searchParams: Promise
           {sp.google === "failed" && <p className="text-coral-dark font-bold">Connecting didn&apos;t work. Check the client ID, secret and redirect address below, then try again.</p>}
           {sp.google === "cancelled" && <p className="text-coral-dark font-bold">Cancelled on Google&apos;s screen.</p>}
           {sp.google === "missing" && <p className="text-coral-dark font-bold">Add GOOGLE_ADS_CLIENT_ID and GOOGLE_ADS_CLIENT_SECRET on Render first.</p>}
-          <p className="text-ink/70">{gads.connected ? `Connected${gads.email ? ` as ${gads.email}` : ""} on ${new Date(gads.at!).toLocaleDateString("en-GB")}.` : "Not connected."}{gadsNeeds.length > 0 && ` Still needed on Render: ${gadsNeeds.join(", ")}.`}</p>
+          <p className="text-ink/70">{gads.connected ? (gads.via === "render" ? "Connected (refresh token on Render)." : `Connected${gads.email ? ` as ${gads.email}` : ""} on ${new Date(gads.at!).toLocaleDateString("en-GB")}.`) : "Not connected: add GOOGLE_ADS_REFRESH_TOKEN on Render, or connect below with a Web OAuth client."}{gadsNeeds.length > 0 && ` Still needed on Render: ${gadsNeeds.join(", ")}.`}</p>
           <p className="text-ink/60">The OAuth client&apos;s authorised redirect URI must be <code className="select-all font-mono bg-white px-1 rounded">{gadsRedirectUri()}</code></p>
           <a href="/api/admin/google-ads/connect" className="inline-block rounded-full bg-ink text-white px-4 py-2 font-bold">{gads.connected ? "Reconnect Google Ads" : "Connect Google Ads"}</a>
         </div>

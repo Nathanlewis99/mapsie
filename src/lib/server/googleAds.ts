@@ -1,12 +1,14 @@
 // Google Ads API: read campaign and ad status, and make changes the owner has approved.
 //
 // On Render (service "mapsie"):
-//   GOOGLE_ADS_CLIENT_ID, GOOGLE_ADS_CLIENT_SECRET  OAuth client (Google Cloud → APIs & Services → Credentials)
-//   GOOGLE_ADS_DEVELOPER_TOKEN                      Manager account → Admin → API Center
-//   GOOGLE_ADS_CUSTOMER_ID                          the Mapsie ads account, e.g. 123-456-7890
-//   GOOGLE_ADS_LOGIN_CUSTOMER_ID                    the manager account's id (when access is through it)
-// The long-lived refresh token comes from "Connect Google Ads" in /admin/channels and is
-// stored encrypted in the database, never in an environment variable or a log.
+//   GOOGLE_ADS_CLIENT_ID, GOOGLE_ADS_CLIENT_SECRET  OAuth client in the Google Cloud project that has the Ads API
+//   GOOGLE_ADS_REFRESH_TOKEN                        from that client's sign-in flow (or use "Connect Google Ads"
+//                                                   in /admin/channels with a Web client: stored encrypted in the DB)
+//   GOOGLE_ADS_CUSTOMER_ID                          the Mapsie ads account (437-894-4568)
+//   GOOGLE_ADS_LOGIN_CUSTOMER_ID                    the manager account (975-293-2129)
+//   GOOGLE_ADS_DEVELOPER_TOKEN                      optional: developer tokens were retired in Sept 2026, when
+//                                                   API access moved to the Google Cloud project
+// Tokens are never logged.
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { getKv, putKv } from "./db";
 import { publicUrl } from "./urls";
@@ -34,7 +36,6 @@ export function gadsMissing(): string[] {
   return [
     !c.clientId && "GOOGLE_ADS_CLIENT_ID",
     !c.clientSecret && "GOOGLE_ADS_CLIENT_SECRET",
-    !c.developerToken && "GOOGLE_ADS_DEVELOPER_TOKEN",
     !c.customerId && "GOOGLE_ADS_CUSTOMER_ID",
   ].filter(Boolean) as string[];
 }
@@ -56,9 +57,10 @@ export function openToken(sealed: string): string {
   return Buffer.concat([d.update(body), d.final()]).toString("utf8");
 }
 
-export async function gadsConnection(): Promise<{ connected: boolean; at?: string; email?: string }> {
+export async function gadsConnection(): Promise<{ connected: boolean; at?: string; email?: string; via?: "render" | "admin" }> {
+  if (process.env.GOOGLE_ADS_REFRESH_TOKEN) return { connected: true, via: "render" };
   const kv = await getKv<{ sealed: string; email?: string }>(KV);
-  return kv ? { connected: true, at: kv.updatedAt, email: kv.value.email } : { connected: false };
+  return kv ? { connected: true, at: kv.updatedAt, email: kv.value.email, via: "admin" } : { connected: false };
 }
 
 // ------------------------------------------------------------ OAuth
@@ -101,13 +103,14 @@ let cached: { token: string; until: number } | null = null;
 
 async function accessToken(): Promise<string> {
   if (cached && cached.until > Date.now() + 60_000) return cached.token;
-  const kv = await getKv<{ sealed: string }>(KV);
-  if (!kv) throw new Error("Google Ads isn't connected yet: use Connect Google Ads in /admin/channels");
+  const kv = process.env.GOOGLE_ADS_REFRESH_TOKEN ? null : await getKv<{ sealed: string }>(KV);
+  const refresh = process.env.GOOGLE_ADS_REFRESH_TOKEN || (kv && openToken(kv.value.sealed));
+  if (!refresh) throw new Error("Google Ads isn't connected yet: add GOOGLE_ADS_REFRESH_TOKEN on Render");
   const c = gadsConfig();
   const r = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ refresh_token: openToken(kv.value.sealed), client_id: c.clientId, client_secret: c.clientSecret, grant_type: "refresh_token" }),
+    body: new URLSearchParams({ refresh_token: refresh, client_id: c.clientId, client_secret: c.clientSecret, grant_type: "refresh_token" }),
     signal: AbortSignal.timeout(15_000),
   });
   const j = (await r.json()) as { access_token?: string; expires_in?: number; error?: string; error_description?: string };
@@ -125,7 +128,7 @@ async function call<T>(path: string, body: unknown): Promise<T> {
     method: "POST",
     headers: {
       authorization: `Bearer ${await accessToken()}`,
-      "developer-token": c.developerToken,
+      ...(c.developerToken ? { "developer-token": c.developerToken } : {}),
       ...(c.loginCustomerId ? { "login-customer-id": c.loginCustomerId } : {}),
       "content-type": "application/json",
     },

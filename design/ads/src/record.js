@@ -12,12 +12,14 @@ fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 
 // The real Sonnet plan for the Sri Lanka description, as the site turns it into a trip.
-const TRIP = {
+// TRIP_JSON / TEXT (env) swap in another trip for the describe scenario, e.g. a template.
+const TRIP = process.env.TRIP_JSON ? JSON.parse(process.env.TRIP_JSON) : {
   id: "ai", name: "Your trip", emoji: "✨", title: "Sri Lanka 2026", subtitle: "By train & tuk-tuk · March 2026", preset: "tropical",
   stickers: ["safari-elephant", "surf-van", "tea-pour"],
   stops: [["Colombo", 79.8542, 6.93886, null], ["Kandy", 80.63504, 7.29312, "train"], ["Ella", 81.04899, 6.87361, "train"], ["Mirissa", 80.45581, 5.94936, "tuktuk"], ["Galle", 80.21496, 6.03281, "tuktuk"]],
 };
-const REPLY = "Here's your Sri Lanka map, from Colombo through the hill country down to the southern coast!";
+const REPLY = process.env.REPLY || "Here's your Sri Lanka map, from Colombo through the hill country down to the southern coast!";
+const TEXT = process.env.TEXT || "Two weeks in Sri Lanka: Colombo, the train from Kandy to Ella, tuk-tuks to Mirissa and Galle";
 
 (async () => {
   const b = await chromium.launch({ args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
@@ -83,7 +85,7 @@ const REPLY = "Here's your Sri Lanka map, from Colombo through the hill country 
     await pause(700);
     const box = p.locator("textarea").first();
     await box.click();
-    await box.pressSequentially("Two weeks in Sri Lanka: Colombo, the train from Kandy to Ella, tuk-tuks to Mirissa and Galle", { delay: 28 });
+    await box.pressSequentially(TEXT, { delay: 28 });
     await pause(450);
     await p.getByRole("button", { name: "Create my map" }).click();
     mark("create");
@@ -93,6 +95,42 @@ const REPLY = "Here's your Sri Lanka map, from Colombo through the hill country 
     await p.getByTitle("See it on a wall").click();
     mark("wall");
     await pause(3600);
+  }
+
+  if (scenario === "styles") {
+    // One trip, flicking through the map styles (STYLES env: comma-separated preset names).
+    const names = (process.env.STYLES || "Vintage,Minimal,Topographic,Midnight,Blush,Terrain,Atlas,Blueprint,Ink").split(",");
+    const pick = (n) => p.getByRole("button", { name: new RegExp(`^${n}`) }).first();
+    // Build the trip through "Describe your trip" (TRIP_JSON), so the map is framed on it.
+    const setup = async () => {
+      await p.goto(`${BASE}/create?new=1`);
+      await p.locator("textarea").first().waitFor();
+      await pause(2500);
+      await p.locator("textarea").first().fill(TEXT);
+      await p.getByRole("button", { name: "Create my map" }).click();
+      await p.getByText("Change anything you like").waitFor();
+      await pause(5000);
+    };
+    for (let i = 0; i < 2; i++) {
+      await setup();
+      await p.getByRole("button", { name: /Style/ }).first().click();
+      await pause(800);
+      for (const n of names) {
+        await pick(n).click();
+        await pause(2200);
+      }
+    }
+    await pick(names[0]).click();
+    await pause(3000);
+    await start();
+    await pause(900);
+    mark("s0");
+    for (const n of names.slice(1)) {
+      await pick(n).click();
+      await pause(Number(process.env.STYLE_MS || 1500));
+    }
+    mark("s1");
+    await pause(500);
   }
 
   if (scenario === "photos") {

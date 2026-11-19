@@ -210,6 +210,16 @@ async function overlays() {
   // The gift card as a full-frame still (caption goes above it).
   await render("overlay/still-gift-card", 1080, 1920, `<div style="position:absolute;inset:0;top:300px">${giftCardVisual(1.3)}</div><div style="position:absolute;left:0;right:0;top:0;height:300px;background:#fbf6ee"></div><div style="position:absolute;left:0;right:0;top:300px;height:200px;background:linear-gradient(#fbf6ee,rgba(251,246,238,0))"></div>`);
   await band("photos-4", `Printed with <span class="coral">your memories</span>`);
+  // Organic Reels (Instagram / TikTok).
+  await cap("japan-1", `Two weeks <span class="coral">in Japan…</span>`);
+  await cap("nz-1", `A New Zealand <span class="coral">road trip…</span>`);
+  await cap("styles-1", `One trip.`);
+  await cap("styles-2", `<span class="coral">12 map styles.</span>`);
+  await cap("styles-3", `Which one's <span class="coral">yours?</span>`);
+  await band("xmas-1", `For the traveller who <span class="coral">has everything…</span>`);
+  await band("xmas-2", `…their trip, <span class="coral">on the wall.</span>`);
+  await band("xmas-3", `Every stop. <span class="coral">Every route.</span>`);
+  await band("xmas-4", `Framed <span class="coral">&amp; delivered.</span>`);
   // End cards.
   const end = (name: string, line: string, cta: string, sub: string) =>
     render(

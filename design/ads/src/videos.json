@@ -201,5 +201,177 @@
   ],
   "end": "end-gift.png",
   "end_seconds": 2.2
+ },
+ "xmas-traveller": {
+  "layout": "phone",
+  "segments": [
+   {
+    "image": "design/mockups/etsy/01-southeast-asia.jpg",
+    "seconds": 3.0,
+    "from": [
+     1200,
+     880,
+     1250
+    ],
+    "to": [
+     1200,
+     960,
+     1650
+    ],
+    "fade": 0.4,
+    "caption": "band-xmas-1.png"
+   },
+   {
+    "image": "design/mockups/etsy/04-sri-lanka.jpg",
+    "seconds": 2.8,
+    "from": [
+     1200,
+     930,
+     1650
+    ],
+    "to": [
+     1200,
+     860,
+     1300
+    ],
+    "fade": 0.4,
+    "caption": "band-xmas-2.png"
+   },
+   {
+    "image": "design/mockups/etsy/03-route-66.jpg",
+    "seconds": 2.8,
+    "from": [
+     1100,
+     860,
+     1300
+    ],
+    "to": [
+     1300,
+     900,
+     1500
+    ],
+    "fade": 0.4,
+    "caption": "band-xmas-3.png"
+   },
+   {
+    "image": "design/mockups/etsy/09-africa-safari.jpg",
+    "seconds": 2.8,
+    "from": [
+     1200,
+     960,
+     1650
+    ],
+    "to": [
+     1200,
+     880,
+     1300
+    ],
+    "fade": 0.4,
+    "caption": "band-xmas-4.png"
+   }
+  ],
+  "captions": [],
+  "end": "end-xmas.png",
+  "end_seconds": 2.4
+ },
+ "reel-japan": {
+  "rec": "rec-japan",
+  "layout": "phone",
+  "segments": [
+   [
+    "start+0.3",
+    "create",
+    1.15
+   ],
+   [
+    "create",
+    "map",
+    1.0
+   ],
+   [
+    "map+1.25",
+    "end-0.3",
+    1.0
+   ]
+  ],
+  "captions": [
+   [
+    "start",
+    "create",
+    "cap-japan-1.png"
+   ],
+   [
+    "create",
+    "end",
+    "cap-describe-2.png"
+   ]
+  ],
+  "end": "end-design.png",
+  "end_seconds": 2.2
+ },
+ "reel-nz": {
+  "rec": "rec-nz",
+  "layout": "phone",
+  "segments": [
+   [
+    "start+0.3",
+    "create",
+    1.15
+   ],
+   [
+    "create",
+    "map",
+    1.0
+   ],
+   [
+    "map+1.25",
+    "end-0.3",
+    1.0
+   ]
+  ],
+  "captions": [
+   [
+    "start",
+    "create",
+    "cap-nz-1.png"
+   ],
+   [
+    "create",
+    "end",
+    "cap-describe-2.png"
+   ]
+  ],
+  "end": "end-design.png",
+  "end_seconds": 2.2
+ },
+ "reel-styles": {
+  "rec": "rec-styles",
+  "layout": "phone",
+  "segments": [
+   [
+    "start+0.2",
+    "end-0.2",
+    1.9
+   ]
+  ],
+  "captions": [
+   [
+    "start",
+    "s0+5",
+    "cap-styles-1.png"
+   ],
+   [
+    "s0+5",
+    "s0+13",
+    "cap-styles-2.png"
+   ],
+   [
+    "s0+13",
+    "end",
+    "cap-styles-3.png"
+   ]
+  ],
+  "end": "end-design.png",
+  "end_seconds": 2.2
  }
 }

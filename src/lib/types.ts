@@ -85,6 +85,8 @@ export interface Theme {
   texture: boolean; // paper grain overlay
   hypso: boolean; // colour land by height (green lowlands to snowy peaks)
   physical: boolean; // classic atlas shaded-relief base
+  /** Victorian Ordnance Survey look: hatched buildings, stippled parks, cased roads, land contours, serif labels. */
+  engraved?: boolean;
   details: MapDetails;
 }
 

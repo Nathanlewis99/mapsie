@@ -15,6 +15,7 @@ export interface Preset {
   texture: boolean;
   hypso?: boolean;
   physical?: boolean;
+  engraved?: boolean;
   details?: Partial<MapDetails>;
   /** Shown as a small tag on the style card. */
   tag?: string;
@@ -109,6 +110,17 @@ export const PRESETS: Preset[] = [
     colors: { land: "#2c5d9c", water: "#1d4479", park: "#2c5d9c", roads: "#a9c4e8", borders: "#dbe7f7", labels: "#eef4fc", accent: "#ffd166", paper: "#1d4479", ink: "#f2f6fc" },
   },
   {
+    // After the Ordnance Survey town plans of the 1880s and 90s: one sepia ink on cream,
+    // engraved buildings, stippled parks, contour lines and a gilt route.
+    id: "heritage",
+    name: "Heritage",
+    tag: "Victorian",
+    relief: true,
+    texture: true,
+    engraved: true,
+    colors: { land: "#f2e8d0", water: "#d8ccad", park: "#ebe0c4", roads: "#f7efdc", borders: "#5b4630", labels: "#3a2a19", accent: "#c08b2c", paper: "#efe4c9", ink: "#3a2a19" },
+  },
+  {
     id: "ink",
     name: "Ink",
     relief: false,
@@ -126,6 +138,7 @@ export function themeFromPreset(p: Preset): Theme {
     texture: p.texture,
     hypso: p.hypso ?? false,
     physical: p.physical ?? false,
+    ...(p.engraved ? { engraved: true } : {}),
     details: { ...NO_DETAILS, ...p.details },
   };
 }
@@ -146,15 +159,26 @@ const hide = (l: AnyLayer) => {
 export const showSeaDepth = (t: Theme) => t.seaDepth ?? t.relief;
 
 /** `seaTiles`: the sea-depth contour tile URL (from lib/seaDepth), when running in a browser. */
-export function buildStyle(base: StyleSpecification, theme: Theme, opts: { seaTiles?: string } = {}): StyleSpecification {
+export function buildStyle(base: StyleSpecification, theme: Theme, opts: { seaTiles?: string; origin?: string } = {}): StyleSpecification {
   const sea = showSeaDepth(theme) && !!opts.seaTiles;
   const c = theme.colors;
   const style: StyleSpecification = JSON.parse(JSON.stringify(base));
   const out: AnyLayer[] = [];
+  const engraved = !!theme.engraved;
+  if (engraved) style.glyphs = `${opts.origin ?? ""}/api/glyphs/{fontstack}/{range}.pbf`;
 
   for (const layer of style.layers as AnyLayer[]) {
     const id = layer.id;
     const paint = (layer.paint ??= {});
+
+    if (engraved) {
+      const res = engrave(layer, theme, sea);
+      if (res) {
+        out.push(...res);
+        if (id === "boundary_disputed") out.push(...detailLayers(theme.details ?? NO_DETAILS, c));
+        continue;
+      }
+    }
 
     if (id === "background") paint["background-color"] = c.land;
     else if (id === "water") paint["fill-color"] = c.water;
@@ -251,6 +275,110 @@ export function buildStyle(base: StyleSpecification, theme: Theme, opts: { seaTi
     };
   }
   return style;
+}
+
+// ---------------------------------------------------------------- Heritage (engraved)
+const SERIF = { regular: ["Old Standard Regular"], italic: ["Old Standard Italic"], bold: ["Old Standard Bold"] };
+// Road widths for the engraved look: a fine ink casing either side of a paper-coloured road.
+const roadWidth = (k: number, extra = 0): unknown => ["interpolate", ["exponential", 1.6], ["zoom"], 10, 0.4 * k + extra, 13, 1.6 * k + extra, 15, 5 * k + extra, 17, 14 * k + extra];
+
+/**
+ * The engraved treatment for one base layer: the layers to draw in its place, or
+ * null to fall back to the normal handling.
+ */
+function engrave(layer: AnyLayer, theme: Theme, sea: boolean): AnyLayer[] | null {
+  const id = layer.id;
+  const c = theme.colors;
+  const ink = c.borders;
+  const paint = (layer.paint ??= {});
+  const show = () => (layer.layout = { ...(layer.layout ?? {}), visibility: "visible" });
+  const from = layer as unknown as { source: string; "source-layer"?: string; filter?: unknown };
+
+  if (id === "water") {
+    paint["fill-color"] = c.water;
+    paint["fill-outline-color"] = ink;
+    const out: AnyLayer[] = [];
+    if (theme.relief) out.push(reliefLayer(theme, 0.25));
+    out.push(layer, { id: "mapsie-water-edge", type: "line", source: from.source, "source-layer": from["source-layer"], filter: from.filter, paint: { "line-color": ink, "line-width": ["interpolate", ["linear"], ["zoom"], 8, 0.4, 15, 1.1], "line-opacity": 0.8 } } as AnyLayer);
+    if (sea) out.push(...seaLayers(c.water, c.labels));
+    // Land contours, as on the town plans' hills (Arthur's Seat and the like).
+    if (sea) out.push({
+      id: "mapsie-land-contours",
+      type: "line",
+      source: "mapsie-sea",
+      "source-layer": "contours",
+      filter: [">", ["get", "ele"], 0],
+      layout: { "line-join": "round", "line-cap": "round" },
+      paint: { "line-color": ink, "line-opacity": ["match", ["get", "level"], 1, 0.5, 0.3], "line-width": ["match", ["get", "level"], 1, 0.8, 0.5] },
+    } as AnyLayer);
+    return out;
+  }
+  if (id === "park" || id === "landcover_wood") {
+    // Real parks and woods only: the park data also holds protected areas, such as
+    // Edinburgh's World Heritage Site, which cover whole city centres.
+    if (id === "park") (layer as { filter?: unknown }).filter = ["all", from.filter as never, ["!", ["in", ["get", "class"], ["literal", ["protected_area", "national_park", "aboriginal_lands"]]]]] as never;
+    paint["fill-color"] = c.park;
+    paint["fill-opacity"] = 1;
+    return [layer, { ...layer, id: `${id}-stipple`, paint: { "fill-pattern": "mapsie-stipple", "fill-opacity": 0.9 } } as AnyLayer];
+  }
+  if (id === "building") {
+    show();
+    layer.paint = { "fill-pattern": "mapsie-hatch", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 12, 0.4, 14, 1] };
+    return [layer, { id: "building-outline", type: "line", source: from.source, "source-layer": from["source-layer"], minzoom: 13, paint: { "line-color": ink, "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.3, 17, 1], "line-opacity": 0.85 } } as AnyLayer];
+  }
+  if (id.startsWith("highway") && layer.type === "line" && !id.includes("casing") && !id.includes("subtle") && !id.includes("bridge")) {
+    const k = id.includes("motorway") ? 1.6 : id.includes("major") ? 1.3 : id.includes("path") ? 0.35 : 1;
+    if (id.includes("path")) {
+      layer.paint = { "line-color": ink, "line-width": 0.6, "line-dasharray": [2, 2], "line-opacity": 0.6 };
+      return [layer];
+    }
+    show();
+    const casing = { ...layer, id: `${id}-engraved-case`, paint: { "line-color": ink, "line-width": roadWidth(k, 1.2), "line-opacity": 0.9 } } as unknown as AnyLayer;
+    (layer as { paint?: Record<string, unknown> }).paint = { "line-color": c.roads, "line-width": roadWidth(k) };
+    return [casing, layer];
+  }
+  if (id.startsWith("highway") && layer.type === "line") {
+    hide(layer);
+    return [layer];
+  }
+  if (id.startsWith("railway")) {
+    // Fine single lines, as engraved; the base style's dashed overlays would thicken them.
+    if (id.includes("dashline")) hide(layer);
+    else (layer as { paint?: Record<string, unknown> }).paint = { "line-color": ink, "line-opacity": 0.8, "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.5, 16, 1.4] };
+    return [layer];
+  }
+  if (id.startsWith("boundary")) {
+    // Fine dotted county lines, as on the town plans; national borders a little heavier.
+    layer.paint = { "line-color": ink, "line-opacity": 0.45, "line-width": id === "boundary_2" ? 0.9 : 0.6, "line-dasharray": [1, 2] };
+    return [layer];
+  }
+  if (layer.type === "symbol") {
+    const isPlaceOrWater = id.startsWith("label_") || id.startsWith("water_name");
+    const minorPlace = id.startsWith("label_") && !id.startsWith("label_country");
+    if (!theme.labels || !isPlaceOrWater || id === "label_other" || (theme.countriesOnly && minorPlace)) {
+      hide(layer);
+      return [layer];
+    }
+    const big = id.startsWith("label_country") || id.startsWith("label_state") || id === "label_city_capital" || id === "label_city";
+    const water = id.startsWith("water_name");
+    const name = ["coalesce", ["get", "name:en"], ["get", "name_en"], ["get", "name:latin"], ["get", "name"]];
+    (layer as { layout?: Record<string, unknown> }).layout = {
+      ...(layer.layout ?? {}),
+      "text-field": big ? ["upcase", name] : name,
+      "text-font": water ? SERIF.italic : big ? SERIF.bold : SERIF.regular,
+      "text-letter-spacing": big ? 0.25 : water ? 0.12 : 0.04,
+    };
+    paint["text-color"] = c.labels;
+    paint["text-halo-color"] = c.land;
+    paint["text-halo-width"] = 1.4;
+    return [layer];
+  }
+  return null;
+}
+
+function reliefLayer(theme: Theme, exaggeration: number): AnyLayer {
+  const c = theme.colors;
+  return { id: "mapsy-relief", type: "hillshade", source: "mapsy-dem", paint: { "hillshade-exaggeration": exaggeration, "hillshade-shadow-color": c.labels, "hillshade-highlight-color": c.land, "hillshade-accent-color": c.borders } } as AnyLayer;
 }
 
 // Height bands, roughly in the tradition of school atlases. Sea level and below

@@ -21,7 +21,7 @@ export function seaContourTiles() {
   dem.setupMaplibre(maplibregl);
   tiles = dem.contourProtocolUrl({
     // Metres between lines, [minor, major], by zoom: wider apart when zoomed out.
-    thresholds: { 1: [2000, 4000], 4: [1000, 2000], 6: [500, 2000], 8: [200, 1000], 10: [100, 500] },
+    thresholds: { 1: [2000, 4000], 4: [1000, 2000], 6: [500, 2000], 8: [200, 1000], 10: [100, 500], 11: [50, 250] },
     elevationKey: "ele",
     levelKey: "level",
     contourLayer: "contours",

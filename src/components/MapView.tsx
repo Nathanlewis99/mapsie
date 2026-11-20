@@ -120,7 +120,7 @@ export default function MapView(props: Props) {
       const zoom = d.view.zoom + Math.log2(widthRef.current / d.view.refWidth);
       const m = new maplibregl.Map({
         container: el.current,
-        style: buildStyle(base, d.theme, { seaTiles: seaContourTiles() }),
+        style: buildStyle(base, d.theme, { seaTiles: seaContourTiles(), origin: location.origin }),
         center: d.view.center,
         zoom,
         bearing: d.view.bearing,
@@ -147,9 +147,12 @@ export default function MapView(props: Props) {
       m.on("styleimagemissing", (e) => {
         const img = detailIcon(e.id);
         if (img && !m.hasImage(e.id)) m.addImage(e.id, img, { sdf: true, pixelRatio: 2 });
+        const pat = engravingPattern(e.id);
+        if (pat && !m.hasImage(e.id)) m.addImage(e.id, pat, { pixelRatio: 2 });
       });
       if (editable) m.touchZoomRotate.disableRotation();
       map.current = m;
+      (window as unknown as { __MAPSIE_MAP?: unknown }).__MAPSIE_MAP = m; // for render checks and debugging
 
       m.on("style.load", () => {
         styleReady.current = true;
@@ -206,7 +209,7 @@ export default function MapView(props: Props) {
     if (!m) return;
     loadBaseStyle().then((base) => {
       styleReady.current = false;
-      m.setStyle(buildStyle(base, design.theme, { seaTiles: seaContourTiles() }), { diff: false });
+      m.setStyle(buildStyle(base, design.theme, { seaTiles: seaContourTiles(), origin: location.origin }), { diff: false });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeKey]);
@@ -614,6 +617,48 @@ export default function MapView(props: Props) {
       }}
     />
   );
+}
+
+/**
+ * Fill patterns for the engraved (Heritage) style, in its sepia ink: fine diagonal
+ * hatching for buildings, and a stipple of dots and tree tufts for parks and woods.
+ */
+function engravingPattern(id: string): ImageData | null {
+  if (id !== "mapsie-hatch" && id !== "mapsie-stipple") return null;
+  const size = id === "mapsie-hatch" ? 12 : 40;
+  const cv = document.createElement("canvas");
+  cv.width = cv.height = size;
+  const g = cv.getContext("2d")!;
+  g.strokeStyle = g.fillStyle = "rgba(91, 70, 48, 0.85)";
+  if (id === "mapsie-hatch") {
+    // 45° lines that join up across tiles.
+    g.lineWidth = 1.1;
+    g.beginPath();
+    for (let o = -size; o <= size; o += 6) {
+      g.moveTo(o, size);
+      g.lineTo(o + size, 0);
+    }
+    g.stroke();
+  } else {
+    // Scattered dots with a few little tree tufts (a fixed pattern, so tiles match).
+    const dots = [[4, 6], [17, 3], [30, 9], [9, 19], [24, 17], [36, 24], [5, 31], [19, 33], [31, 36], [13, 11], [27, 27]];
+    for (const [x, y] of dots) {
+      g.beginPath();
+      g.arc(x, y, 0.9, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.lineWidth = 1;
+    for (const [x, y] of [[11, 26], [32, 15]]) {
+      g.beginPath();
+      g.arc(x, y, 2.6, Math.PI * 0.9, Math.PI * 2.1);
+      g.stroke();
+      g.beginPath();
+      g.moveTo(x, y + 1);
+      g.lineTo(x, y + 4.5);
+      g.stroke();
+    }
+  }
+  return g.getImageData(0, 0, size, size);
 }
 
 /** Small single-colour icons (tinted by the style) for current arrows and shipping lanes. */

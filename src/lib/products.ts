@@ -23,6 +23,9 @@ export const getRegion = (id: string | undefined) => REGIONS.find((r) => r.id ==
 /** Best guess at the shopper's region from their browser. */
 export function guessRegion(): RegionId {
   if (typeof navigator === "undefined") return "GB";
+  // Links can choose the country (e.g. ads for US searches use ?region=US).
+  const asked = typeof location !== "undefined" ? new URLSearchParams(location.search).get("region")?.toUpperCase() : null;
+  if (asked && REGIONS.some((r) => r.id === asked)) return asked as RegionId;
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";
   if (tz.startsWith("Australia")) return "AU";
   if (tz.startsWith("America/") && navigator.language === "en-US") return "US";

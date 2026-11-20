@@ -168,6 +168,11 @@ export async function gadsMutate(resource: string, operations: unknown[], valida
   return call<{ results?: { resourceName: string }[] }>(`${resource}:mutate`, { operations, validateOnly });
 }
 
+/** Several kinds of change in one all-or-nothing request (temporary ids like customers/X/campaigns/-1 link them). */
+export async function gadsMutateAll(mutateOperations: unknown[], validateOnly = false) {
+  return call<{ mutateOperationResponses?: unknown[] }>("googleAds:mutate", { mutateOperations, validateOnly });
+}
+
 /** Campaigns, budgets and every ad's review status, for a quick check. */
 export async function gadsStatus() {
   // No date segment here: a campaign with no impressions yet would otherwise be left out.

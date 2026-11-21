@@ -142,7 +142,7 @@ export interface Design {
   stops: Stop[];
   route: { show: boolean; style: RouteStyle; curved: boolean; width: number; modeIcons: boolean; /** Art style of the transport icons. */ iconArt?: ArtStyleId };
   markers: { style: MarkerStyle; showDates: boolean; size: number; labelSize: number };
-  visited: { show: boolean; opacity: number };
+  visited: { show: boolean; opacity: number; /** Each country its own colour (default) rather than all in the route colour. */ multi?: boolean };
   stickers: Sticker[];
   text: TextStyle;
   stickerStyle: ArtStyleId; // default style for new stickers

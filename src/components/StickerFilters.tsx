@@ -20,6 +20,41 @@ const tables = (colors: string[]) => {
   return [0, 1, 2].map((i) => rgb.map((c) => c[i]).join(" "));
 };
 
+// A line screen for engraving: fine diagonal stripes whose brightness rises and falls
+// across each stripe. Where the art is darker than the stripe, ink is laid, so shadows
+// get thick lines and highlights thin or none, as in a copperplate engraving.
+const HATCH =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="400" height="400" preserveAspectRatio="none"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#000"/><stop offset="0.5" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient><pattern id="p" width="2.6" height="2.6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="2.6" height="2.6" fill="url(#g)"/></pattern></defs><rect x="-50" y="-50" width="200" height="200" fill="url(#p)"/></svg>`,
+  );
+
+/** The engraving itself: line-screen shading plus an outline, in ink. `boost` sets how much is shaded. */
+function Engrave({ ink, boost, result }: { ink: string; boost: number; result: string }) {
+  return (
+    <>
+      {/* darkness of the art (0 = white, 1 = black), only where the art is */}
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.2126 -0.7152 -0.0722 0 1" result="dark" />
+      <feComposite in="dark" in2="SourceAlpha" operator="in" result="tone" />
+      <feImage href={HATCH} x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="screen" />
+      <feColorMatrix in="screen" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1 0 0 0 0" result="screenA" />
+      <feComposite in="tone" in2="screenA" operator="arithmetic" k1="0" k2={boost} k3="-1" k4="0" result="diff" />
+      <feComponentTransfer in="diff" result="lines">
+        <feFuncA type="discrete" tableValues="0 1 1 1 1 1 1 1" />
+      </feComponentTransfer>
+      {/* a fine outline round every shape */}
+      <feMorphology in="SourceAlpha" operator="erode" radius="0.011" result="inner" />
+      <feComposite in="SourceAlpha" in2="inner" operator="out" result="edge" />
+      <feMerge result="inkMask">
+        <feMergeNode in="lines" />
+        <feMergeNode in="edge" />
+      </feMerge>
+      <feFlood floodColor={ink} />
+      <feComposite in2="inkMask" operator="in" result={result} />
+    </>
+  );
+}
+
 export default function StickerFilters({ prefix, colors }: { prefix: string; colors: ThemeColors }) {
   const region = { x: "-30%", y: "-30%", width: "160%", height: "160%", primitiveUnits: "objectBoundingBox", colorInterpolationFilters: "sRGB" } as const;
   const [rR, rG, rB] = tables([colors.ink, colors.accent, colors.paper]);
@@ -152,6 +187,36 @@ export default function StickerFilters({ prefix, colors }: { prefix: string; col
             <feMergeNode in="glowTight" />
             <feMergeNode in="tube" />
             <feMergeNode in="core" />
+          </feMerge>
+        </filter>
+
+        {/* Engraved: a copperplate etching in the poster's ink, on its paper */}
+        <filter id={filterId(prefix, "engraved")} {...region}>
+          <Engrave ink={colors.ink} boost={1.7} result="inked" />
+          <feFlood floodColor={colors.paper} floodOpacity="0.9" />
+          <feComposite in2="SourceAlpha" operator="in" result="ground" />
+          <feMerge>
+            <feMergeNode in="ground" />
+            <feMergeNode in="inked" />
+          </feMerge>
+        </filter>
+
+        {/* Hand-coloured: the engraving tinted with soft, faded watercolour, as on antique maps */}
+        <filter id={filterId(prefix, "handcoloured")} {...region}>
+          <Engrave ink={colors.ink} boost={1.25} result="inked" />
+          <feColorMatrix in="SourceGraphic" type="saturate" values="0.55" result="muted" />
+          {/* fade the colours toward the paper, like old pigment */}
+          <feComponentTransfer in="muted" result="faded">
+            <feFuncR type="linear" slope="0.6" intercept="0.36" />
+            <feFuncG type="linear" slope="0.6" intercept="0.33" />
+            <feFuncB type="linear" slope="0.55" intercept="0.27" />
+          </feComponentTransfer>
+          <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="4" result="flow" />
+          <feDisplacementMap in="faded" in2="flow" scale="0.03" xChannelSelector="R" yChannelSelector="G" result="wash" />
+          <feComposite in="wash" in2="SourceAlpha" operator="in" result="tint" />
+          <feMerge>
+            <feMergeNode in="tint" />
+            <feMergeNode in="inked" />
           </feMerge>
         </filter>
 

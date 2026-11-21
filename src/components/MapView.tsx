@@ -4,13 +4,14 @@ import { useEffect, useRef } from "react";
 import maplibregl, { Map as MLMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { DEFAULT_TEXT, type Design, type FontId, type Sticker, type Stop } from "@/lib/types";
-import { buildStyle, loadBaseStyle } from "@/lib/themes";
+import { buildStyle, loadBaseStyle, lookOf, WASH_COLOURS } from "@/lib/themes";
+import { visitedPalette } from "@/lib/lookMatch";
 import { buildLegs, routeGeoJSON, stopsBounds } from "@/lib/geo";
 import { loadCountries, visitedCountries } from "@/lib/countries";
 import { fontBold, fontCss } from "@/lib/fonts";
 import { getArtStyle, stickerSrc } from "@/lib/stickers";
 import { buildPhoto } from "@/lib/photoStyle";
-import { originalSrc, resolvePalette } from "@/lib/originals";
+import { originalFinish, originalSrc, resolvePalette } from "@/lib/originals";
 import { filterId } from "./StickerFilters";
 import { TINY_PIN } from "@/lib/legibility";
 
@@ -258,7 +259,9 @@ export default function MapView(props: Props) {
           const node = document.createElement("div");
           node.className = "mapsie-mode";
           node.style.cssText = `--u:${u}px;background:${c.paper};border-color:${c.accent}`;
-          node.innerHTML = `<img src="${stickerSrc(leg.vehicle, design.route.iconArt ?? "cartoon")}" alt="" />`;
+          const iconArt = getArtStyle(design.route.iconArt ?? "cartoon");
+          const iconFilter = iconArt.finish !== "none" ? ` style="filter:url(#${filterId(filterPrefix, iconArt.finish)})"` : "";
+          node.innerHTML = `<img src="${stickerSrc(leg.vehicle, iconArt.id)}" alt=""${iconFilter} />`;
           const a = leg.line[0];
           const b = leg.line[leg.line.length - 1];
           // Only show the icon when the leg is long enough on screen not to crowd the stops.
@@ -293,13 +296,14 @@ export default function MapView(props: Props) {
         // Below the water layer, so the sea crisply trims the country shapes.
         m.addLayer({ id: VISITED_SRC, type: "fill", source: VISITED_SRC, paint: {} }, m.getLayer("water") ? "water" : undefined);
       }
-      m.setPaintProperty(VISITED_SRC, "fill-color", d.theme.colors.accent);
+      const pal = visitedPalette(d.theme.colors.accent, lookOf(d.theme), WASH_COLOURS);
+      m.setPaintProperty(VISITED_SRC, "fill-color", d.visited.multi === false ? d.theme.colors.accent : (["match", ["%", ["get", "ci"], pal.length], ...pal.flatMap((col, i) => [i, col]), d.theme.colors.accent] as never));
       m.setPaintProperty(VISITED_SRC, "fill-opacity", d.visited.opacity);
     };
     if (!d.visited.show) return apply(EMPTY);
     loadCountries().then((all) => apply(visitedCountries(all, latest.current.stops)));
   }
-  const visitedKey = JSON.stringify([design.visited, design.stops.map((s) => [s.lng, s.lat]), design.theme.colors.accent]);
+  const visitedKey = JSON.stringify([design.visited, design.stops.map((s) => [s.lng, s.lat]), design.theme.colors.accent, design.theme.presetId]);
   useEffect(() => {
     syncVisited();
      
@@ -363,7 +367,8 @@ export default function MapView(props: Props) {
         ? originalSrc(m.name, m.origStyle ?? "papercut", resolvePalette(m.palette ?? "auto", design.theme.presetId, m.origStyle ?? "papercut"))
         : stickerSrc(m.name, m.art);
     const art = m.kind === "sticker" ? getArtStyle(m.art) : null;
-    const filter = art && art.finish !== "none" ? `filter:url(#${filterId(filterPrefix, art.finish)});` : "";
+    const finish = art && art.finish !== "none" ? art.finish : m.kind === "original" ? originalFinish(m.origStyle) : null;
+    const filter = finish ? `filter:url(#${filterId(filterPrefix, finish)});` : "";
     return `<img class="mapsie-stop-sticker" src="${src}" alt="" draggable="false" style="${filter}${art?.blend ? `mix-blend-mode:${art.blend};` : ""}">`;
   }
 
@@ -511,7 +516,8 @@ export default function MapView(props: Props) {
                 : st.kind === "sticker" && st.name
                   ? stickerSrc(st.name, st.art)
                   : st.src;
-            if (art && art.finish !== "none") img.style.filter = `url(#${filterId(filterPrefix, art.finish)})`;
+            const finish = art && art.finish !== "none" ? art.finish : st.kind === "original" ? originalFinish(st.origStyle) : null;
+            if (finish) img.style.filter = `url(#${filterId(filterPrefix, finish)})`;
             img.draggable = false;
             img.alt = "";
             inner = img;
@@ -674,13 +680,20 @@ function washTexture(): ImageData {
   // A fixed pseudo-random sequence, so every tile and every render match.
   let seed = 7;
   const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  // Granulation: fine pigment specks that settle in the paper's grain.
+  for (let i = 0; i < 1400; i++) {
+    const x = rnd() * size, y = rnd() * size;
+    g.fillStyle = rnd() < 0.35 ? "rgba(60,45,30,0.06)" : "rgba(255,255,255,0.2)";
+    g.fillRect(x, y, 1 + rnd() * 1.5, 1 + rnd() * 1.5);
+  }
+  // Blooms: soft lighter and darker patches where the paint dried unevenly.
   for (let i = 0; i < 28; i++) {
     const x = rnd() * size, y = rnd() * size, r = 40 + rnd() * 80;
-    const light = rnd() < 0.55;
+    const light = rnd() < 0.7;
     // Draw each blotch at all 9 tile offsets so the edges wrap.
     for (const dx of [-size, 0, size]) for (const dy of [-size, 0, size]) {
       const grad = g.createRadialGradient(x + dx, y + dy, 0, x + dx, y + dy, r);
-      grad.addColorStop(0, light ? "rgba(255,255,255,0.28)" : "rgba(60,45,30,0.12)");
+      grad.addColorStop(0, light ? "rgba(255,255,255,0.34)" : "rgba(60,45,30,0.07)");
       grad.addColorStop(1, "rgba(0,0,0,0)");
       g.fillStyle = grad;
       g.beginPath();

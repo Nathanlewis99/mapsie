@@ -12,9 +12,9 @@ type ArtSet = "cartoon" | "flat" | "color" | "line";
 
 // Finishes are SVG filters (see StickerFilters.tsx), drawn in the poster's own
 // colours. They're vector effects, so they stay crisp at 300 dpi.
-export type Finish = "none" | "diecut" | "stamp" | "watercolour" | "retro" | "gold" | "neon" | "ink";
+export type Finish = "none" | "diecut" | "stamp" | "watercolour" | "retro" | "gold" | "neon" | "ink" | "engraved" | "handcoloured";
 
-export type ArtStyleId = "cartoon" | "flat" | "illustrated" | "sticker" | "line" | "stamp" | "watercolour" | "retro" | "gold" | "neon";
+export type ArtStyleId = "cartoon" | "flat" | "illustrated" | "sticker" | "line" | "stamp" | "watercolour" | "retro" | "gold" | "neon" | "engraved" | "handcoloured";
 
 export interface ArtStyle {
   id: ArtStyleId;
@@ -27,6 +27,8 @@ export interface ArtStyle {
 
 export const ART_STYLES: ArtStyle[] = [
   { id: "illustrated", name: "Illustrated", blurb: "Rich, painterly colour", set: "color", finish: "none" },
+  { id: "engraved", name: "Engraved", blurb: "A copperplate etching, like the old town plans", set: "flat", finish: "engraved" },
+  { id: "handcoloured", name: "Hand-coloured", blurb: "Engraved and tinted with faded watercolour, like antique maps", set: "color", finish: "handcoloured" },
   { id: "watercolour", name: "Watercolour", blurb: "Soft washes that bleed into the paper", set: "color", finish: "watercolour", blend: "multiply" },
   { id: "stamp", name: "Vintage stamp", blurb: "Inked like an old explorer's chart", set: "flat", finish: "stamp", blend: "multiply" },
   { id: "line", name: "Fine line", blurb: "Elegant pen drawing in your ink colour", set: "line", finish: "ink" },
@@ -55,6 +57,11 @@ export const SUGGESTED_STYLE: Record<string, ArtStyleId> = {
   blueprint: "line",
   ink: "line",
   custom: "illustrated",
+  heritage: "engraved",
+  antique: "handcoloured",
+  touring: "handcoloured",
+  poster: "retro",
+  watercolour: "watercolour",
 };
 export const suggestedStyleFor = (presetId: string): ArtStyleId => SUGGESTED_STYLE[presetId] ?? "illustrated";
 

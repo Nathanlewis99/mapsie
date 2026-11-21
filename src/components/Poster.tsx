@@ -5,6 +5,7 @@ import StickerFilters from "./StickerFilters";
 import { DEFAULT_TEXT, type CompassStyle, type Design, type TextCase } from "@/lib/types";
 import { posterAspect } from "@/lib/products";
 import { fontBold, fontCss } from "@/lib/fonts";
+import { lookOf } from "@/lib/themes";
 import type { MapHandlers } from "./MapView";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
@@ -141,7 +142,8 @@ export default function Poster({ design, width, editable = false, print, selecte
       id="poster"
       className="relative overflow-hidden select-none"
       onContextMenu={print ? undefined : (e) => e.preventDefault()}
-      style={{ width, height, background: c.paper, ["--u" as string]: `${u}px` }}
+      data-look={lookOf(design.theme)}
+      style={{ width, height, background: c.paper, ["--u" as string]: `${u}px`, ["--c-ink" as string]: c.ink, ["--c-paper" as string]: c.paper, ["--c-accent" as string]: c.accent }}
     >
       <StickerFilters prefix={filterPrefix} colors={c} />
       <div

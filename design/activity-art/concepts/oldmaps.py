@@ -175,48 +175,69 @@ def galleon(d: Drawing):
 
 
 # ================================================================ WIND HEAD
-def puff(cx, cy, r, n=9, k=0.3):
-    """A scalloped cloud ring."""
-    s = ""
-    pts = [(cx + r * math.cos(2 * math.pi * i / n), cy + r * math.sin(2 * math.pi * i / n)) for i in range(n)]
-    s = f"M{pts[0][0]:.1f} {pts[0][1]:.1f}"
-    for i in range(n):
-        a = pts[i]
-        b = pts[(i + 1) % n]
-        mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
-        ox, oy = mx - cx, my - cy
-        L = math.hypot(ox, oy)
-        c = (mx + ox / L * r * k * 1.6, my + oy / L * r * k * 1.6)
-        s += f" Q{c[0]:.1f} {c[1]:.1f} {b[0]:.1f} {b[1]:.1f}"
+def billow(pts, bulge=1.25):
+    """A billowing cloud: arcs bulging outward between outline points (given clockwise on screen)."""
+    s = f"M{pts[0][0]} {pts[0][1]}"
+    for i in range(len(pts)):
+        a, b = pts[i], pts[(i + 1) % len(pts)]
+        r = math.hypot(b[0] - a[0], b[1] - a[1]) / 2 * bulge
+        s += f" A{r:.1f} {r:.1f} 0 0 1 {b[0]} {b[1]}"
     return s + "Z"
 
 
+def gust(pts, w0, w1, n=60):
+    """A stream of breath: narrow at the lips, swelling, then thinning into its curl."""
+    return tube(pts, lambda t: max(1.6, w0 + (w1 - w0) * math.sin(math.pi * min(1, t * 1.6)) * (1 - t) ** 0.6), n)
+
+
+def ringlet(x, y, r):
+    """A spiral curl of hair."""
+    return f"M{x + r * 0.55:.1f} {y:.1f} A{r * 0.55:.1f} {r * 0.55:.1f} 0 1 0 {x:.1f} {y + r * 0.55:.1f} A{r * 0.3:.1f} {r * 0.3:.1f} 0 0 0 {x + r * 0.25:.1f} {y + r * 0.1:.1f}"
+
+
 def windhead(d: Drawing):
-    # wind lines streaming right, curling at their ends
-    d.stroke("wind", "M120 100 C140 92 160 84 176 90 C188 95 186 108 176 108 C168 108 168 98 176 98", 4.4)
-    d.stroke("wind", "M124 110 C148 112 170 116 192 124", 4.4)
-    d.stroke("wind", "M120 120 C138 132 152 146 172 150 C184 152 188 140 180 136 C172 134 170 142 176 144", 4.4)
-    d.stroke("wind", "M116 88 C132 74 150 64 170 64", 3.4)
-    # cloud around the back of the head
-    d.shape("cloud", puff(60, 102, 46, 11, 0.32))
-    d.shape("cloud2", puff(52, 108, 30, 9, 0.3), shadow=False)
-    # curly hair streaming back
-    d.shape("hair", puff(66, 86, 27, 10, 0.38), spot=True)
-    d.shape("hair", puff(46, 76, 12, 7, 0.4), spot=True)
-    d.shape("hair", puff(44, 102, 11, 7, 0.4), spot=True)
-    # face in profile: brow, nose, cheeks blown out round pursed lips
-    d.shape("skin", "M66 74 C74 64 92 62 100 74 C102 79 106 84 109 88 C110 92 106 94 102 94 "
-                    "C112 94 120 100 120 108 C120 116 112 122 104 126 C94 132 80 132 70 126 C60 118 58 86 66 74Z")
-    d.shape("cheek", circle(100, 110, 9), shadow=False, line=False)
-    d.shape("lips", ellipse(123, 108, 4.2, 5), shadow=False)
-    d.marks("dark", ellipse(124, 108, 1.8, 2.4))
-    d.marks("light", ellipse(90, 84, 4.2, 3.4))
-    d.marks("dark", circle(92, 84, 2.2))
-    d.stroke("dark", "M83 76 Q90 71 98 76", 2.2)
-    d.stroke("dark", "M68 106 Q63 100 67 95", 1.8, line=False)
-    # little wind puffs at the lips
-    d.shape("cloud", puff(140, 108, 6, 6, 0.3), shadow=False)
-    d.shape("cloud", puff(154, 102, 4, 6, 0.3), shadow=False)
+    # the sea below, whipped up by the wind
+    d.band("mid", waves(146, 4, 30))
+    front_sea(d, 160, "near", 5, 28, [(64, 172), (112, 176), (152, 168)], 4)
+    # streams of breath fanning out across the circle, each ending in a curl
+    streams = [
+        ([(122, 94), (134, 82), (144, 70), (156, 64), (168, 58), (176, 70), (168, 76), (160, 80), (156, 70), (162, 68)], 3, 13),
+        ([(124, 104), (140, 103), (156, 104), (168, 101), (180, 98), (182, 116), (170, 117), (162, 118), (160, 108), (166, 107)], 3, 14),
+        ([(122, 114), (132, 126), (140, 140), (154, 142), (168, 144), (172, 128), (162, 127), (154, 127), (154, 137), (160, 137)], 3, 13),
+    ]
+    for pts, w0, w1 in streams:
+        d.shape("wind", gust(pts, w0, w1), spot=True)
+    # a big billowing cloud behind the head...
+    ring = [(40, 46), (24, 48), (6, 50), (-12, 49), (-32, 48), (-54, 49), (-78, 50), (-102, 49), (-126, 50), (-150, 49),
+            (-174, 47), (160, 46), (138, 47), (116, 46), (94, 44)]
+    back = [(round(74 + r * math.cos(math.radians(-t)), 1), round(96 + r * math.sin(math.radians(-t)), 1)) for t, r in ring]
+    d.shape("cloud", billow(back, 1.2))
+    d.stroke("cloud2", "M36 84 C34 76 40 70 46 72", 2.2, line=False)
+
+    def head():
+        # face, three-quarter view facing right, with a plump chin
+        d.shape("skin", "M46 92 C46 72 60 60 76 60 C92 60 104 72 104 90 C104 108 94 122 76 122 C60 122 46 110 46 92Z")
+        # curly hair over the crown and down the back of the head
+        curls = [(50, 100, 9), (47, 86, 9.5), (52, 72, 10), (64, 62, 10.5), (79, 58, 10), (92, 62, 8.5)]
+        d.shape("hair", "".join(circle(x, y, r) for x, y, r in curls), spot=True)
+        d.stroke("hair2", "".join(ringlet(x, y, r) for x, y, r in curls), 1.8)
+        # puffed-out cheek bulging past the face, and pursed lips
+        d.shape("skin", circle(98, 104, 17))
+        d.shape("cheek", circle(97, 106, 9), shadow=False, line=False)
+        d.shape("lips", ellipse(117, 101, 5, 6))
+        d.marks("dark", ellipse(118.5, 101, 2, 2.8))
+        # nose, screwed-up eye and raised brow
+        d.shape("skin", "M93 78 C100 80 105 87 103 92 C100 95 95 93 92 90Z")
+        d.stroke("skin2", "M96 93 Q100 94 103 91", 1.6, line=False)
+        d.stroke("dark", "M80 84 Q86 89 93 84", 2.8)
+        d.stroke("hair2", "M77 74 Q85 68 95 73", 3.2)
+        d.stroke("skin2", "M64 112 Q70 120 80 120", 2.0, line=False)
+    group(d, "translate(78 96) scale(.94) translate(-74 -94)", head)
+    # ...and billowing round in front of the chin, so the head rises out of it
+    d.shape("cloud", billow([(26, 104), (40, 112), (54, 120), (70, 128), (86, 134), (102, 134), (116, 130), (120, 142), (104, 150),
+                             (78, 152), (52, 146), (32, 134), (24, 118)], 1.22))
+    d.shape("cloud2", billow([(30, 126), (44, 134), (62, 140), (80, 144), (100, 146), (80, 151), (54, 146), (36, 138)], 1.15),
+            shadow=False, line=False)
 
 
 # ================================================================ SPOUTING WHALE
@@ -339,7 +360,8 @@ def mermaid(d: Drawing):
 # ================================================================ concepts
 SEA = ["coastal", "dusk", "meadow", "blush"]
 SHIP = {"hull": "#8A5A36", "sail": "#FBF3DC"}
-WIND = {"skin": "#F4C9A4", "cheek": "#EE9C88", "lips": "#D9604C", "hair": "#E7B04A", "cloud": "#FFFFFF", "cloud2": "#EEF2F6"}
+WIND = {"skin": "#F4C9A4", "cheek": "#EE9C88", "lips": "#D9604C", "hair": "#E0A43A", "cloud": "#FFFFFF", "cloud2": "#E8EEF4",
+        "wind": "#FFFFFF", "hair2": "#A8701E", "skin2": "#E0A887"}
 WHALE_C = {"whale": "#5E7389", "whale2": "#46596E", "belly": "#E9DCC0"}
 KRAKEN_C = {"kraken": "#C9473C", "kraken2": "#F3B7A0", **SHIP}
 MERMAID_C = {"skin": "#F4C9A4", "lips": "#C65A4A", "hair": "#C8643A", "tail": "#2E9C83", "tail2": "#1F6E5D", "rock": "#8C8478",
@@ -352,9 +374,9 @@ CONCEPTS = [
     Concept("oldmap-galleon", "oldmap-galleon", "Galleon", galleon, SEA, overrides=SHIP,
             checks=[("sail", "glow"), ("hull", "near"), ("hull", "mid"), ("glow", "sky")],
             fixes={"glow": ["far", "mid", "near"]}),
-    Concept("oldmap-windhead", "oldmap-wind-head", "Wind head", windhead, overrides={**WIND, "wind": "#5C7A99"},
-            checks=[("cloud", "sky"), ("skin", "cloud"), ("wind", "sky")],
-            fixes={"sky": ["far", "mid", "sky2"], "wind": ["deep", "near", "mark", "light"]}),
+    Concept("oldmap-windhead", "oldmap-wind-head", "Wind head", windhead, SEA, overrides=WIND,
+            checks=[("cloud", "sky"), ("wind", "sky"), ("skin", "cloud"), ("hair", "cloud"), ("cloud", "mid")],
+            fixes={"sky": ["far", "sky2", "#9FC9DB", "mid"]}),
     Concept("oldmap-whale", "oldmap-whale", "Spouting whale", whale, SEA, overrides={**WHALE_C, "spout": "#FFFFFF"},
             checks=[("whale", "near"), ("whale", "mid"), ("whale", "far"), ("spout", "sky")],
             fixes={"whale": ["#8D99AE", "#3E4A5A", "hero"], "sky": ["far", "mid", "sky2"]}),

@@ -161,7 +161,7 @@ export const PRESETS: Preset[] = [
     relief: true,
     texture: false,
     look: "watercolour",
-    colors: { land: "#fbf8f1", water: "#9fc8db", park: "#b7d3a0", roads: "#d9cfc2", borders: "#6b5b4b", labels: "#4a4038", accent: "#d46a6a", paper: "#fbf8f1", ink: "#4a4038" },
+    colors: { land: "#fdfbf6", water: "#8cc4de", park: "#b7d3a0", roads: "#d9cfc2", borders: "#6b5b4b", labels: "#4a4038", accent: "#d46a6a", paper: "#fbf8f1", ink: "#4a4038" },
   },
   {
     id: "ink",
@@ -310,7 +310,7 @@ export function buildStyle(base: StyleSpecification, theme: Theme, opts: { seaTi
   if (d.tropics) style.sources["mapsie-tropics"] = geo(specialLatitudes);
   if (d.currents) style.sources["mapsie-currents"] = geo(currents);
   if (d.lanes) style.sources["mapsie-lanes"] = geo(shippingLanes);
-  if (look === "antique") style.sources["mapsie-wash"] = geo(`${opts.origin ?? ""}/geo/countries-wash.json`);
+  if (look === "antique" || look === "watercolour") style.sources["mapsie-wash"] = geo(`${opts.origin ?? ""}/geo/countries-wash.json`);
   if (sea) style.sources["mapsie-sea"] = { type: "vector", tiles: [opts.seaTiles!], maxzoom: 11 } as StyleSpecification["sources"][string];
   if (theme.relief || theme.hypso || sea) {
     style.sources["mapsy-dem"] = {
@@ -364,13 +364,15 @@ function restyle(look: Look, layer: AnyLayer, theme: Theme, sea: boolean): AnyLa
   if (id === "water") {
     paint["fill-color"] = c.water;
     const out: AnyLayer[] = [];
-    if (look === "antique") out.push(...washLayers());
-    const relief = { engraved: 0.25, touring: 0.35, antique: 0.4, poster: 0, watercolour: 0.2 }[look];
+    if (look === "antique") out.push(...washLayers(WASH_COLOURS, "antique"));
+    if (look === "watercolour") out.push(...washLayers(PAINT_COLOURS, "watercolour"));
+    const relief = { engraved: 0.25, touring: 0.35, antique: 0.4, poster: 0, watercolour: 0.1 }[look];
     if (theme.relief && relief) out.push(reliefLayer(theme, relief));
     out.push(layer);
     if (look === "watercolour") {
-      // Pigment pools at the edge of a wash, so the coast is a soft, darker line.
-      out.push({ ...layer, id: "mapsie-water-texture", paint: { "fill-pattern": "mapsie-wash", "fill-opacity": 0.35 } } as AnyLayer);
+      // The sea deepens away from the coast, with uneven pigment, and pools at the edge
+      // into a soft, darker line.
+      out.push({ ...layer, id: "mapsie-water-texture", paint: { "fill-pattern": "mapsie-wash", "fill-opacity": 0.55 } } as AnyLayer);
       out.push(like({ id: "mapsie-water-edge", paint: { "line-color": mix(c.water, ink, 0.3), "line-width": ["interpolate", ["linear"], ["zoom"], 4, 3, 10, 7], "line-blur": ["interpolate", ["linear"], ["zoom"], 4, 3, 10, 7], "line-opacity": 0.6 } }));
     } else if (look !== "poster") {
       out.push(like({ id: "mapsie-water-edge", paint: { "line-color": ink, "line-width": ["interpolate", ["linear"], ["zoom"], 8, 0.4, 15, 1.1], "line-opacity": 0.8 } }));
@@ -484,13 +486,34 @@ function restyle(look: Look, layer: AnyLayer, theme: Theme, sea: boolean): AnyLa
   return null;
 }
 
-/** Antique hand-colouring: each country edged in its own watercolour, fading out as you zoom into a town. */
-function washLayers(): AnyLayer[] {
-  const colour = ["match", ["get", "c"], ...WASH_COLOURS.flatMap((col, i) => [i, col]), WASH_COLOURS[0]];
-  const fade = (v: number) => ["interpolate", ["linear"], ["zoom"], 6, v, 9, 0];
+// Watercolour: brighter washes than the antique ones, as if freshly painted.
+// (no blue: a blue country would read as sea)
+export const PAINT_COLOURS = ["#f0a98f", "#a7d39a", "#f4d27c", "#c9aee0", "#f2b8c6"];
+
+/**
+ * Colour washes per country (no two neighbours alike), fading out as you zoom into a town.
+ * Antique: a strong edge along each border, as hand-colourists did. Watercolour: a fuller,
+ * blotchy wash with pigment pooling softly at the edges.
+ */
+function washLayers(colours: string[], look: "antique" | "watercolour"): AnyLayer[] {
+  const colour = ["match", ["get", "c"], ...colours.flatMap((col, i) => [i, col]), colours[0]];
+  const fade = (v: number) => ["interpolate", ["linear"], ["zoom"], 6, v, 9, look === "watercolour" ? v * 0.5 : 0];
+  const paint = look === "watercolour";
   return [
-    { id: "mapsie-wash-fill", type: "fill", source: "mapsie-wash", paint: { "fill-color": colour, "fill-opacity": fade(0.24) } } as unknown as AnyLayer,
-    { id: "mapsie-wash-edge", type: "line", source: "mapsie-wash", layout: { "line-join": "round" }, paint: { "line-color": colour, "line-width": ["interpolate", ["linear"], ["zoom"], 1, 3, 5, 9], "line-blur": ["interpolate", ["linear"], ["zoom"], 1, 2, 5, 6], "line-opacity": fade(0.9) } } as unknown as AnyLayer,
+    { id: "mapsie-wash-fill", type: "fill", source: "mapsie-wash", paint: { "fill-color": colour, "fill-opacity": fade(paint ? 0.55 : 0.24) } } as unknown as AnyLayer,
+    ...(paint ? [{ id: "mapsie-wash-texture", type: "fill", source: "mapsie-wash", paint: { "fill-pattern": "mapsie-wash", "fill-opacity": fade(0.7) } } as unknown as AnyLayer] : []),
+    {
+      id: "mapsie-wash-edge",
+      type: "line",
+      source: "mapsie-wash",
+      layout: { "line-join": "round" },
+      paint: {
+        "line-color": colour,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 1, paint ? 4 : 3, 5, paint ? 14 : 9],
+        "line-blur": ["interpolate", ["linear"], ["zoom"], 1, paint ? 4 : 2, 5, paint ? 12 : 6],
+        "line-opacity": fade(paint ? 0.75 : 0.9),
+      },
+    } as unknown as AnyLayer,
   ];
 }
 

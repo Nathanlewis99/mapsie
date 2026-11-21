@@ -5,6 +5,7 @@ import { searchPlaces, MODES, VEHICLES, vehicleFor, type PlaceResult } from "@/l
 import { PRESETS, showSeaDepth, themeFromPreset } from "@/lib/themes";
 import { ART_STYLES, PACKS, STICKERS, getArtStyle, searchStickers, stickerSrc, suggestedStyleFor, type ArtStyleId } from "@/lib/stickers";
 import StickerFilters, { filterId } from "@/components/StickerFilters";
+import { applyPreset } from "@/lib/lookMatch";
 import {
   ORIGINALS,
   PAINTED,
@@ -18,6 +19,7 @@ import {
   type OriginalDef,
   LANDMARK_REGIONS,
   landmarksNear,
+  originalFinish,
   type OriginalStyle,
 } from "@/lib/originals";
 import { FONTS } from "@/lib/fonts";
@@ -437,7 +439,7 @@ export function StylePanel() {
           {PRESETS.map((p) => (
             <button
               key={p.id}
-              onClick={() => set({ theme: { ...themeFromPreset(p), labels: t.labels } })}
+              onClick={() => set(applyPreset(design, p))}
               className={`rounded-2xl p-1.5 border-2 transition ${t.presetId === p.id ? "border-coral" : "border-transparent hover:border-ink/15"}`}
             >
               <div
@@ -500,9 +502,10 @@ export function StylePanel() {
       <div>
         <Label>Details</Label>
         <Toggle on={design.visited.show} onChange={(v) => set({ visited: { ...design.visited, show: v } })} label="🌍 Highlight countries I visited" />
-        {design.visited.show && (
+        {design.visited.show && (<>
           <Slider label="Highlight" min={0.1} max={0.8} step={0.05} value={design.visited.opacity} onChange={(v) => set({ visited: { ...design.visited, opacity: v } }, "visited-opacity")} />
-        )}
+          <Toggle on={design.visited.multi !== false} onChange={(v) => set({ visited: { ...design.visited, multi: v } })} label="🎨 A different colour for each country" />
+        </>)}
         <Toggle on={t.relief} onChange={(v) => setTheme({ relief: v })} label="⛰️ Terrain shading" />
         <Toggle on={t.hypso} onChange={(v) => setTheme({ hypso: v })} label="🏔️ Colour land by height" />
         <Toggle on={t.physical} onChange={(v) => setTheme({ physical: v })} label="🗺️ Classic atlas relief" />
@@ -850,7 +853,7 @@ function OriginalsPanel({ q }: { q: string }) {
       className="rounded-2xl p-1.5 hover:scale-105 hover:-rotate-3 transition"
       style={{ background: style === "line" && resolved === "night" ? "#1F2A44" : "transparent" }}
     >
-      <SafeImg src={originalSrc(o.id, style, resolved)} className="w-full aspect-square pointer-events-none" />
+      <SafeImg src={originalSrc(o.id, style, resolved)} className="w-full aspect-square pointer-events-none" style={originalFinish(style) ? { filter: `url(#${filterId(PANEL_FILTERS, originalFinish(style)!)})` } : undefined} />
       <div className="text-[11px] font-bold text-ink/60 leading-tight mt-0.5 truncate">{o.title}</div>
     </button>
   );
@@ -866,6 +869,7 @@ function OriginalsPanel({ q }: { q: string }) {
 
   return (
     <div className="space-y-5">
+      <StickerFilters prefix={PANEL_FILTERS} colors={design.theme.colors} />
       {!q && (<>
       <div className="rounded-2xl bg-sand/60 p-3 text-sm text-ink/70">
         Our own artwork, drawn for Mapsie. {ORIGINALS.length} designs across {new Set(ORIGINALS.map((o) => o.activity)).size} activities. Tap to add, or drag onto the map.
@@ -874,15 +878,15 @@ function OriginalsPanel({ q }: { q: string }) {
       <div>
         <Label>Style</Label>
         <div className={`grid gap-2 ${PAINTED.size ? "grid-cols-3" : "grid-cols-2"}`}>
-          {((PAINTED.size ? ["papercut", "line", "painted"] : ["papercut", "line"]) as OriginalStyle[]).map((st) => (
+          {((PAINTED.size ? ["papercut", "line", "painted", "engraved", "handcoloured"] : ["papercut", "line", "engraved", "handcoloured"]) as OriginalStyle[]).map((st) => (
             <button
               key={st}
               onClick={() => setOriginals({ style: st, palette: "auto" })}
               className={`rounded-2xl border-2 p-2 flex items-center gap-2 transition ${style === st ? "border-coral bg-white" : "border-transparent bg-white/60 hover:border-ink/15"}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={originalSrc(st === "painted" ? [...PAINTED][0] : "safari-giraffe", st, matchedPalette(preset, st))} alt="" className="w-12 h-12" />
-              <span className="font-extrabold text-sm">{st === "papercut" ? "Papercut" : st === "line" ? "Line" : "Painted"}</span>
+              <img src={originalSrc(st === "painted" ? [...PAINTED][0] : "safari-giraffe", st, matchedPalette(preset, st))} alt="" className="w-12 h-12" style={originalFinish(st) ? { filter: `url(#${filterId(PANEL_FILTERS, originalFinish(st)!)})` } : undefined} />
+              <span className="font-extrabold text-sm">{{ papercut: "Papercut", line: "Line", painted: "Painted", engraved: "Engraved", handcoloured: "Hand-coloured" }[st]}</span>
             </button>
           ))}
         </div>

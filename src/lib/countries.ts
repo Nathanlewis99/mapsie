@@ -33,6 +33,11 @@ function contains(f: GeoJSON.Feature, p: number[]) {
 
 /** Countries that contain at least one stop. */
 export function visitedCountries(all: GeoJSON.FeatureCollection, stops: Stop[]): GeoJSON.FeatureCollection {
-  const hit = all.features.filter((f) => stops.some((s) => contains(f, [s.lng, s.lat])));
-  return { type: "FeatureCollection", features: hit };
+  // In the order they were visited, numbered so each can have its own colour.
+  const hit: GeoJSON.Feature[] = [];
+  for (const s of stops) {
+    const f = all.features.find((x) => contains(x, [s.lng, s.lat]));
+    if (f && !hit.includes(f)) hit.push(f);
+  }
+  return { type: "FeatureCollection", features: hit.map((f, i) => ({ ...f, properties: { ...(f.properties ?? {}), ci: i } })) };
 }

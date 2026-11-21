@@ -87,14 +87,14 @@ def serpent(d: Drawing):
     back_sea(d, 104)
     d.stroke("light", curls([(40, 128), (150, 124), (176, 134)], 3.5), 1.6, line=False)
     wn = lambda t: 26 - 10 * t
-    neck = [(78, 160), (84, 118), (36, 110), (46, 68)]
+    neck = [(80, 160), (88, 116), (52, 110), (62, 70)]
     wh = lambda t: 22
     hump = [(98, 160), (100, 104), (146, 104), (148, 160)]
     wt = lambda t: max(3, 20 * (1 - t) ** 0.9)
-    tail = [(160, 160), (162, 122), (196, 118), (186, 88), (180, 72), (158, 74), (164, 88)]
+    tail = [(156, 160), (158, 126), (182, 122), (178, 98), (174, 82), (158, 84), (162, 96)]
     # spines behind the body
-    d.shape("pop", spikes(neck, wn, [0.3, 0.45, 0.6, 0.75, 0.9], 9, side=-1), spot=True)
-    d.shape("pop", spikes(hump, wh, [0.28, 0.42, 0.58, 0.72], 10, side=1), spot=True)
+    d.shape("pop", spikes(neck, wn, [0.34, 0.52, 0.7, 0.88], 11, side=-1, base=6), spot=True)
+    d.shape("pop", spikes(hump, wh, [0.3, 0.5, 0.7], 12, side=1, base=6), spot=True)
     d.shape("pop", spikes(tail, wt, [0.12, 0.25], 8, side=1), spot=True)
     d.shape("hero", tube(tail, wt, 60))
     d.shape("hero", tube(hump, wh))
@@ -106,14 +106,16 @@ def serpent(d: Drawing):
             b = frame(body, t, -w(t) / 2 + 1.5)
             d.stroke("hero2", f"M{a[0]:.1f} {a[1]:.1f} L{b[0]:.1f} {b[1]:.1f}", 2.2)
     # head facing left, jaws open
-    d.shape("pop", "M54 54 L70 38 L64 58Z M60 60 L78 52 L66 66Z", spot=True)
-    d.shape("hero", "M60 50 C50 44 36 46 26 52 L14 54 C12 58 16 62 22 62 L44 64 C52 68 58 74 62 80 C70 72 70 58 60 50Z")
-    d.shape("hero", "M44 66 L22 72 C20 76 24 80 30 79 C40 78 50 76 58 78Z")
-    d.shape("light", "M22 62 L26 66 L30 62 L34 66 L38 62 L42 66 L44 64Z M28 72 L31 69 L34 72.5 L37 69 L40 72 L43 69 L46 71Z", shadow=False)
-    d.stroke("pop", "M20 68 Q10 70 6 66 M10 69 Q6 74 2 74", 2.0)
-    d.marks("light", circle(46, 54, 4))
-    d.marks("dark", circle(45, 54, 2.2))
-    d.marks("dark", circle(18, 56, 1.3))
+    def head():
+        d.shape("pop", "M54 54 L70 38 L64 58Z M60 60 L78 52 L66 66Z", spot=True)
+        d.shape("hero", "M60 50 C50 44 36 46 26 52 L14 54 C12 58 16 62 22 62 L44 64 C52 68 58 74 62 80 C70 72 70 58 60 50Z")
+        d.shape("hero", "M44 66 L22 72 C20 76 24 80 30 79 C40 78 50 76 58 78Z")
+        d.shape("light", "M22 62 L26 66 L30 62 L34 66 L38 62 L42 66 L44 64Z M28 72 L31 69 L34 72.5 L37 69 L40 72 L43 69 L46 71Z", shadow=False)
+        d.stroke("pop", "M20 68 Q13 70 10 66 M13 69 Q11 73 8 73", 2.0)
+        d.marks("light", circle(46, 54, 4))
+        d.marks("dark", circle(45, 54, 2.2))
+        d.marks("dark", circle(18, 56, 1.3))
+    group(d, "translate(18 4)", head)
     front_sea(d, 152, "near", 6, 26, [(60, 170), (124, 166), (176, 172), (96, 186)])
     d.band("deep", waves(182, 4, 34), line=False)
 
@@ -165,10 +167,9 @@ def galleon_ship(d: Drawing, flags=True, sail_role="sail", rigging=True):
 
 
 def galleon(d: Drawing):
+    d.disc("glow", 104, 74, 62)
     back_sea(d, 120)
-    d.shape("light", cloud(150, 40, 0.9), shadow=False, line=False)
-    d.shape("light", cloud(10, 54, 0.7), shadow=False, line=False)
-    group(d, "translate(4 6)", lambda: galleon_ship(d))
+    group(d, "translate(4 10)", lambda: galleon_ship(d))
     front_sea(d, 146, "near", 6, 28, [(40, 166), (100, 172), (160, 164), (70, 186), (138, 188)])
     d.band("deep", waves(186, 4, 34), line=False)
 
@@ -192,34 +193,33 @@ def puff(cx, cy, r, n=9, k=0.3):
 
 def windhead(d: Drawing):
     # wind lines streaming right, curling at their ends
-    d.stroke("wind", "M118 98 C140 92 160 86 176 92 C188 97 186 110 176 110 C168 110 168 100 176 100", 4.2)
-    d.stroke("wind", "M120 110 C146 112 170 116 190 124", 4.2)
-    d.stroke("wind", "M118 122 C138 132 152 146 172 150 C184 152 188 140 180 136 C172 134 170 142 176 144", 4.2)
-    d.stroke("wind", "M116 86 C134 74 150 66 168 66", 3.4)
+    d.stroke("wind", "M120 100 C140 92 160 84 176 90 C188 95 186 108 176 108 C168 108 168 98 176 98", 4.4)
+    d.stroke("wind", "M124 110 C148 112 170 116 192 124", 4.4)
+    d.stroke("wind", "M120 120 C138 132 152 146 172 150 C184 152 188 140 180 136 C172 134 170 142 176 144", 4.4)
+    d.stroke("wind", "M116 88 C132 74 150 64 170 64", 3.4)
     # cloud around the back of the head
-    d.shape("cloud", puff(62, 100, 46, 11, 0.32))
-    d.shape("cloud2", puff(56, 104, 30, 9, 0.3), shadow=False)
-    # hair curls
-    d.shape("hair", puff(64, 84, 26, 9, 0.35))
-    # face: puffed cheeks, pursed lips, facing right
-    d.shape("skin", "M60 78 C76 66 98 70 104 84 C108 88 110 92 108 96 C116 98 118 108 112 114 "
-                    "C108 126 96 134 82 132 C68 132 56 122 54 106 C52 94 54 84 60 78Z")
-    d.shape("cheek", circle(90, 112, 9), shadow=False)
-    d.shape("skin", "M110 100 C118 98 122 104 118 110 C122 114 118 120 112 118Z")
-    d.marks("lips", ellipse(119, 108, 3.5, 4.2))
-    d.marks("dark", ellipse(119, 108, 1.6, 2))
-    d.stroke("dark", "M84 92 Q90 88 96 92", 2.2)
-    d.stroke("dark", "M82 84 Q90 78 99 83", 2.0)
-    d.stroke("dark", "M66 104 Q62 98 66 94", 1.8, line=False)
+    d.shape("cloud", puff(60, 102, 46, 11, 0.32))
+    d.shape("cloud2", puff(52, 108, 30, 9, 0.3), shadow=False)
+    # curly hair streaming back
+    d.shape("hair", puff(66, 86, 27, 10, 0.38), spot=True)
+    d.shape("hair", puff(46, 76, 12, 7, 0.4), spot=True)
+    d.shape("hair", puff(44, 102, 11, 7, 0.4), spot=True)
+    # face in profile: brow, nose, cheeks blown out round pursed lips
+    d.shape("skin", "M66 74 C74 64 92 62 100 74 C102 79 106 84 109 88 C110 92 106 94 102 94 "
+                    "C112 94 120 100 120 108 C120 116 112 122 104 126 C94 132 80 132 70 126 C60 118 58 86 66 74Z")
+    d.shape("cheek", circle(100, 110, 9), shadow=False, line=False)
+    d.shape("lips", ellipse(123, 108, 4.2, 5), shadow=False)
+    d.marks("dark", ellipse(124, 108, 1.8, 2.4))
+    d.marks("light", ellipse(90, 84, 4.2, 3.4))
+    d.marks("dark", circle(92, 84, 2.2))
+    d.stroke("dark", "M83 76 Q90 71 98 76", 2.2)
+    d.stroke("dark", "M68 106 Q63 100 67 95", 1.8, line=False)
     # little wind puffs at the lips
-    d.shape("cloud", puff(136, 106, 6, 6, 0.3), shadow=False)
-    d.shape("cloud", puff(150, 100, 4, 6, 0.3), shadow=False)
+    d.shape("cloud", puff(140, 108, 6, 6, 0.3), shadow=False)
+    d.shape("cloud", puff(154, 102, 4, 6, 0.3), shadow=False)
 
 
 # ================================================================ SPOUTING WHALE
-WHALE = [(152, 148), (150, 112), (126, 82), (92, 80), (64, 78), (36, 92), (28, 122)]
-
-
 def whale(d: Drawing):
     back_sea(d, 118)
     # spout: a fountain from the blowhole, splitting left and right
@@ -231,10 +231,9 @@ def whale(d: Drawing):
     d.shape("whale", "M150 140 C152 120 156 106 162 96 C152 90 144 76 142 58 C150 62 160 74 170 84 "
                      "C176 70 184 60 196 56 C194 72 186 88 174 98 C170 112 170 128 172 140Z")
     # body
-    w = lambda t: 10 + 46 * math.sin(math.pi * min(1, t * 1.05) ** 0.8) if t < 0.95 else 46
-    d.shape("whale", "M156 150 C154 124 140 96 112 84 C92 76 62 74 46 84 C32 92 24 106 24 122 L24 150Z")
+    d.shape("whale", "M156 150 C154 124 140 96 112 84 C92 76 62 74 46 84 C30 92 22 106 22 120 C22 132 26 142 32 150Z")
     # belly grooves
-    d.shape("belly", "M24 122 C40 128 70 130 100 128 C120 127 140 130 154 140 L154 150 L24 150Z", shadow=False)
+    d.shape("belly", "M23 124 C40 128 70 130 100 128 C120 127 140 130 154 140 L154 150 L31 150 C26 143 23 134 23 124Z", shadow=False)
     d.stroke("whale", "M30 134 C60 138 100 136 150 146 M30 142 C60 146 100 144 150 152", 1.6)
     # mouth and teeth
     d.stroke("dark", "M24 112 C36 116 48 118 62 114", 2.2)
@@ -269,26 +268,26 @@ def suckers(pts, w, ts, side=-1, role_r=1.9):
 def kraken(d: Drawing):
     back_sea(d, 112)
     # head (mantle) rising behind the ship
-    d.shape("kraken", "M118 128 C104 104 108 56 140 38 C170 22 198 44 198 78 C198 104 186 120 176 132Z")
-    d.shape("kraken2", "M132 50 C140 42 152 40 158 44 C148 46 140 52 136 60Z", shadow=False)
-    d.marks("light", ellipse(140, 104, 8, 6.5) + ellipse(168, 108, 7, 6))
-    d.marks("dark", ellipse(142, 105, 3.6, 4.6) + ellipse(169, 109, 3.2, 4.2))
-    d.stroke("dark", "M130 94 Q140 90 150 96 M160 98 Q168 94 178 100", 2.0)
+    d.shape("kraken", "M112 134 C98 100 106 50 142 32 C174 18 200 44 198 82 C196 110 186 124 178 136Z", spot=True)
+    d.shape("kraken2", "M128 50 C136 40 150 36 158 40 C146 44 138 50 134 60Z", shadow=False, line=False)
+    d.marks("light", ellipse(140, 98, 8.5, 7) + ellipse(170, 102, 7.5, 6.5))
+    d.marks("dark", ellipse(142, 99, 3.8, 5) + ellipse(171, 103, 3.4, 4.6))
+    d.stroke("dark", "M128 86 Q140 80 152 88 M160 90 Q170 85 182 92", 2.2)
+    # the ship, small and tilted, in front of the head
+    group(d, "translate(14 60) rotate(-8 60 100) scale(.6)", lambda: galleon_ship(d, flags=True, sail_role="sail", rigging=False))
     arms = [
-        # arm wrapping over and round the mainmast
-        tentacle((130, 132), (118, 90), (106, 56), (86, 46), [(70, 40), (60, 56), (74, 62), (84, 66), (90, 56), (82, 52)], 16),
+        # arm rising behind the ship and coiling round the mainmast
+        tentacle((126, 150), (126, 108), (106, 72), (88, 62), [(72, 56), (62, 70), (72, 78), (82, 84), (88, 74), (80, 70)], 15),
         # arm rising on the far left, curling
-        tentacle((40, 150), (24, 124), (14, 98), (28, 78), [(38, 64), (54, 74), (46, 86), (40, 94), (32, 88), (36, 82)], 14),
+        tentacle((40, 152), (20, 128), (12, 100), (26, 82), [(36, 68), (54, 74), (48, 88), (42, 96), (34, 90), (38, 84)], 13),
         # arm hooked over the stern
-        tentacle((176, 136), (184, 116), (176, 96), (160, 98), [(150, 100), (146, 112), (154, 114)], 13),
+        tentacle((160, 150), (158, 128), (136, 110), (118, 116), [(108, 120), (108, 132), (116, 132)], 12),
     ]
-    # the ship, small and tilted, behind the front arms
-    group(d, "translate(44 52) rotate(-10 60 100) scale(.62)", lambda: galleon_ship(d, flags=True, sail_role="sail", rigging=False))
     for pts, w in arms:
-        d.shape("kraken", tube(pts, w, 70))
-        d.marks("kraken2", suckers(pts, w, [0.08, 0.16, 0.24, 0.32, 0.4, 0.48, 0.56]))
-    front_sea(d, 146, "near", 6, 26, [(70, 166), (120, 172), (172, 168), (96, 186), (40, 184)])
-    d.band("deep", waves(184, 4, 34), line=False)
+        d.shape("kraken", tube(pts, w, 70), spot=True)
+        d.marks("kraken2", suckers(pts, w, [0.1, 0.2, 0.3, 0.4, 0.5]))
+    front_sea(d, 148, "near", 6, 26, [(70, 168), (120, 174), (172, 168), (96, 188), (40, 186)])
+    d.band("deep", waves(186, 4, 34), line=False)
 
 
 # ================================================================ MERMAID
@@ -296,17 +295,16 @@ def mermaid(d: Drawing):
     back_sea(d, 120)
     # rock she sits on
     d.shape("rock", "M40 150 C44 128 60 116 82 116 C104 116 118 128 122 150Z")
+    d.stroke("dark", "M58 132 Q66 128 72 132 M92 128 Q100 124 106 130", 1.6, line=False)
     # tail: from the hips down over the rock, then curling up over a wave
-    tail = [(86, 112), (96, 134), (120, 150), (146, 140), (166, 132), (170, 112), (160, 98)]
+    tail = [(88, 112), (98, 134), (120, 150), (146, 140), (166, 132), (170, 112), (160, 98)]
     wt = lambda t: max(5, 26 * (1 - t) ** 0.7)
     d.shape("tail", tube(tail, wt, 64))
-    # fluke
     fx, fy, dx, dy = _chain(tail, 1.0)
     d.shape("tail", f"M{fx:.1f} {fy + 2:.1f} C{fx - 8:.1f} {fy - 6:.1f} {fx - 18:.1f} {fy - 10:.1f} {fx - 22:.1f} {fy - 20:.1f} "
                     f"C{fx - 10:.1f} {fy - 18:.1f} {fx - 4:.1f} {fy - 12:.1f} {fx:.1f} {fy - 6:.1f} "
                     f"C{fx + 2:.1f} {fy - 16:.1f} {fx + 8:.1f} {fy - 24:.1f} {fx + 18:.1f} {fy - 28:.1f} "
                     f"C{fx + 16:.1f} {fy - 16:.1f} {fx + 10:.1f} {fy - 6:.1f} {fx + 4:.1f} {fy + 2:.1f}Z", spot=True)
-    # scales
     sc = ""
     for t in [0.14, 0.26, 0.38, 0.5, 0.62, 0.74]:
         for off in (-0.25, 0.0, 0.25):
@@ -314,24 +312,26 @@ def mermaid(d: Drawing):
             r = max(1.4, wt(t) * 0.13)
             sc += f"M{x - r:.1f} {y:.1f} a{r:.1f} {r:.1f} 0 0 0 {2 * r:.1f} 0 "
     d.stroke("tail2", sc, 1.4, line=False)
-    d.stroke("tail2", "M78 112 C84 116 92 116 98 110", 2.4)
-    # back hair
-    d.shape("hair", "M84 54 C98 52 106 64 104 78 C102 92 110 104 116 114 C104 116 96 110 92 100 C88 90 80 80 78 66Z")
-    # body: torso and head, facing left
-    d.shape("skin", "M76 76 C72 86 72 100 76 114 L98 112 C100 100 98 88 92 78Z")
-    d.shape("skin", "M84 68 L90 68 L91 80 L83 80Z", shadow=False)
-    d.shape("skin", circle(86, 56, 13))
-    d.marks("skin", "M74 56 L70 60 L74 62Z")
-    # arm raised, holding a mirror
-    d.limb("skin", "M80 84 C70 86 62 80 58 70", 6.5)
-    d.limb("mirror", "M58 72 L56 62", 3.2)
-    d.shape("mirror", ellipse(54, 50, 9, 11), spot=True)
-    d.shape("glass", ellipse(54, 50, 6, 8), shadow=False)
-    # front hair, flowing over the shoulder and chest
-    d.shape("hair", "M76 52 C76 40 94 38 100 48 C104 56 100 66 96 72 C98 84 96 96 90 104 C86 94 84 86 84 76 "
-                    "C80 72 76 62 76 52Z")
-    d.marks("dark", circle(78, 56, 1.4))
-    d.stroke("dark", "M75 63 Q77 65 79 64", 1.2, line=False)
+    # long hair down her back
+    d.shape("hair", "M86 46 C100 44 108 56 106 72 C104 88 110 102 118 114 C104 118 94 110 90 98 C86 86 82 74 80 60Z")
+    # torso and head, facing left towards the mirror
+    d.shape("skin", "M79 78 C75 88 75 102 79 114 L99 112 C101 100 99 88 95 78Z")
+    d.shape("skin", "M84 66 L92 66 L93 80 L84 80Z", shadow=False)
+    d.shape("skin", "M74 52 C74 44 80 40 88 40 C96 40 100 48 100 56 C100 64 96 70 88 70 C82 70 78 68 76 64 "
+                    "L73 64 L74 60 L71 58 L74 54Z")
+    d.stroke("tail2", "M80 112 C86 116 94 116 100 110", 2.4)
+    # arm raised, holding a hand mirror
+    d.limb("skin", "M84 84 C74 86 64 80 60 70", 6.5)
+    d.limb("mirror", "M60 70 L57 60", 3.2)
+    d.shape("mirror", ellipse(54, 48, 9.5, 11.5), spot=True)
+    d.shape("glass", ellipse(54, 48, 6.5, 8.5), shadow=False)
+    d.stroke("light", "M51 43 L55 39", 1.6, line=False)
+    # hair: crown and a lock falling over the shoulder and chest
+    d.shape("hair", "M76 48 C78 38 94 34 100 44 C104 52 102 60 98 66 C100 78 98 92 90 104 C86 96 88 84 90 74 "
+                    "C92 66 92 58 88 52 C84 48 80 48 76 50Z", spot=True)
+    d.marks("dark", ellipse(80, 54, 1.4, 1.8))
+    d.stroke("dark", "M77 49 Q80 47 83 49", 1.2, line=False)
+    d.stroke("lips", "M74 62 Q76 63 78 62", 1.4, line=False)
     front_sea(d, 150, "near", 6, 28, [(40, 168), (100, 174), (160, 168), (70, 188), (136, 188)])
     d.band("deep", waves(186, 4, 34), line=False)
 
@@ -342,7 +342,7 @@ SHIP = {"hull": "#8A5A36", "sail": "#FBF3DC"}
 WIND = {"skin": "#F4C9A4", "cheek": "#EE9C88", "lips": "#D9604C", "hair": "#E7B04A", "cloud": "#FFFFFF", "cloud2": "#EEF2F6"}
 WHALE_C = {"whale": "#5E7389", "whale2": "#46596E", "belly": "#E9DCC0"}
 KRAKEN_C = {"kraken": "#C9473C", "kraken2": "#F3B7A0", **SHIP}
-MERMAID_C = {"skin": "#F4C9A4", "hair": "#C8643A", "tail": "#2E9C83", "tail2": "#1F6E5D", "rock": "#8C8478",
+MERMAID_C = {"skin": "#F4C9A4", "lips": "#C65A4A", "hair": "#C8643A", "tail": "#2E9C83", "tail2": "#1F6E5D", "rock": "#8C8478",
              "mirror": "#D9A441", "glass": "#DDEEF3"}
 
 CONCEPTS = [
@@ -350,8 +350,8 @@ CONCEPTS = [
             checks=[("hero", "near"), ("hero", "mid"), ("hero", "sky"), ("pop", "sky"), ("hero", "far")],
             fixes={"hero": ["pop", "hero2", "#3F8F5A", "#C9473C"], "pop": ["hero2", "deep", "dark"]}),
     Concept("oldmap-galleon", "oldmap-galleon", "Galleon", galleon, SEA, overrides=SHIP,
-            checks=[("sail", "sky"), ("hull", "near"), ("sail", "far")],
-            fixes={"sky": ["far", "mid", "sky2"]}),
+            checks=[("sail", "glow"), ("hull", "near"), ("hull", "mid"), ("glow", "sky")],
+            fixes={"glow": ["far", "mid", "near"]}),
     Concept("oldmap-windhead", "oldmap-wind-head", "Wind head", windhead, overrides={**WIND, "wind": "#5C7A99"},
             checks=[("cloud", "sky"), ("skin", "cloud"), ("wind", "sky")],
             fixes={"sky": ["far", "mid", "sky2"], "wind": ["deep", "near", "mark", "light"]}),
@@ -363,5 +363,5 @@ CONCEPTS = [
             fixes={"kraken": ["#9E3B6B", "#E0653A", "hero"]}),
     Concept("oldmap-mermaid", "oldmap-mermaid", "Mermaid", mermaid, SEA, overrides=MERMAID_C,
             checks=[("tail", "near"), ("tail", "mid"), ("hair", "sky"), ("skin", "sky"), ("rock", "near"), ("tail", "rock")],
-            fixes={"tail": ["#3AA58A", "#2A7F8F", "hero", "hero2"], "sky": ["far", "sky2", "mid"], "rock": ["#B8AD9C", "#6E655A", "dark"]}),
+            fixes={"tail": ["#3AA58A", "#2A7F8F", "hero", "hero2"], "sky": ["far", "sky2", "#CFE3EA", "mid"], "rock": ["#B8AD9C", "#6E655A", "dark"]}),
 ]

@@ -109,7 +109,7 @@ const ANGLES: Angle[] = [
   {
     id: "vintage-antique",
     image: img(path.resolve("design/ads/vintage/antique-grand-tour-room.jpg")),
-    pos: { sq: "50% 12%", p45: "50% 14%", p23: "50% 16%" },
+    pos: { sq: "50% 12%", p45: "50% 14%", p23: "50% 16%", p916: "50% 8%" },
     head: `Your trip, as an <span class="coral">antique map.</span>`,
     sub: "Hand-coloured borders, sea monsters and a scroll title, like the maps of the 1700s. Plus Victorian, 1920s touring and more.",
     cta: "Design yours",
@@ -118,7 +118,7 @@ const ANGLES: Angle[] = [
   {
     id: "vintage-heritage",
     image: img(path.resolve("design/ads/vintage/heritage-edinburgh-room.jpg")),
-    pos: { sq: "50% 14%", p45: "50% 16%", p23: "50% 18%" },
+    pos: { sq: "50% 14%", p45: "50% 16%", p23: "50% 18%", p916: "50% 8%" },
     head: `Your city, as a <span class="coral">Victorian map.</span>`,
     sub: "Engraved streets and buildings, like the old town plans, with your route in gold. Any city, any trip.",
     cta: "Design yours",
@@ -130,8 +130,12 @@ const SIZES = [
   { key: "sq", w: 1080, h: 1080, imgH: 560, head: 70, sub: 31 },
   { key: "p45", w: 1080, h: 1350, imgH: 760, head: 88, sub: 36 },
   { key: "p23", w: 1000, h: 1500, imgH: 880, head: 88, sub: 35 },
+  { key: "p916", w: 1080, h: 1920, imgH: 720, head: 84, sub: 32 },
 ] as const;
-const SIZE_NAME = { sq: "1080x1080", p45: "1080x1350", p23: "1000x1500" } as const;
+const SIZE_NAME = { sq: "1080x1080", p45: "1080x1350", p23: "1000x1500", p916: "1080x1920" } as const;
+// Stories/Reels: keep the logo, text and button clear of the profile bar (top 14%)
+// and the "Shop now" button and caption (bottom ~25%).
+const SAFE = { top: 270, bottom: 500 };
 
 function giftCardVisual(scale: number) {
   return `<div style="position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,#ffd9cf 0,#fbe3d8 35%,#f6efe4 75%);overflow:hidden">
@@ -156,18 +160,20 @@ function giftCardVisual(scale: number) {
 async function statics() {
   const only = process.env.ANGLES?.split(",");
   for (const a of ANGLES.filter((x) => !only || only.includes(x.id))) {
-    for (const s of SIZES) {
+    for (const s of SIZES.filter((z) => z.key !== "p916" || a.id.startsWith("vintage"))) {
+      const tall = s.key === "p916";
       const pad = s.w > 1000 ? 64 : 58;
       const src = a.id === "your-photos" && s.key === "p23" ? img(path.resolve("design/ads/assets/sri-lanka-photos-tall.jpg")) : a.image;
       const visual = src
         ? `<img src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:${a.pos[s.key]}">`
         : giftCardVisual(s.key === "sq" ? 0.9 : s.key === "p45" ? 1.12 : 1.06);
       const html = `
-        <div style="position:absolute;left:0;top:0;width:${s.w}px;height:${s.imgH}px;overflow:hidden">${visual}
+        ${tall ? `<div style="position:absolute;inset:0;background:${"#fbf6ee"}"></div>` : ""}
+        <div style="position:absolute;left:0;top:${tall ? SAFE.top : 0}px;width:${s.w}px;height:${s.imgH}px;overflow:hidden">${visual}
           ${a.image ? `<div class="logo" style="position:absolute;left:${pad - 14}px;top:${pad - 18}px;font-size:40px;background:#fbf6eef0;border-radius:999px;padding:8px 26px 10px;box-shadow:0 6px 18px rgba(31,36,48,.12)">Mapsie<i></i></div>` : ""}
           ${a.badge ? `<div class="pill" style="position:absolute;right:${pad - 14}px;top:${pad - 14}px;background:#1f4d3a;color:#fff;font-size:27px;padding:14px 24px;box-shadow:0 6px 18px rgba(0,0,0,.18)">${a.badge}</div>` : ""}
         </div>
-        <div style="position:absolute;left:${pad}px;right:${pad}px;top:${s.imgH + (s.key === "sq" ? 40 : 52)}px;bottom:${pad - 6}px;display:flex;flex-direction:column">
+        <div style="position:absolute;left:${pad}px;right:${pad}px;top:${(tall ? SAFE.top : 0) + s.imgH + (s.key === "sq" ? 40 : tall ? 40 : 52)}px;bottom:${tall ? SAFE.bottom : pad - 6}px;display:flex;flex-direction:column">
           <div class="pf" style="font-size:${s.head}px">${a.head}</div>
           <div style="font-size:${s.sub}px;line-height:1.35;color:#1f2430c4;margin-top:${s.key === "sq" ? 14 : 26}px;font-weight:600;text-wrap:pretty">${a.sub}</div>
           <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:20px">
@@ -246,6 +252,13 @@ async function overlays() {
   await band("vint-heritage", `Victorian <span class="coral">town plan</span>`);
   await band("vint-touring", `1920s <span class="coral">touring map</span>`);
   await band("vint-poster", `Railway <span class="coral">poster</span>`);
+  const pill = (name: string, html: string) =>
+    render(`overlay/pill-${name}`, 1080, 220, `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div class="pf" style="font-size:66px;background:#fbf6eef2;border-radius:999px;padding:22px 54px;box-shadow:0 10px 30px rgba(31,36,48,.18)">${html}</div></div>`, { transparent: true });
+  await pill("vint-antique", `Antique <span class="coral">· 1700s</span>`);
+  await pill("vint-heritage", `Victorian <span class="coral">town plan</span>`);
+  await pill("vint-touring", `1920s <span class="coral">touring map</span>`);
+  await pill("vint-poster", `Railway <span class="coral">poster</span>`);
+  await pill("vint-watercolour", `<span class="coral">Watercolour</span>`);
   await band("vint-watercolour", `<span class="coral">Watercolour</span>`);
   // End cards.
   const end = (name: string, line: string, cta: string, sub: string) =>

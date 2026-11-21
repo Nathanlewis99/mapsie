@@ -109,7 +109,7 @@ const ANGLES: Angle[] = [
   {
     id: "vintage-antique",
     image: img(path.resolve("design/ads/vintage/antique-grand-tour-room.jpg")),
-    pos: { sq: "50% 12%", p45: "50% 14%", p23: "50% 16%", p916: "50% 8%" },
+    pos: { sq: "50% 12%", p45: "50% 14%", p23: "50% 16%", p916: "50% 0%" },
     head: `Your trip, as an <span class="coral">antique map.</span>`,
     sub: "Hand-coloured borders, sea monsters and a scroll title, like the maps of the 1700s. Plus Victorian, 1920s touring and more.",
     cta: "Design yours",
@@ -118,7 +118,7 @@ const ANGLES: Angle[] = [
   {
     id: "vintage-heritage",
     image: img(path.resolve("design/ads/vintage/heritage-edinburgh-room.jpg")),
-    pos: { sq: "50% 14%", p45: "50% 16%", p23: "50% 18%", p916: "50% 8%" },
+    pos: { sq: "50% 14%", p45: "50% 16%", p23: "50% 18%", p916: "50% 0%" },
     head: `Your city, as a <span class="coral">Victorian map.</span>`,
     sub: "Engraved streets and buildings, like the old town plans, with your route in gold. Any city, any trip.",
     cta: "Design yours",
@@ -136,6 +136,7 @@ const SIZE_NAME = { sq: "1080x1080", p45: "1080x1350", p23: "1000x1500", p916: "
 // Stories/Reels: keep the logo, text and button clear of the profile bar (top 14%)
 // and the "Shop now" button and caption (bottom ~25%).
 const SAFE = { top: 270, bottom: 500 };
+const TALL = { top: 330, textH: 560, right: 190, imgTop: 930 };
 
 function giftCardVisual(scale: number) {
   return `<div style="position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,#ffd9cf 0,#fbe3d8 35%,#f6efe4 75%);overflow:hidden">
@@ -167,7 +168,21 @@ async function statics() {
       const visual = src
         ? `<img src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:${a.pos[s.key]}">`
         : giftCardVisual(s.key === "sq" ? 0.9 : s.key === "p45" ? 1.12 : 1.06);
-      const html = `
+      // 9:16 (Stories/Reels): text and button first, inside the area no overlay covers on Instagram
+      // Reels (top 15%, bottom 40%, right 15%); the room photo fills the rest underneath.
+      const html = tall ? `
+        <div style="position:absolute;inset:0;background:#fbf6ee"></div>
+        <div style="position:absolute;left:0;right:0;top:${TALL.imgTop}px;bottom:0;overflow:hidden">${visual}</div>
+        <div style="position:absolute;left:0;right:0;top:${TALL.imgTop}px;height:120px;background:linear-gradient(#fbf6ee,#fbf6ee00)"></div>
+        <div style="position:absolute;left:${pad}px;right:${TALL.right}px;top:${TALL.top}px;height:${TALL.textH}px;display:flex;flex-direction:column">
+          <div class="logo" style="align-self:flex-start;font-size:40px">Mapsie<i></i></div>
+          <div class="pf" style="font-size:${s.head}px;margin-top:30px">${a.head}</div>
+          <div style="font-size:${s.sub}px;line-height:1.35;color:#1f2430c4;margin-top:22px;font-weight:600;text-wrap:pretty">${a.sub}</div>
+          <div style="margin-top:auto;display:flex;align-items:center;gap:36px">
+            <div class="pill" style="background:#ff6b4a;color:#fff;font-size:34px;padding:20px 38px;box-shadow:0 12px 26px -8px rgba(255,107,74,.6)">${a.cta} →</div>
+            <div><div style="font-size:30px;font-weight:900">${a.price}</div><div style="font-size:24px;font-weight:700;color:#1f243099">mapsie.shop</div></div>
+          </div>
+        </div>` : `
         ${tall ? `<div style="position:absolute;inset:0;background:${"#fbf6ee"}"></div>` : ""}
         <div style="position:absolute;left:0;top:${tall ? SAFE.top : 0}px;width:${s.w}px;height:${s.imgH}px;overflow:hidden">${visual}
           ${a.image ? `<div class="logo" style="position:absolute;left:${pad - 14}px;top:${pad - 18}px;font-size:40px;background:#fbf6eef0;border-radius:999px;padding:8px 26px 10px;box-shadow:0 6px 18px rgba(31,36,48,.12)">Mapsie<i></i></div>` : ""}

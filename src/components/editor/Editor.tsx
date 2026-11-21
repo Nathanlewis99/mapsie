@@ -28,6 +28,9 @@ const TABS = [
   { id: "size", label: "Size", icon: "🖼️" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
+type Sheet = "peek" | "half" | "full";
+/** Map stage height on phones for each panel size (the panel takes the rest). */
+const STAGE_H: Record<Sheet, string> = { peek: "h-[66dvh]", half: "h-[54dvh]", full: "h-[26dvh]" };
 
 /** Text sticker effects, with the CSS used for the little previews in the picker. */
 const EFFECTS: { id: TextEffect; label: string; preview: React.CSSProperties }[] = [
@@ -51,6 +54,9 @@ export default function Editor() {
   const labelStop = design.stops.find((s) => s.id === selectedLabel);
   const [me, setMe] = useState<{ user: { email: string; name: string | null; picture: string | null } | null; googleEnabled: boolean } | null>(null);
   const [tab, setTab] = useState<Tab>("trip");
+  // On phones the editing panel is a sheet: drag or tap its handle for more (or less) room.
+  const [sheet, setSheet] = useState<Sheet>("half");
+  const sheetDrag = useRef<{ y: number } | null>(null);
   const [pickMode, setPickMode] = useState(false);
   const [busy, setBusy] = useState<"" | "order" | "share" | "save">("");
   const [toast, setToast] = useState("");
@@ -537,7 +543,7 @@ export default function Editor() {
 
       <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
         {/* poster stage */}
-        <div ref={stage} className="relative h-[54dvh] lg:h-auto lg:flex-1 shrink-0 grid place-items-center bg-[radial-gradient(circle_at_30%_20%,#fff_0%,#f1e8da_70%)] overflow-hidden">
+        <div ref={stage} className={`relative ${STAGE_H[sheet]} lg:h-auto lg:flex-1 shrink-0 grid place-items-center bg-[radial-gradient(circle_at_30%_20%,#fff_0%,#f1e8da_70%)] overflow-hidden`}>
           {box.w > 0 && (
             <div
               className={`${pickMode ? "[&_canvas]:!cursor-crosshair" : ""} ${locked ? "touch-none [&_canvas]:!cursor-default" : ""}`}
@@ -857,11 +863,37 @@ export default function Editor() {
 
         {/* sidebar */}
         <aside className="flex-1 lg:flex-none lg:w-[400px] min-h-0 border-t lg:border-t-0 lg:border-l border-ink/5 bg-cream flex flex-col">
+          {/* phone only: drag the handle up for a bigger panel, down for a bigger map; or tap it */}
+          <div
+            className="lg:hidden flex items-center justify-center gap-2 pt-2 pb-1 touch-none select-none cursor-grab active:cursor-grabbing"
+            onPointerDown={(e) => {
+              sheetDrag.current = { y: e.clientY };
+              (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+            }}
+            onPointerUp={(e) => {
+              const start = sheetDrag.current;
+              sheetDrag.current = null;
+              if (!start) return;
+              const dy = e.clientY - start.y;
+              const order: Sheet[] = ["peek", "half", "full"];
+              const i = order.indexOf(sheet);
+              if (Math.abs(dy) < 10) setSheet(sheet === "full" ? "half" : "full");
+              else setSheet(order[Math.max(0, Math.min(2, i + (dy < 0 ? (dy < -120 ? 2 : 1) : dy > 120 ? -2 : -1)))]);
+            }}
+            role="button"
+            aria-label={sheet === "full" ? "Show more of the map" : "Make the editing panel bigger"}
+          >
+            <span className="block h-1.5 w-12 rounded-full bg-ink/25" />
+            <span className="text-[11px] font-bold text-ink/40">{sheet === "full" ? "▾ Show map" : "▴ More room"}</span>
+          </div>
           <nav className="flex gap-1 p-2 border-b border-ink/5 bg-cream">
             {TABS.map((t) => (
               <button
                 key={t.id}
-                onClick={() => setTab(t.id)}
+                onClick={() => {
+                  setTab(t.id);
+                  if (sheet === "peek") setSheet("half");
+                }}
                 className={`flex-1 rounded-xl py-2 text-xs font-semibold tracking-wide transition ${tab === t.id ? "bg-white shadow-sm text-ink" : "text-ink/45 hover:text-ink"}`}
               >
                 <div className="text-lg leading-none mb-1">{t.icon}</div>

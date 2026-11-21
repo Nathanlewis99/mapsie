@@ -1,0 +1,442 @@
+{
+ "id": "watercolour-italy-honeymoon",
+ "subtitle": "Venice · Florence · Rome · Positano · June 2026",
+ "font": "vibes",
+ "layout": "band",
+ "productId": "a3",
+ "orientation": "portrait",
+ "frame": "white",
+ "paper": "ema",
+ "mount": "none",
+ "glaze": "perspex",
+ "stickerStyle": "watercolour",
+ "title": "Our Italian Honeymoon",
+ "stops": [
+  {
+   "id": "s0",
+   "name": "Venice",
+   "lng": 12.3155,
+   "lat": 45.4408,
+   "showLabel": true,
+   "labelOffset": [
+    -0.2,
+    0
+   ]
+  },
+  {
+   "id": "s1",
+   "name": "Florence",
+   "lng": 11.2558,
+   "lat": 43.7696,
+   "showLabel": true,
+   "arriveBy": "train",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
+  },
+  {
+   "id": "s2",
+   "name": "Rome",
+   "lng": 12.4964,
+   "lat": 41.9028,
+   "showLabel": true,
+   "arriveBy": "train",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
+  },
+  {
+   "id": "s3",
+   "name": "Positano",
+   "lng": 14.4842,
+   "lat": 40.6281,
+   "showLabel": true,
+   "arriveBy": "car",
+   "path": [
+    [
+     12.4965,
+     41.90287
+    ],
+    [
+     12.50506,
+     41.89336
+    ],
+    [
+     12.52792,
+     41.89126
+    ],
+    [
+     12.52766,
+     41.8864
+    ],
+    [
+     12.53386,
+     41.88288
+    ],
+    [
+     12.60004,
+     41.86547
+    ],
+    [
+     12.59669,
+     41.85325
+    ],
+    [
+     12.67193,
+     41.82618
+    ],
+    [
+     12.69424,
+     41.8291
+    ],
+    [
+     12.73604,
+     41.82689
+    ],
+    [
+     12.77077,
+     41.81847
+    ],
+    [
+     12.79029,
+     41.81769
+    ],
+    [
+     12.86537,
+     41.77916
+    ],
+    [
+     12.99233,
+     41.74927
+    ],
+    [
+     13.06247,
+     41.74774
+    ],
+    [
+     13.18396,
+     41.68858
+    ],
+    [
+     13.27318,
+     41.63354
+    ],
+    [
+     13.32606,
+     41.61448
+    ],
+    [
+     13.34039,
+     41.59173
+    ],
+    [
+     13.35988,
+     41.58003
+    ],
+    [
+     13.41037,
+     41.55886
+    ],
+    [
+     13.49932,
+     41.54275
+    ],
+    [
+     13.55892,
+     41.54409
+    ],
+    [
+     13.5791,
+     41.54104
+    ],
+    [
+     13.74677,
+     41.46992
+    ],
+    [
+     13.87562,
+     41.44106
+    ],
+    [
+     13.97546,
+     41.40186
+    ],
+    [
+     14.08363,
+     41.32027
+    ],
+    [
+     14.09086,
+     41.30063
+    ],
+    [
+     14.09261,
+     41.23446
+    ],
+    [
+     14.09973,
+     41.21806
+    ],
+    [
+     14.15143,
+     41.19286
+    ],
+    [
+     14.20126,
+     41.13926
+    ],
+    [
+     14.23683,
+     41.11362
+    ],
+    [
+     14.28596,
+     41.08778
+    ],
+    [
+     14.32157,
+     41.05085
+    ],
+    [
+     14.3277,
+     40.9572
+    ],
+    [
+     14.31737,
+     40.88917
+    ],
+    [
+     14.3213,
+     40.86868
+    ],
+    [
+     14.31629,
+     40.84874
+    ],
+    [
+     14.34179,
+     40.83389
+    ],
+    [
+     14.37757,
+     40.79122
+    ],
+    [
+     14.39217,
+     40.77992
+    ],
+    [
+     14.45227,
+     40.76124
+    ],
+    [
+     14.47969,
+     40.74782
+    ],
+    [
+     14.49129,
+     40.72117
+    ],
+    [
+     14.5048,
+     40.70278
+    ],
+    [
+     14.49597,
+     40.69427
+    ],
+    [
+     14.49604,
+     40.68748
+    ],
+    [
+     14.48656,
+     40.6844
+    ],
+    [
+     14.47216,
+     40.68888
+    ],
+    [
+     14.45222,
+     40.68626
+    ],
+    [
+     14.44035,
+     40.67937
+    ],
+    [
+     14.42771,
+     40.65595
+    ],
+    [
+     14.40609,
+     40.65562
+    ],
+    [
+     14.41952,
+     40.63726
+    ],
+    [
+     14.42674,
+     40.63414
+    ],
+    [
+     14.42417,
+     40.62152
+    ],
+    [
+     14.41522,
+     40.62134
+    ],
+    [
+     14.43517,
+     40.61688
+    ],
+    [
+     14.43296,
+     40.61488
+    ],
+    [
+     14.45282,
+     40.62203
+    ],
+    [
+     14.46303,
+     40.61832
+    ],
+    [
+     14.47818,
+     40.62627
+    ],
+    [
+     14.47739,
+     40.63
+    ],
+    [
+     14.48413,
+     40.62832
+    ]
+   ],
+   "pathFor": "12.4964,41.9028>14.4842,40.6281",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
+  }
+ ],
+ "route": {
+  "show": true,
+  "style": "dashed",
+  "curved": true,
+  "width": 0.6,
+  "modeIcons": true,
+  "iconArt": "watercolour"
+ },
+ "markers": {
+  "style": "heart",
+  "showDates": false,
+  "size": 1.1,
+  "labelSize": 1
+ },
+ "stickers": [
+  {
+   "id": "w1",
+   "kind": "original",
+   "name": "lm-venice-rialto",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": 13.9,
+   "lat": 44.6,
+   "size": 11,
+   "rotation": 5
+  },
+  {
+   "id": "w2",
+   "kind": "original",
+   "name": "lm-colosseum-ruin",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": 11,
+   "lat": 41.2,
+   "size": 11,
+   "rotation": -5
+  },
+  {
+   "id": "w3",
+   "kind": "original",
+   "name": "gondola-gondolier",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": 10.4,
+   "lat": 44.9,
+   "size": 9,
+   "rotation": 3
+  }
+ ],
+ "text": {
+  "titleSize": 1.15,
+  "titleCase": "none",
+  "titleSpacing": 0,
+  "titleItalic": false,
+  "subtitleFont": "cormorant",
+  "subtitleSize": 1.25,
+  "subtitleCase": "none",
+  "subtitleSpacing": 0.5,
+  "subtitleItalic": true,
+  "showRoute": false,
+  "labelFont": "title",
+  "labelCase": "none",
+  "labelItalic": false,
+  "align": "center"
+ },
+ "theme": {
+  "presetId": "watercolour",
+  "colors": {
+   "land": "#fdfbf6",
+   "water": "#8cc4de",
+   "park": "#b7d3a0",
+   "roads": "#d9cfc2",
+   "borders": "#6b5b4b",
+   "labels": "#4a4038",
+   "accent": "#d46a6a",
+   "paper": "#fbf8f1",
+   "ink": "#4a4038"
+  },
+  "labels": true,
+  "relief": true,
+  "texture": false,
+  "hypso": false,
+  "physical": false,
+  "look": "watercolour",
+  "details": {
+   "grid": false,
+   "tropics": false,
+   "currents": false,
+   "lanes": false,
+   "compass": false
+  }
+ },
+ "view": {
+  "center": [
+   12.870000000000001,
+   43.08168140234243
+  ],
+  "zoom": 5.1,
+  "bearing": 0,
+  "refWidth": 400
+ },
+ "visited": {
+  "show": false,
+  "opacity": 0.35
+ },
+ "originals": {
+  "style": "papercut",
+  "palette": "auto"
+ }
+}

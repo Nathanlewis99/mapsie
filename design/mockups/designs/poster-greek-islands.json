@@ -1,0 +1,187 @@
+{
+ "id": "poster-greek-islands",
+ "subtitle": "Island hopping · Summer 2026",
+ "font": "bebas",
+ "layout": "band",
+ "productId": "a3",
+ "orientation": "portrait",
+ "frame": "white",
+ "paper": "ema",
+ "mount": "none",
+ "glaze": "perspex",
+ "stickerStyle": "retro",
+ "title": "The Greek Islands",
+ "stops": [
+  {
+   "id": "s0",
+   "name": "Athens",
+   "lng": 23.7275,
+   "lat": 37.9838,
+   "showLabel": true,
+   "labelOffset": [
+    -0.28,
+    0
+   ]
+  },
+  {
+   "id": "s1",
+   "name": "Mykonos",
+   "lng": 25.3289,
+   "lat": 37.4467,
+   "showLabel": true,
+   "arriveBy": "boat",
+   "labelOffset": [
+    -0.28,
+    0
+   ]
+  },
+  {
+   "id": "s2",
+   "name": "Naxos",
+   "lng": 25.3763,
+   "lat": 37.1036,
+   "showLabel": true,
+   "arriveBy": "boat",
+   "labelOffset": [
+    -0.28,
+    0
+   ]
+  },
+  {
+   "id": "s3",
+   "name": "Santorini",
+   "lng": 25.4615,
+   "lat": 36.3932,
+   "showLabel": true,
+   "arriveBy": "boat",
+   "labelOffset": [
+    -0.28,
+    0
+   ]
+  },
+  {
+   "id": "s4",
+   "name": "Crete",
+   "lng": 25.1442,
+   "lat": 35.3387,
+   "showLabel": true,
+   "arriveBy": "boat",
+   "labelOffset": [
+    -0.28,
+    0
+   ]
+  }
+ ],
+ "route": {
+  "show": true,
+  "style": "solid",
+  "curved": true,
+  "width": 0.8,
+  "modeIcons": true,
+  "iconArt": "retro"
+ },
+ "markers": {
+  "style": "dot",
+  "showDates": false,
+  "size": 1.1,
+  "labelSize": 1.1
+ },
+ "stickers": [
+  {
+   "id": "g1",
+   "kind": "original",
+   "name": "lm-santorini-domes",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": 24.1,
+   "lat": 36.15,
+   "size": 12,
+   "rotation": 4
+  },
+  {
+   "id": "g2",
+   "kind": "original",
+   "name": "lm2-mykonos",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": 24.5,
+   "lat": 37.35,
+   "size": 11,
+   "rotation": -4
+  },
+  {
+   "id": "g3",
+   "kind": "original",
+   "name": "lm-acropolis-parthenon",
+   "origStyle": "papercut",
+   "palette": "auto",
+   "src": "",
+   "lng": 23,
+   "lat": 38.55,
+   "size": 10,
+   "rotation": -3
+  }
+ ],
+ "text": {
+  "titleSize": 1.25,
+  "titleCase": "upper",
+  "titleSpacing": 0.3,
+  "titleItalic": false,
+  "subtitleFont": "montserrat",
+  "subtitleSize": 1,
+  "subtitleCase": "upper",
+  "subtitleSpacing": 0.5,
+  "subtitleItalic": false,
+  "showRoute": false,
+  "labelFont": "title",
+  "labelCase": "none",
+  "labelItalic": false,
+  "align": "center"
+ },
+ "theme": {
+  "presetId": "poster",
+  "colors": {
+   "land": "#f0d9a8",
+   "water": "#24628f",
+   "park": "#8db26c",
+   "roads": "#fff4dc",
+   "borders": "#2d3a46",
+   "labels": "#1f2a35",
+   "accent": "#d9442b",
+   "paper": "#f6e7c4",
+   "ink": "#1f2a35"
+  },
+  "labels": true,
+  "relief": false,
+  "texture": false,
+  "hypso": false,
+  "physical": false,
+  "look": "poster",
+  "details": {
+   "grid": false,
+   "tropics": false,
+   "currents": false,
+   "lanes": false,
+   "compass": false
+  }
+ },
+ "view": {
+  "center": [
+   24.5945,
+   36.672614830287934
+  ],
+  "zoom": 6.2,
+  "bearing": 0,
+  "refWidth": 400
+ },
+ "visited": {
+  "show": false,
+  "opacity": 0.35
+ },
+ "originals": {
+  "style": "papercut",
+  "palette": "auto"
+ }
+}

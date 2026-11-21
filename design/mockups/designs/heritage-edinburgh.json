@@ -1,0 +1,152 @@
+{
+ "id": "heritage-edinburgh",
+ "subtitle": "The Royal Mile · Old Town",
+ "font": "rye",
+ "layout": "band",
+ "productId": "a3",
+ "orientation": "portrait",
+ "frame": "black",
+ "paper": "ema",
+ "mount": "none",
+ "glaze": "perspex",
+ "stickerStyle": "engraved",
+ "title": "Edinburgh",
+ "stops": [
+  {
+   "id": "s0",
+   "name": "Edinburgh Castle",
+   "lng": -3.2008,
+   "lat": 55.9486,
+   "showLabel": true,
+   "labelOffset": [
+    -0.2,
+    0
+   ]
+  },
+  {
+   "id": "s1",
+   "name": "St Giles' Cathedral",
+   "lng": -3.1908,
+   "lat": 55.9495,
+   "showLabel": true,
+   "arriveBy": "walk",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
+  },
+  {
+   "id": "s2",
+   "name": "Canongate Kirk",
+   "lng": -3.1798,
+   "lat": 55.9517,
+   "showLabel": true,
+   "arriveBy": "walk",
+   "labelOffset": [
+    -15,
+    -3.4
+   ]
+  }
+ ],
+ "route": {
+  "show": true,
+  "style": "dashed",
+  "curved": false,
+  "width": 0.6,
+  "modeIcons": false,
+  "iconArt": "engraved"
+ },
+ "markers": {
+  "style": "dot",
+  "showDates": false,
+  "size": 1,
+  "labelSize": 1
+ },
+ "stickers": [
+  {
+   "id": "e1",
+   "kind": "original",
+   "name": "lm-edinburgh-rock",
+   "origStyle": "engraved",
+   "palette": "auto",
+   "src": "",
+   "lng": -3.1975,
+   "lat": 55.9532,
+   "size": 15,
+   "rotation": -4
+  },
+  {
+   "id": "e2",
+   "kind": "original",
+   "name": "whisky-glass",
+   "origStyle": "engraved",
+   "palette": "auto",
+   "src": "",
+   "lng": -3.1845,
+   "lat": 55.9468,
+   "size": 12,
+   "rotation": 6
+  }
+ ],
+ "text": {
+  "titleSize": 1.15,
+  "titleCase": "none",
+  "titleSpacing": 0,
+  "titleItalic": false,
+  "subtitleFont": "cormorant",
+  "subtitleSize": 1,
+  "subtitleCase": "upper",
+  "subtitleSpacing": 0.6,
+  "subtitleItalic": false,
+  "showRoute": true,
+  "labelFont": "title",
+  "labelCase": "none",
+  "labelItalic": false,
+  "align": "center",
+  "cartouche": "plaque"
+ },
+ "theme": {
+  "presetId": "heritage",
+  "colors": {
+   "land": "#f2e8d0",
+   "water": "#d8ccad",
+   "park": "#ebe0c4",
+   "roads": "#f7efdc",
+   "borders": "#5b4630",
+   "labels": "#3a2a19",
+   "accent": "#c08b2c",
+   "paper": "#efe4c9",
+   "ink": "#3a2a19"
+  },
+  "labels": true,
+  "relief": true,
+  "texture": true,
+  "hypso": false,
+  "physical": false,
+  "engraved": true,
+  "details": {
+   "grid": false,
+   "tropics": false,
+   "currents": false,
+   "lanes": false,
+   "compass": false
+  }
+ },
+ "view": {
+  "center": [
+   -3.1903,
+   55.950150031024755
+  ],
+  "zoom": 13.29,
+  "bearing": 0,
+  "refWidth": 400
+ },
+ "visited": {
+  "show": false,
+  "opacity": 0.35
+ },
+ "originals": {
+  "style": "papercut",
+  "palette": "auto"
+ }
+}

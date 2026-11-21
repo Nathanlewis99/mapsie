@@ -373,5 +373,93 @@
   ],
   "end": "end-design.png",
   "end_seconds": 2.2
+ },
+ "vintage-styles": {
+  "layout": "phone",
+  "segments": [
+   {
+    "image": "design/ads/vintage/antique-grand-tour-room.jpg",
+    "seconds": 2.7,
+    "from": [
+     1200,
+     900,
+     1800
+    ],
+    "to": [
+     1200,
+     660,
+     1150
+    ],
+    "fade": 0.4,
+    "caption": "band-vint-antique.png"
+   },
+   {
+    "image": "design/ads/vintage/heritage-edinburgh-room.jpg",
+    "seconds": 2.7,
+    "from": [
+     1200,
+     660,
+     1150
+    ],
+    "to": [
+     1200,
+     880,
+     1750
+    ],
+    "fade": 0.4,
+    "caption": "band-vint-heritage.png"
+   },
+   {
+    "image": "design/ads/vintage/touring-nc500-room.jpg",
+    "seconds": 2.7,
+    "from": [
+     1200,
+     900,
+     1800
+    ],
+    "to": [
+     1200,
+     660,
+     1150
+    ],
+    "fade": 0.4,
+    "caption": "band-vint-touring.png"
+   },
+   {
+    "image": "design/ads/vintage/poster-greek-islands-room.jpg",
+    "seconds": 2.7,
+    "from": [
+     1200,
+     660,
+     1150
+    ],
+    "to": [
+     1200,
+     880,
+     1750
+    ],
+    "fade": 0.4,
+    "caption": "band-vint-poster.png"
+   },
+   {
+    "image": "design/ads/vintage/watercolour-italy-honeymoon-room.jpg",
+    "seconds": 2.7,
+    "from": [
+     1200,
+     900,
+     1800
+    ],
+    "to": [
+     1200,
+     660,
+     1150
+    ],
+    "fade": 0.4,
+    "caption": "band-vint-watercolour.png"
+   }
+  ],
+  "captions": [],
+  "end": "end-vintage.png",
+  "end_seconds": 2.4
  }
 }

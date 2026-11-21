@@ -105,6 +105,25 @@ const ANGLES: Angle[] = [
     cta: "Add your photos",
     price: `From £${FROM} · free delivery`,
   },
+  // Vintage map styles (Nov 2026)
+  {
+    id: "vintage-antique",
+    image: img(path.resolve("design/ads/vintage/antique-grand-tour-room.jpg")),
+    pos: { sq: "50% 12%", p45: "50% 14%", p23: "50% 16%" },
+    head: `Your trip, as an <span class="coral">antique map.</span>`,
+    sub: "Hand-coloured borders, sea monsters and a scroll title, like the maps of the 1700s. Plus Victorian, 1920s touring and more.",
+    cta: "Design yours",
+    price: `Prints from £${FROM}`,
+  },
+  {
+    id: "vintage-heritage",
+    image: img(path.resolve("design/ads/vintage/heritage-edinburgh-room.jpg")),
+    pos: { sq: "50% 14%", p45: "50% 16%", p23: "50% 18%" },
+    head: `Your city, as a <span class="coral">Victorian map.</span>`,
+    sub: "Engraved streets and buildings, like the old town plans, with your route in gold. Any city, any trip.",
+    cta: "Design yours",
+    price: `Prints from £${FROM}`,
+  },
 ];
 
 const SIZES = [
@@ -135,7 +154,8 @@ function giftCardVisual(scale: number) {
 }
 
 async function statics() {
-  for (const a of ANGLES) {
+  const only = process.env.ANGLES?.split(",");
+  for (const a of ANGLES.filter((x) => !only || only.includes(x.id))) {
     for (const s of SIZES) {
       const pad = s.w > 1000 ? 64 : 58;
       const src = a.id === "your-photos" && s.key === "p23" ? img(path.resolve("design/ads/assets/sri-lanka-photos-tall.jpg")) : a.image;
@@ -220,6 +240,13 @@ async function overlays() {
   await band("xmas-2", `…their trip, <span class="coral">on the wall.</span>`);
   await band("xmas-3", `Every stop. <span class="coral">Every route.</span>`);
   await band("xmas-4", `Framed <span class="coral">&amp; delivered.</span>`);
+  // The vintage styles video.
+  await cap("vint-0", `Your trip, as a <span class="coral">vintage map</span>`, 70);
+  await band("vint-antique", `Antique <span class="coral">· 1700s</span>`);
+  await band("vint-heritage", `Victorian <span class="coral">town plan</span>`);
+  await band("vint-touring", `1920s <span class="coral">touring map</span>`);
+  await band("vint-poster", `Railway <span class="coral">poster</span>`);
+  await band("vint-watercolour", `<span class="coral">Watercolour</span>`);
   // End cards.
   const end = (name: string, line: string, cta: string, sub: string) =>
     render(
@@ -240,6 +267,7 @@ async function overlays() {
   await end("design", `Your trip, <span class="coral">on your wall.</span>`, "Design yours", `From £${FROM} · free delivery`);
   await end("xmas", `The gift they'll <span class="coral">actually</span> hang up.`, "Design theirs", `Order by ${xmas} for Christmas (UK)`);
   await end("gift", `Give a map of <span class="coral">their favourite trip.</span>`, "Buy a gift card", `From £${GIFT_MIN} · emailed instantly`);
+  await end("vintage", `17 map styles. <span class="coral">Your trip.</span>`, "Design yours", `Prints from £${FROM} · free delivery`);
 }
 
 (async () => {

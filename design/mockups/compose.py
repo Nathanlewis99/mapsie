@@ -192,4 +192,6 @@ def compose(slug, frame, room_id):
     return out
 
 for slug, frame, room in TRIPS:
+    if not (RENDERS / f"{slug}.png").exists():
+        continue  # only the designs rendered this time
     print(compose(slug, frame, room))

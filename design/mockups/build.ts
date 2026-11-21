@@ -55,7 +55,8 @@ function fit(d: Design, mapFrac: number, adj: { zoom?: number; up?: number } = {
 
 async function main() {
   mkdirSync("design/mockups/designs", { recursive: true });
-  for (const t of TRIPS) {
+  const only = process.argv.slice(2);
+  for (const t of TRIPS.filter((x) => !only.length || only.includes(x.slug))) {
     console.log(t.slug);
     const { preset, themePatch, ...rest } = t.design;
     const p = PRESETS.find((x) => x.id === preset)!;

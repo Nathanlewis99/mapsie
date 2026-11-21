@@ -1,0 +1,226 @@
+{
+ "id": "antique-grand-tour",
+ "subtitle": "London · Paris · Venice · Rome · Athens",
+ "font": "rye",
+ "layout": "band",
+ "productId": "a3",
+ "orientation": "portrait",
+ "frame": "brown",
+ "paper": "ema",
+ "mount": "none",
+ "glaze": "perspex",
+ "stickerStyle": "handcoloured",
+ "title": "The Grand Tour",
+ "stops": [
+  {
+   "id": "s0",
+   "name": "London",
+   "lng": -0.1276,
+   "lat": 51.5072,
+   "showLabel": true,
+   "labelOffset": [
+    -0.2,
+    0
+   ]
+  },
+  {
+   "id": "s1",
+   "name": "Paris",
+   "lng": 2.3522,
+   "lat": 48.8566,
+   "showLabel": true,
+   "arriveBy": "train",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
+  },
+  {
+   "id": "s2",
+   "name": "Venice",
+   "lng": 12.3155,
+   "lat": 45.4408,
+   "showLabel": true,
+   "arriveBy": "train",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
+  },
+  {
+   "id": "s3",
+   "name": "Florence",
+   "lng": 11.2558,
+   "lat": 43.7696,
+   "showLabel": true,
+   "arriveBy": "train",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
+  },
+  {
+   "id": "s4",
+   "name": "Rome",
+   "lng": 12.4964,
+   "lat": 41.9028,
+   "showLabel": true,
+   "arriveBy": "train",
+   "labelOffset": [
+    -11.24,
+    0
+   ]
+  },
+  {
+   "id": "s5",
+   "name": "Athens",
+   "lng": 23.7275,
+   "lat": 37.9838,
+   "showLabel": true,
+   "arriveBy": "boat",
+   "labelOffset": [
+    -0.2,
+    0
+   ]
+  }
+ ],
+ "route": {
+  "show": true,
+  "style": "dotted",
+  "curved": true,
+  "width": 0.6,
+  "modeIcons": true,
+  "iconArt": "handcoloured"
+ },
+ "markers": {
+  "style": "dot",
+  "showDates": false,
+  "size": 1,
+  "labelSize": 1
+ },
+ "stickers": [
+  {
+   "id": "a1",
+   "kind": "original",
+   "name": "oldmap-galleon",
+   "origStyle": "handcoloured",
+   "palette": "auto",
+   "src": "",
+   "lng": 17.6,
+   "lat": 35.4,
+   "size": 12,
+   "rotation": -4
+  },
+  {
+   "id": "a2",
+   "kind": "original",
+   "name": "oldmap-serpent",
+   "origStyle": "handcoloured",
+   "palette": "auto",
+   "src": "",
+   "lng": -3.2,
+   "lat": 45.9,
+   "size": 11,
+   "rotation": 5
+  },
+  {
+   "id": "a3",
+   "kind": "original",
+   "name": "oldmap-windhead",
+   "origStyle": "handcoloured",
+   "palette": "auto",
+   "src": "",
+   "lng": 3.4,
+   "lat": 56.4,
+   "size": 10,
+   "rotation": 0
+  },
+  {
+   "id": "a4",
+   "kind": "original",
+   "name": "lm-colosseum-ruin",
+   "origStyle": "handcoloured",
+   "palette": "auto",
+   "src": "",
+   "lng": 14.6,
+   "lat": 41,
+   "size": 9,
+   "rotation": 4
+  },
+  {
+   "id": "a5",
+   "kind": "original",
+   "name": "lm-acropolis-parthenon",
+   "origStyle": "handcoloured",
+   "palette": "auto",
+   "src": "",
+   "lng": 25.2,
+   "lat": 40,
+   "size": 9,
+   "rotation": -4
+  }
+ ],
+ "text": {
+  "titleSize": 1.1,
+  "titleCase": "none",
+  "titleSpacing": 0,
+  "titleItalic": false,
+  "subtitleFont": "cormorant",
+  "subtitleSize": 1,
+  "subtitleCase": "upper",
+  "subtitleSpacing": 0.5,
+  "subtitleItalic": false,
+  "showRoute": false,
+  "labelFont": "title",
+  "labelCase": "none",
+  "labelItalic": false,
+  "align": "center",
+  "cartouche": "scroll"
+ },
+ "theme": {
+  "presetId": "antique",
+  "colors": {
+   "land": "#f1e3c2",
+   "water": "#ece0c2",
+   "park": "#e4d6b0",
+   "roads": "#f6ecd6",
+   "borders": "#4a3622",
+   "labels": "#3a2a18",
+   "accent": "#a2342a",
+   "paper": "#efe0bd",
+   "ink": "#3a2a18"
+  },
+  "labels": true,
+  "relief": true,
+  "texture": true,
+  "hypso": false,
+  "physical": false,
+  "look": "antique",
+  "details": {
+   "grid": false,
+   "tropics": false,
+   "currents": false,
+   "lanes": false,
+   "compass": true,
+   "compassStyle": "vintage",
+   "neatline": true
+  }
+ },
+ "view": {
+  "center": [
+   11.799949999999999,
+   44.83580821276815
+  ],
+  "zoom": 2.94,
+  "bearing": 0,
+  "refWidth": 400
+ },
+ "visited": {
+  "show": false,
+  "opacity": 0.35
+ },
+ "originals": {
+  "style": "papercut",
+  "palette": "auto"
+ }
+}

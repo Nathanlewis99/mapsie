@@ -27,9 +27,13 @@ posts = [p for p in json.load(open(__import__("os").path.join(__import__("os").p
 for i, p in enumerate(posts):
     if i: time.sleep(gap)
     msg = fb_text(p["caption"])
-    if p["type"] == "image":
+    if p["type"] == "carousel":
+        # Facebook: one post with several photos (each uploaded unpublished, then attached).
+        ids = [call("POST", f"{PAGE}/photos", {"url": BASE + f, "published": "false"}, token).get("id") for f in p["files"]]
+        r = call("POST", f"{PAGE}/feed", {"message": msg, "attached_media": json.dumps([{"media_fbid": i} for i in ids if i])}, token)
+    elif p["type"] == "image":
         r = call("POST", f"{PAGE}/photos", {"url": BASE + p["file"], "message": msg}, token)
     else:
         r = call("POST", f"{PAGE}/videos", {"file_url": BASE + p["file"], "description": msg}, token)
-    if "id" in r: print(f"FB {p['n']} OK {p['file']} https://www.facebook.com/{r.get('post_id', r['id'])}", flush=True)
+    if "id" in r: print(f"FB {p['n']} OK {p.get('file') or 'carousel'} https://www.facebook.com/{r.get('post_id', r['id'])}", flush=True)
     else: print(f"FB {p['n']} FAILED: {r.get('error',{}).get('message')}", flush=True)

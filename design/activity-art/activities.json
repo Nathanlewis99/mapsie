@@ -5788,5 +5788,59 @@
   "keywords": "",
   "tags": "compass rose navigation north map explore",
   "batch": "basics_things"
+ },
+ {
+  "id": "oldmap-sea-serpent",
+  "label": "Sea serpent",
+  "category": "Old maps",
+  "tier": 2,
+  "keywords": "old map antique vintage nautical cartography sea ocean voyage explorer compass",
+  "tags": "sea monster serpent dragon snake leviathan",
+  "batch": "oldmaps"
+ },
+ {
+  "id": "oldmap-galleon",
+  "label": "Galleon",
+  "category": "Old maps",
+  "tier": 2,
+  "keywords": "old map antique vintage nautical cartography sea ocean voyage explorer compass",
+  "tags": "ship sailing ship tall ship galleon boat pirate",
+  "batch": "oldmaps"
+ },
+ {
+  "id": "oldmap-wind-head",
+  "label": "Wind head",
+  "category": "Old maps",
+  "tier": 2,
+  "keywords": "old map antique vintage nautical cartography sea ocean voyage explorer compass",
+  "tags": "wind cherub breeze blowing zephyr boreas cloud compass rose",
+  "batch": "oldmaps"
+ },
+ {
+  "id": "oldmap-whale",
+  "label": "Spouting whale",
+  "category": "Old maps",
+  "tier": 2,
+  "keywords": "old map antique vintage nautical cartography sea ocean voyage explorer compass",
+  "tags": "whale sea monster spout leviathan",
+  "batch": "oldmaps"
+ },
+ {
+  "id": "oldmap-kraken",
+  "label": "Kraken",
+  "category": "Old maps",
+  "tier": 2,
+  "keywords": "old map antique vintage nautical cartography sea ocean voyage explorer compass",
+  "tags": "sea monster octopus squid tentacles ship",
+  "batch": "oldmaps"
+ },
+ {
+  "id": "oldmap-mermaid",
+  "label": "Mermaid",
+  "category": "Old maps",
+  "tier": 2,
+  "keywords": "old map antique vintage nautical cartography sea ocean voyage explorer compass",
+  "tags": "siren mirror sea maiden",
+  "batch": "oldmaps"
  }
 ]

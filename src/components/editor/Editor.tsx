@@ -3,6 +3,7 @@ import { TEMPLATES } from "@/lib/templates";
 import EmailDesign from "./EmailDesign";
 import { adEvent } from "@/lib/adTrack";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { nanoid } from "nanoid";
 import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
 import Link from "next/link";
@@ -132,6 +133,26 @@ export default function Editor() {
     fetch("/api/auth/me").then((r) => r.json()).then(setMe).catch(() => setMe({ user: null, googleEnabled: false }));
   }, []);
 
+  /** Save the current map as a new map in the account, and keep editing that copy. */
+  const saveCopy = async () => {
+    setBusy("save");
+    try {
+      const st = useEditor.getState();
+      const r = await fetch("/api/me/designs", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ design: { ...st.design, id: nanoid(10) }, name: `${st.design.title || "Untitled map"} (copy)` }),
+      });
+      if (!r.ok) throw new Error();
+      st.setSaved((await r.json()).id);
+      track("saved_design");
+      setToast("Saved as a copy ✓ You're now editing the copy; the original is unchanged.");
+    } catch {
+      setToast("Couldn't save a copy, please try again.");
+    }
+    setBusy("");
+  };
+
   /** Save to the signed-in user's account (sends them to sign in first if needed). */
   const save = async () => {
     if (!me?.user) {
@@ -166,6 +187,7 @@ export default function Editor() {
         .then((r) => (r.ok ? r.json() : Promise.reject()))
         .then((s: { id: string; design: Design }) => {
           useEditor.getState().loadSaved(s.id, s.design);
+          if (params.get("copied")) setToast("This is your copy: change anything you like. The original is safe in My account.");
           router.replace("/create");
         })
         .catch(() => setToast("Sorry, we couldn't open that map."));
@@ -477,6 +499,12 @@ export default function Editor() {
               <Icon name="heart" className={savedId && !dirty ? "text-coral fill-coral" : ""} />
               <span className="hidden lg:inline">{busy === "save" ? "Saving…" : savedId && !dirty ? "Saved" : "Save"}</span>
             </button>
+            {savedId && me?.user && (
+              <button title="Save as a copy: try another style or layout without changing the original" className={textBtn} onClick={saveCopy} disabled={busy === "save"}>
+                <span aria-hidden className="text-base leading-none">⧉</span>
+                <span className="hidden lg:inline">Save a copy</span>
+              </button>
+            )}
             <button title="Start a new map" onClick={() => confirm("Start a fresh map? (You can undo this.)") && store.reset()} className={`${textBtn} hidden md:inline-flex`}>
               <Icon name="plus" />
               <span className="hidden lg:inline">New</span>

@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   if (!user) return NextResponse.json({ error: "Sign in first" }, { status: 401 });
   const text = await req.text();
   if (text.length > MAX_BYTES) return NextResponse.json({ error: "Design too large" }, { status: 413 });
-  const { design, id } = JSON.parse(text) as { design: Design; id?: string };
+  const { design, id, name } = JSON.parse(text) as { design: Design; id?: string; name?: string };
   if (!design || !Array.isArray(design.stops)) return NextResponse.json({ error: "Invalid design" }, { status: 400 });
-  return NextResponse.json({ id: await upsertSavedDesign(user.id, design, id) });
+  return NextResponse.json({ id: await upsertSavedDesign(user.id, design, id, typeof name === "string" ? name : undefined) });
 }

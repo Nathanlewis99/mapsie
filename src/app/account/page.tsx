@@ -7,6 +7,7 @@ import { money, type RegionId, describeOptions } from "@/lib/products";
 import { normalizeDesign } from "@/lib/types";
 import SiteFooter from "@/components/SiteFooter";
 import DeleteDesignButton from "./DeleteDesignButton";
+import DuplicateDesignButton from "./DuplicateDesignButton";
 import { ResendVerification } from "../signin/PasswordForms";
 
 export const dynamic = "force-dynamic";
@@ -94,6 +95,7 @@ export default async function Account({ searchParams }: { searchParams: Promise<
                           <Link href={`/create?saved=${s.id}`} className="font-extrabold text-coral px-2 outline-none after:absolute after:inset-0 after:content-['']" aria-label={`Open ${s.title}`}>
                             Open
                           </Link>
+                          <DuplicateDesignButton id={s.id} title={s.title} />
                           <DeleteDesignButton id={s.id} title={s.title} />
                         </span>
                       </div>

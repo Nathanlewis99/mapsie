@@ -542,8 +542,9 @@ export async function getSavedDesign(userId: string, id: string): Promise<SavedD
   return r ? toSaved(r) : null;
 }
 /** Create (no id) or update (id) one of a user's designs. Returns its id. */
-export async function upsertSavedDesign(userId: string, design: Design, id?: string): Promise<string> {
-  const title = (design.title || "Untitled map").slice(0, 80);
+export async function upsertSavedDesign(userId: string, design: Design, id?: string, name?: string): Promise<string> {
+  // `name` labels the map in the account list (e.g. "… (copy)") without changing the printed title.
+  const title = (name || design.title || "Untitled map").slice(0, 80);
   if (id && (await one("SELECT 1 AS x FROM saved_designs WHERE id = ? AND user_id = ?", [id, userId]))) {
     await run("UPDATE saved_designs SET title = ?, json = ?, updated_at = ? WHERE id = ?", [title, JSON.stringify(design), now(), id]);
     return id;

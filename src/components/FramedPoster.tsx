@@ -64,16 +64,20 @@ function Side({ side, fw, base, wood }: { side: "top" | "bottom" | "left" | "rig
  * Read-only previews are laid out at the design's own width and scaled, so a
  * thumbnail shows exactly what the print will.
  */
-export default function FramedPoster(props: ComponentProps<typeof Poster> & { shadow?: boolean; realistic?: boolean }) {
-  const { shadow = true, realistic = false, ...rest } = props;
-  const { design, width, editable } = props;
+export default function FramedPoster(props: ComponentProps<typeof Poster> & { shadow?: boolean; realistic?: boolean; zoomScale?: number }) {
+  const { shadow = true, realistic = false, zoomScale = 1, ...rest } = props;
+  const { design, width } = props;
   const frame = FRAMES.find((f) => f.id === design.frame);
   const framed = !!frame && frame.id !== "none";
   const fw = mouldingWidth(design, width);
   const mw = mountWidth(design, width);
   const mount = MOUNTS.find((m) => m.id === design.mount);
   const ref = design.view.refWidth;
-  const scaled = !editable && Math.abs(width - ref) > 1;
+  // The poster is always laid out at the design's own width (the same layout the print
+  // file uses) and scaled to fit the screen, so labels, stickers and the map's own text
+  // keep the same size and spacing on a phone, a laptop or a big monitor.
+  const scaled = Math.abs(width - ref) > 1;
+  const renderScale = (width / ref) * zoomScale;
   const h = width * posterAspect(design.productId, design.orientation);
   const unit = width / 100;
   // Framed prints are always on Matte art (Prodigi's A-size frames use it).
@@ -98,10 +102,10 @@ export default function FramedPoster(props: ComponentProps<typeof Poster> & { sh
     >
       {scaled ? (
         <div style={{ transform: `scale(${width / ref})`, transformOrigin: "top left", width: ref }}>
-          <Poster {...rest} width={ref} />
+          <Poster {...rest} width={ref} renderScale={renderScale} />
         </div>
       ) : (
-        <Poster {...rest} />
+        <Poster {...rest} renderScale={renderScale} />
       )}
       {/* the paper itself: its tooth, texture or sheen (never part of the print file) */}
       <div aria-hidden className={`mapsie-paper-look paper-${paper}`} style={{ opacity: PAPER_OPACITY[paper] * (realistic ? 1 : 0.7) }} />

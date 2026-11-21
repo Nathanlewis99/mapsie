@@ -41,6 +41,8 @@ interface Props {
   fitRequest?: number;
   handlers?: MapHandlers;
   filterPrefix?: string; // id prefix of this poster's sticker filters
+  /** The poster is shown this much larger than its layout size: draw the map sharper to match. */
+  renderScale?: number;
   onReady?: () => void;
   /** Editor only: keep the framing fixed (no pan/zoom of the map itself). */
   frozen?: boolean;
@@ -86,7 +88,9 @@ function markerSvg(style: Design["markers"]["style"], fill: string, stroke: stri
 }
 
 export default function MapView(props: Props) {
-  const { design, width, height, mapWidth, editable, print, selectedSticker, selectedLabel, fitRequest, handlers, onReady, filterPrefix = "mapsie", frozen = false } = props;
+  const { design, width, height, mapWidth, editable, print, selectedSticker, selectedLabel, fitRequest, handlers, onReady, filterPrefix = "mapsie", frozen = false, renderScale = 1 } = props;
+  // Sharper map when the poster is magnified on screen (capped, as WebGL canvases have a size limit).
+  const screenRatio = () => (typeof window === "undefined" ? 1 : (window.devicePixelRatio || 1) * Math.min(3, Math.max(1, renderScale)));
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
   const stopMarkers = useRef<Marker[]>([]);
@@ -132,6 +136,7 @@ export default function MapView(props: Props) {
         renderWorldCopies: true,
         fadeDuration: print ? 0 : 300,
         canvasContextAttributes: { preserveDrawingBuffer: !!print, antialias: true },
+        ...(print ? {} : { pixelRatio: screenRatio() }),
         // In print mode the page runs at a very high pixel density. WebGL tops out
         // around 8192px, so the map is drawn at most that size and gently upscaled,
         // while text, stickers and markers (HTML) stay at full resolution.
@@ -281,6 +286,15 @@ export default function MapView(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [routeKey],
   );
+
+  // Keep the map sharp as the poster is scaled to fit the screen or zoomed into.
+  useEffect(() => {
+    const m = map.current;
+    if (!m || print) return;
+    const want = screenRatio();
+    if (Math.abs(m.getPixelRatio() - want) > 0.05) m.setPixelRatio(want);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [renderScale]);
 
   // --- visited countries
   function syncVisited() {
@@ -618,7 +632,9 @@ export default function MapView(props: Props) {
         if (!src || !m || !el.current) return;
         e.preventDefault();
         const r = el.current.getBoundingClientRect();
-        const p = m.unproject([e.clientX - r.left, e.clientY - r.top]);
+        // the poster may be scaled to fit the screen: convert to the map's own pixels
+        const k = r.width / (el.current.offsetWidth || 1) || 1;
+        const p = m.unproject([(e.clientX - r.left) / k, (e.clientY - r.top) / k]);
         h.current?.onDropSticker?.(src, p.lng, p.lat);
       }}
     />

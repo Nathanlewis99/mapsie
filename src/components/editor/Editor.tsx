@@ -582,6 +582,7 @@ export default function Editor() {
                 key={`${design.productId}-${design.orientation}-${design.layout}-${design.frame}`}
                 design={design}
                 width={posterW}
+                zoomScale={zoom.k}
                 editable
                 selectedSticker={selectedSticker}
                 selectedLabel={selectedLabel}

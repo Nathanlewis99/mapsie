@@ -21,6 +21,8 @@ interface Props {
   handlers?: MapHandlers;
   onReady?: () => void;
   frozen?: boolean;
+  /** How much bigger than its layout size the poster is shown (so the map can draw sharply). */
+  renderScale?: number;
 }
 
 /** Everything is sized relative to the poster width, so it scales to any print size. */
@@ -28,7 +30,7 @@ interface Props {
 /** Title fonts whose descenders need extra line height. */
 const TALL_TAILS = new Set(["pacifico", "vibes", "satisfy", "lobster", "dancing", "caveat", "kalam", "rocksalt", "marker"]);
 
-export default function Poster({ design, width, editable = false, print, selectedSticker, selectedLabel, fitRequest, handlers, onReady, frozen }: Props) {
+export default function Poster({ design, width, editable = false, print, selectedSticker, selectedLabel, fitRequest, handlers, onReady, frozen, renderScale }: Props) {
   const height = Math.round(width * posterAspect(design.productId, design.orientation));
   const u = width / 100;
   // Each poster gets its own filter ids, since thumbnails may show different themes.
@@ -172,6 +174,7 @@ export default function Poster({ design, width, editable = false, print, selecte
           onReady={onReady}
           frozen={frozen}
           filterPrefix={filterPrefix}
+          renderScale={renderScale}
         />
         {design.theme.details?.neatline && <Neatline u={u} ink={c.ink} paper={c.paper} />}
         {design.theme.details?.compass && (

@@ -27,6 +27,10 @@ export const FONTS: { id: FontId; name: string; css: string; bold: number }[] = 
   { id: "fredoka", name: "Rounded", css: "var(--f-fredoka), sans-serif", bold: 600 },
   { id: "elite", name: "Typewriter 2", css: "var(--f-elite), monospace", bold: 400 },
   { id: "rocksalt", name: "Scrawl", css: "var(--f-rocksalt), cursive", bold: 400 },
+  // Old-map titles: a Victorian ornamental face, an antique engraver's capitals, and blackletter.
+  { id: "rye", name: "Victorian", css: "var(--f-rye), serif", bold: 400 },
+  { id: "fell", name: "Antique", css: "var(--f-fell), serif", bold: 400 },
+  { id: "fraktur", name: "Gothic", css: "var(--f-fraktur), serif", bold: 700 },
 ];
 
 export const fontCss = (id: FontId) => FONTS.find((f) => f.id === id)?.css ?? FONTS[0].css;

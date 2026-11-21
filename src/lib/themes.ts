@@ -16,6 +16,7 @@ export interface Preset {
   hypso?: boolean;
   physical?: boolean;
   engraved?: boolean;
+  look?: Look;
   details?: Partial<MapDetails>;
   /** Shown as a small tag on the style card. */
   tag?: string;
@@ -121,6 +122,48 @@ export const PRESETS: Preset[] = [
     colors: { land: "#f2e8d0", water: "#d8ccad", park: "#ebe0c4", roads: "#f7efdc", borders: "#5b4630", labels: "#3a2a19", accent: "#c08b2c", paper: "#efe4c9", ink: "#3a2a19" },
   },
   {
+    // After Bartholomew's half-inch and the Ordnance Survey's 1920s Popular Edition:
+    // red main roads, yellow lanes, green woods, brown contours, blue water.
+    id: "touring",
+    name: "Touring",
+    tag: "1920s",
+    relief: true,
+    texture: true,
+    look: "touring",
+    colors: { land: "#f3ead3", water: "#b9d2d8", park: "#bccb9b", roads: "#c4473a", borders: "#4b3a2a", labels: "#2f2418", accent: "#2b4f86", paper: "#f3ead3", ink: "#2f2418" },
+  },
+  {
+    // Hand-coloured maps of the 1600s and 1700s: a watercolour wash along every
+    // border, engraved lettering, and the sea lined along the coast.
+    id: "antique",
+    name: "Antique",
+    tag: "1700s",
+    relief: true,
+    texture: true,
+    look: "antique",
+    details: { compass: true, compassStyle: "vintage", neatline: true },
+    colors: { land: "#f1e3c2", water: "#ece0c2", park: "#e4d6b0", roads: "#f6ecd6", borders: "#4a3622", labels: "#3a2a18", accent: "#a2342a", paper: "#efe0bd", ink: "#3a2a18" },
+  },
+  {
+    // Mid-century railway and travel posters: a few strong flat colours.
+    id: "poster",
+    name: "Railway poster",
+    tag: "1930s",
+    relief: false,
+    texture: false,
+    look: "poster",
+    colors: { land: "#f0d9a8", water: "#24628f", park: "#8db26c", roads: "#fff4dc", borders: "#2d3a46", labels: "#1f2a35", accent: "#d9442b", paper: "#f6e7c4", ink: "#1f2a35" },
+  },
+  {
+    // Soft painted washes on white paper, with a hand-lettered feel.
+    id: "watercolour",
+    name: "Watercolour",
+    relief: true,
+    texture: false,
+    look: "watercolour",
+    colors: { land: "#fbf8f1", water: "#9fc8db", park: "#b7d3a0", roads: "#d9cfc2", borders: "#6b5b4b", labels: "#4a4038", accent: "#d46a6a", paper: "#fbf8f1", ink: "#4a4038" },
+  },
+  {
     id: "ink",
     name: "Ink",
     relief: false,
@@ -139,6 +182,7 @@ export function themeFromPreset(p: Preset): Theme {
     hypso: p.hypso ?? false,
     physical: p.physical ?? false,
     ...(p.engraved ? { engraved: true } : {}),
+    ...(p.look ? { look: p.look } : {}),
     details: { ...NO_DETAILS, ...p.details },
   };
 }
@@ -164,17 +208,19 @@ export function buildStyle(base: StyleSpecification, theme: Theme, opts: { seaTi
   const c = theme.colors;
   const style: StyleSpecification = JSON.parse(JSON.stringify(base));
   const out: AnyLayer[] = [];
-  const engraved = !!theme.engraved;
-  if (engraved) style.glyphs = `${opts.origin ?? ""}/api/glyphs/{fontstack}/{range}.pbf`;
+  const look = lookOf(theme);
+  if (look && OWN_FONTS.includes(look)) style.glyphs = `${opts.origin ?? ""}/api/glyphs/{fontstack}/{range}.pbf`;
+  const waterlines = theme.details?.waterlines ?? look === "antique";
 
   for (const layer of style.layers as AnyLayer[]) {
     const id = layer.id;
     const paint = (layer.paint ??= {});
 
-    if (engraved) {
-      const res = engrave(layer, theme, sea);
+    if (look) {
+      const res = restyle(look, layer, theme, sea);
       if (res) {
         out.push(...res);
+        if (id === "water" && waterlines) out.push(...waterLines(c.water, c.borders));
         if (id === "boundary_disputed") out.push(...detailLayers(theme.details ?? NO_DETAILS, c));
         continue;
       }
@@ -250,6 +296,7 @@ export function buildStyle(base: StyleSpecification, theme: Theme, opts: { seaTi
     // Sea depth goes straight on top of the sea: a soft deep-water tint, and fine
     // contour lines (vector, so they stay crisp at any print size).
     if (id === "water" && sea) out.push(...seaLayers(c.water, c.labels));
+    if (id === "water" && waterlines) out.push(...waterLines(c.water, c.borders));
 
     // Cartographic extras go just below the place names.
     if (id === "boundary_disputed") out.push(...detailLayers(theme.details ?? NO_DETAILS, c));
@@ -263,6 +310,7 @@ export function buildStyle(base: StyleSpecification, theme: Theme, opts: { seaTi
   if (d.tropics) style.sources["mapsie-tropics"] = geo(specialLatitudes);
   if (d.currents) style.sources["mapsie-currents"] = geo(currents);
   if (d.lanes) style.sources["mapsie-lanes"] = geo(shippingLanes);
+  if (look === "antique") style.sources["mapsie-wash"] = geo(`${opts.origin ?? ""}/geo/countries-wash.json`);
   if (sea) style.sources["mapsie-sea"] = { type: "vector", tiles: [opts.seaTiles!], maxzoom: 11 } as StyleSpecification["sources"][string];
   if (theme.relief || theme.hypso || sea) {
     style.sources["mapsy-dem"] = {
@@ -277,40 +325,70 @@ export function buildStyle(base: StyleSpecification, theme: Theme, opts: { seaTi
   return style;
 }
 
-// ---------------------------------------------------------------- Heritage (engraved)
-const SERIF = { regular: ["Old Standard Regular"], italic: ["Old Standard Italic"], bold: ["Old Standard Bold"] };
-// Road widths for the engraved look: a fine ink casing either side of a paper-coloured road.
-const roadWidth = (k: number, extra = 0): unknown => ["interpolate", ["exponential", 1.6], ["zoom"], 10, 0.4 * k + extra, 13, 1.6 * k + extra, 15, 5 * k + extra, 17, 14 * k + extra];
+// ---------------------------------------------------------------- vintage looks
+// Heritage (engraved), Touring, Antique, Railway poster and Watercolour each restyle the
+// base layers in their own way. Each returns the layers to draw in place of one base
+// layer, or null to fall back to the normal handling.
+export type Look = "engraved" | "touring" | "antique" | "poster" | "watercolour";
+export const lookOf = (t: Theme): Look | undefined => t.look ?? (t.engraved ? "engraved" : undefined);
+/** Looks that use our own label fonts (served from /api/glyphs). */
+const OWN_FONTS: Look[] = ["engraved", "touring", "antique", "watercolour"];
 
-/**
- * The engraved treatment for one base layer: the layers to draw in its place, or
- * null to fall back to the normal handling.
- */
-function engrave(layer: AnyLayer, theme: Theme, sea: boolean): AnyLayer[] | null {
+const SERIF = { regular: ["Old Standard Regular"], italic: ["Old Standard Italic"], bold: ["Old Standard Bold"] };
+const HAND = { regular: ["Patrick Hand Regular"], italic: ["Patrick Hand Regular"], bold: ["Patrick Hand Regular"] };
+const SANS = { regular: ["Noto Sans Regular"], italic: ["Noto Sans Italic"], bold: ["Noto Sans Bold"] };
+// Road widths: a fine ink casing either side of a coloured road.
+const roadWidth = (k: number, extra = 0): unknown => ["interpolate", ["exponential", 1.6], ["zoom"], 10, 0.4 * k + extra, 13, 1.6 * k + extra, 15, 5 * k + extra, 17, 14 * k + extra];
+// Touring maps (Bartholomew, OS Popular Edition): red main roads, yellow minor roads.
+const TOURING_MINOR = "#ecc86a";
+// Antique hand-colouring: one muted watercolour per country (see public/geo/countries-wash.json).
+export const WASH_COLOURS = ["#cf8a72", "#9fb487", "#dcbc6e", "#b99ab8", "#93b0c0"];
+
+const setPaint = (l: AnyLayer, p: Record<string, unknown>) => ((l as { paint?: Record<string, unknown> }).paint = p);
+const setLayout = (l: AnyLayer, p: Record<string, unknown>) => ((l as { layout?: Record<string, unknown> }).layout = p);
+
+function restyle(look: Look, layer: AnyLayer, theme: Theme, sea: boolean): AnyLayer[] | null {
   const id = layer.id;
   const c = theme.colors;
   const ink = c.borders;
   const paint = (layer.paint ??= {});
-  const show = () => (layer.layout = { ...(layer.layout ?? {}), visibility: "visible" });
+  const show = () => setLayout(layer, { ...(layer.layout ?? {}), visibility: "visible" });
   const from = layer as unknown as { source: string; "source-layer"?: string; filter?: unknown };
+  const like = (extra: Record<string, unknown>) => {
+    const l: Record<string, unknown> = { type: "line", source: from.source, "source-layer": from["source-layer"], filter: from.filter, ...extra };
+    for (const k of Object.keys(l)) if (l[k] === undefined) delete l[k];
+    return l as unknown as AnyLayer;
+  };
+  const fonts = look === "watercolour" ? HAND : look === "poster" ? SANS : SERIF;
 
   if (id === "water") {
     paint["fill-color"] = c.water;
-    paint["fill-outline-color"] = ink;
     const out: AnyLayer[] = [];
-    if (theme.relief) out.push(reliefLayer(theme, 0.25));
-    out.push(layer, { id: "mapsie-water-edge", type: "line", source: from.source, "source-layer": from["source-layer"], filter: from.filter, paint: { "line-color": ink, "line-width": ["interpolate", ["linear"], ["zoom"], 8, 0.4, 15, 1.1], "line-opacity": 0.8 } } as AnyLayer);
-    if (sea) out.push(...seaLayers(c.water, c.labels));
-    // Land contours, as on the town plans' hills (Arthur's Seat and the like).
-    if (sea) out.push({
-      id: "mapsie-land-contours",
-      type: "line",
-      source: "mapsie-sea",
-      "source-layer": "contours",
-      filter: [">", ["get", "ele"], 0],
-      layout: { "line-join": "round", "line-cap": "round" },
-      paint: { "line-color": ink, "line-opacity": ["match", ["get", "level"], 1, 0.5, 0.3], "line-width": ["match", ["get", "level"], 1, 0.8, 0.5] },
-    } as AnyLayer);
+    if (look === "antique") out.push(...washLayers());
+    const relief = { engraved: 0.25, touring: 0.35, antique: 0.4, poster: 0, watercolour: 0.2 }[look];
+    if (theme.relief && relief) out.push(reliefLayer(theme, relief));
+    out.push(layer);
+    if (look === "watercolour") {
+      // Pigment pools at the edge of a wash, so the coast is a soft, darker line.
+      out.push({ ...layer, id: "mapsie-water-texture", paint: { "fill-pattern": "mapsie-wash", "fill-opacity": 0.35 } } as AnyLayer);
+      out.push(like({ id: "mapsie-water-edge", paint: { "line-color": mix(c.water, ink, 0.3), "line-width": ["interpolate", ["linear"], ["zoom"], 4, 3, 10, 7], "line-blur": ["interpolate", ["linear"], ["zoom"], 4, 3, 10, 7], "line-opacity": 0.6 } }));
+    } else if (look !== "poster") {
+      out.push(like({ id: "mapsie-water-edge", paint: { "line-color": ink, "line-width": ["interpolate", ["linear"], ["zoom"], 8, 0.4, 15, 1.1], "line-opacity": 0.8 } }));
+    }
+    // Old hand-coloured maps show no sea depth; their sea is lined along the coast instead.
+    if (sea && (look === "engraved" || look === "touring")) out.push(...seaLayers(c.water, c.labels));
+    // Land contours (in brown on touring maps, as on Bartholomew's).
+    if (sea && (look === "engraved" || look === "touring")) {
+      out.push({
+        id: "mapsie-land-contours",
+        type: "line",
+        source: "mapsie-sea",
+        "source-layer": "contours",
+        filter: [">", ["get", "ele"], 0],
+        layout: { "line-join": "round", "line-cap": "round" },
+        paint: { "line-color": look === "touring" ? "#a87a4e" : ink, "line-opacity": ["match", ["get", "level"], 1, 0.5, 0.3], "line-width": ["match", ["get", "level"], 1, 0.8, 0.5] },
+      } as AnyLayer);
+    }
     return out;
   }
   if (id === "park" || id === "landcover_wood") {
@@ -318,62 +396,116 @@ function engrave(layer: AnyLayer, theme: Theme, sea: boolean): AnyLayer[] | null
     // Edinburgh's World Heritage Site, which cover whole city centres.
     if (id === "park") (layer as { filter?: unknown }).filter = ["all", from.filter as never, ["!", ["in", ["get", "class"], ["literal", ["protected_area", "national_park", "aboriginal_lands"]]]]] as never;
     paint["fill-color"] = c.park;
-    paint["fill-opacity"] = 1;
-    return [layer, { ...layer, id: `${id}-stipple`, paint: { "fill-pattern": "mapsie-stipple", "fill-opacity": 0.9 } } as AnyLayer];
+    paint["fill-opacity"] = look === "watercolour" ? 0.75 : 1;
+    if (look === "engraved" || look === "antique") return [layer, { ...layer, id: `${id}-stipple`, paint: { "fill-pattern": "mapsie-stipple", "fill-opacity": 0.9 } } as AnyLayer];
+    if (look === "watercolour") return [layer, { ...layer, id: `${id}-texture`, paint: { "fill-pattern": "mapsie-wash", "fill-opacity": 0.5 } } as AnyLayer, like({ id: `${id}-edge`, paint: { "line-color": mix(c.park, ink, 0.3), "line-width": 2, "line-blur": 2, "line-opacity": 0.45 } })];
+    if (look === "touring") return [layer, like({ id: `${id}-edge`, paint: { "line-color": mix(c.park, ink, 0.4), "line-width": 0.5, "line-opacity": 0.6 } })];
+    return [layer];
   }
   if (id === "building") {
+    if (look === "poster") return (hide(layer), [layer]);
     show();
-    layer.paint = { "fill-pattern": "mapsie-hatch", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 12, 0.4, 14, 1] };
-    return [layer, { id: "building-outline", type: "line", source: from.source, "source-layer": from["source-layer"], minzoom: 13, paint: { "line-color": ink, "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.3, 17, 1], "line-opacity": 0.85 } } as AnyLayer];
+    if (look === "watercolour") {
+      setPaint(layer, { "fill-color": mix(c.land, ink, 0.18), "fill-opacity": ["interpolate", ["linear"], ["zoom"], 13, 0, 14, 0.6] });
+      return [layer];
+    }
+    if (look === "touring") {
+      setPaint(layer, { "fill-color": "#c9a08a", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 14, 0.9] });
+      return [layer, like({ id: "building-outline", filter: undefined, minzoom: 14, paint: { "line-color": ink, "line-width": 0.4, "line-opacity": 0.6 } })];
+    }
+    setPaint(layer, { "fill-pattern": "mapsie-hatch", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 12, 0.4, 14, 1] });
+    return [layer, like({ id: "building-outline", filter: undefined, minzoom: 13, paint: { "line-color": ink, "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.3, 17, 1], "line-opacity": 0.85 } })];
   }
   if (id.startsWith("highway") && layer.type === "line" && !id.includes("casing") && !id.includes("subtle") && !id.includes("bridge")) {
+    const major = id.includes("motorway") || id.includes("major");
     const k = id.includes("motorway") ? 1.6 : id.includes("major") ? 1.3 : id.includes("path") ? 0.35 : 1;
     if (id.includes("path")) {
-      layer.paint = { "line-color": ink, "line-width": 0.6, "line-dasharray": [2, 2], "line-opacity": 0.6 };
+      if (look === "poster") return (hide(layer), [layer]);
+      setPaint(layer, { "line-color": ink, "line-width": 0.6, "line-dasharray": [2, 2], "line-opacity": look === "watercolour" ? 0.3 : 0.6 });
       return [layer];
     }
     show();
-    const casing = { ...layer, id: `${id}-engraved-case`, paint: { "line-color": ink, "line-width": roadWidth(k, 1.2), "line-opacity": 0.9 } } as unknown as AnyLayer;
-    (layer as { paint?: Record<string, unknown> }).paint = { "line-color": c.roads, "line-width": roadWidth(k) };
+    if (look === "poster") {
+      // Only the main roads, as simple pale lines.
+      if (!major) return (hide(layer), [layer]);
+      setPaint(layer, { "line-color": c.roads, "line-width": roadWidth(k * 0.7), "line-opacity": 0.9 });
+      return [layer];
+    }
+    if (look === "watercolour") {
+      setPaint(layer, { "line-color": mix(c.land, ink, 0.35), "line-width": roadWidth(k * 0.6), "line-opacity": 0.55 });
+      return [layer];
+    }
+    const fill = look === "touring" ? (major ? c.roads : TOURING_MINOR) : c.roads;
+    const casing = { ...layer, id: `${id}-engraved-case`, paint: { "line-color": ink, "line-width": roadWidth(k, look === "touring" ? 0.9 : 1.2), "line-opacity": 0.9 } } as unknown as AnyLayer;
+    setPaint(layer, { "line-color": fill, "line-width": roadWidth(k) });
     return [casing, layer];
   }
-  if (id.startsWith("highway") && layer.type === "line") {
-    hide(layer);
+  if (look === "touring" && id.startsWith("highway") && id.includes("subtle")) {
+    // The main roads at region scale, in touring-map red.
+    setPaint(layer, { "line-color": c.roads, "line-width": ["interpolate", ["linear"], ["zoom"], 5, 0.8, 10, 2.2], "line-opacity": ["interpolate", ["linear"], ["zoom"], 10, 1, 11, 0] });
+    show();
     return [layer];
   }
+  if (id.startsWith("highway") && layer.type === "line") return (hide(layer), [layer]);
   if (id.startsWith("railway")) {
     // Fine single lines, as engraved; the base style's dashed overlays would thicken them.
-    if (id.includes("dashline")) hide(layer);
-    else (layer as { paint?: Record<string, unknown> }).paint = { "line-color": ink, "line-opacity": 0.8, "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.5, 16, 1.4] };
+    if (id.includes("dashline") || look === "poster" || look === "watercolour") hide(layer);
+    else setPaint(layer, { "line-color": ink, "line-opacity": 0.8, "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.5, 16, 1.4] });
     return [layer];
   }
   if (id.startsWith("boundary")) {
-    // Fine dotted county lines, as on the town plans; national borders a little heavier.
-    layer.paint = { "line-color": ink, "line-opacity": 0.45, "line-width": id === "boundary_2" ? 0.9 : 0.6, "line-dasharray": [1, 2] };
+    if (look === "poster") setPaint(layer, { "line-color": ink, "line-opacity": 0.5, "line-width": id === "boundary_2" ? 1.2 : 0.6 });
+    else if (look === "watercolour") setPaint(layer, { "line-color": ink, "line-opacity": 0.3, "line-width": 1, "line-dasharray": [3, 2] });
+    // Fine dotted county lines, as on the old maps; national borders a little heavier.
+    else setPaint(layer, { "line-color": ink, "line-opacity": look === "antique" ? 0.6 : 0.45, "line-width": id === "boundary_2" ? 0.9 : 0.6, "line-dasharray": [1, 2] });
     return [layer];
   }
   if (layer.type === "symbol") {
     const isPlaceOrWater = id.startsWith("label_") || id.startsWith("water_name");
     const minorPlace = id.startsWith("label_") && !id.startsWith("label_country");
-    if (!theme.labels || !isPlaceOrWater || id === "label_other" || (theme.countriesOnly && minorPlace)) {
-      hide(layer);
-      return [layer];
-    }
     const big = id.startsWith("label_country") || id.startsWith("label_state") || id === "label_city_capital" || id === "label_city";
     const water = id.startsWith("water_name");
+    // Railway posters only name the big places.
+    const posterSkip = look === "poster" && !big;
+    if (!theme.labels || !isPlaceOrWater || id === "label_other" || (theme.countriesOnly && minorPlace) || posterSkip) return (hide(layer), [layer]);
     const name = ["coalesce", ["get", "name:en"], ["get", "name_en"], ["get", "name:latin"], ["get", "name"]];
-    (layer as { layout?: Record<string, unknown> }).layout = {
+    const upper = big && look !== "watercolour";
+    setLayout(layer, {
       ...(layer.layout ?? {}),
-      "text-field": big ? ["upcase", name] : name,
-      "text-font": water ? SERIF.italic : big ? SERIF.bold : SERIF.regular,
-      "text-letter-spacing": big ? 0.25 : water ? 0.12 : 0.04,
-    };
+      "text-field": upper ? ["upcase", name] : name,
+      "text-font": water ? fonts.italic : big ? (look === "antique" ? fonts.italic : fonts.bold) : fonts.regular,
+      "text-letter-spacing": upper ? 0.25 : water ? 0.12 : 0.04,
+    });
     paint["text-color"] = c.labels;
     paint["text-halo-color"] = c.land;
-    paint["text-halo-width"] = 1.4;
+    paint["text-halo-width"] = look === "poster" ? 0 : 1.4;
     return [layer];
   }
   return null;
+}
+
+/** Antique hand-colouring: each country edged in its own watercolour, fading out as you zoom into a town. */
+function washLayers(): AnyLayer[] {
+  const colour = ["match", ["get", "c"], ...WASH_COLOURS.flatMap((col, i) => [i, col]), WASH_COLOURS[0]];
+  const fade = (v: number) => ["interpolate", ["linear"], ["zoom"], 6, v, 9, 0];
+  return [
+    { id: "mapsie-wash-fill", type: "fill", source: "mapsie-wash", paint: { "fill-color": colour, "fill-opacity": fade(0.24) } } as unknown as AnyLayer,
+    { id: "mapsie-wash-edge", type: "line", source: "mapsie-wash", layout: { "line-join": "round" }, paint: { "line-color": colour, "line-width": ["interpolate", ["linear"], ["zoom"], 1, 3, 5, 9], "line-blur": ["interpolate", ["linear"], ["zoom"], 1, 2, 5, 6], "line-opacity": fade(0.9) } } as unknown as AnyLayer,
+  ];
+}
+
+/** Water-lining: fine lines following the coast out to sea, the old engravers' trademark. */
+function waterLines(water: string, ink: string): AnyLayer[] {
+  const offsets = [2.5, 6, 11];
+  return offsets.map((o, i) => ({
+    id: `mapsie-waterline-${i}`,
+    type: "line",
+    source: "openmaptiles",
+    "source-layer": "water",
+    filter: ["match", ["geometry-type"], ["MultiPolygon", "Polygon"], true, false],
+    layout: { "line-join": "round" },
+    paint: { "line-color": mix(water, ink, 0.5), "line-width": 0.55, "line-offset": o, "line-opacity": 0.5 - i * 0.14 },
+  }) as unknown as AnyLayer);
 }
 
 function reliefLayer(theme: Theme, exaggeration: number): AnyLayer {

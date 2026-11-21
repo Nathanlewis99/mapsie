@@ -624,6 +624,7 @@ export default function MapView(props: Props) {
  * hatching for buildings, and a stipple of dots and tree tufts for parks and woods.
  */
 function engravingPattern(id: string): ImageData | null {
+  if (id === "mapsie-wash") return washTexture();
   if (id !== "mapsie-hatch" && id !== "mapsie-stipple") return null;
   const size = id === "mapsie-hatch" ? 12 : 40;
   const cv = document.createElement("canvas");
@@ -656,6 +657,35 @@ function engravingPattern(id: string): ImageData | null {
       g.moveTo(x, y + 1);
       g.lineTo(x, y + 4.5);
       g.stroke();
+    }
+  }
+  return g.getImageData(0, 0, size, size);
+}
+
+/**
+ * Watercolour texture: soft light and dark blotches (neutral, so it works over any
+ * colour) that tile seamlessly, laid over washes to give the uneven look of paint.
+ */
+function washTexture(): ImageData {
+  const size = 256;
+  const cv = document.createElement("canvas");
+  cv.width = cv.height = size;
+  const g = cv.getContext("2d")!;
+  // A fixed pseudo-random sequence, so every tile and every render match.
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < 28; i++) {
+    const x = rnd() * size, y = rnd() * size, r = 40 + rnd() * 80;
+    const light = rnd() < 0.55;
+    // Draw each blotch at all 9 tile offsets so the edges wrap.
+    for (const dx of [-size, 0, size]) for (const dy of [-size, 0, size]) {
+      const grad = g.createRadialGradient(x + dx, y + dy, 0, x + dx, y + dy, r);
+      grad.addColorStop(0, light ? "rgba(255,255,255,0.28)" : "rgba(60,45,30,0.12)");
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = grad;
+      g.beginPath();
+      g.arc(x + dx, y + dy, r, 0, Math.PI * 2);
+      g.fill();
     }
   }
   return g.getImageData(0, 0, size, size);

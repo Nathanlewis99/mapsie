@@ -87,6 +87,8 @@ export interface Theme {
   physical: boolean; // classic atlas shaded-relief base
   /** Victorian Ordnance Survey look: hatched buildings, stippled parks, cased roads, land contours, serif labels. */
   engraved?: boolean;
+  /** A vintage cartographic look (engraved, touring, antique, poster, watercolour). */
+  look?: "engraved" | "touring" | "antique" | "poster" | "watercolour";
   details: MapDetails;
 }
 
@@ -96,6 +98,10 @@ export interface MapDetails {
   tropics: boolean; // equator, tropics and polar circles
   currents: boolean; // major ocean currents
   lanes: boolean; // shipping lanes
+  /** Fine lines following the coast out to sea (on by default for the Antique style). */
+  waterlines?: boolean;
+  /** An atlas border round the map: fine rules with a chequered band of alternating ink. */
+  neatline?: boolean;
   compass: boolean; // compass rose
   compassStyle?: CompassStyle;
   compassCorner?: "br" | "bl" | "tr" | "tl";
@@ -161,6 +167,8 @@ export interface TextStyle {
   labelCase: TextCase;
   labelItalic: boolean;
   align: "center" | "left" | "right";
+  /** An ornamental frame round the title, as on old maps. */
+  cartouche?: "none" | "plaque" | "scroll" | "oval";
   titleOffset?: [number, number]; // dragged position, % of poster width
   subtitleOffset?: [number, number];
 }
@@ -184,7 +192,7 @@ export const DEFAULT_TEXT: TextStyle = {
 
 export type TextEffect = "none" | "glow" | "outline" | "shadow" | "neon" | "label";
 
-export type FontId = "playfair" | "caveat" | "montserrat" | "pacifico" | "bebas" | "cormorant" | "josefin" | "abril" | "courier" | "vibes" | "marker" | "amatic" | "indie" | "patrick" | "kalam" | "dancing" | "satisfy" | "lobster" | "righteous" | "fredoka" | "elite" | "rocksalt";
+export type FontId = "playfair" | "caveat" | "montserrat" | "pacifico" | "bebas" | "cormorant" | "josefin" | "abril" | "courier" | "vibes" | "marker" | "amatic" | "indie" | "patrick" | "kalam" | "dancing" | "satisfy" | "lobster" | "righteous" | "fredoka" | "elite" | "rocksalt" | "rye" | "fell" | "fraktur";
 
 /** Fill in fields added after a design was first saved. */
 export function normalizeDesign(d: Partial<Design> & Pick<Design, "id">): Design {

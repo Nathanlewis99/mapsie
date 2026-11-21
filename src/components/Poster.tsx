@@ -82,13 +82,22 @@ export default function Poster({ design, width, editable = false, print, selecte
     </div>
   );
 
+  const cart = t.cartouche && t.cartouche !== "none" ? t.cartouche : null;
   const titleBlock = (box?: React.CSSProperties) => (
     <div
       onPointerDown={drag("title")}
       className={`flex flex-col ${movable}`}
       title={editable ? "Drag to move the title" : undefined}
-      style={{ ...box, alignItems: items, textAlign: align, transform: off(t.titleOffset), maxWidth: "100%" }}
+      style={{
+        ...box,
+        alignItems: items,
+        textAlign: align,
+        transform: off(t.titleOffset),
+        maxWidth: "100%",
+        ...(cart ? { position: "relative", padding: cart === "oval" ? `${u * 2.4}px ${u * 7}px` : `${u * 1.6}px ${u * 5}px`, ...(design.layout === "overlay" ? { background: "transparent" } : {}) } : {}),
+      }}
     >
+      {cart && <Cartouche kind={cart} u={u} ink={c.ink} paper={c.paper} />}
       <div
         style={{
           fontFamily: font,
@@ -114,7 +123,7 @@ export default function Poster({ design, width, editable = false, print, selecte
             opacity: 0.6,
             marginTop: u * 0.9,
             width: "max-content",
-            maxWidth: width * 0.8,
+            maxWidth: width * (cart === "oval" ? 0.58 : 0.8),
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
@@ -162,6 +171,7 @@ export default function Poster({ design, width, editable = false, print, selecte
           frozen={frozen}
           filterPrefix={filterPrefix}
         />
+        {design.theme.details?.neatline && <Neatline u={u} ink={c.ink} paper={c.paper} />}
         {design.theme.details?.compass && (
           <Compass u={u} ink={c.ink} accent={c.accent} paper={c.paper} variant={design.theme.details.compassStyle} corner={design.theme.details.compassCorner} />
         )}
@@ -187,6 +197,72 @@ export default function Poster({ design, width, editable = false, print, selecte
       {/* Previews carry a watermark; only the paid print file is clean. */}
       {!print && <Watermark u={u} ink={c.ink} />}
 
+    </div>
+  );
+}
+
+/**
+ * An atlas neatline round the map: an outer rule, a band of alternating ink and paper
+ * (the degree scale on old maps), and an inner rule.
+ */
+function Neatline({ u, ink, paper }: { u: number; ink: string; paper: string }) {
+  const band = u * 1.1;
+  const seg = u * 2.6;
+  const rule = Math.max(1, u * 0.18);
+  const keys = (dir: "to right" | "to bottom") => `repeating-linear-gradient(${dir}, ${ink} 0 ${seg}px, ${paper} ${seg}px ${seg * 2}px)`;
+  const edge = (pos: React.CSSProperties, dir: "to right" | "to bottom") => (
+    <div className="absolute" style={{ ...pos, background: keys(dir), boxShadow: `inset 0 0 0 ${rule}px ${ink}` }} />
+  );
+  return (
+    <div className="pointer-events-none absolute inset-0" style={{ zIndex: 2 }}>
+      {edge({ left: 0, right: 0, top: 0, height: band }, "to right")}
+      {edge({ left: 0, right: 0, bottom: 0, height: band }, "to right")}
+      {edge({ top: 0, bottom: 0, left: 0, width: band }, "to bottom")}
+      {edge({ top: 0, bottom: 0, right: 0, width: band }, "to bottom")}
+      {/* the inner rule, a hair inside the band */}
+      <div className="absolute" style={{ inset: band + u * 0.35, border: `${rule}px solid ${ink}` }} />
+    </div>
+  );
+}
+
+/** An ornamental frame round the title, after old-map cartouches. Sits behind the text. */
+function Cartouche({ kind, u, ink, paper }: { kind: "plaque" | "scroll" | "oval"; u: number; ink: string; paper: string }) {
+  const rule = Math.max(1, u * 0.2);
+  const base: React.CSSProperties = { position: "absolute", inset: 0, zIndex: -1, pointerEvents: "none" };
+  if (kind === "oval") {
+    return (
+      <div style={{ ...base, background: paper, borderRadius: "50%", border: `${rule * 3}px double ${ink}`, boxShadow: `0 0 0 ${u * 0.5}px ${paper}, 0 0 0 ${u * 0.5 + rule}px ${ink}` }} />
+    );
+  }
+  // A curl for the ends of the scroll and the plaque's corners (fixed shape, scaled to the block).
+  const curl = (flip: boolean, style: React.CSSProperties) => (
+    <svg viewBox="0 0 40 100" preserveAspectRatio="xMidYMid meet" style={{ position: "absolute", top: 0, bottom: 0, height: "100%", width: "auto", transform: flip ? "scaleX(-1)" : undefined, overflow: "visible", ...style }}>
+      <path d="M38 6 C14 6 4 22 4 40 C4 58 16 66 26 62 C36 58 34 44 24 44 C16 44 14 54 22 56" fill="none" stroke={ink} strokeWidth={2.2} strokeLinecap="round" />
+      <path d="M38 94 C14 94 4 78 4 60" fill="none" stroke={ink} strokeWidth={2.2} strokeLinecap="round" />
+      <path d="M38 6 C26 18 26 82 38 94" fill={paper} stroke={ink} strokeWidth={1.6} />
+    </svg>
+  );
+  if (kind === "scroll") {
+    return (
+      <div style={base}>
+        <div style={{ position: "absolute", inset: `0 ${u * 2.2}px`, background: paper, borderTop: `${rule * 3}px double ${ink}`, borderBottom: `${rule * 3}px double ${ink}` }} />
+        {curl(false, { left: -u * 0.6 })}
+        {curl(true, { right: -u * 0.6 })}
+      </div>
+    );
+  }
+  // Plaque: a double-ruled panel with small flourishes at the corners.
+  const corner = (pos: React.CSSProperties, rot: number) => (
+    <svg viewBox="0 0 20 20" style={{ position: "absolute", width: u * 3, height: u * 3, transform: `rotate(${rot}deg)`, ...pos }}>
+      <path d="M2 18 C2 8 8 2 18 2 M6 18 C6 11 11 6 18 6 M2 18 C6 14 10 14 12 18" fill="none" stroke={ink} strokeWidth={1.3} strokeLinecap="round" />
+    </svg>
+  );
+  return (
+    <div style={{ ...base, background: paper, border: `${rule * 3}px double ${ink}`, outline: `${rule}px solid ${ink}`, outlineOffset: u * 0.5 }}>
+      {corner({ left: -u * 1.6, top: -u * 1.6 }, 0)}
+      {corner({ right: -u * 1.6, top: -u * 1.6 }, 90)}
+      {corner({ right: -u * 1.6, bottom: -u * 1.6 }, 180)}
+      {corner({ left: -u * 1.6, bottom: -u * 1.6 }, 270)}
     </div>
   );
 }

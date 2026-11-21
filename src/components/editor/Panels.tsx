@@ -512,6 +512,8 @@ export function StylePanel() {
         <Label>Map extras</Label>
         <Toggle on={t.details.currents} onChange={(v) => setTheme({ details: { ...t.details, currents: v } })} label="🌊 Ocean currents" />
         <Toggle on={t.details.lanes} onChange={(v) => setTheme({ details: { ...t.details, lanes: v } })} label="🚢 Shipping lanes" />
+        <Toggle on={t.details.waterlines ?? t.look === "antique"} onChange={(v) => setTheme({ details: { ...t.details, waterlines: v } })} label="〰️ Coastal water-lines (old engraved maps)" />
+        <Toggle on={!!t.details.neatline} onChange={(v) => setTheme({ details: { ...t.details, neatline: v } })} label="🔲 Atlas border (old map neatline)" />
         <Toggle on={t.details.grid} onChange={(v) => setTheme({ details: { ...t.details, grid: v } })} label="🌐 Latitude & longitude grid" />
         <Toggle on={t.details.tropics} onChange={(v) => setTheme({ details: { ...t.details, tropics: v } })} label="☀️ Equator & tropics" />
         <Toggle on={t.details.compass} onChange={(v) => setTheme({ details: { ...t.details, compass: v } })} label="🧭 Compass rose" />
@@ -1094,6 +1096,16 @@ export function TextPanel() {
           onItalic={(v) => setText({ titleItalic: v })}
           maxSize={2.2}
         />
+        <div className="mt-3">
+          <div className="text-xs font-bold text-ink/50 mb-1.5">Title frame (old map cartouche)</div>
+          <div className="grid grid-cols-4 gap-2">
+            {([["none", "None"], ["plaque", "Plaque"], ["scroll", "Scroll"], ["oval", "Oval"]] as const).map(([id, name]) => (
+              <button key={id} onClick={() => setText({ cartouche: id })} className={`rounded-xl border-2 px-2 py-1.5 text-xs font-bold ${(tx.cartouche ?? "none") === id ? "border-coral bg-coral/10" : "border-ink/10 bg-white"}`}>
+                {name}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
       <div>
         <Label>Subtitle font</Label>

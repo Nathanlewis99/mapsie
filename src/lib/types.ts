@@ -147,6 +147,8 @@ export interface Design {
   text: TextStyle;
   stickerStyle: ArtStyleId; // default style for new stickers
   originals: { style: OriginalStyle; palette: string }; // defaults for new Mapsie Originals
+  /** Started from a partner's link (mapsie.shop/with/<partner>): they're credited if it's ordered. */
+  partnerRef?: string;
 }
 
 export type TextCase = "none" | "upper" | "lower";
@@ -210,7 +212,7 @@ export function normalizeDesign(d: Partial<Design> & Pick<Design, "id">): Design
     theme: x.theme && { ...x.theme, hypso: x.theme.hypso ?? false, physical: x.theme.physical ?? false, details: { ...NO_DETAILS, ...(x.theme.details ?? {}) } },
     route: { show: r.show ?? true, style: r.style ?? "auto", curved: r.curved ?? true, width: r.width ?? 0.45, modeIcons: r.modeIcons ?? true, iconArt: r.iconArt ?? "cartoon" },
     markers: { style: m.style ?? "number", showDates: m.showDates ?? false, size: m.size ?? 1, labelSize: m.labelSize ?? 1 },
-    visited: { show: v.show ?? false, opacity: v.opacity ?? 0.35 },
+    visited: { show: v.show ?? false, opacity: v.opacity ?? 0.35, ...(v.multi !== undefined ? { multi: v.multi } : {}) },
     text: { ...DEFAULT_TEXT, ...(x.text ?? {}) },
     stickerStyle: x.stickerStyle ?? "cartoon",
     originals: x.originals ?? { style: "papercut", palette: "auto" },

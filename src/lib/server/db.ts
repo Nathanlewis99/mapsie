@@ -59,6 +59,9 @@ export interface Order {
   /** Where the visit that placed the order came from (no personal data), and the channel it counts towards. */
   attribution?: import("../channels").AttributionIn;
   channel?: import("../channels").ChannelId;
+  /** A partner who sent this order (see partners.ts): by their link, their discount code, or a prepaid trade code. */
+  partnerId?: string;
+  partnerVia?: "link" | "code" | "trade";
   /** Cookie choices at checkout, and the ad identifiers we may use with them (see conversions.ts). */
   adConsent?: import("./conversions").AdConsent;
   /** Which customer emails have gone out, so none is sent twice. */
@@ -764,6 +767,9 @@ export interface GiftCard {
   parentId?: string;
   redeemedOrderId?: string;
   stripeSessionId?: string;
+  /** A prepaid trade code bought by a partner (batch = one purchase), rather than a gift card sold on the site. */
+  partnerId?: string;
+  tradeBatch?: string;
   attribution?: import("../channels").AttributionIn;
   channel?: import("../channels").ChannelId;
   createdAt: string;

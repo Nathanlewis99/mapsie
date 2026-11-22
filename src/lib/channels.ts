@@ -13,6 +13,7 @@ export const CHANNELS = [
   { id: "organic_social", label: "Organic social (incl. Pinterest pins)" },
   { id: "email", label: "Email" },
   { id: "etsy", label: "Etsy" },
+  { id: "partners", label: "Partners (tour operators, events…)" },
   { id: "referral", label: "Other websites" },
   { id: "direct", label: "Direct / unknown" },
 ] as const;
@@ -30,6 +31,7 @@ export function classifyChannel(a: AttributionIn | undefined): ChannelId {
   if (a.click === "epik") return "pinterest_ads";
   if (a.click === "ttclid") return "tiktok_ads";
   if (a.click === "msclkid") return "microsoft_ads";
+  if (a.medium?.toLowerCase() === "partner") return "partners";
   if (has(a.medium, "email", "newsletter")) return "email";
   if (paid && src) {
     if (has(src, "facebook", "instagram", "meta", "fb", "ig")) return "meta_ads";

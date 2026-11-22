@@ -34,6 +34,7 @@ export default async function Admin() {
             <Link href="/admin/etsy" className="text-sm font-bold text-coral-dark">Etsy →</Link>
             <Link href="/admin/ai" className="text-sm font-bold text-coral-dark">Create with AI →</Link>
             <Link href="/admin/gifts" className="text-sm font-bold text-coral-dark">Gift cards →</Link>
+            <Link href="/admin/partners" className="text-sm font-bold text-coral-dark">Partners →</Link>
             <Link href="/admin/reviews" className="text-sm font-bold text-coral-dark">Reviews →</Link>
             <Link href="/admin/channels" className="text-sm font-bold text-coral-dark">Sales by channel →</Link>
             <Link href="/admin/costs" className="text-sm font-bold text-coral-dark">Costs &amp; margins →</Link>

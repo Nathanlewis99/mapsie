@@ -2,6 +2,7 @@ import { NextResponse, after } from "next/server";
 import Stripe from "stripe";
 import { fulfilOrder, markPaymentFailed } from "@/lib/server/fulfil";
 import { issueGiftCard, settleGiftCards } from "@/lib/server/giftcards";
+import { creditPartnerCode } from "@/lib/server/partners";
 
 export async function POST(req: Request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -42,7 +43,11 @@ export async function POST(req: Request) {
         }),
       );
       // If a gift card paid for some of it: mark it used, and send any balance as a new code.
-      if (s.total_details?.amount_discount) after(() => settleGiftCards(s.id, orderId, s.customer_details?.email ?? s.customer_email ?? ""));
+      if (s.total_details?.amount_discount) {
+        after(() => settleGiftCards(s.id, orderId, s.customer_details?.email ?? s.customer_email ?? ""));
+        // A partner's discount code: credit that partner.
+        after(() => creditPartnerCode(s.id, orderId));
+      }
     }
   }
   if (event.type === "checkout.session.async_payment_failed") {

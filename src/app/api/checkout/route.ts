@@ -8,6 +8,7 @@ import { getDesign, saveDesign, saveOrder, type Order } from "@/lib/server/db";
 import { describeOptions, FRAMES, GLAZES, getRegion, itemPrice, MOUNTS, PAPERS, PRODUCTS, SHIPPING, type PrintOptions, type RegionId, type ShippingId } from "@/lib/products";
 import { normalizeDesign } from "@/lib/types";
 import { currentUser } from "@/lib/server/auth";
+import { partnerForCheckout } from "@/lib/server/partners";
 
 export async function POST(req: Request) {
   if (!limit("checkout", clientIp(req), 20, 60 * 60_000)) return tooMany("Too many checkout attempts. Please wait a few minutes.", 600);
@@ -49,10 +50,12 @@ export async function POST(req: Request) {
     status: "pending_payment",
     visitId: typeof body.visitId === "string" && /^[a-z0-9]{8,40}$/.test(body.visitId) ? body.visitId : undefined,
     adConsent: adConsentFrom(req, clientIp(req)),
-    ...(() => {
+    ...(await (async () => {
       const attribution = cleanAttribution((body as { attribution?: unknown }).attribution);
-      return { attribution, channel: classifyChannel(attribution) };
-    })(),
+      // Started from a partner's link (or arrived on one): credit that partner.
+      const partner = await partnerForCheckout(design.partnerRef, attribution);
+      return { attribution, channel: partner ? ("partners" as const) : classifyChannel(attribution), ...(partner ? { partnerId: partner.id, partnerVia: "link" as const } : {}) };
+    })()),
     createdAt: new Date().toISOString(),
   };
   await saveOrder(order);

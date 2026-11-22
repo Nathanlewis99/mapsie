@@ -1,6 +1,6 @@
 "use client";
 import { seaContourTiles } from "@/lib/seaDepth";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import maplibregl, { Map as MLMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { DEFAULT_TEXT, type Design, type FontId, type Sticker, type Stop } from "@/lib/types";
@@ -93,6 +93,10 @@ export default function MapView(props: Props) {
   const screenRatio = () => (typeof window === "undefined" ? 1 : (window.devicePixelRatio || 1) * Math.min(3, Math.max(1, renderScale)));
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
+  // Set once the map exists, so a "frame the trip" request made before then (a template opened
+  // straight from a link) still happens.
+  const [mapReady, setMapReady] = useState(false);
+  const fitDone = useRef(0);
   const stopMarkers = useRef<Marker[]>([]);
   const stickerMarkers = useRef<Marker[]>([]);
   const modeMarkers = useRef<Marker[]>([]);
@@ -158,6 +162,7 @@ export default function MapView(props: Props) {
       });
       if (editable) m.touchZoomRotate.disableRotation();
       map.current = m;
+      setMapReady(true);
       (window as unknown as { __MAPSIE_MAP?: unknown }).__MAPSIE_MAP = m; // for render checks and debugging
 
       m.on("style.load", () => {
@@ -612,14 +617,15 @@ export default function MapView(props: Props) {
   // --- frame all the stops
   useEffect(() => {
     const m = map.current;
-    if (!m || !fitRequest) return;
+    if (!m || !fitRequest || fitDone.current === fitRequest) return;
+    fitDone.current = fitRequest;
     const stops = latest.current.stops;
     const b = stopsBounds(stops);
     if (!b) return;
     if (stops.length === 1) m.flyTo({ center: [stops[0].lng, stops[0].lat], zoom: Math.max(m.getZoom(), 5) });
     else m.fitBounds(b, { padding: Math.min(mapWidth, height) * 0.16, maxZoom: 10, duration: 900 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fitRequest]);
+  }, [fitRequest, mapReady]);
 
   return (
     <div

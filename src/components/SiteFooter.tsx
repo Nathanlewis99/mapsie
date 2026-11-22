@@ -22,6 +22,9 @@ export default function SiteFooter() {
           <Link href="/gift" className="hover:text-coral-dark">
             Gift cards
           </Link>
+          <Link href="/partners" className="hover:text-coral-dark">
+            For business
+          </Link>
           {LEGAL_LINKS.map((l) => (
             <Link key={l.href} href={l.href} className="hover:text-coral-dark">
               {l.label}

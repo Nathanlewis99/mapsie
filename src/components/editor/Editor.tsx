@@ -1,4 +1,5 @@
 "use client";
+import { personaliseTrip, type PublicPartner } from "@/lib/partners";
 import { TEMPLATES } from "@/lib/templates";
 import EmailDesign from "./EmailDesign";
 import { adEvent } from "@/lib/adTrack";
@@ -204,6 +205,24 @@ export default function Editor() {
       const r = params.get("region");
       if (r && REGIONS.some((x) => x.id === r)) useEditor.getState().setRegion(r as typeof region);
       router.replace("/create");
+    } else if (params.get("partner")) {
+      // From a partner's page (mapsie.shop/with/<partner>): their route, credited to them if ordered.
+      const pid = params.get("partner")!;
+      const tripId = params.get("trip");
+      fetch(`/api/partners/${encodeURIComponent(pid)}`)
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((p: PublicPartner) => {
+          const t = p.trips.find((x) => x.id === tripId);
+          const ed = useEditor.getState();
+          if (!t) ed.reset();
+          // Credit the partner first (not an undoable edit, so undo can't lose it), then draw their route.
+          useEditor.setState((st) => ({ design: { ...st.design, partnerRef: p.id } }));
+          if (t) useEditor.getState().applyTemplate(personaliseTrip(t, params.get("n") ?? undefined, params.get("x") ?? undefined));
+          if (p.region && REGIONS.some((x) => x.id === p.region)) useEditor.getState().setRegion(p.region);
+          setToast(p.promoCode ? `Welcome from ${p.name}! Use code ${p.promoCode} at checkout for ${p.discountPct}% off.` : `Welcome from ${p.name}! Make it your own.`);
+        })
+        .catch(() => useEditor.getState().reset())
+        .finally(() => router.replace("/create"));
     } else if (params.get("template")) {
       // From an occasion page: start from that quick-start trip.
       const t = TEMPLATES.find((x) => x.id === params.get("template"));

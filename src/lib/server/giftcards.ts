@@ -4,7 +4,7 @@
 // new code, so nothing is lost.
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import Stripe from "stripe";
-import { claimGiftCard, getGiftCard, getGiftCardByCode, listGiftCardsToSend, saveGiftCard, updateGiftCard, type GiftCard } from "./db";
+import { claimGiftCard, getGiftCard, getGiftCardByCode, listGiftCardsToSend, saveGiftCard, updateGiftCard, updateOrder, type GiftCard } from "./db";
 import { sendGiftCardEmail } from "./email";
 import { logError } from "./log";
 import { publicUrl } from "./urls";
@@ -27,7 +27,7 @@ const block = () => Array.from({ length: 4 }, () => ALPHABET[randomInt(ALPHABET.
 export const newGiftCode = () => `GIFT-${block()}-${block()}`;
 
 /** Create the Stripe coupon and code for a paid (or balance) card, and mark it active. */
-async function activate(g: GiftCard): Promise<GiftCard> {
+export async function activate(g: GiftCard): Promise<GiftCard> {
   const s = stripe();
   const symbol = { gbp: "£", usd: "$", aud: "A$" }[g.currency] ?? "";
   const coupon = await s.coupons.create(
@@ -90,6 +90,8 @@ export async function settleGiftCards(sessionId: string, orderId: string, email:
       if (!card) continue;
       const used = d.amount / 100;
       await updateGiftCard(card.id, { redeemedOrderId: orderId });
+      // A partner's prepaid trade code: the order counts towards that partner (no commission on it).
+      if (card.partnerId) await updateOrder(orderId, { partnerId: card.partnerId, partnerVia: "trade" });
       const left = Math.round((card.amount - used) * 100) / 100;
       if (left >= 1) {
         const rest = await activate({
@@ -103,6 +105,7 @@ export async function settleGiftCards(sessionId: string, orderId: string, email:
           recipientName: card.recipientName,
           message: "",
           parentId: card.id,
+          ...(card.partnerId ? { partnerId: card.partnerId } : {}),
           createdAt: new Date().toISOString(),
         });
         await sendGiftCardEmail(rest, "balance");

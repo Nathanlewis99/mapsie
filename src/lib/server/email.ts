@@ -116,7 +116,7 @@ export async function sendSaleAlert(orderId: string) {
     const raw = o.designId ? await getDesign(o.designId) : null;
     const d = raw ? normalizeDesign(raw) : null;
     const where = [o.address?.city, o.address?.country].filter(Boolean).join(", ");
-    const what = d ? describeOptions(d) : "map print";
+    const what = `${(o.copies ?? 1) > 1 ? `${o.copies} × ` : ""}${d ? describeOptions(d) : "map print"}`;
     const etsy = o.etsy ? ` (Etsy order ${o.etsy.receiptId})` : "";
     const to = process.env.SALES_EMAIL ?? process.env.ALERT_EMAIL ?? COMPANY.supportEmail;
     const lines = [
@@ -162,7 +162,7 @@ const clock = (iso: string, region: RegionId) =>
 async function build(o: Order, kind: "confirmed" | "shipped" | "cancelled" | "delivered"): Promise<Email> {
   const raw = await getDesign(o.designId);
   const d = raw ? normalizeDesign(raw) : null;
-  const what = d ? `“${d.title}”, ${describeOptions(d)}` : "your map print";
+  const what = `${(o.copies ?? 1) > 1 ? `${o.copies} × ` : ""}${d ? `“${d.title}”, ${describeOptions(d)}` : "your map print"}`;
   const link = `${publicUrl()}/order/${o.id}`;
   const name = o.address?.name?.split(" ")[0];
   const hi = name ? `Hi ${name},` : "Hi,";

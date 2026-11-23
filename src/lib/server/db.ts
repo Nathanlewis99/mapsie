@@ -62,6 +62,8 @@ export interface Order {
   /** A partner who sent this order (see partners.ts): by their link, their discount code, or a prepaid trade code. */
   partnerId?: string;
   partnerVia?: "link" | "code" | "trade";
+  /** How many prints of the design (a partner's bulk order). Default 1. */
+  copies?: number;
   /** Cookie choices at checkout, and the ad identifiers we may use with them (see conversions.ts). */
   adConsent?: import("./conversions").AdConsent;
   /** Which customer emails have gone out, so none is sent twice. */

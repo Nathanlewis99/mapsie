@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { fulfilOrder, markPaymentFailed } from "@/lib/server/fulfil";
 import { issueGiftCard, settleGiftCards } from "@/lib/server/giftcards";
 import { creditPartnerCode } from "@/lib/server/partners";
+import { completeGiftPurchase } from "@/lib/server/partnerShop";
 
 export async function POST(req: Request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -20,6 +21,8 @@ export async function POST(req: Request) {
     // A gift card: create its code and send it.
     const giftCardId = s.metadata?.giftCardId;
     if (giftCardId && s.payment_status === "paid") after(() => issueGiftCard(giftCardId, s.id));
+    // A partner bought gift card codes from their dashboard: make them.
+    if (s.metadata?.partnerGift && s.payment_status === "paid") after(() => completeGiftPurchase(s));
     const orderId = s.metadata?.orderId;
     const ship = s.collected_information?.shipping_details;
     // Digital files have no delivery address.

@@ -45,6 +45,23 @@ export default async function PartnerPage({ params, searchParams }: { params: Pr
             </p>
           )}
         </section>
+        {(p.designs ?? []).some((d) => d.published) && (
+          <section className="max-w-4xl mx-auto px-6 pb-10">
+            <h2 className="font-display text-2xl font-extrabold">Ready-made maps from {p.name}</h2>
+            <p className="text-ink/60 mt-1">Order one as it is, or add your own touches first.</p>
+            <div className="mt-4 grid sm:grid-cols-2 gap-4">
+              {(p.designs ?? []).filter((d) => d.published).map((d) => (
+                <div key={d.id} className="rounded-3xl bg-white p-5 shadow-sm flex flex-col gap-3">
+                  <div className="font-display text-xl font-extrabold">{d.name}</div>
+                  <div className="flex flex-wrap gap-3 mt-auto">
+                    <Link href={`/create?d=${d.id}`} className="rounded-full bg-coral px-5 py-2.5 font-extrabold text-white">Buy this map →</Link>
+                    <a href={`/d/${d.id}`} target="_blank" rel="noreferrer" className="rounded-full border-2 border-ink/15 px-5 py-2 font-extrabold hover:border-coral">Preview</a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
         <section className="max-w-4xl mx-auto px-6 pb-12 grid gap-4">
           {trips.map((t) => (
             <StartTrip key={t.id} partnerId={p.id} trip={t} highlight={t.id === want} />

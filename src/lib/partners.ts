@@ -84,6 +84,8 @@ export interface Partner {
   logins?: string[];
   billing?: PartnerBilling;
   payoutDetails?: PartnerPayoutDetails;
+  /** Maps the partner designed themselves: to order in bulk, or to sell on their page as they are. */
+  designs?: PartnerDesign[];
   /** Stripe invoices sent for trade code batches. */
   invoices?: { batch: string; url?: string | null; total: number; currency: string; at: string }[];
   notes?: string;
@@ -92,6 +94,8 @@ export interface Partner {
   application?: PartnerApplication;
   createdAt: string;
 }
+
+export interface PartnerDesign { id: string; name: string; published: boolean; addedAt: string }
 
 export interface PartnerApplication {
   contactName: string;
@@ -148,7 +152,7 @@ export function assessApplication(a: { company: string; email: string; website: 
 }
 
 /** Public view of a partner (no commission, contacts or notes). */
-export type PublicPartner = Pick<Partner, "id" | "name" | "kind" | "welcome" | "trips" | "promoCode" | "discountPct" | "region">;
+export type PublicPartner = Pick<Partner, "id" | "name" | "kind" | "welcome" | "trips" | "promoCode" | "discountPct" | "region"> & { designs: { id: string; name: string }[] };
 export const publicPartner = (p: Partner): PublicPartner => ({
   id: p.id,
   name: p.name,
@@ -158,6 +162,7 @@ export const publicPartner = (p: Partner): PublicPartner => ({
   promoCode: p.promoCode,
   discountPct: p.discountPct,
   region: p.region,
+  designs: (p.designs ?? []).filter((d) => d.published).map((d) => ({ id: d.id, name: d.name })),
 });
 
 export const PARTNER_ID = /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/;

@@ -60,7 +60,7 @@ export default function Editor() {
   const [sheet, setSheet] = useState<Sheet>("half");
   const sheetDrag = useRef<{ y: number } | null>(null);
   const [pickMode, setPickMode] = useState(false);
-  const [busy, setBusy] = useState<"" | "order" | "share" | "save">("");
+  const [busy, setBusy] = useState<"" | "order" | "share" | "save" | "partner">("");
   const [toast, setToast] = useState("");
   const [wall, setWall] = useState(false);
   const [emailOpen, setEmailOpen] = useState(false);
@@ -150,6 +150,28 @@ export default function Editor() {
       setToast("Saved as a copy ✓ You're now editing the copy; the original is unchanged.");
     } catch {
       setToast("Couldn't save a copy, please try again.");
+    }
+    setBusy("");
+  };
+
+  // A partner signed in on this browser can save maps to their partner account.
+  const [partnerMe, setPartnerMe] = useState<{ id: string; name: string } | null>(null);
+  useEffect(() => {
+    fetch("/api/partner/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => setPartnerMe(j?.partner ?? null))
+      .catch(() => {});
+  }, []);
+  const saveToPartner = async () => {
+    if (!partnerMe) return;
+    setBusy("partner");
+    try {
+      const r = await fetch("/api/partner/designs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ design: useEditor.getState().design, partnerId: partnerMe.id }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error);
+      setToast(`Saved to ${partnerMe.name} ✓ Order prints or sell it from your partner dashboard.`);
+    } catch (e) {
+      setToast((e as Error).message || "Couldn't save, please try again.");
     }
     setBusy("");
   };
@@ -518,6 +540,12 @@ export default function Editor() {
               <Icon name="heart" className={savedId && !dirty ? "text-coral fill-coral" : ""} />
               <span className="hidden lg:inline">{busy === "save" ? "Saving…" : savedId && !dirty ? "Saved" : "Save"}</span>
             </button>
+            {partnerMe && (
+              <button title={`Save this map to ${partnerMe.name}'s partner account`} className={`${textBtn} !opacity-100 text-coral-dark`} onClick={saveToPartner} disabled={busy === "partner" || !design.stops.length}>
+                <span aria-hidden className="text-base leading-none">🏷️</span>
+                <span className="hidden lg:inline">{busy === "partner" ? "Saving…" : `Save to ${partnerMe.name.length > 18 ? "partner" : partnerMe.name}`}</span>
+              </button>
+            )}
             {savedId && me?.user && (
               <button title="Save as a copy: try another style or layout without changing the original" className={textBtn} onClick={saveCopy} disabled={busy === "save"}>
                 <span aria-hidden className="text-base leading-none">⧉</span>

@@ -34,7 +34,7 @@ export async function submitPrintOrder(order: Order, design: Design, address: Ad
       {
         merchantReference: design.id,
         sku: item.sku,
-        copies: 1,
+        copies: Math.max(1, Math.min(500, order.copies ?? 1)),
         sizing: "fillPrintArea",
         attributes: item.attributes,
         assets: [{ printArea: "default", url: assetUrl }],

@@ -6,6 +6,7 @@ import { partnerStats } from "@/lib/server/partners";
 import { publicUrl } from "@/lib/server/urls";
 import { partnerLink, tradeDiscountPct } from "@/lib/partners";
 import CopyLink from "./CopyLink";
+import { FRAMES, getRegion, PRODUCTS, type RegionId } from "@/lib/products";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Partner dashboard · Mapsie", robots: { index: false } };
@@ -14,6 +15,13 @@ const sym = (c: string) => ({ gbp: "£", usd: "$", aud: "A$" })[c] ?? "";
 const fmt = (n: number, c: string) => `${sym(c)}${n.toFixed(2)}`;
 const field = "mt-1 w-full rounded-xl border border-ink/15 px-3 py-2.5 text-sm";
 const card = "rounded-3xl bg-white p-6 shadow-sm";
+const small = "mt-1 block rounded-xl border border-ink/15 px-3 py-2 text-sm";
+// Gift card values that cover a whole print with free delivery.
+const GIFT_VALUES: Record<RegionId, [number, string][]> = {
+  GB: [[34, "an A4 print"], [44, "an A3 print"], [59, "an A2 print"], [69, "a framed A4"], [89, "a framed A3"]],
+  US: [[45, "an A4 print"], [59, "an A3 print"], [79, "an A2 print"], [110, "a framed A4"], [128, "a framed A3"]],
+  AU: [[65, "an A4 print"], [85, "an A3 print"], [115, "an A2 print"], [114, "a framed A4"], [150, "a framed A3"]],
+};
 
 export default async function PartnerDashboard({ searchParams }: { searchParams: Promise<{ p?: string; msg?: string }> }) {
   const q = await searchParams;
@@ -22,6 +30,7 @@ export default async function PartnerDashboard({ searchParams }: { searchParams:
   const p = s.partner;
   const st = await partnerStats(p);
   const base = publicUrl();
+  const region = getRegion((p.region ?? "GB") as RegionId);
   const months = new Map<string, { orders: number; byCur: Record<string, number> }>();
   for (const o of st.all) {
     const m = o.createdAt.slice(0, 7);
@@ -78,10 +87,56 @@ export default async function PartnerDashboard({ searchParams }: { searchParams:
         <p className="mt-4 text-sm text-ink/50">Need a new route set up? Email <a className="underline" href="mailto:hello@mapsie.shop">hello@mapsie.shop</a> with the stops and we&apos;ll add it.</p>
       </section>
 
-      {st.tradeCodes.batches.length > 0 && (
-        <section className={card}>
-          <h2 className="text-xl font-extrabold">Gift cards and prepaid codes</h2>
-          <p className="text-sm text-ink/60 mt-1">{st.tradeCodes.redeemed} of {st.tradeCodes.issued} used so far. Each code works like a gift card for any Mapsie print.</p>
+      <section id="maps" className={card}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-extrabold">Your maps</h2>
+            <p className="text-sm text-ink/60 mt-1">Design a map of your tour, then order prints of it to hand out or sell, or put it on your page for customers to buy as it is.</p>
+          </div>
+          <a href="/create?new=1" className="rounded-full bg-coral px-5 py-2.5 font-extrabold text-white">Design a map →</a>
+        </div>
+        <p className="mt-2 text-xs text-ink/50">In the designer, press <b>“Save to {p.name}”</b> at the top and it appears here.</p>
+        <div className="mt-4 space-y-4">
+          {(p.designs ?? []).map((d) => (
+            <div key={d.id} className="rounded-2xl border border-ink/10 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="font-extrabold">{d.name} {d.published && <span className="ml-2 rounded-full bg-emerald-100 text-emerald-900 px-2 py-0.5 text-xs">on your page</span>}</div>
+                <div className="flex flex-wrap gap-3 text-sm font-bold">
+                  <a className="underline" href={`/d/${d.id}`} target="_blank" rel="noreferrer">Preview</a>
+                  <a className="underline" href={`/create?d=${d.id}`}>Edit a copy</a>
+                  <form action="/api/partner/designs/manage" method="post"><input type="hidden" name="p" value={p.id} /><input type="hidden" name="id" value={d.id} /><input type="hidden" name="do" value={d.published ? "unpublish" : "publish"} /><button className="underline">{d.published ? "Hide from your page" : "Sell on your page"}</button></form>
+                  <form action="/api/partner/designs/manage" method="post"><input type="hidden" name="p" value={p.id} /><input type="hidden" name="id" value={d.id} /><input type="hidden" name="do" value="remove" /><button className="underline text-ink/40">Remove</button></form>
+                </div>
+              </div>
+              <form action="/api/partner/buy" method="post" className="mt-3 flex flex-wrap items-end gap-2 text-sm">
+                <input type="hidden" name="what" value="prints" /><input type="hidden" name="p" value={p.id} /><input type="hidden" name="design" value={d.id} />
+                <label className="font-bold">Size<select name="product" defaultValue="a3" className={small}>{PRODUCTS.map((x) => <option key={x.id} value={x.id}>{x.label} · {sym(region.currency)}{x.price[region.id]} each</option>)}</select></label>
+                <label className="font-bold">Frame<select name="frame" defaultValue="none" className={small}>{FRAMES.map((x) => <option key={x.id} value={x.id}>{x.id === "none" ? "No frame" : `${x.label} frame`}</option>)}</select></label>
+                <label className="font-bold">Prints<input name="copies" type="number" min={1} max={250} defaultValue={20} className={`${small} w-24`} /></label>
+                <button className="rounded-full bg-ink text-white px-4 py-2.5 font-extrabold">Order prints →</button>
+              </form>
+            </div>
+          ))}
+          {!(p.designs ?? []).length && <p className="text-sm text-ink/40">No maps yet.</p>}
+        </div>
+        <p className="mt-3 text-xs text-ink/50">Trade prices on prints of your own maps: {tradeDiscountPct(1)}% off, {tradeDiscountPct(10)}% off 10+, {tradeDiscountPct(50)}% off 50+ (prices above are before the discount; framed prints add the frame price). Delivered free to one address, paid by card; you&apos;ll get a receipt and invoice by email.</p>
+      </section>
+
+      <section id="codes" className={card}>
+        <h2 className="text-xl font-extrabold">Gift cards</h2>
+        <p className="text-sm text-ink/60 mt-1">Gift cards your customers use to design their own map. Hand them out printed, or email the codes. {st.tradeCodes.issued > 0 && `${st.tradeCodes.redeemed} of ${st.tradeCodes.issued} used so far.`}</p>
+        <form action="/api/partner/buy" method="post" className="mt-4 flex flex-wrap items-end gap-2 text-sm">
+          <input type="hidden" name="what" value="giftcards" /><input type="hidden" name="p" value={p.id} />
+          <label className="font-bold">How many<input name="count" type="number" min={1} max={250} defaultValue={20} className={`${small} w-24`} /></label>
+          <label className="font-bold">Worth each ({sym(region.currency)})
+            <select name="value" defaultValue={String(region.id === "GB" ? 44 : region.id === "US" ? 59 : 85)} className={small}>
+              {GIFT_VALUES[region.id].map(([v, l]) => <option key={v} value={v}>{sym(region.currency)}{v}: {l}</option>)}
+            </select>
+          </label>
+          <button className="rounded-full bg-ink text-white px-4 py-2.5 font-extrabold">Buy gift cards →</button>
+        </form>
+        <p className="mt-2 text-xs text-ink/50">You pay the trade price: {tradeDiscountPct(1)}% off, {tradeDiscountPct(10)}% off 10+, {tradeDiscountPct(50)}% off 50+. Codes appear here as soon as you&apos;ve paid, valid for 2 years.</p>
+        {st.tradeCodes.batches.length > 0 && (
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
               <tbody>
@@ -94,16 +149,15 @@ export default async function PartnerDashboard({ searchParams }: { searchParams:
                       <td className="py-2 pr-3 whitespace-nowrap">{b.redeemed} used</td>
                       <td className="py-2 pr-3 whitespace-nowrap"><a className="font-bold underline" href={`/partner/cards?p=${p.id}&batch=${b.batch}`} target="_blank" rel="noreferrer">Printable cards</a></td>
                       <td className="py-2 pr-3 whitespace-nowrap"><a className="font-bold underline" href={`/api/partner/codes?p=${p.id}&batch=${b.batch}`}>Codes (CSV)</a></td>
-                      <td className="py-2 whitespace-nowrap">{inv?.url ? <a className="font-bold underline text-coral-dark" href={inv.url} target="_blank" rel="noreferrer">Invoice {fmt(inv.total, inv.currency)}</a> : <span className="text-ink/40">invoice to follow</span>}</td>
+                      <td className="py-2 whitespace-nowrap">{inv?.url ? <a className="font-bold underline text-coral-dark" href={inv.url} target="_blank" rel="noreferrer">Invoice {fmt(inv.total, inv.currency)}</a> : inv ? <span className="text-ink/50">paid {fmt(inv.total, inv.currency)}</span> : <span className="text-ink/40">invoice to follow</span>}</td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
-          <p className="mt-3 text-xs text-ink/50">Need more? Reply to your last invoice or email hello@mapsie.shop. Trade prices: {tradeDiscountPct(1)}% off, {tradeDiscountPct(10)}% off 10+, {tradeDiscountPct(50)}% off 50+.</p>
-        </section>
-      )}
+        )}
+      </section>
 
       <section className={card}>
         <h2 className="text-xl font-extrabold">Recent orders</h2>

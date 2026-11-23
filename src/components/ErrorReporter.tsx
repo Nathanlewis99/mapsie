@@ -20,8 +20,23 @@ export function reportError(err: unknown, kind = "error") {
 
 export default function ErrorReporter() {
   useEffect(() => {
-    const onError = (e: ErrorEvent) => reportError(e.error ?? e.message);
-    const onRejection = (e: PromiseRejectionEvent) => reportError(e.reason, "promise");
+    // After a site update, code still open in this tab can ask for files that no longer exist.
+    // Reload once to pick up the new version (at most once a minute, so it can never loop).
+    const maybeReload = (err: unknown) => {
+      const s = `${(err as Error)?.name ?? ""} ${(err as Error)?.message ?? err}`;
+      if (!/ChunkLoadError|Loading (CSS )?chunk|dynamically imported module|Failed to find Server Action/i.test(s)) return false;
+      try {
+        const last = Number(sessionStorage.getItem("mapsie-reloaded") ?? 0);
+        if (Date.now() - last < 60_000) return false;
+        sessionStorage.setItem("mapsie-reloaded", String(Date.now()));
+      } catch {
+        return false;
+      }
+      window.location.reload();
+      return true;
+    };
+    const onError = (e: ErrorEvent) => maybeReload(e.error ?? e.message) || reportError(e.error ?? e.message);
+    const onRejection = (e: PromiseRejectionEvent) => maybeReload(e.reason) || reportError(e.reason, "promise");
     window.addEventListener("error", onError);
     window.addEventListener("unhandledrejection", onRejection);
     return () => {

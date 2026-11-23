@@ -201,22 +201,52 @@ export default function StickerFilters({ prefix, colors }: { prefix: string; col
           </feMerge>
         </filter>
 
-        {/* Hand-coloured: the engraving tinted with soft, faded watercolour, as on antique maps */}
+        {/* Hand-coloured: a pen-and-ink drawing (outline and inner contours, with a slightly wobbly hand)
+            tinted with soft, faded watercolour, as on antique maps. Only the deepest shadows get a
+            light touch of hatching, so the colour shows through rather than being striped over. */}
         <filter id={filterId(prefix, "handcoloured")} {...region}>
-          <Engrave ink={colors.ink} boost={1.25} result="inked" />
-          <feColorMatrix in="SourceGraphic" type="saturate" values="0.55" result="muted" />
-          {/* fade the colours toward the paper, like old pigment */}
+          {/* the watercolour: muted, faded toward the paper, edges bleeding a little */}
+          <feColorMatrix in="SourceGraphic" type="saturate" values="0.7" result="muted" />
           <feComponentTransfer in="muted" result="faded">
-            <feFuncR type="linear" slope="0.6" intercept="0.36" />
-            <feFuncG type="linear" slope="0.6" intercept="0.33" />
-            <feFuncB type="linear" slope="0.55" intercept="0.27" />
+            <feFuncR type="linear" slope="0.68" intercept="0.3" />
+            <feFuncG type="linear" slope="0.68" intercept="0.28" />
+            <feFuncB type="linear" slope="0.62" intercept="0.24" />
           </feComponentTransfer>
           <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="4" result="flow" />
           <feDisplacementMap in="faded" in2="flow" scale="0.03" xChannelSelector="R" yChannelSelector="G" result="wash" />
           <feComposite in="wash" in2="SourceAlpha" operator="in" result="tint" />
+          {/* inner contours: where the art's lightness changes sharply */}
+          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.2126 0.7152 0.0722 0 0" result="lum" />
+          <feComposite in="lum" in2="SourceAlpha" operator="in" result="lumIn" />
+          <feConvolveMatrix in="lumIn" order="3" kernelMatrix="-1 -1 -1  -1 8 -1  -1 -1 -1" kernelUnitLength="0.008" preserveAlpha="false" result="edges" />
+          <feComponentTransfer in="edges" result="contours">
+            <feFuncA type="discrete" tableValues="0 1 1 1 1 1 1 1" />
+          </feComponentTransfer>
+          {/* the outline round each shape */}
+          <feMorphology in="SourceAlpha" operator="erode" radius="0.013" result="inner" />
+          <feComposite in="SourceAlpha" in2="inner" operator="out" result="edge" />
+          {/* a light hatch in the deepest shadows only */}
+          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.2126 -0.7152 -0.0722 0 1" result="dark" />
+          <feComposite in="dark" in2="SourceAlpha" operator="in" result="tone" />
+          <feImage href={HATCH} x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="screen" />
+          <feColorMatrix in="screen" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1 0 0 0 0" result="screenA" />
+          <feComposite in="tone" in2="screenA" operator="arithmetic" k1="0" k2="0.85" k3="-1" k4="-0.12" result="deep" />
+          <feComponentTransfer in="deep" result="hatch">
+            <feFuncA type="discrete" tableValues="0 0.45 0.45 0.45" />
+          </feComponentTransfer>
+          <feMerge result="lines">
+            <feMergeNode in="edge" />
+            <feMergeNode in="contours" />
+            <feMergeNode in="hatch" />
+          </feMerge>
+          {/* drawn by hand: the pen line wanders very slightly */}
+          <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="9" result="jitter" />
+          <feDisplacementMap in="lines" in2="jitter" scale="0.018" xChannelSelector="R" yChannelSelector="G" result="penMask" />
+          <feFlood floodColor={colors.ink} floodOpacity="0.85" />
+          <feComposite in2="penMask" operator="in" result="pen" />
           <feMerge>
             <feMergeNode in="tint" />
-            <feMergeNode in="inked" />
+            <feMergeNode in="pen" />
           </feMerge>
         </filter>
 

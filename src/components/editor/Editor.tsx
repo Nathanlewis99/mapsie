@@ -460,7 +460,23 @@ export default function Editor() {
     }
   };
 
-  const order = async () => {
+  // Stops outside the printed map area (e.g. after zooming in to tidy a detail).
+  const [offFrame, setOffFrame] = useState<string[]>([]);
+  const [offWarn, setOffWarn] = useState(false);
+  const fitTrip = () => {
+    setLocked(false);
+    setZoom({ k: 1, x: 0, y: 0 });
+    store.requestFit();
+    setOffWarn(false);
+  };
+
+  const order = async (force?: boolean) => {
+    // Don't let anyone order a print with part of their trip cut off without knowing.
+    if (force !== true && offFrame.length && design.stops.length) {
+      setOffWarn(true);
+      return;
+    }
+    setOffWarn(false);
     track("order_click");
     setBusy("order");
     try {
@@ -584,7 +600,7 @@ export default function Editor() {
             </select>
           </label>
           <button
-            onClick={order}
+            onClick={() => order()}
             disabled={!!busy || design.stops.length === 0}
             className="group ml-1 sm:ml-3 inline-flex items-center gap-2 h-10 sm:h-11 rounded-full bg-coral pl-4 pr-3 sm:pl-6 sm:pr-4 text-sm sm:text-base font-extrabold text-white shadow-lg shadow-coral/40 ring-1 ring-coral-dark/20 hover:bg-coral-dark hover:shadow-xl hover:shadow-coral/40 hover:-translate-y-px active:translate-y-0 disabled:opacity-40 disabled:shadow-none transition whitespace-nowrap"
           >
@@ -654,6 +670,7 @@ export default function Editor() {
                 fitRequest={fitRequest}
                 handlers={{
                   onView: (view) => store.setView(view),
+                  onOffFrame: (names) => setOffFrame((prev) => (prev.join("|") === names.join("|") ? prev : names)),
                   onStopMove: (id, lng, lat) => store.updateStop(id, { lng, lat }),
                   onStickerMove: (id, lng, lat) => store.updateSticker(id, { lng, lat }),
                   onStickerChange: (id, patch) => store.updateSticker(id, patch),
@@ -694,6 +711,15 @@ export default function Editor() {
                 <button title="Zoom out" aria-label="Zoom out" className="w-10 h-10 hover:bg-ink/5 border-t border-ink/10" onClick={() => setZoom((z) => (z.k / 1.4 <= 1.01 ? { k: 1, x: 0, y: 0 } : { k: z.k / 1.4, x: z.x / 1.4, y: z.y / 1.4 }))}>−</button>
                 <button title="Fit the poster" aria-label="Fit the poster" className="w-10 h-10 hover:bg-ink/5 border-t border-ink/10 text-sm" onClick={() => setZoom({ k: 1, x: 0, y: 0 })}>⤢</button>
               </div>
+            )}
+            {design.stops.length > 0 && !locked && (
+              <button
+                onClick={fitTrip}
+                title="Zoom and move the map so every stop is on the print"
+                className={`rounded-full px-4 py-2.5 text-sm font-extrabold shadow-lg transition ${offFrame.length ? "bg-coral text-white animate-pulse" : "bg-white text-ink hover:bg-cream"}`}
+              >
+                ⤢ Fit map to trip
+              </button>
             )}
             {design.stops.length > 0 && (
             <button
@@ -958,6 +984,25 @@ export default function Editor() {
               </div>
             </div>
           )}
+          {offFrame.length > 0 && design.stops.length > 0 && !offWarn && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-lg text-xs sm:text-sm font-bold max-w-[92%]">
+              <span className="truncate">⚠️ {offFrame.length === 1 ? `${offFrame[0]} is` : `${offFrame.length} stops are`} off the printed map</span>
+              <button onClick={fitTrip} className="shrink-0 rounded-full bg-coral px-3 py-1 text-white font-extrabold">Fit</button>
+            </div>
+          )}
+          {offWarn && (
+            <div className="absolute inset-x-3 top-1/2 -translate-y-1/2 z-30 mx-auto max-w-sm rounded-3xl bg-white p-5 shadow-2xl text-center" role="alertdialog" aria-label="Part of your trip is off the map">
+              <div className="font-display text-xl font-extrabold">Part of your trip won&apos;t be printed</div>
+              <p className="mt-2 text-sm text-ink/70">
+                {offFrame.length === 1 ? offFrame[0] : `${offFrame.slice(0, 3).join(", ")}${offFrame.length > 3 ? ` and ${offFrame.length - 3} more` : ""}`} {offFrame.length === 1 ? "is" : "are"} outside the map area, so {offFrame.length === 1 ? "it" : "they"} won&apos;t appear on your print.
+              </p>
+              <div className="mt-4 grid gap-2">
+                <button className="rounded-full bg-coral px-5 py-3 font-extrabold text-white" onClick={fitTrip}>⤢ Fit map to trip</button>
+                <button className="rounded-full border-2 border-ink/15 px-5 py-2.5 font-extrabold" onClick={() => order(true)}>Order as it is</button>
+                <button className="text-sm font-bold text-ink/50 underline" onClick={() => setOffWarn(false)}>Keep editing</button>
+              </div>
+            </div>
+          )}
           {toast && (
             <div className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-ink text-white px-5 py-2.5 shadow-lg text-sm font-bold whitespace-nowrap">{toast}</div>
           )}
@@ -1044,7 +1089,7 @@ export default function Editor() {
             <WallPreview design={design} />
             <div className="mt-4 flex justify-end gap-2">
               <button onClick={() => { setWall(false); setTab("size"); }} className="rounded-full border-2 border-ink/15 px-5 py-2.5 font-bold">Change size or frame</button>
-              <button onClick={order} className="rounded-full bg-coral px-5 py-2.5 font-extrabold text-white">{etsy ? "Send to print" : `Order · ${money(region, price)}`}</button>
+              <button onClick={() => order()} className="rounded-full bg-coral px-5 py-2.5 font-extrabold text-white">{etsy ? "Send to print" : `Order · ${money(region, price)}`}</button>
             </div>
           </div>
         </div>

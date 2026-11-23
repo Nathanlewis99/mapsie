@@ -17,6 +17,8 @@ import { TINY_PIN } from "@/lib/legibility";
 
 export interface MapHandlers {
   onView?: (v: Design["view"]) => void;
+  /** Editor: names of the stops that are outside the printed map area (empty when all fit). */
+  onOffFrame?: (names: string[]) => void;
   onStopMove?: (id: string, lng: number, lat: number) => void;
   onStickerMove?: (id: string, lng: number, lat: number) => void;
   onStickerChange?: (id: string, patch: Partial<Sticker>) => void;
@@ -173,6 +175,7 @@ export default function MapView(props: Props) {
       m.on("moveend", () => {
         const c = m.getCenter();
         h.current?.onView?.({ center: [c.lng, c.lat], zoom: m.getZoom(), bearing: m.getBearing(), refWidth: widthRef.current });
+        checkFrame();
       });
       m.on("click", (e) => {
         h.current?.onStickerSelect?.(null);
@@ -613,6 +616,25 @@ export default function MapView(props: Props) {
   useEffect(() => {
     map.current?.resize();
   }, [mapWidth, height]);
+
+  // --- tell the editor which stops (if any) are outside what will be printed
+  const checkFrame = () => {
+    const m = map.current;
+    if (!m || !h.current?.onOffFrame) return;
+    const el = m.getContainer();
+    const w = el.clientWidth;
+    const ht = el.clientHeight;
+    if (!w || !ht) return;
+    const off = latest.current.stops.filter((s) => {
+      const p = m.project([s.lng, s.lat]);
+      return p.x < 0 || p.y < 0 || p.x > w || p.y > ht;
+    });
+    h.current.onOffFrame(off.map((s) => s.name));
+  };
+  useEffect(() => {
+    checkFrame();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [design.stops, mapWidth, height, mapReady]);
 
   // --- frame all the stops
   useEffect(() => {

@@ -2,6 +2,9 @@
 const nextConfig = {
   serverExternalPackages: ["playwright", "sharp", "better-sqlite3", "pg"],
   devIndicators: false,
+  // Skew protection: each build is tagged with its git commit, so a page left open across a deploy
+  // does a full load on its next navigation instead of mixing old and new code.
+  ...(process.env.RENDER_GIT_COMMIT ? { deploymentId: process.env.RENDER_GIT_COMMIT.slice(0, 12) } : {}),
   // Sticker artwork rarely changes: let browsers and Render's CDN keep it for a week.
   async headers() {
     // Security headers on every page: HTTPS only, no MIME sniffing, no framing by other

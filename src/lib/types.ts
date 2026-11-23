@@ -172,6 +172,10 @@ export interface TextStyle {
   /** An ornamental frame round the title, as on old maps. */
   cartouche?: "none" | "plaque" | "scroll" | "oval";
   titleOffset?: [number, number]; // dragged position, % of poster width
+  /** Framed border: width of the paper border round the map (1 = standard). */
+  borderSize?: number;
+  /** Full bleed: where the title box sits over the map (left/right follow `align`). */
+  overlayPos?: "top" | "middle" | "bottom";
   subtitleOffset?: [number, number];
 }
 

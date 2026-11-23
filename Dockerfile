@@ -11,6 +11,9 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+# Render passes the commit being built; Next tags the build with it (skew protection, see next.config).
+ARG RENDER_GIT_COMMIT
+ENV RENDER_GIT_COMMIT=$RENDER_GIT_COMMIT
 RUN npm run build && npm prune --omit=dev
 
 ENV NODE_ENV=production \

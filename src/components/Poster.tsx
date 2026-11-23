@@ -52,7 +52,7 @@ export default function Poster({ design, width, editable = false, print, selecte
     (design.subtitle ? u * 2.1 * t.subtitleSize * 1.3 + u : 0) +
     (route ? Math.min(2, lines(route.length, u * 1.5, width * 0.78)) * u * 1.5 * 1.35 + u * 0.9 : 0);
   const bandH = design.layout === "overlay" || mapOnly ? 0 : Math.max(u * (landscape ? 11 : 17), needed);
-  const pad = design.layout === "border" ? u * 4.5 : 0;
+  const pad = design.layout === "border" ? u * 4.5 * Math.min(3, Math.max(0.3, t.borderSize ?? 1)) : 0;
   const mapW = width - pad * 2;
   const mapH = height - bandH - pad * (design.layout === "border" ? 1 : 0) - pad;
   const font = fontCss(design.font);
@@ -191,8 +191,15 @@ export default function Poster({ design, width, editable = false, print, selecte
         </div>
       ) : (
         <div
-          className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-          style={{ bottom: u * 5, maxWidth: "86%", zIndex: 3 }}
+          className="absolute pointer-events-none"
+          style={{
+            maxWidth: "86%",
+            zIndex: 3,
+            // Full bleed: top, middle or bottom, and left, centre or right (from the text alignment).
+            ...(t.overlayPos === "top" ? { top: u * 5 } : t.overlayPos === "middle" ? { top: "50%" } : { bottom: u * 5 }),
+            ...(align === "left" ? { left: u * 5 } : align === "right" ? { right: u * 5 } : { left: "50%" }),
+            transform: `${align === "center" ? "translateX(-50%) " : ""}${t.overlayPos === "middle" ? "translateY(-50%)" : ""}`.trim() || undefined,
+          }}
         >
           {titleBlock({ background: c.paper + "e6", padding: `${u * 2.2}px ${u * 5}px`, borderRadius: u * 1.5 })}
         </div>

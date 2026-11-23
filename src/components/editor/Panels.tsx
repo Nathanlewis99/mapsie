@@ -1077,6 +1077,34 @@ export function TextPanel() {
           onChange={(v) => set({ layout: v })}
         />
         {design.layout === "none" && <p className="text-xs text-ink/60 font-semibold mt-2">The whole print is map. Pick another layout to bring the title back.</p>}
+        {design.layout === "border" && (
+          <div className="mt-3">
+            <Slider label="Border width" value={tx.borderSize ?? 1} min={0.3} max={3} step={0.05} onChange={(v) => setText({ borderSize: v }, "borderSize")} />
+            <p className="text-xs text-ink/50 mt-1">Narrower makes the map bigger; wider gives it more of a mount.</p>
+          </div>
+        )}
+        {design.layout === "overlay" && (
+          <div className="mt-3">
+            <div className="text-xs font-bold text-ink/60 mb-1.5">Title position</div>
+            <div className="grid grid-cols-3 gap-1.5 w-40" role="group" aria-label="Title position">
+              {(["top", "middle", "bottom"] as const).flatMap((v) =>
+                (["left", "center", "right"] as const).map((h) => {
+                  const on = (tx.overlayPos ?? "bottom") === v && tx.align === h;
+                  return (
+                    <button
+                      key={`${v}-${h}`}
+                      title={`${v === "middle" ? "Middle" : v[0].toUpperCase() + v.slice(1)} ${h === "center" ? "centre" : h}`}
+                      onClick={() => setText({ overlayPos: v, align: h })}
+                      className={`h-9 rounded-lg border-2 grid ${v === "top" ? "items-start" : v === "middle" ? "items-center" : "items-end"} ${h === "left" ? "justify-items-start" : h === "right" ? "justify-items-end" : "justify-items-center"} p-1 ${on ? "border-coral bg-coral/10" : "border-ink/10 hover:border-ink/30"}`}
+                    >
+                      <span className={`block h-1.5 w-5 rounded-full ${on ? "bg-coral" : "bg-ink/30"}`} />
+                    </button>
+                  );
+                }),
+              )}
+            </div>
+          </div>
+        )}
       </div>
       <fieldset disabled={design.layout === "none"} className={`space-y-5 ${design.layout === "none" ? "opacity-40" : ""}`} title={design.layout === "none" ? "Map only layout: no title or subtitle" : undefined}>
       <div>

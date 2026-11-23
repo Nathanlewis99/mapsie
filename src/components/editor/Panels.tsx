@@ -520,6 +520,20 @@ export function StylePanel() {
         <Toggle on={!!t.details.neatline} onChange={(v) => setTheme({ details: { ...t.details, neatline: v } })} label="🔲 Atlas border (old map neatline)" />
         <Toggle on={t.details.grid} onChange={(v) => setTheme({ details: { ...t.details, grid: v } })} label="🌐 Latitude & longitude grid" />
         <Toggle on={t.details.tropics} onChange={(v) => setTheme({ details: { ...t.details, tropics: v } })} label="☀️ Equator & tropics" />
+        <Toggle on={!!t.details.inset} onChange={(v) => setTheme({ details: { ...t.details, inset: v } })} label="🗺️ Overview map of the whole country" />
+        {t.details.inset && (
+          <div className="pl-1 space-y-2 -mt-1">
+            <div className="flex flex-wrap gap-1.5 text-xs font-bold">
+              {(["tl", "tr", "bl", "br"] as const).map((cn) => (
+                <button key={cn} onClick={() => setTheme({ details: { ...t.details, insetCorner: cn } })} className={`rounded-full border-2 px-2.5 py-0.5 ${(t.details.insetCorner ?? "bl") === cn ? "border-coral bg-white" : "border-ink/10"}`}>
+                  {{ tl: "Top left", tr: "Top right", bl: "Bottom left", br: "Bottom right" }[cn]}
+                </button>
+              ))}
+            </div>
+            <Slider label="Overview size" value={t.details.insetSize ?? 0.3} min={0.18} max={0.45} step={0.01} onChange={(v) => setTheme({ details: { ...t.details, insetSize: v } })} />
+            <p className="text-xs text-ink/50">Shows the whole country with your route on it, and a box where the main map is. Great for a trip along one coast.</p>
+          </div>
+        )}
         <Toggle on={t.details.compass} onChange={(v) => setTheme({ details: { ...t.details, compass: v } })} label="🧭 Compass rose" />
         {t.details.compass && (
           <div className="pb-2">

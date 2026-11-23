@@ -45,6 +45,9 @@ export default function PrintView({ design }: { design: Design }) {
         onReady={async () => {
           // let stickers/photos finish decoding before we say we're ready
           await Promise.all([...document.images].map((i) => (i.complete ? null : i.decode().catch(() => null))));
+          // e.g. the overview map, which loads its country outlines separately
+          await Promise.all((window as unknown as { __MAPSIE_WAIT?: Promise<unknown>[] }).__MAPSIE_WAIT ?? []);
+          await new Promise((r) => requestAnimationFrame(() => r(null)));
           await flattenSvgStickers();
           requestAnimationFrame(() => (window.__MAPSIE_READY = true));
         }}

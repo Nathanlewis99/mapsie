@@ -105,6 +105,11 @@ export interface MapDetails {
   compass: boolean; // compass rose
   compassStyle?: CompassStyle;
   compassCorner?: "br" | "bl" | "tr" | "tl";
+  /** A small overview map of the whole country (or countries) with the route on it. */
+  inset?: boolean;
+  insetCorner?: "br" | "bl" | "tr" | "tl";
+  /** Width of the overview, as a share of the map's shorter side. */
+  insetSize?: number;
 }
 
 export type CompassStyle = "classic" | "nautical" | "minimal" | "vintage";

@@ -99,10 +99,11 @@ body {
 
 .mapsie-stop, .mapsie-mode, .mapsie-sticker { -webkit-text-size-adjust: none; text-size-adjust: none; }
 .mapsie-mode {
-  width: calc(var(--u) * 3.6);
-  height: calc(var(--u) * 3.6);
+  /* --s: smaller on short legs, so every leg keeps its icon */
+  width: calc(var(--u) * 3.6 * var(--s, 1));
+  height: calc(var(--u) * 3.6 * var(--s, 1));
   border-radius: 999px;
-  border: calc(var(--u) * 0.3) solid;
+  border: calc(var(--u) * 0.3 * var(--s, 1)) solid;
   display: grid;
   place-items: center;
   box-shadow: 0 calc(var(--u) * 0.15) calc(var(--u) * 0.5) rgb(0 0 0 / 0.2);

@@ -277,11 +277,14 @@ export default function MapView(props: Props) {
           node.innerHTML = `<img src="${stickerSrc(leg.vehicle, iconArt.id)}" alt=""${iconFilter} />`;
           const a = leg.line[0];
           const b = leg.line[leg.line.length - 1];
-          // Only show the icon when the leg is long enough on screen not to crowd the stops.
+          // Shrink the icon on shorter legs so it doesn't crowd the stops; only hide it when the
+          // leg is too short to fit even a small one.
           const fit = () => {
             const pa = mm.project(a);
             const pb = mm.project(b);
-            node.style.visibility = Math.hypot(pa.x - pb.x, pa.y - pb.y) > u * 13 ? "visible" : "hidden";
+            const len = Math.hypot(pa.x - pb.x, pa.y - pb.y);
+            node.style.setProperty("--s", String(Math.max(0.55, Math.min(1, len / (u * 13)))));
+            node.style.visibility = len > u * 6.5 ? "visible" : "hidden";
           };
           fit();
           mm.on("zoom", fit);

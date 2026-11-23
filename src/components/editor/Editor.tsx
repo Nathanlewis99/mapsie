@@ -1,9 +1,10 @@
 "use client";
+import { crowdedStickers, crowding, tidyDesign } from "@/lib/legibility";
 import { personaliseTrip, type PublicPartner } from "@/lib/partners";
 import { TEMPLATES } from "@/lib/templates";
 import EmailDesign from "./EmailDesign";
 import { adEvent } from "@/lib/adTrack";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { nanoid } from "nanoid";
 import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
@@ -460,6 +461,12 @@ export default function Editor() {
     }
   };
 
+  // Overlapping stops, names, stickers or photos: offer to tidy them from the map itself.
+  const crowdCount = useMemo(() => {
+    if (!design.stops.length && !design.stickers.length) return 0;
+    return new Set(crowding(design).flat()).size + crowdedStickers(design).length;
+  }, [design]);
+
   // Stops outside the printed map area (e.g. after zooming in to tidy a detail).
   const [offFrame, setOffFrame] = useState<string[]>([]);
   const [offWarn, setOffWarn] = useState(false);
@@ -711,6 +718,18 @@ export default function Editor() {
                 <button title="Zoom out" aria-label="Zoom out" className="w-10 h-10 hover:bg-ink/5 border-t border-ink/10" onClick={() => setZoom((z) => (z.k / 1.4 <= 1.01 ? { k: 1, x: 0, y: 0 } : { k: z.k / 1.4, x: z.x / 1.4, y: z.y / 1.4 }))}>−</button>
                 <button title="Fit the poster" aria-label="Fit the poster" className="w-10 h-10 hover:bg-ink/5 border-t border-ink/10 text-sm" onClick={() => setZoom({ k: 1, x: 0, y: 0 })}>⤢</button>
               </div>
+            )}
+            {crowdCount > 0 && (
+              <button
+                onClick={() => {
+                  store.set(tidyDesign(useEditor.getState().design));
+                  setToast("Tidied: names, stickers and photos moved apart.");
+                }}
+                title="Move overlapping stops, names, stickers and photos apart (and shrink them a little if needed)"
+                className="rounded-full bg-white px-4 py-2.5 text-sm font-extrabold text-ink shadow-lg hover:bg-cream"
+              >
+                ✨ Uncrowd ({crowdCount})
+              </button>
             )}
             {design.stops.length > 0 && !locked && (
               <button

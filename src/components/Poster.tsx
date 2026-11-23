@@ -1,4 +1,5 @@
 "use client";
+import InsetMap from "./InsetMap";
 import dynamic from "next/dynamic";
 import { useId } from "react";
 import StickerFilters from "./StickerFilters";
@@ -177,6 +178,7 @@ export default function Poster({ design, width, editable = false, print, selecte
           renderScale={renderScale}
         />
         {design.theme.details?.neatline && <Neatline u={u} ink={c.ink} paper={c.paper} />}
+        {design.theme.details?.inset && <InsetMap design={design} u={u} mapW={mapW} mapH={mapH} posterW={width} />}
         {design.theme.details?.compass && (
           <Compass u={u} ink={c.ink} accent={c.accent} paper={c.paper} variant={design.theme.details.compassStyle} corner={design.theme.details.compassCorner} />
         )}

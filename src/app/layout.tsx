@@ -36,6 +36,8 @@ import ConsentManager from "@/components/ConsentManager";
 const DESCRIPTION = "Design a custom map print of your journey: stops, routes, stickers and your style. Printed and delivered to your door.";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.APP_URL ?? "https://mapsie.shop"),
+  // Site ownership checks: Pinterest ("claim your website": PINTEREST_DOMAIN_VERIFY on Render).
+  ...(process.env.PINTEREST_DOMAIN_VERIFY ? { other: { "p:domain_verify": process.env.PINTEREST_DOMAIN_VERIFY } } : {}),
   title: "Mapsie — turn your trip into a print",
   description: DESCRIPTION,
   // The preview shown when someone shares a link (WhatsApp, Instagram, Facebook, X, iMessage).

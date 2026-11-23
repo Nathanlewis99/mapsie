@@ -1,0 +1,13 @@
+{
+  "name": "mapsie-mail-mcp",
+  "private": true,
+  "type": "module",
+  "description": "Remote MCP connector giving Claude access to the admin@mapsie.shop Gmail inbox, behind Google sign-in.",
+  "engines": { "node": ">=20" },
+  "scripts": { "start": "node server.mjs", "test": "node --test" },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "express": "5.2.1",
+    "zod": "3.25.76"
+  }
+}

@@ -6,13 +6,53 @@
 import type { TripTemplate } from "./templates";
 import type { RegionId } from "./products";
 
-export type PartnerKind = "travel" | "event" | "wedding" | "corporate";
+export type PartnerKind = "travel" | "event" | "wedding" | "corporate" | "shop";
 export const PARTNER_KINDS: { id: PartnerKind; label: string }[] = [
   { id: "travel", label: "Tour operator / travel agent" },
   { id: "event", label: "Event / challenge" },
   { id: "wedding", label: "Wedding / registry" },
   { id: "corporate", label: "Corporate gifting" },
+  { id: "shop", label: "Gift / souvenir shop" },
 ];
+
+/** Who to invoice for trade codes. Entered by the partner in their dashboard (or by us). */
+export interface PartnerBilling { company: string; address: string; vatNumber?: string; invoiceEmail?: string }
+
+/** How we pay their commission. Stored encrypted; `summary` is the safe-to-show version, e.g. "Bank ••••1234". */
+export interface PartnerPayoutDetails { sealed: string; summary: string; updatedAt: string }
+export type PayoutMethod =
+  | { method: "uk_bank"; accountName: string; sortCode: string; accountNumber: string }
+  | { method: "iban"; accountName: string; iban: string; bic?: string }
+  | { method: "paypal"; email: string };
+
+/** Check and tidy payout details typed by a partner. Returns an error message, or the cleaned details. */
+export function cleanPayout(v: Record<string, string>): PayoutMethod | string {
+  const t = (k: string, max = 80) => (v[k] ?? "").trim().slice(0, max);
+  if (v.method === "uk_bank") {
+    const sortCode = t("sortCode").replace(/\D/g, "");
+    const accountNumber = t("accountNumber").replace(/\D/g, "");
+    if (!t("accountName")) return "Add the name on the account";
+    if (sortCode.length !== 6) return "A sort code has 6 digits";
+    if (!/^\d{8}$/.test(accountNumber)) return "A UK account number has 8 digits";
+    return { method: "uk_bank", accountName: t("accountName"), sortCode, accountNumber };
+  }
+  if (v.method === "iban") {
+    const iban = t("iban", 40).replace(/\s/g, "").toUpperCase();
+    if (!t("accountName")) return "Add the name on the account";
+    if (!/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(iban)) return "That doesn't look like an IBAN";
+    return { method: "iban", accountName: t("accountName"), iban, ...(t("bic", 11) ? { bic: t("bic", 11).toUpperCase() } : {}) };
+  }
+  if (v.method === "paypal") {
+    if (!/^\S+@\S+\.\S+$/.test(t("email", 120))) return "Add the PayPal email address";
+    return { method: "paypal", email: t("email", 120) };
+  }
+  return "Choose how you'd like to be paid";
+}
+export function payoutSummary(p: PayoutMethod) {
+  if (p.method === "uk_bank") return `UK bank account ••••${p.accountNumber.slice(-4)} (${p.accountName})`;
+  if (p.method === "iban") return `IBAN ${p.iban.slice(0, 2)}••••${p.iban.slice(-4)} (${p.accountName})`;
+  return `PayPal ${p.email.replace(/^(.).*(@.*)$/, "$1•••$2")}`;
+}
 
 /** A route a partner's customers start from. Same shape as a quick-start trip, plus optional prompts. */
 export interface PartnerTrip extends TripTemplate {
@@ -40,6 +80,12 @@ export interface Partner {
   region?: RegionId;
   trips: PartnerTrip[];
   payouts?: PartnerPayout[];
+  /** Email addresses that can sign in to the partner dashboard (mapsie.shop/partner). */
+  logins?: string[];
+  billing?: PartnerBilling;
+  payoutDetails?: PartnerPayoutDetails;
+  /** Stripe invoices sent for trade code batches. */
+  invoices?: { batch: string; url?: string | null; total: number; currency: string; at: string }[];
   notes?: string;
   createdAt: string;
 }

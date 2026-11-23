@@ -48,3 +48,28 @@ describe("partners", () => {
     expect(d.visited.multi).toBe(false);
   });
 });
+
+import { cleanPayout, payoutSummary } from "@/lib/partners";
+import { openPayout, sealPayout } from "@/lib/server/partnerAuth";
+
+describe("partner payout details", () => {
+  it("checks and tidies UK bank, IBAN and PayPal details", () => {
+    expect(cleanPayout({ method: "uk_bank", accountName: "Coast Rides Ltd", sortCode: "12-34-56", accountNumber: "1234 5678" })).toEqual({ method: "uk_bank", accountName: "Coast Rides Ltd", sortCode: "123456", accountNumber: "12345678" });
+    expect(cleanPayout({ method: "uk_bank", accountName: "X", sortCode: "12-34", accountNumber: "12345678" })).toBe("A sort code has 6 digits");
+    expect(cleanPayout({ method: "iban", accountName: "X", iban: "gb29 nwbk 6016 1331 9268 19" })).toMatchObject({ iban: "GB29NWBK60161331926819" });
+    expect(cleanPayout({ method: "iban", accountName: "X", iban: "nope" })).toBe("That doesn't look like an IBAN");
+    expect(cleanPayout({ method: "paypal", email: "pay@coast.com" })).toEqual({ method: "paypal", email: "pay@coast.com" });
+    expect(cleanPayout({})).toBe("Choose how you'd like to be paid");
+  });
+  it("only ever shows a masked summary", () => {
+    expect(payoutSummary({ method: "uk_bank", accountName: "Coast", sortCode: "123456", accountNumber: "12345678" })).toBe("UK bank account ••••5678 (Coast)");
+    expect(payoutSummary({ method: "paypal", email: "pay@coast.com" })).toBe("PayPal p•••@coast.com");
+  });
+  it("encrypts payout details at rest", () => {
+    const d = { method: "uk_bank" as const, accountName: "Coast", sortCode: "123456", accountNumber: "12345678" };
+    const sealed = sealPayout(d);
+    expect(sealed).not.toContain("12345678");
+    expect(openPayout(sealed)).toEqual(d);
+    expect(openPayout(sealed.slice(0, -4) + "AAAA")).toBeNull();
+  });
+});

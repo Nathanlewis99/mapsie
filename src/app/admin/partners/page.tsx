@@ -3,6 +3,7 @@ import Logo from "@/components/Logo";
 import { listGiftCards, listOrders } from "@/lib/server/db";
 import { listPartners, partnerStats } from "@/lib/server/partners";
 import { publicUrl } from "@/lib/server/urls";
+import { openPayout } from "@/lib/server/partnerAuth";
 import { PARTNER_KINDS, partnerLink, tradeDiscountPct, tradePrice, type Partner } from "@/lib/partners";
 import { PRESETS } from "@/lib/themes";
 import { REGIONS } from "@/lib/products";
@@ -87,6 +88,9 @@ function PartnerForm({ p }: { p?: Partner }) {
         </label>
         <label className="grid gap-1 text-sm font-bold">Headline on their page (optional)<input name="welcome" defaultValue={p?.welcome} placeholder="Your Coast to Coast ride, as a map for your wall" className={input} /></label>
       </div>
+      <label className="grid gap-1 text-sm font-bold">Dashboard logins: emails that can sign in at mapsie.shop/partner (one per line)
+        <textarea name="logins" rows={2} defaultValue={(p?.logins ?? []).join("\n")} placeholder="owner@company.com" className={input} />
+      </label>
       <label className="grid gap-1 text-sm font-bold">Notes (private)<textarea name="notes" rows={2} defaultValue={p?.notes} className={input} /></label>
       <label className="flex items-center gap-2 text-sm font-bold"><input type="checkbox" name="active" defaultChecked={p?.active ?? true} /> Live (their page and links work)</label>
       <button className={btn}>{p ? "Save" : "Add partner"}</button>
@@ -176,7 +180,7 @@ function PartnerDetail({ p, base, stats }: { p: Partner; base: string; stats: Aw
                   <td className="py-2">{b.count} × {fmt(b.value, b.currency)}</td>
                   <td className="py-2">{b.redeemed} used</td>
                   <td className="py-2">trade total {fmt(tradePrice(b.value, b.count) * b.count, b.currency)}</td>
-                  <td className="py-2"><a className="font-bold underline" href={`/api/admin/partners/codes?id=${p.id}&batch=${b.batch}`}>Download CSV</a></td>
+                  <td className="py-2"><a className="font-bold underline" href={`/api/admin/partners/codes?id=${p.id}&batch=${b.batch}`}>Download CSV</a> · <a className="font-bold underline" href={`/partner/cards?p=${p.id}&batch=${b.batch}`} target="_blank" rel="noreferrer">Printable cards</a>{(p.invoices ?? []).some((i) => i.batch === b.batch) && <span className="text-ink/50"> · invoiced</span>}</td>
                   <td className="py-2">
                     <form action="/api/admin/partners" method="post">
                       <input type="hidden" name="do" value="invoice" /><input type="hidden" name="id" value={p.id} /><input type="hidden" name="batch" value={b.batch} />
@@ -189,6 +193,13 @@ function PartnerDetail({ p, base, stats }: { p: Partner; base: string; stats: Aw
           </table>
         </section>
       )}
+
+      <section className="rounded-3xl bg-white p-5 shadow-sm space-y-2 text-sm">
+        <h2 className="text-xl font-extrabold">Their details</h2>
+        <p><b>Dashboard logins:</b> {(p.logins ?? []).join(", ") || <span className="text-ink/40">none yet: add their email above so they can sign in at /partner</span>}</p>
+        <p><b>Billing:</b> {p.billing ? `${p.billing.company}, ${p.billing.address.replace(/\n/g, ", ")}${p.billing.vatNumber ? ` · VAT ${p.billing.vatNumber}` : ""}${p.billing.invoiceEmail ? ` · invoices to ${p.billing.invoiceEmail}` : ""}` : <span className="text-ink/40">not given yet</span>}</p>
+        <PayoutView p={p} />
+      </section>
 
       <section className="rounded-3xl bg-white p-5 shadow-sm space-y-3">
         <h2 className="text-xl font-extrabold">Commission</h2>
@@ -221,5 +232,19 @@ function PartnerDetail({ p, base, stats }: { p: Partner; base: string; stats: Aw
         )}
       </section>
     </div>
+  );
+}
+
+/** The partner's payout details. Hidden until asked for, so they aren't on screen by default. */
+function PayoutView({ p }: { p: Partner }) {
+  if (!p.payoutDetails) return <p><b>Pay commission to:</b> <span className="text-ink/40">not given yet</span></p>;
+  const full = openPayout(p.payoutDetails.sealed);
+  return (
+    <details>
+      <summary className="cursor-pointer"><b>Pay commission to:</b> {p.payoutDetails.summary} <span className="text-ink/40">(updated {new Date(p.payoutDetails.updatedAt).toLocaleDateString("en-GB")}; click to show)</span></summary>
+      <div className="mt-2 rounded-2xl bg-sand/60 px-4 py-3 font-mono text-xs">
+        {!full ? "Couldn't decrypt (was SESSION_SECRET changed?)" : full.method === "uk_bank" ? `${full.accountName} · sort code ${full.sortCode.replace(/(\d\d)(\d\d)(\d\d)/, "$1-$2-$3")} · account ${full.accountNumber}` : full.method === "iban" ? `${full.accountName} · IBAN ${full.iban}${full.bic ? ` · BIC ${full.bic}` : ""}` : `PayPal ${full.email}`}
+      </div>
+    </details>
   );
 }

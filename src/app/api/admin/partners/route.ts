@@ -34,6 +34,8 @@ export async function POST(req: Request) {
         commissionPct,
         region,
         notes: get("notes", 2000) || undefined,
+        // Who can sign in to the partner dashboard: one email per line or comma.
+        logins: [...new Set(get("logins", 1000).split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter((e) => /^\S+@\S+\.\S+$/.test(e)))].slice(0, 10),
       };
       await savePartner(p);
       return back(p.id, existing ? "Saved" : "Partner added");
@@ -87,7 +89,7 @@ export async function POST(req: Request) {
     }
     if (action === "invoice") {
       const r = await invoiceTradeBatch(p, get("batch", 40));
-      return back(p.id, `Invoice for ${r.total} ${r.currency.toUpperCase()} sent by Stripe to ${p.contactEmail}`);
+      return back(p.id, `Invoice for ${r.total} ${r.currency.toUpperCase()} sent by Stripe to ${r.to}`);
     }
     if (action === "payout") {
       const amount = num("amount");

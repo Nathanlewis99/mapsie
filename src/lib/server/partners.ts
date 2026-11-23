@@ -91,14 +91,20 @@ export async function issueTradeCodes(p: Partner, count: number, value: number, 
 
 /** Send the partner a Stripe invoice for a batch of trade codes (Stripe emails it, payable by card or bank transfer). */
 export async function invoiceTradeBatch(p: Partner, batch: string) {
-  if (!p.contactEmail) throw new Error("Add the partner's contact email first");
+  const to = p.billing?.invoiceEmail ?? p.contactEmail;
+  if (!to) throw new Error("Add the partner's contact email first");
   const cards = (await listGiftCards(5000)).filter((g) => g.tradeBatch === batch);
   if (!cards.length) throw new Error("No codes in that batch");
   const { amount, currency } = cards[0];
   const unit = tradePrice(amount, cards.length);
   const s = stripe();
-  const existing = await s.customers.list({ email: p.contactEmail, limit: 1 });
-  const customer = existing.data[0] ?? (await s.customers.create({ email: p.contactEmail, name: p.name, metadata: { partnerId: p.id } }));
+  const existing = await s.customers.list({ email: to, limit: 1 });
+  const details = {
+    name: p.billing?.company ?? p.name,
+    ...(p.billing?.address ? { address: { line1: p.billing.address.split("\n")[0].slice(0, 200), line2: p.billing.address.split("\n").slice(1).join(", ").slice(0, 200) || undefined } } : {}),
+    metadata: { partnerId: p.id, ...(p.billing?.vatNumber ? { vatNumber: p.billing.vatNumber } : {}) },
+  };
+  const customer = existing.data[0] ? await s.customers.update(existing.data[0].id, details) : await s.customers.create({ email: to, ...details });
   const invoice = await s.invoices.create(
     { customer: customer.id, collection_method: "send_invoice", days_until_due: 14, currency, metadata: { partnerId: p.id, tradeBatch: batch }, description: `${cards.length} Mapsie print codes worth ${amount} each, for ${p.name}.` },
     { idempotencyKey: `trade-invoice-${batch}` },
@@ -109,7 +115,11 @@ export async function invoiceTradeBatch(p: Partner, batch: string) {
   );
   const final = await s.invoices.finalizeInvoice(invoice.id!);
   await s.invoices.sendInvoice(final.id!);
-  return { url: final.hosted_invoice_url, total: (final.total ?? 0) / 100, currency };
+  const result = { url: final.hosted_invoice_url, total: (final.total ?? 0) / 100, currency };
+  // So the partner can find it again in their dashboard.
+  const fresh = (await getPartner(p.id)) ?? p;
+  await savePartner({ ...fresh, invoices: [...(fresh.invoices ?? []).filter((i) => i.batch !== batch), { batch, ...result, at: new Date().toISOString() }] });
+  return { ...result, to };
 }
 
 export interface PartnerStats {
@@ -118,6 +128,8 @@ export interface PartnerStats {
   byCurrency: Record<string, { sales: number; commission: number; paidOut: number }>;
   tradeCodes: { issued: number; redeemed: number; batches: { batch: string; count: number; value: number; currency: string; redeemed: number; at: string }[] };
   recent: Order[];
+  /** Every credited order, without customer details (safe to show the partner). */
+  all: { createdAt: string; total: number; currency: string; via: NonNullable<Order["partnerVia"]>; commission: number }[];
 }
 
 const PAID: Order["status"][] = ["paid", "rendering", "ready", "submitted", "shipped", "delivered"];
@@ -125,13 +137,17 @@ const PAID: Order["status"][] = ["paid", "rendering", "ready", "submitted", "shi
 export async function partnerStats(p: Partner, orders?: Order[], cards?: GiftCard[]): Promise<PartnerStats> {
   const mine = (orders ?? (await listOrders())).filter((o) => o.partnerId === p.id && PAID.includes(o.status));
   const byCurrency: PartnerStats["byCurrency"] = {};
+  const all: PartnerStats["all"] = [];
   for (const o of mine) {
     const c = (byCurrency[o.currency] ??= { sales: 0, commission: 0, paidOut: 0 });
     const delivery = o.digital ? 0 : (SHIPPING.find((s) => s.id === o.shipping)?.price[o.region] ?? 0);
     c.sales += Math.max(0, o.total - delivery);
     // Orders paid with a prepaid trade code earn nothing more: the partner bought the code at trade price.
-    if (o.partnerVia !== "trade") c.commission += commissionFor(p, o.total, delivery);
+    const commission = o.partnerVia === "trade" ? 0 : commissionFor(p, o.total, delivery);
+    c.commission += commission;
+    all.push({ createdAt: o.createdAt, total: o.total, currency: o.currency, via: o.partnerVia ?? "link", commission });
   }
+  all.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   for (const pay of p.payouts ?? []) (byCurrency[pay.currency] ??= { sales: 0, commission: 0, paidOut: 0 }).paidOut += pay.amount;
   for (const c of Object.values(byCurrency)) for (const k of ["sales", "commission", "paidOut"] as const) c[k] = Math.round(c[k] * 100) / 100;
   const trade = (cards ?? (await listGiftCards(5000))).filter((g) => g.partnerId === p.id && g.tradeBatch);
@@ -146,6 +162,7 @@ export async function partnerStats(p: Partner, orders?: Order[], cards?: GiftCar
     orders: mine.length,
     byCurrency,
     tradeCodes: { issued: trade.length, redeemed: trade.filter((g) => g.status === "redeemed").length, batches: [...batches.values()].sort((a, b) => b.at.localeCompare(a.at)) },
-    recent: mine.slice(0, 20),
+    recent: [...mine].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 20),
+    all,
   };
 }

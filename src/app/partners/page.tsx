@@ -8,7 +8,7 @@ import EnquiryForm from "./EnquiryForm";
 
 export const metadata: Metadata = {
   title: "Mapsie for Business: Map Prints for Tour Operators, Events & Gifting",
-  description: "Give your customers a map print of their trip, challenge or new home. Pre-drawn routes, commission on every sale, or prepaid codes at trade prices.",
+  description: "Give your customers a map print of their trip, challenge or new home. Pre-drawn routes, commission on every sale, or gift cards and prepaid codes at trade prices.",
   alternates: { canonical: "/partners" },
 };
 
@@ -47,6 +47,17 @@ const SEGMENTS = [
     image: "/partners/wedding.webp",
   },
   {
+    id: "shop",
+    title: "Gift & souvenir shops",
+    lead: "The souvenir that's actually about their trip.",
+    points: [
+      "Mapsie gift cards for your counter: visitors buy one, then map their whole holiday at home",
+      "Bought from us at trade prices; you set the shelf price",
+      "Printed, ready-to-sell cards with a QR code. We post them, or you print your own",
+    ],
+    image: "/partners/shop.webp",
+  },
+  {
     id: "corporate",
     title: "Corporate & client gifts",
     lead: "A gift that's actually personal.",
@@ -63,6 +74,7 @@ const FAQ_ITEMS = [
   { q: "How does commission work?", a: "You get your own page and links (mapsie.shop/with/your-name) and, if you like, a discount code for your customers. Every order that comes through them earns you 10% of what the customer pays for the print, paid monthly by bank transfer. There's no cost to join." },
   { q: "What are prepaid codes?", a: `You buy codes in advance at a trade price and hand them out: in a finisher pack, a thank-you email or a client gift. Each code works like a gift card for any print. Trade prices are ${tradeDiscountPct(1)}% off, ${tradeDiscountPct(10)}% off for 10 or more and ${tradeDiscountPct(50)}% off for 50 or more, and we invoice you.` },
   { q: "Can you draw our route for us?", a: "Yes. Send us your itinerary or route (a list of stops, a GPX file or a map link) and we'll set it up in the style you choose. Your customers can still change anything." },
+  { q: "How do gift cards work for shops?", a: "You buy cards from us at a trade price and sell them at whatever price you like. Each card has its own code and a QR code; your customer designs their map at home, enters the code at checkout and we deliver the print. Cards are valid for 2 years, and you can see how many have been used in your partner dashboard." },
   { q: "Where do you deliver?", a: "Prints are made to order and delivered free in the UK, the US and Australia, framed or unframed. Digital files are available everywhere." },
   { q: "Does it carry our branding?", a: "Your page is co-branded with your name. The print itself is about your customer's journey, so it has no logos unless they add one." },
 ];
@@ -72,7 +84,10 @@ export default function PartnersPage() {
     <div className="min-h-dvh overflow-x-hidden">
       <header className="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
         <Link href="/" className="font-display text-3xl font-extrabold"><Logo /></Link>
-        <a href="#talk" className="rounded-full bg-ink text-white px-5 py-2.5 font-extrabold hover:bg-ink/85">Talk to us</a>
+        <div className="flex items-center gap-4">
+          <Link href="/partner/signin" className="text-sm font-bold hover:text-coral-dark">Partner sign in</Link>
+          <a href="#talk" className="rounded-full bg-ink text-white px-5 py-2.5 font-extrabold hover:bg-ink/85">Talk to us</a>
+        </div>
       </header>
       <main>
         <section className="max-w-4xl mx-auto px-6 pt-6 pb-12 text-center">

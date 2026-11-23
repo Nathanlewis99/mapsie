@@ -1,4 +1,4 @@
-import { AbsoluteFill, Easing, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import type { ReelConfig } from "./reels";
 
 export interface RouteData { width: number; height: number; title: string; subtitle: string; legs: number[][][]; stops: { name: string; mode: string }[] }
@@ -66,9 +66,23 @@ export const RouteReel: React.FC<{ reel: ReelConfig; data: RouteData | null }> =
   const end = interpolate(frame, [T.end[0], T.end[0] + 12], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const stroke = Math.max(3, reel.routeWidth * (data.width / 100) * s * 1.05);
 
+  // When each stop appears: invert the ease-in-out used for the drawing (y -> t).
+  const unease = (y: number) => (y < 0.5 ? Math.sqrt(y / 2) : 1 - Math.sqrt((1 - y) / 2));
+  const stopFrames = reachedAt.map((r) => Math.round(T.draw[0] + unease(r) * (T.draw[1] - T.draw[0])));
+
   return (
     <AbsoluteFill style={{ background: CREAM, fontFamily: "Nunito, sans-serif", color: INK }}>
       <style>{fonts}</style>
+      {/* Sound: our own music bed (design/video/sound.py), a pop per stop, a whoosh for the reveal */}
+      <Audio src={staticFile("audio/music.wav")} volume={0.85} />
+      {stopFrames.map((f, i) => (
+        <Sequence key={i} from={f} durationInFrames={12}>
+          <Audio src={staticFile("audio/pop.wav")} volume={0.55} />
+        </Sequence>
+      ))}
+      <Sequence from={T.reveal[0] - 8} durationInFrames={30}>
+        <Audio src={staticFile("audio/whoosh.wav")} volume={0.5} />
+      </Sequence>
 
       {/* Hook, inside the safe area (clear of the top bar) */}
       <div style={{ position: "absolute", top: 285, left: 70, right: 70, textAlign: "center", fontFamily: "Playfair, serif", fontWeight: 800, fontSize: 62, lineHeight: 1.12, opacity: hookIn * (1 - room), transform: `translateY(${(1 - hookIn) * 30}px)` }}>

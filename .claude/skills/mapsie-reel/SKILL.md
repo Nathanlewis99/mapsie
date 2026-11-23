@@ -36,6 +36,8 @@ This writes `design/video/public/maps/<slug>-base.png`, `-full.png` and `.json`.
 - Check that nothing important sits in the top 14% or the bottom 35% of the frame, where Instagram puts its buttons.
 - Render the video: `npx remotion render <Id> out/<Id>.mp4 --concurrency=4 --crf=20`. It takes about 20 seconds.
 
+Sound is built in: `design/video/sound.py` makes our own music bed, stop "pops" and the reveal whoosh (no samples, so no licensing). Instagram's API can't add in-app music, so Reels go out with this track. Re-run it to change the music.
+
 ## 4. Caption
 
 - Write it with the **ig-caption** skill: a concrete first line, one ask ("link in bio"), and three hashtags placed after the text.

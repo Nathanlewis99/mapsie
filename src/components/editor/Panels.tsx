@@ -254,6 +254,7 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
               }
               if (e.key === "Escape") setQ("");
             }}
+            id="stop-search"
             placeholder="Search a place, or paste coordinates"
             className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral"
           />

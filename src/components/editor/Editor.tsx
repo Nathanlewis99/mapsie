@@ -176,6 +176,24 @@ export default function Editor() {
     setBusy("");
   };
 
+  /** From the start card on an empty map: open the Trip panel and focus the right box, or load an example. */
+  const startWith = (how: "describe" | "search" | "example") => {
+    setTab("trip");
+    if (how === "example") {
+      const pick = TEMPLATES[Math.floor(Math.random() * TEMPLATES.length)];
+      useEditor.getState().applyTemplate(pick);
+      setToast("Here's an example: swap in your own stops, style and photos.");
+      return;
+    }
+    // On a phone, open the panel far enough that the box and the keyboard both fit.
+    if (sheet === "peek") setSheet("half");
+    setTimeout(() => {
+      const el = ((how === "describe" && document.getElementById("describe-trip")) || document.getElementById("stop-search")) as HTMLElement | null;
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      el?.focus();
+    }, 150);
+  };
+
   /** Save to the signed-in user's account (sends them to sign in first if needed). */
   const save = async () => {
     if (!me?.user) {
@@ -521,12 +539,12 @@ export default function Editor() {
               <Icon name="wall" />
               <span className="hidden lg:inline">On the wall</span>
             </button>
-            <button title="Share a link" className={textBtn} onClick={share} disabled={!!busy || !design.stops.length}>
+            <button title="Share a link" className={textBtn.replace("inline-flex", "hidden sm:inline-flex")} onClick={share} disabled={!!busy || !design.stops.length}>
               <Icon name="share" />
               <span className="hidden lg:inline">{busy === "share" ? "Sharing…" : "Share"}</span>
             </button>
             {!etsy && (
-              <button title="Email this design to yourself" className={textBtn} onClick={() => setEmailOpen(true)} disabled={!design.stops.length}>
+              <button title="Email this design to yourself" className={textBtn.replace("inline-flex", "hidden sm:inline-flex")} onClick={() => setEmailOpen(true)} disabled={!design.stops.length}>
                 <span aria-hidden className="text-base leading-none">✉️</span>
                 <span className="hidden lg:inline">Email me</span>
               </button>
@@ -677,6 +695,7 @@ export default function Editor() {
                 <button title="Fit the poster" aria-label="Fit the poster" className="w-10 h-10 hover:bg-ink/5 border-t border-ink/10 text-sm" onClick={() => setZoom({ k: 1, x: 0, y: 0 })}>⤢</button>
               </div>
             )}
+            {design.stops.length > 0 && (
             <button
               onClick={() => {
                 setLocked((v) => !v);
@@ -687,6 +706,7 @@ export default function Editor() {
             >
               {locked ? "🔒 Framing locked" : "🔓 Lock framing"}
             </button>
+            )}
           </div>
 
           {roadsLoading > 0 && (
@@ -927,9 +947,15 @@ export default function Editor() {
             </div>
           )}
 
-          {design.stops.length === 0 && tab === "trip" && (
-            <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/95 px-4 sm:px-5 py-2 sm:py-2.5 shadow-lg text-xs sm:text-sm font-bold animate-bounce whitespace-nowrap">
-              👉 Pick a trip or add your first stop
+          {design.stops.length === 0 && (
+            <div className="absolute inset-x-3 top-1/2 -translate-y-1/2 z-10 mx-auto max-w-sm rounded-3xl bg-white/95 backdrop-blur p-5 shadow-2xl text-center">
+              <div className="font-display text-xl sm:text-2xl font-extrabold">Where did you go?</div>
+              <p className="mt-1 text-sm text-ink/60">Add your stops and we&apos;ll draw your route. It takes about a minute.</p>
+              <div className="mt-4 grid gap-2">
+                <button className="rounded-full bg-coral px-5 py-3 font-extrabold text-white shadow-lg shadow-coral/30" onClick={() => startWith("describe")}>✨ Describe your trip</button>
+                <button className="rounded-full border-2 border-ink/15 px-5 py-2.5 font-extrabold" onClick={() => startWith("search")}>📍 Add your first stop</button>
+                <button className="text-sm font-bold text-ink/60 underline py-1" onClick={() => startWith("example")}>or start from an example trip</button>
+              </div>
             </div>
           )}
           {toast && (

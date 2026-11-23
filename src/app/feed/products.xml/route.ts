@@ -28,7 +28,7 @@ export function GET(req: Request) {
   <g:description>${esc(f.description)}</g:description>
   <g:link>${esc(f.link)}</g:link>
   <g:image_link>${SITE}/examples/${f.image}.webp</g:image_link>
-  <g:additional_image_link>${SITE}/examples/your-photos.webp</g:additional_image_link>
+${f.image === "your-photos" ? "" : `  <g:additional_image_link>${SITE}/examples/your-photos.webp</g:additional_image_link>\n`}
   <g:availability>in_stock</g:availability>
   <g:condition>new</g:condition>
   <g:price>${f.price.toFixed(2)} ${cur}</g:price>

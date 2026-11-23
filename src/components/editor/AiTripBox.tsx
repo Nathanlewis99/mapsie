@@ -168,6 +168,7 @@ export default function AiTripBox({ onTrip, replacing }: { onTrip: (t: TripTempl
       <div className="text-sm font-extrabold">✨ Describe your trip</div>
       <div className="relative">
         <textarea
+          id="describe-trip"
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && (e.metaKey || e.ctrlKey) && go()}

@@ -5,7 +5,7 @@ import { classifyChannel, cleanAttribution } from "@/lib/channels";
 import { nanoid } from "nanoid";
 import Stripe from "stripe";
 import { getDesign, saveDesign, saveOrder, type Order } from "@/lib/server/db";
-import { describeOptions, FRAMES, GLAZES, getRegion, itemPrice, MOUNTS, PAPERS, PRODUCTS, SHIPPING, type PrintOptions, type RegionId, type ShippingId } from "@/lib/products";
+import { allowedOptions, describeOptions, FRAMES, GLAZES, getRegion, itemPrice, MOUNTS, PAPERS, PRODUCTS, SHIPPING, type PrintOptions, type RegionId, type ShippingId } from "@/lib/products";
 import { normalizeDesign } from "@/lib/types";
 import { currentUser } from "@/lib/server/auth";
 import { partnerForCheckout } from "@/lib/server/partners";
@@ -20,14 +20,14 @@ export async function POST(req: Request) {
   // Size, frame and paper can still be changed at checkout. Only known values are accepted.
   const o = body.options ?? {};
   const pick = <T extends { id: string }>(list: T[], v: unknown, fallback: T["id"]) => (list.some((x) => x.id === v) ? (v as T["id"]) : fallback);
-  const chosen = {
+  const chosen = allowedOptions({
     format: o.format === "digital" ? ("digital" as const) : ("print" as const),
     productId: pick(PRODUCTS, o.productId, design.productId),
     frame: pick(FRAMES, o.frame, design.frame),
     paper: pick(PAPERS, o.paper, design.paper),
     mount: pick(MOUNTS, o.mount, design.mount),
     glaze: pick(GLAZES, o.glaze, design.glaze),
-  };
+  });
   if (Object.entries(chosen).some(([k, v]) => (design[k as keyof typeof chosen] ?? (k === "format" ? "print" : undefined)) !== v)) {
     // Keep shared snapshots unchanged: the order gets its own copy.
     design = { ...design, ...chosen, id: nanoid(10) };

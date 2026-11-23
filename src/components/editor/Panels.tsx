@@ -384,6 +384,11 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
           <Toggle on={design.route.show} onChange={(v) => set({ route: { ...design.route, show: v } })} label="Draw the route" />
           <Toggle disabled={!routeOn} hint="Turn on “Draw the route” first" on={design.route.modeIcons} onChange={(v) => set({ route: { ...design.route, modeIcons: v } })} label="Show ✈️ 🚗 🚆 icons on legs" />
           <div className={`pl-1 pb-2 space-y-1 ${!routeOn || !design.route.modeIcons ? "opacity-40 pointer-events-none" : ""}`}>
+            <Slider label="Icon size" value={design.route.iconSize ?? 1} min={0.5} max={2} step={0.05} onChange={(v) => set({ route: { ...design.route, iconSize: v } }, "iconSize")} />
+            <p className="text-xs text-ink/50">Tip: tap an icon on the map to change that leg&apos;s transport, size it, or hide it.</p>
+            {design.stops.some((s) => s.hideIcon) && (
+              <button onClick={() => set({ stops: design.stops.map((s) => ({ ...s, hideIcon: undefined })) })} className="text-xs font-bold text-coral-dark underline">Show hidden icons again</button>
+            )}
             <div className="text-xs font-bold text-ink/50">Icon style (pick each leg&apos;s vehicle with ▾ in your stops)</div>
             <Chips
               disabled={!routeOn || !design.route.modeIcons}
@@ -1091,10 +1096,20 @@ export function TextPanel() {
           onChange={(v) => set({ layout: v })}
         />
         {design.layout === "none" && <p className="text-xs text-ink/60 font-semibold mt-2">The whole print is map. Pick another layout to bring the title back.</p>}
+        {design.layout === "band" && (
+          <div className="mt-3">
+            <Slider label="Space for the title" value={tx.bandSize ?? 1} min={0.3} max={2} step={0.05} onChange={(v) => setText({ bandSize: v }, "bandSize")} />
+            <p className="text-xs text-ink/50 mt-1">Less makes the map taller (it never overlaps the text).</p>
+          </div>
+        )}
         {design.layout === "border" && (
           <div className="mt-3">
             <Slider label="Border width" value={tx.borderSize ?? 1} min={0.3} max={3} step={0.05} onChange={(v) => setText({ borderSize: v }, "borderSize")} />
             <p className="text-xs text-ink/50 mt-1">Narrower makes the map bigger; wider gives it more of a mount.</p>
+            <div className="mt-3">
+              <Slider label="Space for the title" value={tx.bandSize ?? 1} min={0.3} max={2} step={0.05} onChange={(v) => setText({ bandSize: v }, "bandSize")} />
+              <p className="text-xs text-ink/50 mt-1">Less brings the bottom of the map closer to the title (it never overlaps the text).</p>
+            </div>
           </div>
         )}
         {design.layout === "overlay" && (

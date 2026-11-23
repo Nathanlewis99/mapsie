@@ -2,7 +2,7 @@ import { printToken } from "./printToken";
 import path from "path";
 import { promises as fs } from "fs";
 import type { Design } from "../types";
-import { posterAspect, printPixels, PRINT_DPI } from "../products";
+import { posterAspect, printDpi, printPixels } from "../products";
 import { rendersDir } from "./db";
 import { internalUrl } from "./urls";
 
@@ -74,13 +74,13 @@ export async function renderDesign(design: Design, fileName: string, opts: Rende
     const out = path.join(await rendersDir(), fileName);
     await sharp({ create: { width, height, channels: 4, background: "#ffffff" } })
       .composite(strips)
-      .withMetadata({ density: PRINT_DPI })
+      .withMetadata({ density: printDpi(design.productId) })
       .png({ compressionLevel: 6 })
       .toFile(out);
 
-    const mapDpi = Math.round(Math.min(1, glMax / Math.max(width, height)) * PRINT_DPI);
+    const mapDpi = Math.round(Math.min(1, glMax / Math.max(width, height)) * printDpi(design.productId));
     const stat = await fs.stat(out);
-    return { file: fileName, width, height, dpi: PRINT_DPI, mapDpi, bytes: stat.size };
+    return { file: fileName, width, height, dpi: printDpi(design.productId), mapDpi, bytes: stat.size };
   } finally {
     await browser.close();
   }

@@ -1,4 +1,5 @@
 "use client";
+import { MODES } from "@/lib/geo";
 import { crowdedStickers, crowding, tidyDesign } from "@/lib/legibility";
 import { personaliseTrip, type PublicPartner } from "@/lib/partners";
 import { TEMPLATES } from "@/lib/templates";
@@ -467,6 +468,11 @@ export default function Editor() {
     return new Set(crowding(design).flat()).size + crowdedStickers(design).length;
   }, [design]);
 
+  // A tapped transport icon: the stop its leg leads to.
+  const [selectedLeg, setSelectedLeg] = useState<string | null>(null);
+  const legStop = design.stops.find((s) => s.id === selectedLeg);
+  const legIndex = design.stops.findIndex((s) => s.id === selectedLeg);
+
   // Stops outside the printed map area (e.g. after zooming in to tidy a detail).
   const [offFrame, setOffFrame] = useState<string[]>([]);
   const [offWarn, setOffWarn] = useState(false);
@@ -677,12 +683,13 @@ export default function Editor() {
                 fitRequest={fitRequest}
                 handlers={{
                   onView: (view) => store.setView(view),
+                  onLegSelect: (id) => (store.select(null), setSelectedLeg(id)),
                   onOffFrame: (names) => setOffFrame((prev) => (prev.join("|") === names.join("|") ? prev : names)),
                   onStopMove: (id, lng, lat) => store.updateStop(id, { lng, lat }),
                   onStickerMove: (id, lng, lat) => store.updateSticker(id, { lng, lat }),
                   onStickerChange: (id, patch) => store.updateSticker(id, patch),
-                  onStickerSelect: (id) => store.select(id),
-                  onLabelSelect: (id) => store.selectLabel(id),
+                  onStickerSelect: (id) => (setSelectedLeg(null), store.select(id)),
+                  onLabelSelect: (id) => (setSelectedLeg(null), store.selectLabel(id)),
                   onLabelChange: (id, patch) => store.updateStop(id, patch),
                   onTextMove: (which, o) => store.set({ text: { ...useEditor.getState().design.text, [which === "title" ? "titleOffset" : "subtitleOffset"]: o } }),
                   onDropSticker: (payload, lng, lat) => {
@@ -860,6 +867,27 @@ export default function Editor() {
             </div>
           )}
 
+          {legStop && legIndex > 0 && !sel && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 rounded-full bg-ink text-white px-2 py-1.5 shadow-xl text-sm font-bold max-w-[96%] overflow-x-auto">
+              <span className="px-2 whitespace-nowrap opacity-80">{design.stops[legIndex - 1].name} → {legStop.name}</span>
+              {MODES.map((m) => (
+                <button
+                  key={m.id}
+                  title={m.label}
+                  onClick={() => store.updateStop(legStop.id, { arriveBy: m.id, vehicle: undefined })}
+                  className={`w-8 h-8 shrink-0 grid place-items-center rounded-full ${(legStop.arriveBy ?? "plane") === m.id ? "bg-coral" : "hover:bg-white/15"}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={m.icon} alt={m.label} className="w-5 h-5" />
+                </button>
+              ))}
+              <span className="w-px h-5 bg-white/20 mx-1 shrink-0" />
+              <button title="Smaller" className="w-8 h-8 shrink-0 rounded-full hover:bg-white/15" onClick={() => store.updateStop(legStop.id, { iconScale: Math.max(0.4, +((legStop.iconScale ?? 1) - 0.15).toFixed(2)) }, `iconScale-${legStop.id}`)}>−</button>
+              <button title="Bigger" className="w-8 h-8 shrink-0 rounded-full hover:bg-white/15" onClick={() => store.updateStop(legStop.id, { iconScale: Math.min(2.5, +((legStop.iconScale ?? 1) + 0.15).toFixed(2)) }, `iconScale-${legStop.id}`)}>+</button>
+              <button title="Hide this icon" className="px-3 py-1 shrink-0 rounded-full hover:bg-white/15" onClick={() => (store.updateStop(legStop.id, { hideIcon: true }), setSelectedLeg(null), setToast("Icon hidden. Bring it back under Trip → Route."))}>Hide</button>
+              <button className="px-3 py-1 shrink-0 rounded-full hover:bg-white/15 opacity-70" onClick={() => setSelectedLeg(null)}>Done</button>
+            </div>
+          )}
           {sel && (
             <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-full bg-ink text-white px-2 py-1.5 shadow-xl text-sm font-bold max-w-[96%] overflow-x-auto">
               {sel.kind === "text" && (

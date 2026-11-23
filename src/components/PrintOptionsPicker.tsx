@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { DIGITAL_PRICE, FRAMES, GLAZES, MOUNTS, PAPERS, PRODUCTS, getProduct, money, type PrintOptions, type RegionId } from "@/lib/products";
 
 const Heading = ({ children }: { children: React.ReactNode }) => <div className="text-xs font-bold uppercase tracking-wider text-ink/50 mb-2">{children}</div>;
@@ -19,6 +20,23 @@ export default function PrintOptionsPicker({
   showSizes?: boolean;
 }) {
   const p = getProduct(value.productId);
+  const [moreOpen, setMoreOpen] = useState(false);
+  // Choosing a size also drops options Prodigi doesn't make at that size (frames, some papers).
+  const pickSize = (id: string) => {
+    const x = getProduct(id);
+    onChange({ productId: id, ...(x.unframed && value.frame !== "none" ? { frame: "none" as const } : {}), ...(x.papers && !x.papers.includes(value.paper) ? { paper: "ema" as const } : {}) });
+  };
+  const sizeRow = (x: (typeof PRODUCTS)[number]) => (
+    <button key={x.id} onClick={() => (pickSize(x.id), setMoreOpen(false))} className={`flex w-full items-center justify-between gap-3 px-4 py-3 ${card(value.productId === x.id)}`}>
+      <span className="font-bold text-left">
+        {x.label}
+        {sizeNote?.(x.id) && <span className={`block text-[11px] font-extrabold ${sizeNote(x.id) === "Recommended" ? "text-sea" : "text-coral-dark"}`}>{sizeNote(x.id)}</span>}
+        {x.unframed && !digital && <span className="block text-[11px] font-bold text-ink/45">Poster only (no frame)</span>}
+      </span>
+      <span className="text-sm text-ink/50">{x.widthCm} × {x.heightCm} cm</span>
+      <span className="font-extrabold">{money(region, digital ? DIGITAL_PRICE[region] : x.price[region])}</span>
+    </button>
+  );
   const framed = value.frame !== "none";
   const fp = p.framePrice[region];
   // Prodigi's A-size frames only use Matte art.
@@ -44,19 +62,23 @@ export default function PrintOptionsPicker({
         <div>
           <Heading>Print size</Heading>
           <div className="space-y-2">
-            {PRODUCTS.map((x) => (
-              <button key={x.id} onClick={() => onChange({ productId: x.id })} className={`flex w-full items-center justify-between px-4 py-3 ${card(value.productId === x.id)}`}>
-                <span className="font-bold text-left">
-                  {x.label}
-                  {sizeNote?.(x.id) && (
-                    <span className={`block text-[11px] font-extrabold ${sizeNote(x.id) === "Recommended" ? "text-sea" : "text-coral-dark"}`}>{sizeNote(x.id)}</span>
-                  )}
-                </span>
-                <span className="text-sm text-ink/50">{x.widthCm} × {x.heightCm} cm</span>
-                <span className="font-extrabold">{money(region, digital ? DIGITAL_PRICE[region] : x.price[region])}</span>
-              </button>
-            ))}
+            {PRODUCTS.filter((x) => !x.more || x.id === value.productId).map(sizeRow)}
+            <button onClick={() => setMoreOpen(true)} className="w-full rounded-2xl border-2 border-dashed border-ink/15 px-4 py-2.5 text-sm font-extrabold text-ink/70 hover:border-coral">
+              More sizes, up to 100 × 150 cm →
+            </button>
           </div>
+          {moreOpen && (
+            <div className="fixed inset-0 z-50 grid place-items-center bg-ink/40 p-4" onClick={() => setMoreOpen(false)} role="dialog" aria-label="All print sizes">
+              <div className="w-full max-w-lg max-h-[85dvh] overflow-y-auto rounded-3xl bg-cream p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-display text-2xl font-extrabold">All sizes</h3>
+                  <button onClick={() => setMoreOpen(false)} className="w-9 h-9 rounded-full hover:bg-ink/5 text-xl" aria-label="Close">×</button>
+                </div>
+                <p className="text-sm text-ink/60 mt-1">Big statement prints are printed on matte art or German etching paper and rolled in a tube. 60 × 90 cm can also be framed.</p>
+                <div className="mt-4 space-y-2">{PRODUCTS.map(sizeRow)}</div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -65,7 +87,7 @@ export default function PrintOptionsPicker({
         <Heading>Frame</Heading>
         <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
           {FRAMES.map((f) => (
-            <button key={f.id} onClick={() => onChange({ frame: f.id })} className={`p-2 text-center ${card(value.frame === f.id)}`}>
+            <button key={f.id} onClick={() => onChange({ frame: f.id })} disabled={p.unframed && f.id !== "none"} className={`p-2 text-center disabled:opacity-35 disabled:cursor-not-allowed ${card(value.frame === f.id)}`}>
               <div
                 className="mx-auto w-9 h-11 rounded-sm"
                 style={f.id === "none" ? { boxShadow: "inset 0 0 0 1px #0002", background: "#f1e8da" } : { background: f.finish ?? f.color, padding: 4 }}
@@ -92,7 +114,7 @@ export default function PrintOptionsPicker({
               <button
                 key={x.id}
                 onClick={() => onChange({ paper: x.id })}
-                disabled={framed && x.id !== "ema"}
+                disabled={(framed && x.id !== "ema") || (!!p.papers && !p.papers.includes(x.id))}
                 className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left disabled:opacity-40 disabled:cursor-not-allowed ${card(shownPaper === x.id)}`}
               >
                 <span>

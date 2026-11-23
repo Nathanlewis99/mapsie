@@ -24,6 +24,8 @@ export interface MapHandlers {
   onStickerChange?: (id: string, patch: Partial<Sticker>) => void;
   onStickerSelect?: (id: string | null) => void;
   onLabelSelect?: (stopId: string | null) => void;
+  /** A transport icon was tapped: the stop that leg leads to. */
+  onLegSelect?: (stopId: string) => void;
   onLabelChange?: (stopId: string, patch: Partial<Stop>) => void;
   onMapClick?: (lng: number, lat: number) => void;
   onDropSticker?: (src: string, lng: number, lat: number) => void;
@@ -98,6 +100,7 @@ export default function MapView(props: Props) {
   // Set once the map exists, so a "frame the trip" request made before then (a template opened
   // straight from a link) still happens.
   const [mapReady, setMapReady] = useState(false);
+  const [noGl, setNoGl] = useState(false);
   const fitDone = useRef(0);
   const stopMarkers = useRef<Marker[]>([]);
   const stickerMarkers = useRef<Marker[]>([]);
@@ -129,7 +132,15 @@ export default function MapView(props: Props) {
       const d = latest.current;
       // Keep the same framing if the editor is a different width from when the view was saved.
       const zoom = d.view.zoom + Math.log2(widthRef.current / d.view.refWidth);
-      const m = new maplibregl.Map({
+      // Some phones and locked-down browsers can't run WebGL, which the map needs. Say so kindly
+      // instead of showing a blank square (and an error).
+      if (!print && !webglAvailable()) {
+        setNoGl(true);
+        return;
+      }
+      let m: MLMap;
+      try {
+        m = new maplibregl.Map({
         container: el.current,
         style: buildStyle(base, d.theme, { seaTiles: seaContourTiles(), origin: location.origin }),
         center: d.view.center,
@@ -147,7 +158,12 @@ export default function MapView(props: Props) {
         // around 8192px, so the map is drawn at most that size and gently upscaled,
         // while text, stickers and markers (HTML) stay at full resolution.
         ...(print ? { maxCanvasSize: [glMax(), glMax()] as [number, number] } : {}),
-      });
+        });
+      } catch (e) {
+        if (print) throw e;
+        setNoGl(true);
+        return;
+      }
       if (print) {
         // Tell the renderer straight away if WebGL can't start, rather than hanging.
         m.on("error", (e) => {
@@ -254,7 +270,7 @@ export default function MapView(props: Props) {
       if (l.pattern) m.setPaintProperty(l.id, "line-dasharray", l.pattern);
     }
   }
-  const routeKey = JSON.stringify([design.stops.map((s) => [s.lng, s.lat, s.arriveBy, s.vehicle, s.pathFor, s.path?.length]), design.route, design.theme.colors, width]);
+  const routeKey = JSON.stringify([design.stops.map((s) => [s.lng, s.lat, s.arriveBy, s.vehicle, s.pathFor, s.path?.length, s.iconScale, s.hideIcon, s.name]), design.route, design.theme.colors, width, frozen]);
   useEffect(() => {
     syncRoute();
      
@@ -268,10 +284,23 @@ export default function MapView(props: Props) {
         modeMarkers.current = [];
         if (!design.route.show || !design.route.modeIcons) return;
         const c = design.theme.colors;
-        modeMarkers.current = buildLegs(design.stops, design.route.curved).map((leg) => {
+        modeMarkers.current = buildLegs(design.stops, design.route.curved).flatMap((leg, k) => {
+          const to = design.stops[k + 1];
+          if (to?.hideIcon) return [];
           const node = document.createElement("div");
           node.className = "mapsie-mode";
-          node.style.cssText = `--u:${u}px;background:${c.paper};border-color:${c.accent}`;
+          const scale = Math.min(3, Math.max(0.3, (design.route.iconSize ?? 1) * (to?.iconScale ?? 1)));
+          node.style.cssText = `--u:${u}px;--k:${scale};background:${c.paper};border-color:${c.accent}`;
+          // In the editor, tap an icon to change that leg (mode, size, hide).
+          if (editable && to && !frozen) {
+            node.style.pointerEvents = "auto";
+            node.style.cursor = "pointer";
+            node.title = `Leg to ${to.name}: tap to change`;
+            node.addEventListener("click", (e) => {
+              e.stopPropagation();
+              h.current?.onLegSelect?.(to.id);
+            });
+          }
           const iconArt = getArtStyle(design.route.iconArt ?? "cartoon");
           const iconFilter = iconArt.finish !== "none" ? ` style="filter:url(#${filterId(filterPrefix, iconArt.finish)})"` : "";
           node.innerHTML = `<img src="${stickerSrc(leg.vehicle, iconArt.id)}" alt=""${iconFilter} />`;
@@ -291,7 +320,7 @@ export default function MapView(props: Props) {
           const mk = new maplibregl.Marker({ element: node, anchor: "center" }).setLngLat(leg.mid).addTo(mm);
           const remove = mk.remove.bind(mk);
           mk.remove = () => (mm.off("zoom", fit), remove());
-          return mk;
+          return [mk];
         });
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -652,6 +681,20 @@ export default function MapView(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fitRequest, mapReady]);
 
+  if (noGl)
+    return (
+      <div style={{ width: mapWidth, height, background: design.theme.colors.water }} className="grid place-items-center p-6 text-center">
+        <div className="max-w-xs rounded-2xl bg-white/95 p-4 shadow-lg text-sm" style={{ color: "#1f2430" }}>
+          <div className="text-2xl">🗺️</div>
+          <div className="mt-1 font-extrabold">This browser can&apos;t show the map</div>
+          <p className="mt-1 text-ink/70">
+            It needs graphics features this browser has switched off. Try opening mapsie.shop in Chrome or Safari, updating your browser, or turning on
+            &ldquo;hardware acceleration&rdquo; in its settings. In an app like Facebook or Instagram, tap ⋯ and choose &ldquo;Open in browser&rdquo;.
+          </p>
+        </div>
+      </div>
+    );
+
   return (
     <div
       ref={el}
@@ -902,5 +945,15 @@ function textEffect(st: Sticker, ink: string) {
       const g = `0 0 ${0.12 * k}em ${rgba(col, 0.85)}, 0 0 ${0.35 * k}em ${rgba(col, 0.6)}`;
       return { css: `text-shadow:${g};`, svgStroke: { color: rgba(col, 0.8), width: 0.08 * k }, svgFilter: "" };
     }
+  }
+}
+
+/** Can this browser draw the map at all? (WebGL, which MapLibre needs.) */
+function webglAvailable() {
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
   }
 }

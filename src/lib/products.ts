@@ -49,6 +49,12 @@ export interface Product {
   price: Record<RegionId, number>;
   framePrice: Record<RegionId, number>;
   sizeCode: string; // Prodigi size part of the SKU
+  /** Large sizes, shown under "More sizes". */
+  more?: boolean;
+  /** Prodigi doesn't frame it at a sensible cost everywhere: posters only. */
+  unframed?: boolean;
+  /** Papers Prodigi prints at this size (default: all). */
+  papers?: PaperId[];
 }
 
 export const PRODUCTS: Product[] = [
@@ -57,6 +63,14 @@ export const PRODUCTS: Product[] = [
   { id: "a2", label: "A2", widthCm: 42, heightCm: 59.4, price: { GB: 59, US: 79, AU: 115 }, framePrice: { GB: 55, US: 69, AU: 99 }, sizeCode: "A2" },
   { id: "50x70", label: "50 × 70 cm", widthCm: 50, heightCm: 70, price: { GB: 69, US: 89, AU: 129 }, framePrice: { GB: 65, US: 79, AU: 115 }, sizeCode: "20X28" },
   { id: "a1", label: "A1", widthCm: 59.4, heightCm: 84.1, price: { GB: 84, US: 109, AU: 159 }, framePrice: { GB: 80, US: 99, AU: 145 }, sizeCode: "A1" },
+  // Large sizes. Priced from Prodigi's price sheets (print + standard delivery) to keep our usual
+  // margins (~70% unframed, ~50% framed); only papers and frames Prodigi makes at a sensible cost.
+  { id: "60x90", label: "60 × 90 cm", widthCm: 60, heightCm: 90, price: { GB: 89, US: 129, AU: 169 }, framePrice: { GB: 82, US: 89, AU: 179 }, sizeCode: "24X36", more: true, papers: ["ema", "hge"] },
+  { id: "70x100", label: "70 × 100 cm", widthCm: 70, heightCm: 100, price: { GB: 99, US: 139, AU: 199 }, framePrice: { GB: 0, US: 0, AU: 0 }, sizeCode: "28X40", more: true, unframed: true, papers: ["ema", "hge"] },
+  { id: "a0", label: "A0", widthCm: 84.1, heightCm: 118.9, price: { GB: 119, US: 169, AU: 229 }, framePrice: { GB: 0, US: 0, AU: 0 }, sizeCode: "A0", more: true, unframed: true, papers: ["ema", "hge"] },
+  { id: "80x120", label: "80 × 120 cm", widthCm: 80, heightCm: 120, price: { GB: 129, US: 189, AU: 239 }, framePrice: { GB: 0, US: 0, AU: 0 }, sizeCode: "32X48", more: true, unframed: true, papers: ["ema", "hge"] },
+  { id: "90x120", label: "90 × 120 cm", widthCm: 90, heightCm: 120, price: { GB: 139, US: 199, AU: 259 }, framePrice: { GB: 0, US: 0, AU: 0 }, sizeCode: "36X48", more: true, unframed: true, papers: ["ema", "hge"] },
+  { id: "100x150", label: "100 × 150 cm", widthCm: 100, heightCm: 150, price: { GB: 169, US: 229, AU: 279 }, framePrice: { GB: 0, US: 0, AU: 0 }, sizeCode: "40X60", more: true, unframed: true, papers: ["ema", "hge"] },
 ];
 
 /** Prodigi's papers for unframed prints. `extra` is the uplift on the print price. */
@@ -136,8 +150,25 @@ export interface PrintOptions {
   glaze?: GlazeId;
 }
 
+/** The options as Prodigi can actually make them at this size (unframed-only sizes, papers per size). */
+export function allowedOptions<T extends PrintOptions>(o: T): T {
+  const p = getProduct(o.productId);
+  let next = o;
+  if (p.unframed && o.frame !== "none") next = { ...next, frame: "none" };
+  if (p.papers && !p.papers.includes((next.paper ?? "ema") as PaperId)) next = { ...next, paper: "ema" };
+  return next;
+}
+
+/** Print resolution: 300 dpi, a little less for the biggest posters (still sharp at viewing distance). */
+export function printDpi(productId: string) {
+  const p = getProduct(productId);
+  const sqIn = (p.widthCm / 2.54) * (p.heightCm / 2.54);
+  return Math.min(PRINT_DPI, Math.floor(Math.sqrt(72e6 / sqIn) / 10) * 10);
+}
+
 /** Each part of the price, so checkout can show the breakdown. */
-export function priceLines(o: PrintOptions, region: RegionId) {
+export function priceLines(o0: PrintOptions, region: RegionId) {
+  const o = allowedOptions(o0);
   const p = getProduct(o.productId);
   const framed = o.frame !== "none";
   const lines: { label: string; amount: number }[] = [];
@@ -162,7 +193,8 @@ export function itemPrice(o: PrintOptions, region: RegionId) {
 }
 
 /** The Prodigi SKU and attributes for these options. */
-export function prodigiItem(o: PrintOptions) {
+export function prodigiItem(o0: PrintOptions) {
+  const o = allowedOptions(o0);
   const p = getProduct(o.productId);
   if (o.frame === "none") {
     const paper = PAPERS.find((x) => x.id === (o.paper ?? "ema")) ?? PAPERS[0];
@@ -226,6 +258,7 @@ export function printPixels(productId: string, orientation: Orientation) {
   const p = getProduct(productId);
   const w = orientation === "portrait" ? p.widthCm : p.heightCm;
   const h = orientation === "portrait" ? p.heightCm : p.widthCm;
-  const px = (cm: number) => Math.round((cm / 2.54) * PRINT_DPI);
+  const dpi = printDpi(productId);
+  const px = (cm: number) => Math.round((cm / 2.54) * dpi);
   return { width: px(w), height: px(h) };
 }

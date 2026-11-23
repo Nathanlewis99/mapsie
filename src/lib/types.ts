@@ -19,6 +19,9 @@ export interface Stop {
   arriveBy?: TravelMode;
   /** The vehicle sticker drawn on the leg TO this stop, e.g. "steam-train" (default: the mode's own). */
   vehicle?: string;
+  /** Size of that leg's icon (1 = standard), and whether it's hidden. */
+  iconScale?: number;
+  hideIcon?: boolean;
   // Road geometry for car/bus legs, fetched once and stored so prints never re-fetch.
   path?: LngLat[];
   pathFor?: string; // which leg the path was fetched for, so moved stops refetch
@@ -145,7 +148,7 @@ export interface Design {
   // density, so the framing and label sizes match the editor exactly.
   view: { center: LngLat; zoom: number; bearing: number; refWidth: number };
   stops: Stop[];
-  route: { show: boolean; style: RouteStyle; curved: boolean; width: number; modeIcons: boolean; /** Art style of the transport icons. */ iconArt?: ArtStyleId };
+  route: { show: boolean; style: RouteStyle; curved: boolean; width: number; modeIcons: boolean; /** Art style of the transport icons. */ iconArt?: ArtStyleId; /** Size of all the transport icons (1 = standard). */ iconSize?: number };
   markers: { style: MarkerStyle; showDates: boolean; size: number; labelSize: number };
   visited: { show: boolean; opacity: number; /** Each country its own colour (default) rather than all in the route colour. */ multi?: boolean };
   stickers: Sticker[];
@@ -179,6 +182,8 @@ export interface TextStyle {
   titleOffset?: [number, number]; // dragged position, % of poster width
   /** Framed border: width of the paper border round the map (1 = standard). */
   borderSize?: number;
+  /** Height of the title area below the map (1 = standard); never smaller than the text needs. */
+  bandSize?: number;
   /** Full bleed: where the title box sits over the map (left/right follow `align`). */
   overlayPos?: "top" | "middle" | "bottom";
   subtitleOffset?: [number, number];
@@ -219,7 +224,7 @@ export function normalizeDesign(d: Partial<Design> & Pick<Design, "id">): Design
     mount: x.mount && x.mount !== "none" ? "white" : "none",
     glaze: "perspex",
     theme: x.theme && { ...x.theme, hypso: x.theme.hypso ?? false, physical: x.theme.physical ?? false, details: { ...NO_DETAILS, ...(x.theme.details ?? {}) } },
-    route: { show: r.show ?? true, style: r.style ?? "auto", curved: r.curved ?? true, width: r.width ?? 0.45, modeIcons: r.modeIcons ?? true, iconArt: r.iconArt ?? "cartoon" },
+    route: { show: r.show ?? true, style: r.style ?? "auto", curved: r.curved ?? true, width: r.width ?? 0.45, modeIcons: r.modeIcons ?? true, iconArt: r.iconArt ?? "cartoon", ...(r.iconSize ? { iconSize: r.iconSize } : {}) },
     markers: { style: m.style ?? "number", showDates: m.showDates ?? false, size: m.size ?? 1, labelSize: m.labelSize ?? 1 },
     visited: { show: v.show ?? false, opacity: v.opacity ?? 0.35, ...(v.multi !== undefined ? { multi: v.multi } : {}) },
     text: { ...DEFAULT_TEXT, ...(x.text ?? {}) },

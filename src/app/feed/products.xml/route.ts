@@ -42,6 +42,7 @@ ${f.image === "your-photos" ? "" : `  <g:additional_image_link>${SITE}/examples/
   const desc = "Design your own map print of a trip: every stop, the real route between them, stickers and your own photos, in your choice of style. Printed to order at 300 dpi and delivered free.";
   for (const p of PRODUCTS) {
     for (const f of FINISHES) {
+      if (p.unframed && f.frame !== "none") continue; // poster-only sizes
       const price = itemPrice({ productId: p.id, frame: f.frame, paper: "ema", mount: f.mount, glaze: "perspex" } as never, region.id);
       const framed = f.frame !== "none";
       items.push(item({

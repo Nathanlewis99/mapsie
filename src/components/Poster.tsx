@@ -52,7 +52,7 @@ export default function Poster({ design, width, editable = false, print, selecte
     lines(design.title.length, titleFont, width * 0.86) * titleFont * (titleLine + 0.03) +
     (design.subtitle ? u * 2.1 * t.subtitleSize * 1.3 + u : 0) +
     (route ? Math.min(2, lines(route.length, u * 1.5, width * 0.78)) * u * 1.5 * 1.35 + u * 0.9 : 0);
-  const bandH = design.layout === "overlay" || mapOnly ? 0 : Math.max(u * (landscape ? 11 : 17), needed);
+  const bandH = design.layout === "overlay" || mapOnly ? 0 : Math.max(u * (landscape ? 11 : 17) * Math.min(2, Math.max(0.3, t.bandSize ?? 1)), needed);
   const pad = design.layout === "border" ? u * 4.5 * Math.min(3, Math.max(0.3, t.borderSize ?? 1)) : 0;
   const mapW = width - pad * 2;
   const mapH = height - bandH - pad * (design.layout === "border" ? 1 : 0) - pad;

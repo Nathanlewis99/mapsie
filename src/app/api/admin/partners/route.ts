@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import { searchPlaces } from "@/lib/server/geocode";
 import { createPartnerCode, getPartner, invoiceTradeBatch, issueTradeCodes, savePartner } from "@/lib/server/partners";
 import { logError } from "@/lib/server/log";
+import { decideApplication } from "@/lib/server/partnerApply";
 import { publicUrl } from "@/lib/server/urls";
 import { PARTNER_KINDS, parseStopList, slugify, type Partner, type PartnerKind, type PartnerTrip } from "@/lib/partners";
 import { PRESETS } from "@/lib/themes";
@@ -28,7 +29,7 @@ export async function POST(req: Request) {
         id,
         name: get("name", 80) || existing?.name || id,
         kind,
-        active: f.get("active") === "on",
+        active: f.get("active") === "on" && existing?.status !== "pending" && existing?.status !== "denied",
         contactEmail: get("contactEmail", 120) || undefined,
         welcome: get("welcome", 160) || undefined,
         commissionPct,
@@ -44,6 +45,10 @@ export async function POST(req: Request) {
     const p = await getPartner(get("id"));
     if (!p) return back(undefined, "Partner not found");
 
+    if (action === "approve" || action === "deny") {
+      await decideApplication(p.id, action === "approve" ? "approved" : "denied", get("note", 500) || undefined);
+      return back(p.id, action === "approve" ? `${p.name} approved: we've emailed them their dashboard link` : `${p.name} declined: we've emailed them`);
+    }
     if (action === "addTrip") {
       const list = parseStopList(get("stops", 3000));
       if (list.length < 2) return back(p.id, "Add at least two stops, separated by ; (e.g. Land's End; Bristol (car); John o' Groats (car))");

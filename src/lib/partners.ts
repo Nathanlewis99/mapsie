@@ -87,7 +87,64 @@ export interface Partner {
   /** Stripe invoices sent for trade code batches. */
   invoices?: { batch: string; url?: string | null; total: number; currency: string; at: string }[];
   notes?: string;
+  /** Self sign-up: pending until approved in admin. Partners we add ourselves have no status (approved). */
+  status?: "pending" | "approved" | "denied";
+  application?: PartnerApplication;
   createdAt: string;
+}
+
+export interface PartnerApplication {
+  contactName: string;
+  email: string;
+  website: string;
+  message: string;
+  volume?: string;
+  appliedAt: string;
+  checks: PartnerCheck[];
+  recommendation: "approve" | "review" | "deny";
+  decidedAt?: string;
+  decision?: "approved" | "denied";
+  /** A short reason, included in the email if denied. */
+  decisionNote?: string;
+}
+export interface PartnerCheck { ok: boolean | null; label: string }
+
+/** What we found out about an application (see server/partnerApply.ts). */
+export interface ApplicationFacts {
+  website: { reachable: boolean; title?: string; nameOnSite?: boolean; finalHost?: string };
+  duplicateOf?: string;
+}
+
+const FREE_EMAIL = /^(gmail|googlemail|hotmail|outlook|live|msn|yahoo|ymail|icloud|me|mac|aol|proton|protonmail|gmx|mail|zoho|yandex|btinternet|sky|virginmedia|talktalk)\./i;
+export const hostOf = (url: string) => {
+  try {
+    return new URL(/^https?:\/\//i.test(url) ? url : `https://${url}`).hostname.toLowerCase().replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+};
+/** example.co.uk from shop.example.co.uk (good enough for matching an email to a website). */
+export const baseDomain = (host: string) => {
+  const parts = host.toLowerCase().replace(/^www\./, "").split(".");
+  const two = /^(co|org|ac|gov|com|net)\.[a-z]{2}$/.test(parts.slice(-2).join("."));
+  return parts.slice(two ? -3 : -2).join(".");
+};
+
+/** Turn what we found into checks and a recommendation. Pure, so it's easy to test. */
+export function assessApplication(a: { company: string; email: string; website: string }, f: ApplicationFacts): Pick<PartnerApplication, "checks" | "recommendation"> {
+  const emailDomain = a.email.split("@")[1]?.toLowerCase() ?? "";
+  const site = hostOf(a.website);
+  const free = FREE_EMAIL.test(emailDomain);
+  const sameDomain = !!site && baseDomain(emailDomain) === baseDomain(f.website.finalHost || site);
+  const checks: PartnerCheck[] = [
+    { ok: true, label: "Email address confirmed (they clicked the link we sent)" },
+    { ok: sameDomain, label: sameDomain ? `Email is on their website's domain (${baseDomain(emailDomain)})` : free ? `Personal email (${emailDomain}), not on their website's domain` : `Email domain (${emailDomain}) differs from the website (${site || "none"})` },
+    { ok: f.website.reachable, label: f.website.reachable ? `Website is live${f.website.title ? `: “${f.website.title.slice(0, 80)}”` : ""}` : `Website didn't load (${site || "none given"})` },
+    { ok: f.website.reachable ? !!f.website.nameOnSite : null, label: f.website.nameOnSite ? `“${a.company}” appears on the website` : `Couldn't find “${a.company}” on the website's home page` },
+    { ok: !f.duplicateOf, label: f.duplicateOf ? `Same email or domain as existing partner “${f.duplicateOf}”` : "Not a duplicate of an existing partner" },
+  ];
+  const recommendation = f.duplicateOf || !f.website.reachable ? (f.duplicateOf ? "deny" : "review") : sameDomain && f.website.nameOnSite ? "approve" : "review";
+  return { checks, recommendation };
 }
 
 /** Public view of a partner (no commission, contacts or notes). */

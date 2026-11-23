@@ -73,3 +73,34 @@ describe("partner payout details", () => {
     expect(openPayout(sealed.slice(0, -4) + "AAAA")).toBeNull();
   });
 });
+
+import { assessApplication, baseDomain } from "@/lib/partners";
+import { checkWebsite, cleanApplication } from "@/lib/server/partnerApply";
+
+describe("partner applications", () => {
+  const live = { reachable: true, title: "Coast Rides | Cycling holidays", nameOnSite: true, finalHost: "coastrides.co.uk" };
+  it("suggests approving a work email on a live website that names them", () => {
+    const r = assessApplication({ company: "Coast Rides", email: "sam@coastrides.co.uk", website: "https://www.coastrides.co.uk" }, { website: live });
+    expect(r.recommendation).toBe("approve");
+    expect(r.checks.every((c) => c.ok)).toBe(true);
+  });
+  it("asks for a human look at personal emails or dead websites, and declines duplicates", () => {
+    expect(assessApplication({ company: "Coast Rides", email: "sam@gmail.com", website: "coastrides.co.uk" }, { website: live }).recommendation).toBe("review");
+    expect(assessApplication({ company: "Coast Rides", email: "sam@coastrides.co.uk", website: "coastrides.co.uk" }, { website: { reachable: false } }).recommendation).toBe("review");
+    expect(assessApplication({ company: "Coast Rides", email: "sam@coastrides.co.uk", website: "coastrides.co.uk" }, { website: live, duplicateOf: "Coast Rides" }).recommendation).toBe("deny");
+  });
+  it("matches subdomains and UK domains", () => {
+    expect(baseDomain("shop.coastrides.co.uk")).toBe("coastrides.co.uk");
+    expect(baseDomain("mail.example.com")).toBe("example.com");
+  });
+  it("needs a name, a valid email and a website", () => {
+    expect(cleanApplication({ company: "X", contactName: "Y", email: "nope", website: "x.com" })).toBe("Please enter a valid email address.");
+    expect(cleanApplication({ company: "X", contactName: "Y", email: "a@x.com", website: "" })).toMatch(/website/);
+    expect(cleanApplication({ company: " Coast ", contactName: "Sam", email: "Sam@Coast.com", website: "coast.com", kind: "shop" })).toMatchObject({ company: "Coast", email: "sam@coast.com", kind: "shop" });
+  });
+  it("never fetches internal addresses", async () => {
+    for (const u of ["http://localhost:3000", "http://127.0.0.1", "http://169.254.169.254/latest/meta-data", "http://10.0.0.5", "https://example.com:8443", "file:///etc/passwd"]) {
+      expect((await checkWebsite(u, "X")).reachable).toBe(false);
+    }
+  });
+});

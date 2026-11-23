@@ -38,18 +38,20 @@ export default async function PartnersAdmin({ searchParams }: { searchParams: Pr
         {msg && <p className="mt-3 rounded-2xl bg-sand px-4 py-3 font-bold text-sm">{msg}</p>}
       </div>
 
+      {partners.filter((p) => p.status === "pending").map((p) => <Application key={p.id} p={p} />)}
+
       <div className="rounded-3xl bg-white p-4 shadow-sm overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wider text-ink/50">
             <tr>{["Partner", "Type", "Orders", "Sales", "Commission owed", "Trade codes", ""].map((h) => <th key={h} className="px-2 py-2">{h}</th>)}</tr>
           </thead>
           <tbody>
-            {partners.map((p) => {
+            {partners.filter((p) => p.status !== "pending").map((p) => {
               const s = stats.get(p.id)!;
               const cur = Object.entries(s.byCurrency);
               return (
                 <tr key={p.id} className="border-t border-ink/5 align-top">
-                  <td className="px-2 py-2 font-bold">{p.name}{!p.active && <span className="ml-2 text-xs text-ink/40">paused</span>}<div className="text-xs font-mono text-ink/40">{p.id}</div></td>
+                  <td className="px-2 py-2 font-bold">{p.name}{p.status === "denied" ? <span className="ml-2 text-xs text-ink/40">declined</span> : !p.active && <span className="ml-2 text-xs text-ink/40">paused</span>}<div className="text-xs font-mono text-ink/40">{p.id}</div></td>
                   <td className="px-2 py-2">{PARTNER_KINDS.find((k) => k.id === p.kind)?.label}</td>
                   <td className="px-2 py-2">{s.orders}</td>
                   <td className="px-2 py-2">{cur.map(([c, v]) => <div key={c}>{fmt(v.sales, c)}</div>)}</td>
@@ -246,5 +248,39 @@ function PayoutView({ p }: { p: Partner }) {
         {!full ? "Couldn't decrypt (was SESSION_SECRET changed?)" : full.method === "uk_bank" ? `${full.accountName} · sort code ${full.sortCode.replace(/(\d\d)(\d\d)(\d\d)/, "$1-$2-$3")} · account ${full.accountNumber}` : full.method === "iban" ? `${full.accountName} · IBAN ${full.iban}${full.bic ? ` · BIC ${full.bic}` : ""}` : `PayPal ${full.email}`}
       </div>
     </details>
+  );
+}
+
+/** A self sign-up waiting for a decision, with what the automatic checks found. */
+function Application({ p }: { p: Partner }) {
+  const a = p.application!;
+  const tone = { approve: "bg-emerald-100 text-emerald-900", review: "bg-amber-100 text-amber-900", deny: "bg-red-100 text-red-900" }[a.recommendation];
+  return (
+    <section className="rounded-3xl bg-white p-5 shadow-sm ring-2 ring-coral/40 space-y-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-xl font-extrabold">New application: {p.name}</h2>
+        <span className={`rounded-full px-3 py-1 text-xs font-extrabold ${tone}`}>Suggested: {a.recommendation}</span>
+      </div>
+      <p className="text-sm">
+        {a.contactName} · {a.email} · <a className="underline" href={/^https?:/.test(a.website) ? a.website : `https://${a.website}`} target="_blank" rel="noreferrer noopener">{a.website}</a> · {PARTNER_KINDS.find((k) => k.id === p.kind)?.label}
+        {a.volume ? ` · ${a.volume}` : ""} · applied {new Date(a.appliedAt).toLocaleDateString("en-GB")}
+      </p>
+      {a.message && <p className="text-sm rounded-2xl bg-sand/60 px-4 py-3 whitespace-pre-line">{a.message}</p>}
+      <ul className="text-sm space-y-1">
+        {a.checks.map((c) => <li key={c.label}>{c.ok === true ? "✅" : c.ok === false ? "⚠️" : "❔"} {c.label}</li>)}
+      </ul>
+      <div className="flex flex-wrap gap-3 items-start">
+        <form action="/api/admin/partners" method="post">
+          <input type="hidden" name="do" value="approve" /><input type="hidden" name="id" value={p.id} />
+          <button className="rounded-full bg-emerald-700 text-white px-5 py-2 text-sm font-extrabold">Approve</button>
+        </form>
+        <form action="/api/admin/partners" method="post" className="flex flex-wrap gap-2 items-start">
+          <input type="hidden" name="do" value="deny" /><input type="hidden" name="id" value={p.id} />
+          <input name="note" placeholder="Optional reason, included in the email" className={`${input} w-72`} />
+          <button className="rounded-full border-2 border-ink/20 px-5 py-1.5 text-sm font-extrabold">Decline</button>
+        </form>
+      </div>
+      <p className="text-xs text-ink/50">Approving makes their page and links live and emails them a link to their dashboard (10% commission; change it below once approved).</p>
+    </section>
   );
 }

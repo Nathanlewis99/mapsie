@@ -86,7 +86,7 @@ export default function PartnersPage() {
         <Link href="/" className="font-display text-3xl font-extrabold"><Logo /></Link>
         <div className="flex items-center gap-4">
           <Link href="/partner/signin" className="text-sm font-bold hover:text-coral-dark">Partner sign in</Link>
-          <a href="#talk" className="rounded-full bg-ink text-white px-5 py-2.5 font-extrabold hover:bg-ink/85">Talk to us</a>
+          <Link href="/partners/join" className="rounded-full bg-ink text-white px-5 py-2.5 font-extrabold hover:bg-ink/85">Join</Link>
         </div>
       </header>
       <main>
@@ -98,7 +98,7 @@ export default function PartnersPage() {
             We draw your routes once. Your customers personalise and order in minutes, and you earn on every sale.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <a href="#talk" className="rounded-full bg-coral px-7 py-4 text-lg font-extrabold text-white shadow-xl shadow-coral/30 hover:bg-coral-dark">Become a partner →</a>
+            <Link href="/partners/join" className="rounded-full bg-coral px-7 py-4 text-lg font-extrabold text-white shadow-xl shadow-coral/30 hover:bg-coral-dark">Become a partner →</Link>
             <Link href="/create" className="rounded-full border-2 border-ink/15 px-6 py-3.5 font-extrabold hover:border-coral">Try the designer</Link>
           </div>
         </section>
@@ -134,8 +134,8 @@ export default function PartnersPage() {
 
         <section id="talk" className="bg-white/60 border-y border-ink/5">
           <div className="max-w-3xl mx-auto px-6 py-14">
-            <h2 className="font-display text-3xl font-extrabold">Let&apos;s talk</h2>
-            <p className="mt-2 text-ink/70">Tell us a little about what you do. We&apos;ll reply with a sample map of one of your routes.</p>
+            <h2 className="font-display text-3xl font-extrabold">Questions first? Let&apos;s talk</h2>
+            <p className="mt-2 text-ink/70">Ready to go? <Link href="/partners/join" className="font-bold underline">Create your partner account</Link>. Or tell us a little about what you do and we&apos;ll reply with a sample map of one of your routes.</p>
             <EnquiryForm />
           </div>
         </section>

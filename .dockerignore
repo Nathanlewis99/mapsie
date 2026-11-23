@@ -7,3 +7,4 @@ design/activity-art/**/__pycache__
 *.log
 .env*
 services
+design/video

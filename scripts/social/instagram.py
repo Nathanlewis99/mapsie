@@ -17,6 +17,13 @@ def live(f):
     except Exception: return False
 first, last, gap = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
 posts = [p for p in json.load(open(__import__("os").path.join(__import__("os").path.dirname(__file__), "posts.json"))) if first <= p["n"] <= last]
+# Captions are checked with the Instagram skills, and drafts (not yet approved) never go out.
+sys.path.insert(0, __import__("os").path.dirname(__import__("os").path.abspath(__file__)))
+from check import check as _check
+for _p in posts:
+    _ok, _notes = _check(_p)
+    if not _ok:
+        sys.exit(f"post {_p['n']} isn't ready: " + "; ".join(_notes))
 for i, p in enumerate(posts):
     if i: time.sleep(gap)
     for f in (p.get("files") or [p["file"]]) + ([p["cover"]] if p.get("cover") else []):

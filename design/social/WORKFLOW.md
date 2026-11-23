@@ -2,6 +2,17 @@
 
 The skills live in `.claude/skills` and load automatically in Claude Code sessions in this repo. Each skill folder keeps its source's licence; sources are listed at the end.
 
+## The quick way
+
+Ask for "a new Reel about …" and the **mapsie-reel** skill runs the whole recipe:
+- capture a real design;
+- animate the route with Remotion (`design/video`);
+- score the hooks;
+- write and check the caption;
+- queue it as a draft for approval.
+
+`scripts/social/check.py` runs the caption and human-sounding checks automatically before anything is posted, and drafts can't be posted.
+
 ## A Reel or post, start to finish
 
 1. **Plan:** `/ig-plan` builds a week of posts around what's selling (vintage styles, gift cards, Christmas dates). `/mkt-marketing-ideas` helps when we're stuck.

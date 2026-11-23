@@ -535,6 +535,8 @@ export function StylePanel() {
                 </button>
               ))}
             </div>
+            <Toggle on={!!t.details.insetLabels} onChange={(v) => setTheme({ details: { ...t.details, insetLabels: v } })} label="Country names" />
+            <Toggle on={!!t.details.insetRegions} onChange={(v) => setTheme({ details: { ...t.details, insetRegions: v } })} label="States & provinces (lines and names)" />
             <Slider label="Overview size" value={t.details.insetSize ?? 0.3} min={0.18} max={0.45} step={0.01} onChange={(v) => setTheme({ details: { ...t.details, insetSize: v } })} />
             <p className="text-xs text-ink/50">Shows the whole country with your route on it, and a box where the main map is. Great for a trip along one coast.</p>
           </div>

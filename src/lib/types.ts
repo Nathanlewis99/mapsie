@@ -113,6 +113,9 @@ export interface MapDetails {
   insetCorner?: "br" | "bl" | "tr" | "tl";
   /** Width of the overview, as a share of the map's shorter side. */
   insetSize?: number;
+  /** Overview extras: country names; state/province lines and their names. */
+  insetLabels?: boolean;
+  insetRegions?: boolean;
 }
 
 export type CompassStyle = "classic" | "nautical" | "minimal" | "vintage";

@@ -30,6 +30,11 @@ for i, p in enumerate(posts):
         for _ in range(40):
             if live(f): break
             time.sleep(30)
+    # Never post the same thing twice: skip if a recent post already has this caption.
+    recent = call("GET", f"{IG}/media", {"fields": "permalink,caption", "limit": "25"}).get("data", [])
+    dup = next((m for m in recent if (m.get("caption") or "").strip() == p["caption"].strip()), None)
+    if dup:
+        print(f"POST {p['n']} SKIPPED: already on Instagram {dup.get('permalink')}", flush=True); continue
     d = {"caption": p["caption"]}
     if p["type"] == "carousel":
         kids = []
@@ -50,6 +55,16 @@ for i, p in enumerate(posts):
         time.sleep(10)
     if s.get("status_code") != "FINISHED": print(f"POST {p['n']} FAILED processing: {s}", flush=True); continue
     r = call("POST", f"{IG}/media_publish", {"creation_id": cid})
-    if "id" not in r: print(f"POST {p['n']} FAILED publish: {r.get('error',{}).get('message')}", flush=True); continue
+    if "id" not in r:
+        # Instagram sometimes publishes the post and still returns an error (e.g. "Application request
+        # limit reached"). Retrying then makes duplicates, so check before calling it a failure.
+        time.sleep(15)
+        st = call("GET", cid, {"fields": "status_code"})
+        if st.get("status_code") == "PUBLISHED":
+            recent = call("GET", f"{IG}/media", {"fields": "permalink,caption", "limit": "5"}).get("data", [])
+            link = next((m.get("permalink") for m in recent if (m.get("caption") or "").strip() == p["caption"].strip()), "(check the profile)")
+            print(f"POST {p['n']} OK (published despite an API error: {r.get('error',{}).get('message')}) {link}", flush=True)
+            continue
+        print(f"POST {p['n']} FAILED publish: {r.get('error',{}).get('message')} (container status: {st.get('status_code')}; not published, safe to retry)", flush=True); continue
     link = call("GET", r["id"], {"fields": "permalink"}).get("permalink")
     print(f"POST {p['n']} OK {p.get('file') or 'carousel'} {link}", flush=True)

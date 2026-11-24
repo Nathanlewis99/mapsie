@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import FramedPoster, { frameWidth } from "@/components/FramedPoster";
 import WallPreview from "@/components/WallPreview";
+import FullScreenPreview from "@/components/editor/FullScreenPreview";
 import { useEditor } from "@/lib/store";
 import { reverseGeocode } from "@/lib/geo";
 import { FRAMES, itemPrice, MOUNTS, money, posterAspect, PRODUCTS, REGIONS } from "@/lib/products";
@@ -475,6 +476,9 @@ export default function Editor() {
 
   // Stops outside the printed map area (e.g. after zooming in to tidy a detail).
   const [offFrame, setOffFrame] = useState<string[]>([]);
+  // The trip only fills a small part of the map: fitting would zoom in to it.
+  const [loose, setLoose] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
   const [offWarn, setOffWarn] = useState(false);
   const fitTrip = () => {
     setLocked(false);
@@ -599,7 +603,7 @@ export default function Editor() {
                 <span className="hidden lg:inline">Save a copy</span>
               </button>
             )}
-            <button title="Start a new map" onClick={() => confirm("Start a fresh map? (You can undo this.)") && store.reset()} className={`${textBtn} hidden md:inline-flex`}>
+            <button title="Start a new map" onClick={() => confirm("Start a fresh map? (You can undo this.)") && store.reset()} className={textBtn.replace("inline-flex", "hidden md:inline-flex")}>
               <Icon name="plus" />
               <span className="hidden lg:inline">New</span>
             </button>
@@ -684,7 +688,10 @@ export default function Editor() {
                 handlers={{
                   onView: (view) => store.setView(view),
                   onLegSelect: (id) => (store.select(null), setSelectedLeg(id)),
-                  onOffFrame: (names) => setOffFrame((prev) => (prev.join("|") === names.join("|") ? prev : names)),
+                  onOffFrame: (names, loose) => {
+                    setOffFrame((prev) => (prev.join("|") === names.join("|") ? prev : names));
+                    setLoose(!!loose);
+                  },
                   onStopMove: (id, lng, lat) => store.updateStop(id, { lng, lat }),
                   onStickerMove: (id, lng, lat) => store.updateSticker(id, { lng, lat }),
                   onStickerChange: (id, patch) => store.updateSticker(id, patch),
@@ -718,6 +725,16 @@ export default function Editor() {
             </div>
           )}
 
+          {design.stops.length > 0 && (
+            <button
+              onClick={() => setFullscreen(true)}
+              title="See the whole print, full screen"
+              aria-label="Full screen preview"
+              className="absolute left-3 top-3 z-20 w-10 h-10 grid place-items-center rounded-full bg-white/95 text-ink shadow-lg hover:bg-cream"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+            </button>
+          )}
           <div className="absolute right-3 bottom-3 z-20 flex flex-col items-end gap-2">
             {locked && (
               <div className="flex flex-col rounded-2xl bg-white shadow-lg overflow-hidden text-lg font-extrabold">
@@ -738,13 +755,14 @@ export default function Editor() {
                 ✨ Uncrowd ({crowdCount})
               </button>
             )}
-            {design.stops.length > 0 && !locked && (
+            {/* Only when it would help: part of the trip is cut off, or the trip could fill more of the map. */}
+            {design.stops.length > 0 && !locked && (offFrame.length > 0 || loose) && (
               <button
                 onClick={fitTrip}
-                title="Zoom and move the map so every stop is on the print"
+                title={offFrame.length ? "Part of your trip is off the print: bring it all back in" : "Zoom in so your trip fills the map"}
                 className={`rounded-full px-4 py-2.5 text-sm font-extrabold shadow-lg transition ${offFrame.length ? "bg-coral text-white animate-pulse" : "bg-white text-ink hover:bg-cream"}`}
               >
-                ⤢ Fit map to trip
+                ⤢ <span className="hidden sm:inline">Fit map to trip</span><span className="sm:hidden">Fit trip</span>
               </button>
             )}
             {design.stops.length > 0 && (
@@ -754,9 +772,11 @@ export default function Editor() {
                 if (!locked) setToast("Framing locked. Pinch or use + to zoom in and rearrange labels and stickers.");
               }}
               title={locked ? "Unlock to move and zoom the map again" : "Lock the map's framing, then zoom in to edit"}
-              className={`rounded-full px-4 py-2.5 text-sm font-extrabold shadow-lg transition ${locked ? "bg-ink text-white" : "bg-white text-ink hover:bg-cream"}`}
+              aria-label={locked ? "Unlock framing" : "Lock framing"}
+              className={`rounded-full w-11 h-11 sm:w-auto sm:h-auto sm:px-4 sm:py-2.5 grid sm:block place-items-center text-lg sm:text-sm font-extrabold shadow-lg transition ${locked ? "bg-ink text-white" : "bg-white text-ink hover:bg-cream"}`}
             >
-              {locked ? "🔒 Framing locked" : "🔓 Lock framing"}
+              <span className="sm:hidden">{locked ? "🔒" : "🔓"}</span>
+              <span className="hidden sm:inline">{locked ? "🔒 Framing locked" : "🔓 Lock framing"}</span>
             </button>
             )}
           </div>
@@ -1126,6 +1146,7 @@ export default function Editor() {
           </div>
         </div>
       )}
+      {fullscreen && <FullScreenPreview design={design} onClose={() => setFullscreen(false)} />}
       {wall && (
         <div className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm grid place-items-center p-4" onClick={() => setWall(false)}>
           <div className="w-full max-w-4xl rounded-3xl bg-cream p-4 sm:p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>

@@ -18,7 +18,7 @@ import { TINY_PIN } from "@/lib/legibility";
 export interface MapHandlers {
   onView?: (v: Design["view"]) => void;
   /** Editor: names of the stops that are outside the printed map area (empty when all fit). */
-  onOffFrame?: (names: string[]) => void;
+  onOffFrame?: (names: string[], loose?: boolean) => void;
   onStopMove?: (id: string, lng: number, lat: number) => void;
   onStickerMove?: (id: string, lng: number, lat: number) => void;
   onStickerChange?: (id: string, patch: Partial<Sticker>) => void;
@@ -661,7 +661,12 @@ export default function MapView(props: Props) {
       const p = m.project([s.lng, s.lat]);
       return p.x < 0 || p.y < 0 || p.x > w || p.y > ht;
     });
-    h.current.onOffFrame(off.map((s) => s.name));
+    // "Loose": the whole trip sits in a small part of the map, so fitting would zoom in on it.
+    const pts = latest.current.stops.map((s) => m.project([s.lng, s.lat]));
+    const xs = pts.map((p) => p.x);
+    const ys = pts.map((p) => p.y);
+    const loose = pts.length >= 2 && !off.length && Math.max(...xs) - Math.min(...xs) < w * 0.45 && Math.max(...ys) - Math.min(...ys) < ht * 0.45;
+    h.current.onOffFrame(off.map((s) => s.name), loose);
   };
   useEffect(() => {
     checkFrame();

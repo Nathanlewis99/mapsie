@@ -25,7 +25,7 @@ import { PAINTED, PALETTE_NAMES, getOriginal, type OriginalStyle } from "@/lib/o
 import { PHOTO_BORDERS, PHOTO_BORDER_COLOURS, PHOTO_FILTERS, PHOTO_SHAPES, photoLook, type PhotoBorder, type PhotoFilter, type PhotoShape } from "@/lib/photoStyle";
 import { normalizeDesign, type Design, type TextEffect } from "@/lib/types";
 import { TripPanel, StylePanel, StickersPanel, TextPanel, SizePanel } from "./Panels";
-import { track, trackLeave } from "@/lib/track";
+import { stopSource, track, trackEach, trackLeave } from "@/lib/track";
 
 const TABS = [
   { id: "trip", label: "Trip", icon: "🧭" },
@@ -53,6 +53,37 @@ async function saveSnapshot(design: Design): Promise<string> {
   const r = await fetch("/api/designs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(design) });
   if (!r.ok) throw new Error("save failed");
   return (await r.json()).id;
+}
+
+/**
+ * Opening a link that starts a new map (an example, a partner's trip, a shared design…) shouldn't lose
+ * the one they were working on: keep it, so they can switch back.
+ */
+const PREV = "mapsie-previous";
+let keptAt = 0;
+function keepPrevious() {
+  const d = useEditor.getState().design;
+  // Once per link: the link handler can run twice, and the second time the new map is already in.
+  if (!d.stops.length || Date.now() - keptAt < 5000) return;
+  keptAt = Date.now();
+  try {
+    localStorage.setItem(PREV, JSON.stringify(d));
+  } catch {
+    try {
+      // Too big with photos: keep it without them rather than not at all.
+      localStorage.setItem(PREV, JSON.stringify({ ...d, photos: [] }));
+    } catch {}
+  }
+  // Tell the editor (once the new map is in) so it can offer the old one back.
+  setTimeout(() => window.dispatchEvent(new CustomEvent("mapsie-previous")), 800);
+}
+function previousDesign(): Design | null {
+  try {
+    const d = JSON.parse(localStorage.getItem(PREV) ?? "null") as Design | null;
+    return d?.stops?.length ? d : null;
+  } catch {
+    return null;
+  }
 }
 
 export default function Editor() {
@@ -187,6 +218,7 @@ export default function Editor() {
     setTab("trip");
     if (how === "example") {
       const pick = TEMPLATES[Math.floor(Math.random() * TEMPLATES.length)];
+      stopSource.v = "example";
       useEditor.getState().applyTemplate(pick);
       setToast("Here's an example: swap in your own stops, style and photos.");
       return;
@@ -259,6 +291,8 @@ export default function Editor() {
         .then((r) => (r.ok ? r.json() : Promise.reject()))
         .then((p: PublicPartner) => {
           const t = p.trips.find((x) => x.id === tripId);
+          keepPrevious();
+          stopSource.v = "partner";
           const ed = useEditor.getState();
           if (!t) ed.reset();
           // Credit the partner first (not an undoable edit, so undo can't lose it), then draw their route.
@@ -272,16 +306,18 @@ export default function Editor() {
     } else if (params.get("template")) {
       // From an occasion page: start from that quick-start trip.
       const t = TEMPLATES.find((x) => x.id === params.get("template"));
-      if (t) useEditor.getState().applyTemplate(t);
+      if (t) keepPrevious(), (stopSource.v = "template"), useEditor.getState().applyTemplate(t);
       router.replace("/create");
     } else if (params.get("describe") !== null) {
       // From an occasion page: a fresh map, with "Describe your trip" filled in (the box reads it once).
       try {
         sessionStorage.setItem("mapsie-describe", (params.get("describe") ?? "").slice(0, 2000));
       } catch {}
+      keepPrevious();
       useEditor.getState().reset();
       router.replace("/create");
     } else if (params.get("new")) {
+      keepPrevious();
       useEditor.getState().reset();
       router.replace("/create");
     } else if (params.get("save") && me.user) {
@@ -298,6 +334,8 @@ export default function Editor() {
     fetch(`/api/designs/${id}`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d: Design) => {
+        keepPrevious();
+        stopSource.v = "shared";
         useEditor.getState().load(normalizeDesign(d));
         setToast("Design loaded. Make it your own!");
         router.replace("/create");
@@ -419,7 +457,8 @@ export default function Editor() {
     adEvent({ name: "view_design" });
   }, []);
   useEffect(() => {
-    if (stopCount.current !== null && design.stops.length > stopCount.current) track("stop_added");
+    if (stopCount.current !== null && design.stops.length > stopCount.current) track("stop_added", { source: stopSource.v });
+    stopSource.v = "manual";
     stopCount.current = design.stops.length;
   }, [design.stops.length]);
   const lookKey = JSON.stringify([design.theme, design.text, design.title, design.subtitle, design.stickers.length, design.markers, design.font]);
@@ -508,6 +547,69 @@ export default function Editor() {
     }
   };
 
+  // Keep a copy of the map on our side (under a cookie, no sign-up) as they work, so it's there when
+  // they come back even if the browser has cleared its storage. Not for Etsy or partner sessions.
+  const draftKey = JSON.stringify(design);
+  const draftOn = !etsy && !partnerMe && design.stops.length > 0;
+  useEffect(() => {
+    if (!draftOn) return;
+    const t = setTimeout(() => {
+      if (draftKey.length > 4_000_000) return;
+      fetch("/api/drafts", { method: "POST", headers: { "content-type": "application/json" }, body: draftKey, keepalive: draftKey.length < 60_000 }).catch(() => {});
+    }, 4000);
+    return () => clearTimeout(t);
+  }, [draftKey, draftOn]);
+  // Back with an empty map (and no link telling us what to open)? Bring back their map.
+  const [prev, setPrev] = useState<Design | null>(null);
+  useEffect(() => {
+    const keys = ["saved", "product", "format", "partner", "template", "describe", "new", "d", "etsy"];
+    if (keys.some((k) => params.get(k) !== null)) return;
+    if (useEditor.getState().design.stops.length) return;
+    fetch("/api/drafts")
+      .then((r) => r.json())
+      .then((j: { design: Design | null }) => {
+        if (!j.design || useEditor.getState().design.stops.length) return;
+        stopSource.v = "restored";
+        useEditor.getState().load(normalizeDesign(j.design));
+        trackEach("restored", { from: "server", stops: j.design.stops.length });
+        setToast("Welcome back! Here's the map you were making.");
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  // The map they had before a link replaced it, offered back for a while.
+  useEffect(() => {
+    const check = () => {
+      const p = previousDesign();
+      const cur = useEditor.getState().design;
+      if (p && JSON.stringify(p.stops.map((s) => s.name)) !== JSON.stringify(cur.stops.map((s) => s.name))) setPrev(p);
+    };
+    window.addEventListener("mapsie-previous", check);
+    return () => window.removeEventListener("mapsie-previous", check);
+  }, []);
+  const restorePrevious = () => {
+    if (!prev) return;
+    const other = useEditor.getState().design;
+    useEditor.getState().load(normalizeDesign(prev));
+    try {
+      localStorage.setItem(PREV, JSON.stringify(other)); // so the other one isn't lost either
+    } catch {}
+    trackEach("restored", { from: "previous", stops: prev.stops.length });
+    setPrev(null);
+    setToast("Here's your earlier map. The other one is kept too.");
+  };
+  // How long the map takes to appear (phones on slow connections), and whether it ever does.
+  useEffect(() => {
+    const t0 = performance.now();
+    const w = window as unknown as { __MAPSIE_READY?: boolean };
+    const iv = setInterval(() => {
+      const ms = Math.round(performance.now() - t0);
+      if (w.__MAPSIE_READY) return clearInterval(iv), trackEach("map_ready", { ms });
+      if (ms > 20_000) return clearInterval(iv), trackEach("map_ready", { ms, stuck: true });
+    }, 250);
+    return () => clearInterval(iv);
+  }, []);
+
   // "Save your map" (with this week's hour-long discount): once, after intent: a second stop, or one stop
   // and 40 seconds. Not for Etsy or partner sessions, nor anyone who already has a code.
   const [saveOpen, setSaveOpen] = useState(false);
@@ -548,7 +650,7 @@ export default function Editor() {
   }, [saveEligible, saveShown, design.stops.length >= 2]);
   // Why people leave: what they'd done when the tab closed or went to the background.
   const leaveRef = useRef<Record<string, string | number | boolean>>({});
-  leaveRef.current = { stops: design.stops.length, stickers: design.stickers.length, tab, saveShown, offer: !!offer, ordering: busy === "order" };
+  leaveRef.current = { page: "editor", stops: design.stops.length, stickers: design.stickers.length, tab, saveShown, offer: !!offer, ordering: busy === "order" };
   useEffect(() => trackLeave("leave", () => leaveRef.current), []);
 
   // A gentle, one-time offer to email the design to people who've started a map but
@@ -1191,6 +1293,13 @@ export default function Editor() {
         // On phones the header is full, so the countdown sits just under it.
         <div className="sm:hidden fixed right-3 top-[64px] z-30 rounded-full bg-coral px-3 py-1 text-xs font-extrabold text-white shadow-lg tabular-nums pointer-events-none">
           {offer.pct}% off · ⏱️ {countdown(offer)}
+        </div>
+      )}
+      {prev && !saveOpen && (
+        <div className="fixed left-3 right-3 sm:right-auto bottom-20 lg:bottom-6 z-40 sm:max-w-sm rounded-2xl bg-white p-3 shadow-xl border border-ink/10 text-sm flex items-center gap-2">
+          <span className="flex-1">Your earlier map <b>{prev.title || prev.stops[0]?.name}</b> is saved.</span>
+          <button onClick={restorePrevious} className="rounded-full bg-ink px-3 py-1.5 font-extrabold text-white whitespace-nowrap">Open it</button>
+          <button onClick={() => setPrev(null)} aria-label="Dismiss" className="px-1 text-lg text-ink/40">×</button>
         </div>
       )}
       {saveOpen && !emailOpen && (

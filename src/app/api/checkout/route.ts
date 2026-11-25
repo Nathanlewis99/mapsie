@@ -123,7 +123,7 @@ export async function POST(req: Request) {
     payment_intent_data: { description: `Mapsie order ${order.id}`, metadata: { orderId: order.id } },
     ...(tax ? { automatic_tax: { enabled: true } } : {}),
     success_url: `${base}/order/${order.id}`,
-    cancel_url: `${base}/checkout/${body.designId}`,
+    cancel_url: `${base}/checkout/${body.designId}?back=1`,
   });
   return NextResponse.json({ url: session.url });
 }

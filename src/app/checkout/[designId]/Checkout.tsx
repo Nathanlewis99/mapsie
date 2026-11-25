@@ -8,7 +8,7 @@ import { describeOptions, getRegion, guessRegion, itemPrice, money, priceLines, 
 import PrintOptionsPicker from "@/components/PrintOptionsPicker";
 import ChristmasBanner from "@/components/ChristmasBanner";
 import { sizeNote } from "@/lib/legibility";
-import { attribution, track, trackLeave, visitId } from "@/lib/track";
+import { attribution, track, trackEach, trackLeave, visitId } from "@/lib/track";
 import { countdown, myOffer, type MyOffer } from "@/lib/offers";
 import { adEvent } from "@/lib/adTrack";
 
@@ -47,7 +47,11 @@ export default function Checkout({ design: saved }: { design: Design }) {
   const paid = useRef(false);
   const leaveState = useRef<Record<string, string | number | boolean>>({});
   useEffect(() => trackLeave("checkout_leave", () => (paid.current ? { paid: true } : leaveState.current)), []);
-  useEffect(() => track("checkout_view"), []);
+  useEffect(() => {
+    track("checkout_view");
+    // Came back from Stripe's payment page without paying.
+    if (new URLSearchParams(location.search).get("back")) trackEach("stripe_back", { at: "stripe" });
+  }, []);
   // For the ad platforms (only sent with consent): someone started checking out.
   useEffect(() => {
     const t = setTimeout(() => adEvent({ name: "begin_checkout", value: itemPrice({ ...saved, format: saved.format ?? "print" }, storedRegion()), currency: getRegion(storedRegion()).currency }), 1500);

@@ -74,6 +74,24 @@ export default function CookiesPage() {
               "Autosaves the design you're working on (including any photos you've added) and your chosen country, so your work is still there if you close the tab.",
               "Until you clear your browser's site data",
             ],
+            [
+              <code key="n">mapsie_draft</code>,
+              "Cookie",
+              "A random number that links your browser to a saved copy of the map you're working on, kept on our server, so your map is still there when you come back, even if your browser clears its storage. No sign-up needed.",
+              "90 days from your last change",
+            ],
+            [
+              <code key="n">mapsie-previous</code>,
+              "Local storage",
+              "Keeps the map you were working on when a link starts a new one (an example trip or a shared map), so you can switch back.",
+              "Until you clear your browser's site data",
+            ],
+            [
+              <code key="n">mapsie-offer</code>,
+              "Local storage",
+              "Your personal discount code from \u201cSave your map\u201d, so it's applied at checkout until it expires.",
+              "Until it expires (60 minutes)",
+            ],
           ]}
         />
         <p>

@@ -26,7 +26,7 @@ import { FONTS } from "@/lib/fonts";
 import { getRegion, REGIONS } from "@/lib/products";
 import PrintOptionsPicker from "@/components/PrintOptionsPicker";
 import { Compass } from "@/components/Poster";
-import { trackSearch } from "@/lib/track";
+import { stopSource, trackEach, trackSearch } from "@/lib/track";
 import SafeImg from "@/components/SafeImg";
 import { crowdedStickers, crowding, MIN_STOP_SCALE, readability, recommendedProduct, sizeNote, smallestText, tidyDesign } from "@/lib/legibility";
 import { getProduct } from "@/lib/products";
@@ -166,6 +166,8 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
     setSearchState("searching");
     return searchPlaces(query, signal, full)
       .then((r) => {
+        // Places people look for and we can't find: worth knowing.
+        if (!r.length) trackEach("place_search", { q: query.trim().toLowerCase().slice(0, 60), results: 0 });
         setResults(r);
         setActive(0);
         setSearchState("done");
@@ -217,7 +219,7 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
   return (
     <div className="space-y-5">
       {design.stops.length === 0 || aiOpen ? (
-        <AiTripBox onTrip={(t, reply) => (applyTemplate(t), setAiOpen(false), setAiReply(reply))} replacing={design.stops.length > 0} />
+        <AiTripBox onTrip={(t, reply) => ((stopSource.v = "ai"), applyTemplate(t), setAiOpen(false), setAiReply(reply))} replacing={design.stops.length > 0} />
       ) : (
         <div className="space-y-1">
           {aiReply && <div className="rounded-2xl bg-sea/10 px-3 py-2 text-xs text-ink/80">✨ {aiReply}</div>}

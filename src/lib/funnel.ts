@@ -16,5 +16,6 @@ export const EXTRA_EVENTS = [
   "search", "saved_design", "shared", "signed_in", "order_cancelled", "wall_preview", "lock_framing", "ai_create", "ai_mic",
   // Why people leave: the start card, the save-your-map offer, and how long they stayed and how far they got.
   "start_card", "save_offer_shown", "save_offer_saved", "save_offer_closed", "fullscreen", "leave", "checkout_leave",
+  "place_search", "ai_failed", "map_ready", "stripe_back", "restored",
 ] as const;
 export type TrackEvent = FunnelStep | (typeof EXTRA_EVENTS)[number];

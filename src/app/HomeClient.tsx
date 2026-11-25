@@ -1,4 +1,5 @@
 "use client";
+import { trackLeave } from "@/lib/track";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import AccountLink from "@/components/AccountLink";
@@ -34,6 +35,15 @@ export default function HomeClient({ children }: { children?: React.ReactNode })
   // The sample poster fits a phone screen (it's 400px wide on anything bigger).
   const [posterW, setPosterW] = useState(400);
   useEffect(() => setPosterW(Math.min(400, window.innerWidth - 64)), []);
+  // How far down the homepage people get before leaving (and whether they went on to design).
+  useEffect(() => {
+    let deepest = 0;
+    const onScroll = () => (deepest = Math.max(deepest, Math.round(((scrollY + innerHeight) / document.documentElement.scrollHeight) * 100)));
+    onScroll();
+    addEventListener("scroll", onScroll, { passive: true });
+    const stop = trackLeave("leave", () => ({ page: "home", scroll: deepest }));
+    return () => (removeEventListener("scroll", onScroll), stop());
+  }, []);
   const from = DIGITAL_PRICE[region]; // the lowest price: the digital file
   return (
     <div className="min-h-dvh overflow-x-hidden">

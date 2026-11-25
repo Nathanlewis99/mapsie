@@ -94,3 +94,15 @@ export function trackLeave(name: "leave" | "checkout_leave", state: () => Record
     document.removeEventListener("visibilitychange", onHide);
   };
 }
+
+/** Where the latest stops came from, so "added a stop" can be split: typed, AI, an example, a template or a partner's trip. */
+export const stopSource = { v: "manual" };
+
+/** An event we want every time (not once per visit), e.g. each place search and whether it found anything. */
+export function trackEach(name: "place_search" | "ai_failed" | "map_ready" | "stripe_back" | "restored", props: Record<string, string | number | boolean>) {
+  const v = visitId();
+  if (!v) return;
+  const body = JSON.stringify({ v, name, props });
+  if (!navigator.sendBeacon?.("/api/events", new Blob([body], { type: "application/json" })))
+    fetch("/api/events", { method: "POST", body, headers: { "content-type": "application/json" }, keepalive: true }).catch(() => {});
+}

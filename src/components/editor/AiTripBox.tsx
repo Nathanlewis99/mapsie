@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { TripTemplate } from "@/lib/templates";
-import { track } from "@/lib/track";
+import { track, trackEach } from "@/lib/track";
 
 // The browser's own speech recognition (Chrome, Edge, Safari). Not in every browser,
 // so the mic button only shows where it works.
@@ -151,11 +151,12 @@ export default function AiTripBox({ onTrip, replacing }: { onTrip: (t: TripTempl
       const r = await fetch("/api/ai/design", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ prompt: text, turnstileToken: token.current || undefined }) });
       freshCheck();
       const j = (await r.json()) as { trip?: TripTemplate | null; reply?: string; error?: string };
-      if (!r.ok) return setErr(j.error ?? "Something went wrong. Please try again.");
-      if (!j.trip) return setNote(j.reply ?? "Tell me where you went and I'll map it.");
+      if (!r.ok) return trackEach("ai_failed", { why: `http${r.status}` }), setErr(j.error ?? "Something went wrong. Please try again.");
+      if (!j.trip) return trackEach("ai_failed", { why: "no_trip", words: text.trim().split(/\s+/).length }), setNote(j.reply ?? "Tell me where you went and I'll map it.");
       setText("");
       onTrip(j.trip, `${j.reply ?? "Here's your map."} Change anything you like.`);
     } catch {
+      trackEach("ai_failed", { why: "network" });
       setErr("Couldn't reach Mapsie. Check your connection and try again.");
     } finally {
       setBusy(false);

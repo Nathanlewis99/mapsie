@@ -409,6 +409,10 @@ export async function dbKind() {
 export async function saveDesign(d: Design) {
   await run("INSERT INTO designs (id, json, created_at) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET json = excluded.json", [d.id, JSON.stringify(d), now()]);
 }
+/** A map in progress (see /api/drafts): its date moves on with each save, so cleanup counts from the last change. */
+export async function saveDraft(d: Design) {
+  await run("INSERT INTO designs (id, json, created_at) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET json = excluded.json, created_at = excluded.created_at", [d.id, JSON.stringify(d), now()]);
+}
 export async function getDesign(id: string): Promise<Design | null> {
   const row = await one("SELECT json FROM designs WHERE id = ?", [id]);
   return row ? JSON.parse(String(row.json)) : null;

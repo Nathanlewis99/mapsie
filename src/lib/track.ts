@@ -69,3 +69,28 @@ export function trackSearch(q: string, results: number) {
   if (!navigator.sendBeacon?.("/api/events", new Blob([body], { type: "application/json" })))
     fetch("/api/events", { method: "POST", body, headers: { "content-type": "application/json" }, keepalive: true }).catch(() => {});
 }
+
+/**
+ * When the visitor leaves (closes the tab, switches app, navigates away): how long they stayed and
+ * how far they got, so we can see where people give up. `state` is read at the moment they leave.
+ * Sent once per page view; not deduplicated across views.
+ */
+export function trackLeave(name: "leave" | "checkout_leave", state: () => Record<string, string | number | boolean>) {
+  if (typeof window === "undefined") return () => {};
+  const start = Date.now();
+  let sent = false;
+  const send = () => {
+    const v = visitId();
+    if (!v || sent) return;
+    sent = true;
+    const body = JSON.stringify({ v, name, props: { sec: Math.round((Date.now() - start) / 1000), ...state() } });
+    navigator.sendBeacon?.("/api/events", new Blob([body], { type: "application/json" }));
+  };
+  const onHide = () => document.visibilityState === "hidden" && send();
+  window.addEventListener("pagehide", send);
+  document.addEventListener("visibilitychange", onHide);
+  return () => {
+    window.removeEventListener("pagehide", send);
+    document.removeEventListener("visibilitychange", onHide);
+  };
+}

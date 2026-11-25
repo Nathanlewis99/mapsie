@@ -75,7 +75,7 @@ export default async function PartnerPage({ params, searchParams }: { params: Pr
           </div>
         </section>
         <Gallery title="Maps made with Mapsie" />
-        <p className="max-w-4xl mx-auto px-6 pb-12 text-center text-sm text-ink/50">Free to design · prints from £34 · free delivery in the UK, US and Australia</p>
+        <p className="max-w-4xl mx-auto px-6 pb-12 text-center text-sm text-ink/50">Free to design · from £19 · free delivery in the UK, US and Australia</p>
       </main>
       <SiteFooter />
     </div>

@@ -17,7 +17,7 @@ export function newDesign(): Design {
     subtitle: "2026",
     font: "playfair",
     layout: "band",
-    productId: "a3",
+    productId: "a4",
     orientation: "portrait",
     frame: "none",
     theme: themeFromPreset(PRESETS[0]),

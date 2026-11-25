@@ -9,10 +9,11 @@ import { allowedOptions, describeOptions, FRAMES, GLAZES, getRegion, itemPrice, 
 import { normalizeDesign } from "@/lib/types";
 import { currentUser } from "@/lib/server/auth";
 import { partnerForCheckout } from "@/lib/server/partners";
+import { liveCode } from "@/lib/server/offers";
 
 export async function POST(req: Request) {
   if (!limit("checkout", clientIp(req), 20, 60 * 60_000)) return tooMany("Too many checkout attempts. Please wait a few minutes.", 600);
-  const body = (await req.json()) as { designId: string; email: string; shipping: ShippingId; region: RegionId; options?: Partial<PrintOptions>; visitId?: string };
+  const body = (await req.json()) as { designId: string; email: string; shipping: ShippingId; region: RegionId; options?: Partial<PrintOptions>; visitId?: string; offerCode?: string };
   const raw = await getDesign(body.designId);
   if (!raw) return NextResponse.json({ error: "Design not found" }, { status: 404 });
   if (!/^\S+@\S+\.\S+$/.test(body.email ?? "")) return NextResponse.json({ error: "Please enter a valid email" }, { status: 400 });
@@ -71,10 +72,12 @@ export async function POST(req: Request) {
   // Stripe Tax: switch on (STRIPE_TAX=on) once registered for VAT or sales tax somewhere and the
   // registration is added in Stripe. Prices stay tax-inclusive, so customers see the same totals.
   const tax = process.env.STRIPE_TAX === "on";
+  // A personal "Save your map" code from this browser: applied for them (Stripe then hides the code box).
+  const offerPromo = typeof body.offerCode === "string" && body.offerCode ? await liveCode(body.offerCode.toUpperCase()).catch(() => null) : null;
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     // Discount codes are created in the Stripe dashboard (Products > Coupons > promotion codes).
-    allow_promotion_codes: true,
+    ...(offerPromo ? { discounts: [{ promotion_code: offerPromo }] } : { allow_promotion_codes: true }),
     customer_email: body.email,
     line_items: [
       {

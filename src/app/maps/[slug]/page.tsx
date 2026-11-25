@@ -55,7 +55,7 @@ export default async function OccasionPage({ params }: { params: Promise<{ slug:
               {o.gift ? (
                 <Link href="/gift" className="rounded-full border-2 border-ink/15 px-6 py-3.5 font-extrabold hover:border-coral">🎁 Or give a gift card</Link>
               ) : (
-                <span className="text-sm text-ink/50 font-semibold">Free to design · prints from £34 · free delivery</span>
+                <span className="text-sm text-ink/50 font-semibold">Free to design · from £19 · free delivery</span>
               )}
             </div>
           </div>

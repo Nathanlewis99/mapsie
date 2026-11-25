@@ -4,6 +4,8 @@ import { crowdedStickers, crowding, tidyDesign } from "@/lib/legibility";
 import { personaliseTrip, type PublicPartner } from "@/lib/partners";
 import { TEMPLATES } from "@/lib/templates";
 import EmailDesign from "./EmailDesign";
+import SaveOffer from "./SaveOffer";
+import { countdown, myOffer, type MyOffer } from "@/lib/offers";
 import { adEvent } from "@/lib/adTrack";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { nanoid } from "nanoid";
@@ -23,7 +25,7 @@ import { PAINTED, PALETTE_NAMES, getOriginal, type OriginalStyle } from "@/lib/o
 import { PHOTO_BORDERS, PHOTO_BORDER_COLOURS, PHOTO_FILTERS, PHOTO_SHAPES, photoLook, type PhotoBorder, type PhotoFilter, type PhotoShape } from "@/lib/photoStyle";
 import { normalizeDesign, type Design, type TextEffect } from "@/lib/types";
 import { TripPanel, StylePanel, StickersPanel, TextPanel, SizePanel } from "./Panels";
-import { track } from "@/lib/track";
+import { track, trackLeave } from "@/lib/track";
 
 const TABS = [
   { id: "trip", label: "Trip", icon: "🧭" },
@@ -181,6 +183,7 @@ export default function Editor() {
 
   /** From the start card on an empty map: open the Trip panel and focus the right box, or load an example. */
   const startWith = (how: "describe" | "search" | "example") => {
+    track("start_card", { how });
     setTab("trip");
     if (how === "example") {
       const pick = TEMPLATES[Math.floor(Math.random() * TEMPLATES.length)];
@@ -505,9 +508,52 @@ export default function Editor() {
     }
   };
 
+  // "Save your map" (with this week's hour-long discount): once, after intent: a second stop, or one stop
+  // and 40 seconds. Not for Etsy or partner sessions, nor anyone who already has a code.
+  const [saveOpen, setSaveOpen] = useState(false);
+  const [saveShown, setSaveShown] = useState(false);
+  const [offer, setOffer] = useState<MyOffer | null>(null);
+  const [, tickOffer] = useState(0);
+  useEffect(() => {
+    setOffer(myOffer());
+    const t = setInterval(() => (setOffer(myOffer()), tickOffer((n) => n + 1)), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const saveSeen = () => {
+    try {
+      return !!(sessionStorage.getItem("mapsie-save-offer") || localStorage.getItem("mapsie-saved-email"));
+    } catch {
+      return true;
+    }
+  };
+  const showSave = () => {
+    if (saveShown || saveSeen() || myOffer()) return;
+    try {
+      sessionStorage.setItem("mapsie-save-offer", "1");
+    } catch {}
+    setSaveShown(true);
+    setSaveOpen(true);
+    track("save_offer_shown", { stops: useEditor.getState().design.stops.length });
+  };
+  const saveEligible = !etsy && !partnerMe && design.stops.length >= 1;
+  useEffect(() => {
+    if (!saveEligible || saveShown) return;
+    if (design.stops.length >= 2) {
+      const t = setTimeout(showSave, 1500);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(showSave, 40_000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saveEligible, saveShown, design.stops.length >= 2]);
+  // Why people leave: what they'd done when the tab closed or went to the background.
+  const leaveRef = useRef<Record<string, string | number | boolean>>({});
+  leaveRef.current = { stops: design.stops.length, stickers: design.stickers.length, tab, saveShown, offer: !!offer, ordering: busy === "order" };
+  useEffect(() => trackLeave("leave", () => leaveRef.current), []);
+
   // A gentle, one-time offer to email the design to people who've started a map but
   // haven't ordered after a few minutes (not for Etsy buyers, who've already paid).
-  const nudgeArmed = design.stops.length >= 2 && !etsy;
+  const nudgeArmed = design.stops.length >= 2 && !etsy && !saveShown;
   useEffect(() => {
     if (!nudgeArmed) return;
     try {
@@ -616,6 +662,11 @@ export default function Editor() {
               ))}
             </select>
           </label>
+          {offer && !etsy && (
+            <span title={`${offer.pct}% off with ${offer.code}, applied at checkout`} className="ml-1 hidden sm:inline rounded-full bg-coral/15 px-2 py-1 text-xs font-extrabold text-coral-dark tabular-nums whitespace-nowrap">
+              −{offer.pct}% ⏱️ {countdown(offer)}
+            </span>
+          )}
           <button
             onClick={() => order()}
             disabled={!!busy || design.stops.length === 0}
@@ -1136,7 +1187,28 @@ export default function Editor() {
           }}
         />
       )}
-      {emailNudge && !emailOpen && (
+      {offer && !etsy && (
+        // On phones the header is full, so the countdown sits just under it.
+        <div className="sm:hidden fixed right-3 top-[64px] z-30 rounded-full bg-coral px-3 py-1 text-xs font-extrabold text-white shadow-lg tabular-nums pointer-events-none">
+          {offer.pct}% off · ⏱️ {countdown(offer)}
+        </div>
+      )}
+      {saveOpen && !emailOpen && (
+        <SaveOffer
+          save={() => saveSnapshot(design)}
+          onClose={() => setSaveOpen(false)}
+          onSaved={(o) => {
+            setSaveOpen(false);
+            try {
+              localStorage.setItem("mapsie-saved-email", "1");
+              localStorage.setItem("mapsie-email-nudge", "1");
+            } catch {}
+            setOffer(o);
+            setToast(o ? `Saved! Check your inbox. Your ${o.pct}% off is applied when you order in the next hour.` : "Saved! Check your inbox for the link to your map.");
+          }}
+        />
+      )}
+      {emailNudge && !emailOpen && !saveOpen && (
         <div className="fixed left-3 bottom-20 lg:bottom-6 z-40 max-w-xs rounded-2xl bg-white p-4 shadow-xl border border-ink/10 text-sm space-y-2">
           <div className="font-extrabold">Not ready to order yet?</div>
           <p className="text-ink/60">Email yourself this map to finish later, on any device.</p>

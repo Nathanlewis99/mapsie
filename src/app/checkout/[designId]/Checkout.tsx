@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Logo from "@/components/Logo";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -8,7 +8,8 @@ import { describeOptions, getRegion, guessRegion, itemPrice, money, priceLines, 
 import PrintOptionsPicker from "@/components/PrintOptionsPicker";
 import ChristmasBanner from "@/components/ChristmasBanner";
 import { sizeNote } from "@/lib/legibility";
-import { attribution, track, visitId } from "@/lib/track";
+import { attribution, track, trackLeave, visitId } from "@/lib/track";
+import { countdown, myOffer, type MyOffer } from "@/lib/offers";
 import { adEvent } from "@/lib/adTrack";
 
 const FramedPoster = dynamic(() => import("@/components/FramedPoster"), { ssr: false });
@@ -35,6 +36,17 @@ export default function Checkout({ design: saved }: { design: Design }) {
   const [digitalOk, setDigitalOk] = useState(false);
   const [err, setErr] = useState("");
   useEffect(() => setRegion(storedRegion()), []);
+  // A personal "Save your map" code from this browser, ticking down; applied for them at payment.
+  const [offer, setOffer] = useState<MyOffer | null>(null);
+  const [, tick] = useState(0);
+  useEffect(() => {
+    setOffer(myOffer());
+    const t = setInterval(() => (setOffer(myOffer()), tick((n) => n + 1)), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const paid = useRef(false);
+  const leaveState = useRef<Record<string, string | number | boolean>>({});
+  useEffect(() => trackLeave("checkout_leave", () => (paid.current ? { paid: true } : leaveState.current)), []);
   useEffect(() => track("checkout_view"), []);
   // For the ad platforms (only sent with consent): someone started checking out.
   useEffect(() => {
@@ -52,14 +64,16 @@ export default function Checkout({ design: saved }: { design: Design }) {
   const lines = priceLines(design, region);
   const digital = opts.format === "digital";
   const total = item + (digital ? 0 : ship.price[region]);
+  leaveState.current = { size: opts.productId, framed: opts.frame !== "none", digital, region, emailed: !!email, options: showOptions, offer: !!offer, total };
 
   const pay = async () => {
     track("pay_click", { region, framed: opts.frame !== "none", size: opts.productId });
+    paid.current = true;
     setBusy(true);
     setErr("");
-    const r = await fetch("/api/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ designId: saved.id, email, shipping, region, options: opts, visitId: visitId(), attribution: attribution() }) });
+    const r = await fetch("/api/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ designId: saved.id, email, shipping, region, options: opts, visitId: visitId(), attribution: attribution(), offerCode: offer?.code }) });
     const j = await r.json();
-    if (!r.ok) return setErr(j.error ?? "Something went wrong"), setBusy(false);
+    if (!r.ok) return (paid.current = false), setErr(j.error ?? "Something went wrong"), setBusy(false);
     window.location.href = j.url;
   };
 
@@ -100,6 +114,12 @@ export default function Checkout({ design: saved }: { design: Design }) {
                 <div key={l.label} className="flex justify-between text-sm font-bold"><span>{l.label}</span><span>{money(region, l.amount)}</span></div>
               ))}
             </div>
+            {offer && (
+              <div className="mt-2 flex justify-between rounded-xl bg-coral/10 px-3 py-2 text-sm font-extrabold text-coral-dark">
+                <span>⏱️ Your {offer.pct}% off ({offer.code}) is applied at payment</span>
+                <span className="tabular-nums">{countdown(offer)}</span>
+              </div>
+            )}
             <button onClick={() => setShowOptions((v) => !v)} className="pt-2 text-sm font-extrabold text-coral-dark">
               {showOptions ? "Done ✓" : design.frame === "none" ? "🖼️ Add a frame, or change size or paper" : "Change size, frame or mount"}
             </button>

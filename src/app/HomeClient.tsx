@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { SAMPLE } from "@/lib/sample";
 import SiteFooter from "@/components/SiteFooter";
 import ChristmasBanner from "@/components/ChristmasBanner";
-import { guessRegion, money, PRODUCTS, REGIONS, type RegionId } from "@/lib/products";
+import { DIGITAL_PRICE, guessRegion, money, PRODUCTS, REGIONS, type RegionId } from "@/lib/products";
 
 const Poster = dynamic(() => import("@/components/Poster"), { ssr: false });
 
@@ -31,7 +31,10 @@ const STEPS = [
 export default function HomeClient({ children }: { children?: React.ReactNode }) {
   const [region, setRegion] = useState<RegionId>("GB");
   useEffect(() => setRegion(guessRegion()), []);
-  const from = Math.min(...PRODUCTS.map((p) => p.price[region]));
+  // The sample poster fits a phone screen (it's 400px wide on anything bigger).
+  const [posterW, setPosterW] = useState(400);
+  useEffect(() => setPosterW(Math.min(400, window.innerWidth - 64)), []);
+  const from = DIGITAL_PRICE[region]; // the lowest price: the digital file
   return (
     <div className="min-h-dvh overflow-x-hidden">
       <ChristmasBanner />
@@ -45,7 +48,7 @@ export default function HomeClient({ children }: { children?: React.ReactNode })
       </header>
 
       <main>
-        <section className="max-w-6xl mx-auto px-6 pt-8 pb-20 grid lg:grid-cols-[1.1fr_1fr] gap-12 items-center">
+        <section className="max-w-6xl mx-auto px-6 pt-8 pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[1.1fr_1fr] gap-12 items-center">
           <div>
             <div className="inline-block rounded-full bg-coral/15 text-coral-dark px-4 py-1.5 text-sm font-extrabold mb-6">✈️ For travellers who want more than photos on a phone</div>
             <h1 className="font-display text-5xl sm:text-6xl font-extrabold leading-[1.02] tracking-tight">
@@ -65,7 +68,7 @@ export default function HomeClient({ children }: { children?: React.ReactNode })
           <div className="relative grid place-items-center">
             <div className="absolute w-[420px] h-[420px] rounded-full bg-sea/20 blur-3xl -z-10" />
             <div className="rotate-2 shadow-[0_40px_80px_-20px_rgba(31,36,48,0.45)] pointer-events-none">
-              <Poster design={SAMPLE} width={400} />
+              <Poster design={SAMPLE} width={posterW} />
             </div>
           </div>
         </section>

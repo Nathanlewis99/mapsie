@@ -257,10 +257,12 @@ export const unsubscribeUrl = (email: string) => `${publicUrl()}/unsubscribe?e=$
 const designLink = (designId: string) => `${publicUrl()}/create?d=${designId}`;
 
 /** The link to their design, which they asked for. */
-export async function sendDesignLinkEmail(row: DesignEmail, title: string) {
+export async function sendDesignLinkEmail(row: DesignEmail, title: string, offer?: { code: string; pct: number; expiresAt: string }) {
+  const until = offer ? new Date(offer.expiresAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/London" }) : "";
   const lines = [
     "Here's the link to the map you were designing. Open it on any device to pick up where you left off.",
     title ? `Your map: “${title}”.` : "",
+    offer ? `Your ${offer.pct}% off code is ${offer.code}. It works on one order until ${until} (UK time) today, and it's applied for you at checkout on this device.` : "",
     row.remind ? "As you asked, we'll send you one reminder tomorrow if you haven't ordered it yet." : "",
   ].filter(Boolean);
   await sendEmail(page(row.email, "Your Mapsie map design", "Your map is saved 🗺️", lines, { label: "Open my map", href: designLink(row.designId) }, row.remind ? unsubscribeUrl(row.email) : undefined));

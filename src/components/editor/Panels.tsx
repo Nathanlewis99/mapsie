@@ -39,6 +39,52 @@ export const Label = ({ children }: { children: React.ReactNode }) => (
   <div className="text-xs font-bold uppercase tracking-wider text-ink/50 mb-2">{children}</div>
 );
 
+/**
+ * A collapsible group of settings: a header with an icon, a name and a short summary of what's on,
+ * so the panels read as a short list of topics instead of one long column of switches.
+ * Which groups are open is remembered in this browser.
+ */
+const OPEN_KEY = "mapsie-sections";
+function readOpen(): Record<string, boolean> {
+  try {
+    return JSON.parse(localStorage.getItem(OPEN_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+export function Section({ id, icon, title, summary, defaultOpen = false, children }: { id: string; icon: string; title: string; summary?: React.ReactNode; defaultOpen?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen);
+  useEffect(() => {
+    const v = readOpen()[id];
+    if (typeof v === "boolean") setOpen(v);
+  }, [id]);
+  const toggle = () => {
+    const next = !open;
+    setOpen(next);
+    try {
+      localStorage.setItem(OPEN_KEY, JSON.stringify({ ...readOpen(), [id]: next }));
+    } catch {}
+  };
+  return (
+    <div className={`rounded-2xl border bg-white/70 transition ${open ? "border-ink/10 shadow-sm" : "border-ink/5"}`}>
+      <button onClick={toggle} aria-expanded={open} className="w-full flex items-center gap-3 px-3 py-2.5 text-left">
+        <span className="grid place-items-center w-8 h-8 rounded-xl bg-sand/80 text-base shrink-0" aria-hidden>{icon}</span>
+        <span className="flex-1 min-w-0">
+          <span className="block text-sm font-extrabold leading-tight">{title}</span>
+          {summary && !open && <span className="block text-xs text-ink/50 truncate">{summary}</span>}
+        </span>
+        <span aria-hidden className={`text-ink/40 transition-transform ${open ? "rotate-180" : ""}`}>▾</span>
+      </button>
+      {open && <div className="px-3 pb-3 pt-1 space-y-1 border-t border-ink/5">{children}</div>}
+    </div>
+  );
+}
+/** "Terrain, Sea depth" style summaries: the names of what's switched on, or "Off". */
+const onList = (items: [boolean | undefined, string][]) => {
+  const on = items.filter(([v]) => v).map(([, n]) => n);
+  return on.length ? on.join(", ") : "None on";
+};
+
 /** On/off switch. `disabled` greys it out (with `hint` saying why) when another setting makes it irrelevant. */
 function Toggle({ on, onChange, label, disabled, hint }: { on: boolean; onChange: (v: boolean) => void; label: string; disabled?: boolean; hint?: string }) {
   return (
@@ -100,18 +146,36 @@ function ModePicker({
   art: ArtStyleId;
 }) {
   const [open, setOpen] = useState(false);
+  // Collapsed, a leg is one small pill ("✈️ Flight ▾"); tap it to pick another way of travelling.
+  const [picking, setPicking] = useState(false);
+  const mode = MODES.find((m) => m.id === value) ?? MODES[0];
   const choices = VEHICLES[value];
   const current = vehicleFor(value, vehicle);
   const label = (n: string) => STICKERS.find((x) => x.name === n)?.label ?? n;
   return (
     <div className="pl-7 py-1">
+      {!picking ? (
+        <div className="flex items-center gap-1">
+          <span className="w-px h-4 bg-ink/15 mr-1.5" />
+          <button
+            onClick={() => setPicking(true)}
+            title="How you travelled this leg: tap to change"
+            className="flex items-center gap-1.5 rounded-full border border-ink/10 bg-white/70 pl-1.5 pr-2.5 h-7 text-xs font-bold text-ink/70 hover:border-ink/30"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={choices.length > 1 ? stickerSrc(current, art) : mode.icon} alt="" className="w-[18px] h-[18px]" />
+            {mode.label}
+            <span className="text-ink/40">▾</span>
+          </button>
+        </div>
+      ) : (
       <div className="flex flex-wrap items-center gap-0.5">
         <span className="w-px h-4 bg-ink/15 mr-1.5" />
         {MODES.map((m) => (
           <button
             key={m.id}
             title={m.label}
-            onClick={() => onChange(m.id)}
+            onClick={() => (onChange(m.id), (VEHICLES[m.id]?.length ?? 0) > 1 ? setOpen(true) : setPicking(false))}
             className={`w-7 h-7 rounded-full grid place-items-center transition ${value === m.id ? "bg-coral/15 ring-2 ring-coral" : "opacity-40 hover:opacity-100"}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -129,7 +193,9 @@ function ModePicker({
             {open ? "▴" : "▾"}
           </button>
         )}
+        <button onClick={() => (setPicking(false), setOpen(false))} className="ml-1 rounded-full px-2 h-7 text-xs font-extrabold text-coral-dark">Done</button>
       </div>
+      )}
       {open && choices.length > 1 && (
         <div className="mt-1 ml-3 flex flex-wrap gap-1 rounded-2xl bg-sand/60 p-1.5">
           {choices.map((v) => (
@@ -381,8 +447,12 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
       </div>
 
       {design.stops.length > 1 && (
-        <div className="space-y-1">
-          <Label>Route</Label>
+        <Section
+          id="trip-route"
+          icon="🛣️"
+          title="Route line & transport icons"
+          summary={routeOn ? `${{ auto: "Auto", dashed: "Dashed", dotted: "Dotted", solid: "Solid" }[design.route.style]} line${design.route.modeIcons ? ", with ✈️ 🚗 icons" : ""}${design.route.curved && hasFlights ? ", curvy flights" : ""}` : "Route hidden"}
+        >
           {/* (settings below grey out when the route is hidden or has no flights) */}
           <Toggle on={design.route.show} onChange={(v) => set({ route: { ...design.route, show: v } })} label="Draw the route" />
           <Toggle disabled={!routeOn} hint="Turn on “Draw the route” first" on={design.route.modeIcons} onChange={(v) => set({ route: { ...design.route, modeIcons: v } })} label="Show ✈️ 🚗 🚆 icons on legs" />
@@ -416,7 +486,7 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
             />
           </div>
           <Slider disabled={!routeOn} label="Thickness" min={0.15} max={1.2} step={0.05} value={design.route.width} onChange={(v) => set({ route: { ...design.route, width: v } }, "route-width")} />
-        </div>
+        </Section>
       )}
     </div>
   );
@@ -471,9 +541,18 @@ export function StylePanel() {
 
       <SuggestionCard />
 
-      <div>
-        <Label>Make it yours</Label>
-        <div className="grid grid-cols-3 gap-2">
+      <div className="space-y-2">
+      <Section
+        id="style-colours"
+        icon="🎨"
+        title="Colours"
+        summary={
+          <span className="inline-flex gap-1 align-middle pt-0.5">
+            {COLOR_FIELDS.map((f) => <span key={f.key} className="inline-block w-3 h-3 rounded-full ring-1 ring-ink/10" style={{ background: t.colors[f.key] }} />)}
+          </span>
+        }
+      >
+        <div className="grid grid-cols-3 gap-2 pt-1">
           {COLOR_FIELDS.map((f) => (
             <label key={f.key} className="flex items-center gap-2 rounded-xl bg-white border border-ink/5 px-2 py-1.5 cursor-pointer">
               <input type="color" value={t.colors[f.key]} onChange={(e) => setColors({ [f.key]: e.target.value })} className="w-6 h-6 rounded-md cursor-pointer border-0 p-0 bg-transparent" />
@@ -481,10 +560,15 @@ export function StylePanel() {
             </label>
           ))}
         </div>
-      </div>
+      </Section>
 
-      <div>
-        <Label>Stop markers</Label>
+      <Section
+        id="style-markers"
+        icon="📍"
+        title="Stop markers & names"
+        summary={`${{ number: "Numbers", pin: "Pins", heart: "Hearts", dot: "Dots", sticker: "Stickers" }[design.markers.style] ?? "Pins"}${design.markers.showDates ? ", with dates" : ""}`}
+      >
+        <div className="pt-1" />
         <Chips<MarkerStyle>
           value={design.markers.style}
           options={[{ id: "number", label: "① Numbers" }, { id: "pin", label: "📍 Pins" }, { id: "heart", label: "♥ Hearts" }, { id: "dot", label: "• Dots" }, { id: "sticker", label: "🦘 Stickers" }]}
@@ -506,10 +590,14 @@ export function StylePanel() {
         <Slider disabled={!anyLabels} label="Label size" min={0.25} max={2.5} step={0.05} value={design.markers.labelSize} onChange={(v) => set({ markers: { ...design.markers, labelSize: v } }, "label-size")} />
         <p className="text-xs text-ink/50">Tip: tap a pin or place name on the map to resize just that stop, or drag the name somewhere else. Drag the pin to move the stop itself.</p>
         <div className="mt-3"><StopsCheck /></div>
-      </div>
+      </Section>
 
-      <div>
-        <Label>Details</Label>
+      <Section
+        id="style-land"
+        icon="⛰️"
+        title="Land & sea"
+        summary={onList([[design.visited.show, "Visited countries"], [t.relief, "Terrain"], [t.hypso, "Height colours"], [t.physical, "Atlas relief"], [showSeaDepth(t), "Sea depth"], [t.details.waterlines ?? t.look === "antique", "Water-lines"]])}
+      >
         <Toggle on={design.visited.show} onChange={(v) => set({ visited: { ...design.visited, show: v } })} label="🌍 Highlight countries I visited" />
         {design.visited.show && (<>
           <Slider label="Highlight" min={0.1} max={0.8} step={0.05} value={design.visited.opacity} onChange={(v) => set({ visited: { ...design.visited, opacity: v } }, "visited-opacity")} />
@@ -518,16 +606,36 @@ export function StylePanel() {
         <Toggle on={t.relief} onChange={(v) => setTheme({ relief: v })} label="⛰️ Terrain shading" />
         <Toggle on={t.hypso} onChange={(v) => setTheme({ hypso: v })} label="🏔️ Colour land by height" />
         <Toggle on={t.physical} onChange={(v) => setTheme({ physical: v })} label="🗺️ Classic atlas relief" />
-      </div>
-
-      <div>
-        <Label>Map extras</Label>
-        <Toggle on={t.details.currents} onChange={(v) => setTheme({ details: { ...t.details, currents: v } })} label="🌊 Ocean currents" />
-        <Toggle on={t.details.lanes} onChange={(v) => setTheme({ details: { ...t.details, lanes: v } })} label="🚢 Shipping lanes" />
+        <Toggle on={showSeaDepth(t)} onChange={(v) => setTheme({ seaDepth: v })} label="🌊 Sea depth lines" />
         <Toggle on={t.details.waterlines ?? t.look === "antique"} onChange={(v) => setTheme({ details: { ...t.details, waterlines: v } })} label="〰️ Coastal water-lines (old engraved maps)" />
-        <Toggle on={!!t.details.neatline} onChange={(v) => setTheme({ details: { ...t.details, neatline: v } })} label="🔲 Atlas border (old map neatline)" />
+      </Section>
+
+      <Section
+        id="style-labels"
+        icon="🔤"
+        title="Place names & lines"
+        summary={onList([[t.labels, t.countriesOnly ? "Country names" : "Place names"], [t.details.grid, "Grid"], [t.details.tropics, "Tropics"], [t.details.currents, "Currents"], [t.details.lanes, "Shipping lanes"]])}
+      >
+        <Toggle on={t.labels} onChange={(v) => setTheme({ labels: v })} label="🔤 Place names" />
+        <Toggle
+          disabled={!t.labels}
+          hint="Turn on “Place names” first"
+          on={!!t.countriesOnly}
+          onChange={(v) => setTheme({ countriesOnly: v })}
+          label="Countries & seas only (no cities)"
+        />
         <Toggle on={t.details.grid} onChange={(v) => setTheme({ details: { ...t.details, grid: v } })} label="🌐 Latitude & longitude grid" />
         <Toggle on={t.details.tropics} onChange={(v) => setTheme({ details: { ...t.details, tropics: v } })} label="☀️ Equator & tropics" />
+        <Toggle on={t.details.currents} onChange={(v) => setTheme({ details: { ...t.details, currents: v } })} label="🌊 Ocean currents" />
+        <Toggle on={t.details.lanes} onChange={(v) => setTheme({ details: { ...t.details, lanes: v } })} label="🚢 Shipping lanes" />
+      </Section>
+
+      <Section
+        id="style-extras"
+        icon="🧭"
+        title="Compass & overview map"
+        summary={onList([[t.details.compass, "Compass"], [!!t.details.inset, "Overview map"]])}
+      >
         <Toggle on={!!t.details.inset} onChange={(v) => setTheme({ details: { ...t.details, inset: v } })} label="🗺️ Overview map of the whole country" />
         {t.details.inset && (
           <div className="pl-1 space-y-2 -mt-1">
@@ -575,16 +683,12 @@ export function StylePanel() {
             </div>
           </div>
         )}
-        <Toggle on={t.labels} onChange={(v) => setTheme({ labels: v })} label="🔤 Place names" />
-        <Toggle
-          disabled={!t.labels}
-          hint="Turn on “Place names” first"
-          on={!!t.countriesOnly}
-          onChange={(v) => setTheme({ countriesOnly: v })}
-          label="Countries & seas only (no cities)"
-        />
-        <Toggle on={showSeaDepth(t)} onChange={(v) => setTheme({ seaDepth: v })} label="🌊 Sea depth lines" />
+      </Section>
+
+      <Section id="style-paper" icon="📜" title="Paper & border" summary={onList([[t.texture, "Aged paper"], [!!t.details.neatline, "Atlas border"]])}>
         <Toggle on={t.texture} onChange={(v) => setTheme({ texture: v })} label="📜 Aged paper texture" />
+        <Toggle on={!!t.details.neatline} onChange={(v) => setTheme({ details: { ...t.details, neatline: v } })} label="🔲 Atlas border (old map neatline)" />
+      </Section>
       </div>
     </div>
   );
@@ -1149,8 +1253,8 @@ export function TextPanel() {
         <Label>Subtitle</Label>
         <input value={design.subtitle} maxLength={60} onChange={(e) => set({ subtitle: e.target.value }, "subtitle")} placeholder="e.g. Spring 2026 · 4 countries · 1 big adventure" className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral" />
       </div>
-      <div>
-        <Label>Title font</Label>
+      <div className="space-y-2">
+      <Section id="text-title" icon="🅰️" title="Title style" summary={`${FONTS.find((f) => f.id === design.font)?.name ?? ""}${tx.cartouche && tx.cartouche !== "none" ? `, ${tx.cartouche} frame` : ""}`}>
         <FontPicker value={design.font} onChange={(f) => set({ font: f })} />
         <TextFormat
           size={tx.titleSize}
@@ -1173,9 +1277,8 @@ export function TextPanel() {
             ))}
           </div>
         </div>
-      </div>
-      <div>
-        <Label>Subtitle font</Label>
+      </Section>
+      <Section id="text-subtitle" icon="✍️" title="Subtitle style" summary={FONTS.find((f) => f.id === tx.subtitleFont)?.name ?? ""}>
         <FontPicker value={tx.subtitleFont} onChange={(f) => setText({ subtitleFont: f })} />
         <TextFormat
           size={tx.subtitleSize}
@@ -1188,12 +1291,12 @@ export function TextPanel() {
           onItalic={(v) => setText({ subtitleItalic: v })}
           maxSize={2.5}
         />
+      </Section>
       </div>
       </fieldset>
-      <fieldset disabled={!design.stops.some((x) => x.showLabel)} className={design.stops.some((x) => x.showLabel) ? "" : "opacity-40"}>
-      <div>
-        <Label>Place name font</Label>
-        <p className="text-xs text-ink/50 -mt-1 mb-2">The stop names on the map.</p>
+      <fieldset disabled={!design.stops.some((x) => x.showLabel)} className={`!mt-2 ${design.stops.some((x) => x.showLabel) ? "" : "opacity-40"}`}>
+      <Section id="text-labels" icon="📍" title="Stop name style" summary={tx.labelFont === "title" ? "Same as the title" : FONTS.find((f) => f.id === tx.labelFont)?.name ?? ""}>
+        <p className="text-xs text-ink/50 mb-2">The names of your stops on the map.</p>
         <button
           onClick={() => setText({ labelFont: "title" })}
           className={`w-full mb-2 rounded-2xl border-2 px-3 py-2 text-sm font-bold ${tx.labelFont === "title" ? "border-coral bg-white" : "border-ink/10 bg-white hover:border-ink/30"}`}
@@ -1219,11 +1322,10 @@ export function TextPanel() {
           </button>
         </div>
         <p className="text-xs text-ink/50 mt-2">Size: the Label size slider in Style, or tap a name on the map.</p>
-      </div>
+      </Section>
       </fieldset>
-      <fieldset disabled={design.layout === "none"} className={`space-y-5 ${design.layout === "none" ? "opacity-40" : ""}`} title={design.layout === "none" ? "Map only layout: no title or subtitle" : undefined}>
-      <div>
-        <Label>Alignment</Label>
+      <fieldset disabled={design.layout === "none"} className={`!mt-2 space-y-5 ${design.layout === "none" ? "opacity-40" : ""}`} title={design.layout === "none" ? "Map only layout: no title or subtitle" : undefined}>
+      <Section id="text-align" icon="↔️" title="Alignment & stop list" summary={`${{ left: "Left", center: "Centre", right: "Right" }[tx.align]}${tx.showRoute ? ", stops listed under the title" : ""}`}>
         <Chips<TextStyle["align"]>
           value={tx.align}
           options={[{ id: "left", label: "⟸ Left" }, { id: "center", label: "Centre" }, { id: "right", label: "Right ⟹" }]}
@@ -1238,7 +1340,7 @@ export function TextPanel() {
             ↺ Put the text back in place
           </button>
         )}
-      </div>
+      </Section>
       </fieldset>
     </div>
   );

@@ -304,6 +304,7 @@ export default function PrivacyPage() {
             ],
             ["Emails and support messages", "2 years after the matter is resolved"],
             ["Design links you emailed yourself (email address and design)", "12 months, then deleted automatically"],
+            ["Your email, if you ticked \u201cemail me a link if I don't finish\u201d at checkout", "Used for that one email, an hour later; deleted with the design links after 12 months"],
             ["The map you're working on, saved without an account (linked to your browser by a cookie)", "90 days after you last changed it, then deleted automatically"],
             ["Unsubscribe list (email addresses that asked not to be emailed)", "For as long as we send reminders, so we can keep respecting your choice"],
             ["Your trip description for Create with AI", "We don’t store it. Only the resulting map design is kept, as above"],

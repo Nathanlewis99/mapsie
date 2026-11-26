@@ -92,6 +92,18 @@ export default function CookiesPage() {
               "Your personal discount code from \u201cSave your map\u201d, so it's applied at checkout until it expires.",
               "Until it expires (60 minutes)",
             ],
+            [
+              <code key="n">mapsie-poll</code>,
+              "Local storage",
+              "Remembers that you've seen our one-question survey, so we don't ask again.",
+              "Until you clear your browser's site data",
+            ],
+            [
+              <code key="n">mapsie-style</code>,
+              "Session storage",
+              "If you came from an ad for one map style, keeps that style when you start from an example or describe your trip.",
+              "Until you close the tab",
+            ],
           ]}
         />
         <p>

@@ -731,6 +731,19 @@ export async function listDueReminders(fromIso: string, toIso: string): Promise<
   const rows = await all("SELECT * FROM design_emails WHERE remind = 1 AND reminded_at IS NULL AND created_at >= ? AND created_at <= ? ORDER BY created_at", [fromIso, toIso]);
   return rows.map(designEmailRow);
 }
+/**
+ * Checkout follow-ups: someone ticked "email me a link if I don't finish" at checkout. Kept in the same
+ * table as design reminders, as remind = 2, so the daily reminder job never picks them up.
+ */
+export async function setCheckoutFollowup(email: string, designId: string, on: boolean) {
+  const e = email.trim().toLowerCase();
+  await run("DELETE FROM design_emails WHERE remind = 2 AND reminded_at IS NULL AND email = ?", [e]);
+  if (on) await run("INSERT INTO design_emails (id, email, design_id, remind, created_at) VALUES (?, ?, ?, 2, ?)", [nanoid(12), e, designId, now()]);
+}
+export async function listDueFollowups(fromIso: string, toIso: string): Promise<DesignEmail[]> {
+  const rows = await all("SELECT * FROM design_emails WHERE remind = 2 AND reminded_at IS NULL AND created_at >= ? AND created_at <= ? ORDER BY created_at", [fromIso, toIso]);
+  return rows.map(designEmailRow);
+}
 export async function markReminded(id: string) {
   await run("UPDATE design_emails SET reminded_at = ? WHERE id = ?", [now(), id]);
 }

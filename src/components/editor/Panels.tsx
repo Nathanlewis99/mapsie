@@ -6,6 +6,7 @@ import { PRESETS, showSeaDepth, themeFromPreset } from "@/lib/themes";
 import { ART_STYLES, PACKS, STICKERS, getArtStyle, searchStickers, stickerSrc, suggestedStyleFor, type ArtStyleId } from "@/lib/stickers";
 import StickerFilters, { filterId } from "@/components/StickerFilters";
 import { applyPreset } from "@/lib/lookMatch";
+import { keepAdStyle } from "@/lib/adStyle";
 import {
   ORIGINALS,
   PAINTED,
@@ -219,7 +220,7 @@ export function TripPanel({ pickMode, setPickMode }: { pickMode: boolean; setPic
   return (
     <div className="space-y-5">
       {design.stops.length === 0 || aiOpen ? (
-        <AiTripBox onTrip={(t, reply) => ((stopSource.v = "ai"), applyTemplate(t), setAiOpen(false), setAiReply(reply))} replacing={design.stops.length > 0} />
+        <AiTripBox onTrip={(t, reply) => ((stopSource.v = "ai"), applyTemplate(t), keepAdStyle(), setAiOpen(false), setAiReply(reply))} replacing={design.stops.length > 0} />
       ) : (
         <div className="space-y-1">
           {aiReply && <div className="rounded-2xl bg-sea/10 px-3 py-2 text-xs text-ink/80">✨ {aiReply}</div>}

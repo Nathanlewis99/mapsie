@@ -99,7 +99,7 @@ export function trackLeave(name: "leave" | "checkout_leave", state: () => Record
 export const stopSource = { v: "manual" };
 
 /** An event we want every time (not once per visit), e.g. each place search and whether it found anything. */
-export function trackEach(name: "place_search" | "ai_failed" | "map_ready" | "stripe_back" | "restored", props: Record<string, string | number | boolean>) {
+export function trackEach(name: "place_search" | "ai_failed" | "map_ready" | "stripe_back" | "restored" | "exit_poll" | "style_from_ad", props: Record<string, string | number | boolean>) {
   const v = visitId();
   if (!v) return;
   const body = JSON.stringify({ v, name, props });

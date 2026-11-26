@@ -34,6 +34,15 @@ export default function Checkout({ design: saved }: { design: Design }) {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [digitalOk, setDigitalOk] = useState(false);
+  // Opt-in (unticked): one email with a link back here if they don't finish.
+  const [followUp, setFollowUp] = useState(false);
+  useEffect(() => {
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return;
+    const t = setTimeout(() => {
+      fetch("/api/checkout/followup", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ designId: saved.id, email, on: followUp }) }).catch(() => {});
+    }, 800);
+    return () => clearTimeout(t);
+  }, [followUp, email, saved.id]);
   const [err, setErr] = useState("");
   useEffect(() => setRegion(storedRegion()), []);
   // A personal "Save your map" code from this browser, ticking down; applied for them at payment.
@@ -164,6 +173,10 @@ export default function Checkout({ design: saved }: { design: Design }) {
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-ink/50 mb-2">{digital ? "Email for your download link" : "Email for updates"}</div>
             <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" className="w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3 font-semibold outline-none focus:border-coral" />
+            <label className="mt-2 flex items-start gap-2 text-sm text-ink/60">
+              <input type="checkbox" checked={followUp} onChange={(e) => (setFollowUp(e.target.checked), e.target.checked && track("followup_optin"))} className="mt-1 accent-coral" />
+              <span>Not ready yet? Email me a link back to my map if I don&apos;t finish. Just one email, an hour from now.</span>
+            </label>
           </div>
           {err && <div className="text-coral-dark font-bold">{err}</div>}
           <button onClick={pay} disabled={busy || (digital && !digitalOk)} className="w-full rounded-full bg-coral py-4 text-lg font-extrabold text-white shadow-lg shadow-coral/30 hover:bg-coral-dark disabled:opacity-50">

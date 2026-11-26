@@ -86,6 +86,20 @@ async function sendDesignReminders() {
   }
 }
 
+/** Checkout follow-ups (opted in at checkout): one email an hour after, unless they've paid since. */
+async function sendCheckoutFollowups() {
+  const { listDueFollowups, markReminded, isOptedOut, orderedSince, getDesign } = await import("./db");
+  const { sendCheckoutFollowupEmail } = await import("./email");
+  const hour = 3600_000;
+  const due = await listDueFollowups(new Date(Date.now() - 48 * hour).toISOString(), new Date(Date.now() - hour).toISOString());
+  for (const r of due) {
+    await markReminded(r.id); // first, so a failure never means two emails
+    if ((await isOptedOut(r.email)) || (await orderedSince(r.email, r.createdAt))) continue;
+    const d = await getDesign(r.designId);
+    if (d) await sendCheckoutFollowupEmail(r, d.title ?? "");
+  }
+}
+
 /** Runs on the worker (or the single server): renders, sends due orders, tidies up. */
 export function startScheduler() {
   if (started) return;
@@ -104,6 +118,7 @@ export function startScheduler() {
   setInterval(safe(etsyJob, "etsy"), 5 * 60_000);
   if (ROLE === "worker") setInterval(safe(checkSite, "uptime"), 5 * 60_000);
   setInterval(safe(sendDesignReminders, "design-reminders"), 30 * 60_000);
+  setInterval(safe(sendCheckoutFollowups, "checkout-followups"), 10 * 60_000);
   // Review requests a few days after delivery.
   setInterval(safe(async () => (await import("./reviews")).sendReviewRequests(), "review-requests"), 3 * 3600_000);
   // Gift cards scheduled for a date (e.g. Christmas morning).

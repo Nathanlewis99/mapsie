@@ -3,8 +3,12 @@ import { MODES } from "@/lib/geo";
 import { crowdedStickers, crowding, tidyDesign } from "@/lib/legibility";
 import { personaliseTrip, type PublicPartner } from "@/lib/partners";
 import { TEMPLATES } from "@/lib/templates";
+import { applyPreset } from "@/lib/lookMatch";
+import { keepAdStyle } from "@/lib/adStyle";
+import { PRESETS } from "@/lib/themes";
 import EmailDesign from "./EmailDesign";
 import SaveOffer from "./SaveOffer";
+import ExitPoll from "./ExitPoll";
 import { countdown, myOffer, type MyOffer } from "@/lib/offers";
 import { adEvent } from "@/lib/adTrack";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -220,6 +224,7 @@ export default function Editor() {
       const pick = TEMPLATES[Math.floor(Math.random() * TEMPLATES.length)];
       stopSource.v = "example";
       useEditor.getState().applyTemplate(pick);
+      keepAdStyle();
       setToast("Here's an example: swap in your own stops, style and photos.");
       return;
     }
@@ -598,6 +603,29 @@ export default function Editor() {
     setPrev(null);
     setToast("Here's your earlier map. The other one is kept too.");
   };
+  // From an ad for one map style (e.g. the Victorian one): start a new visitor in that style, so the
+  // map they see matches the ad. Also /create?style=<id>. Someone already making a map keeps theirs.
+  useEffect(() => {
+    const FROM_AD: Record<string, string> = { "vintage-heritage": "heritage", "vintage-antique": "antique" };
+    const id = params.get("style") ?? FROM_AD[params.get("utm_content") ?? ""];
+    const p = PRESETS.find((x) => x.id === id);
+    if (!p) return;
+    const t = setTimeout(() => {
+      const ed = useEditor.getState();
+      if (ed.design.stops.length) return;
+      ed.set(applyPreset(ed.design, p));
+      // The Victorian style is modelled on British maps: open over Britain, as in the ad.
+      if (p.id === "heritage") ed.setView({ ...ed.design.view, center: [-3.2, 54.6], zoom: 4.3 });
+      try {
+        sessionStorage.setItem("mapsie-style", p.id); // and keep it when they pick an example or describe a trip
+      } catch {}
+      trackEach("style_from_ad", { style: p.id });
+      setToast(`You're designing in our ${p.tag ? `${p.tag} ` : ""}${p.name} style. Add your first stop to begin!`);
+    }, 1200); // after a returning visitor's map has had the chance to come back
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // How long the map takes to appear (phones on slow connections), and whether it ever does.
   useEffect(() => {
     const t0 = performance.now();
@@ -652,6 +680,44 @@ export default function Editor() {
   const leaveRef = useRef<Record<string, string | number | boolean>>({});
   leaveRef.current = { page: "editor", stops: design.stops.length, stickers: design.stickers.length, tab, saveShown, offer: !!offer, ordering: busy === "order" };
   useEffect(() => trackLeave("leave", () => leaveRef.current), []);
+
+  // The exit poll: once ever, to people who've added a stop but gone quiet for a minute (or, on a
+  // computer, move to leave the page). Never over another pop-up, never after they've pressed Order.
+  const [poll, setPoll] = useState(false);
+  const pollBlocked = useRef(false);
+  pollBlocked.current = saveOpen || emailOpen || wall || busy === "order";
+  const pollArmed = design.stops.length > 0 && !etsy && !partnerMe;
+  useEffect(() => {
+    if (!pollArmed) return;
+    let seen = false;
+    try {
+      seen = !!localStorage.getItem("mapsie-poll");
+    } catch {
+      seen = true;
+    }
+    if (seen) return;
+    const open = () => {
+      if (pollBlocked.current) return void poke();
+      try {
+        localStorage.setItem("mapsie-poll", "1");
+      } catch {}
+      setPoll(true);
+      cleanup();
+    };
+    let idle = setTimeout(open, 60_000);
+    const poke = () => (clearTimeout(idle), (idle = setTimeout(open, 60_000)));
+    const exitIntent = (e: MouseEvent) => e.clientY <= 0 && !e.relatedTarget && open();
+    const events = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
+    events.forEach((n) => addEventListener(n, poke, { passive: true }));
+    document.addEventListener("mouseout", exitIntent);
+    const cleanup = () => {
+      clearTimeout(idle);
+      events.forEach((n) => removeEventListener(n, poke));
+      document.removeEventListener("mouseout", exitIntent);
+    };
+    return cleanup;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pollArmed]);
 
   // A gentle, one-time offer to email the design to people who've started a map but
   // haven't ordered after a few minutes (not for Etsy buyers, who've already paid).
@@ -1294,6 +1360,9 @@ export default function Editor() {
         <div className="sm:hidden fixed right-3 top-[64px] z-30 rounded-full bg-coral px-3 py-1 text-xs font-extrabold text-white shadow-lg tabular-nums pointer-events-none">
           {offer.pct}% off · ⏱️ {countdown(offer)}
         </div>
+      )}
+      {poll && !saveOpen && !emailOpen && (
+        <ExitPoll onClose={() => setPoll(false)} context={{ stops: design.stops.length, stickers: design.stickers.length, tab }} />
       )}
       {prev && !saveOpen && (
         <div className="fixed left-3 right-3 sm:right-auto bottom-20 lg:bottom-6 z-40 sm:max-w-sm rounded-2xl bg-white p-3 shadow-xl border border-ink/10 text-sm flex items-center gap-2">

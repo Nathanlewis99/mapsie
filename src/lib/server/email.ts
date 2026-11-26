@@ -281,6 +281,19 @@ export async function sendDesignReminderEmail(row: DesignEmail, title: string) {
   await sendEmail(page(row.email, "Your map is still waiting", "Still dreaming about that trip?", lines, { label: "Finish my map", href: designLink(row.designId) }, unsubscribeUrl(row.email)));
 }
 
+/** The one email for someone who ticked "email me a link if I don't finish" at checkout and didn't pay. */
+export async function sendCheckoutFollowupEmail(row: DesignEmail, title: string) {
+  const { BLACK_FRIDAY, blackFridayOn } = await import("../offers");
+  const lines = [
+    "You were nearly there! Your map is saved just as you left it, ready to order whenever you are.",
+    title ? `Your map: “${title}”.` : "",
+    "Every print is made to order and delivered free. If something wasn't right, or you had a question, just reply to this email.",
+    blackFridayOn() ? `Our Black Friday launch sale is on until Monday: ${BLACK_FRIDAY.pct}% off with code ${BLACK_FRIDAY.code}.` : "",
+    "You asked for this one email at checkout. We won't send another.",
+  ].filter(Boolean);
+  await sendEmail(page(row.email, "Your map is ready when you are", "Nearly yours! 🗺️", lines, { label: "Finish my order", href: `${publicUrl()}/checkout/${row.designId}` }, unsubscribeUrl(row.email)));
+}
+
 // ---------------------------------------------------------------- gift cards
 const giftMoney = (g: GiftCard) => `${{ gbp: "£", usd: "$", aud: "A$" }[g.currency] ?? ""}${Number.isInteger(g.amount) ? g.amount : g.amount.toFixed(2)}`;
 const giftExpiry = (g: GiftCard) => (g.expiresAt ? new Date(g.expiresAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "");

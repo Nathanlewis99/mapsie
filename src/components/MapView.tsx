@@ -198,6 +198,8 @@ export default function MapView(props: Props) {
         h.current?.onLabelSelect?.(null);
         h.current?.onMapClick?.(e.lngLat.lng, e.lngLat.lat);
       });
+      // For the editor's load-time stats: the map has drawn for the first time.
+      if (editable) m.once("idle", () => ((window as unknown as { __MAPSIE_DRAWN?: boolean }).__MAPSIE_DRAWN = true));
       if (onReady) {
         m.once("idle", async () => {
           // the visited-countries layer loads asynchronously

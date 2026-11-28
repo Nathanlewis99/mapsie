@@ -628,12 +628,12 @@ export default function Editor() {
 
   // How long the map takes to appear (phones on slow connections), and whether it ever does.
   useEffect(() => {
-    const t0 = performance.now();
-    const w = window as unknown as { __MAPSIE_READY?: boolean };
+    // Timed from when the page started loading (so it includes download time on slow phones).
+    const w = window as unknown as { __MAPSIE_DRAWN?: boolean };
     const iv = setInterval(() => {
-      const ms = Math.round(performance.now() - t0);
-      if (w.__MAPSIE_READY) return clearInterval(iv), trackEach("map_ready", { ms });
-      if (ms > 20_000) return clearInterval(iv), trackEach("map_ready", { ms, stuck: true });
+      const ms = Math.round(performance.now());
+      if (w.__MAPSIE_DRAWN) return clearInterval(iv), trackEach("map_ready", { ms });
+      if (ms > 30_000) return clearInterval(iv), trackEach("map_ready", { ms, stuck: true });
     }, 250);
     return () => clearInterval(iv);
   }, []);
@@ -678,7 +678,7 @@ export default function Editor() {
   }, [saveEligible, saveShown, design.stops.length >= 2]);
   // Why people leave: what they'd done when the tab closed or went to the background.
   const leaveRef = useRef<Record<string, string | number | boolean>>({});
-  leaveRef.current = { page: "editor", stops: design.stops.length, stickers: design.stickers.length, tab, saveShown, offer: !!offer, ordering: busy === "order" };
+  leaveRef.current = { page: "editor", loadSec: Math.round(performance.now() / 1000), drawn: !!(typeof window !== "undefined" && (window as unknown as { __MAPSIE_DRAWN?: boolean }).__MAPSIE_DRAWN), stops: design.stops.length, stickers: design.stickers.length, tab, saveShown, offer: !!offer, ordering: busy === "order" };
   useEffect(() => trackLeave("leave", () => leaveRef.current), []);
 
   // The exit poll: once ever, to people who've added a stop but gone quiet for a minute (or, on a
